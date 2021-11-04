@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="PSR 编码规范12PHP编码规范PSR（中文版）https:&#x2F;&#x2F;github.com&#x2F;PizzaLiu&#x2F;PHP-FIG  &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="框架开发-PSR&#x2F;命名空间&#x2F;trait&#x2F;smarty">
+<meta property="og:url" content="https://ni9ne.github.io/2018/09/30/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-PSR%20%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%20trait/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="PSR 编码规范12PHP编码规范PSR（中文版）https:&#x2F;&#x2F;github.com&#x2F;PizzaLiu&#x2F;PHP-FIG  &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-09-30T07:23:02.000Z">
+<meta property="article:modified_time" content="2019-09-04T09:07:17.006Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="框架开发">
+<meta property="article:tag" content="trait">
+<meta property="article:tag" content="smarty">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2018/09/30/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-PSR%20%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%20trait/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2018/09/30/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-PSR%20%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%20trait/","path":"2018/09/30/框架开发-PSR 命名空间 trait/","title":"框架开发-PSR/命名空间/trait/smarty"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>框架开发-PSR/命名空间/trait/smarty | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">37</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">42</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PSR-%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83"><span class="nav-number">1.</span> <span class="nav-text">PSR 编码规范</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PDO"><span class="nav-number">2.</span> <span class="nav-text">PDO</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4-php-5-3"><span class="nav-number">3.</span> <span class="nav-text">命名空间 (php 5.3 +)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Trait-php-5-4"><span class="nav-number">4.</span> <span class="nav-text">Trait (php 5.4 +)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A8%A1%E7%89%88%E5%BC%95%E6%93%8E"><span class="nav-number">5.</span> <span class="nav-text">模版引擎</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#smarty%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E"><span class="nav-number">6.</span> <span class="nav-text">smarty模板引擎</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2018/09/30/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-PSR%20%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%20trait/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          框架开发-PSR/命名空间/trait/smarty
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-09-30 15:23:02" itemprop="dateCreated datePublished" datetime="2018-09-30T15:23:02+08:00">2018-09-30</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2019-09-04 17:07:17" itemprop="dateModified" datetime="2019-09-04T17:07:17+08:00">2019-09-04</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="PSR-编码规范"><a href="#PSR-编码规范" class="headerlink" title="PSR 编码规范"></a>PSR 编码规范</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PHP编码规范PSR（中文版）</span><br><span class="line">https://github.com/PizzaLiu/PHP-FIG</span><br></pre></td></tr></table></figure>
+
+<p>====================================</p>
+<h1 id="PDO"><a href="#PDO" class="headerlink" title="PDO"></a>PDO</h1><ol>
+<li>复习 PDO<ul>
+<li>实例化PDO  DSN: mysql:host=127.0.0.1;dbname=xx</li>
+<li>设置PDO的连接属性: setAttribute()  <ul>
+<li>是否自动提交<br>属性<pre><code>PDO::ATTR_AUTOCOMMIT
+</code></pre>
+值<pre><code>0 关闭 / 1 开启
+</code></pre>
+</li>
+<li>SQL错误处理方式<br>属性<pre><code>PDO::ATTR_ERRMODE
+</code></pre>
+值<pre><code>PDO::ERRMODE_SILENT    无提示(默认)
+PDO::ERRMODE_WARNING   报错WARNING
+PDO::ERRMODE_EXCEPTION 抛出异常
+</code></pre>
+</li>
+<li>返回结果集的形式<br>属性<pre><code>PDO::ATTR_DEFAULT_FETCH_MODE
+</code></pre>
+值<pre><code>PDO::FETCH_ASSOC 关联
+PDO::FETCH_NUM   索引
+PDO::FETCH_OBJ   对象
+PDO::FETCH_BOTH  混合
+</code></pre>
+</li>
+</ul>
+</li>
+<li>PDO的增删改查<br>exec()  返回受影响行数 用于增删改<br>query() 返回PDOStatement的实例 用于查询<br>处理查询结果集<pre><code>fetch() 单条数据/一维数组
+fetchAll() 所有数据/二维数组
+使用foreach遍历PDOStatement对象
+</code></pre>
+</li>
+<li>PDO对象<br>setAttribute()  设置连接属性<br>getAttribute()  获取连接属性<br>exec()          返回受影响行数<br>query()         返回查询结果集对象<br>lastInsertId()   返回自增ID</li>
+<li>PDOStatement对象<br>fetch()         单条数据<br>fetchAll()      所有数据<br>rowCount()      受影响行数</li>
+<li>预处理<ul>
+<li>预处理的优点<ul>
+<li>对用户的数据 进行过滤 提高安全性</li>
+<li>提高批量操作的性能</li>
+</ul>
+</li>
+<li>SQL的占位符<ul>
+<li>? </li>
+<li>:</li>
+</ul>
+</li>
+<li>绑定参数<ul>
+<li>bindValue()</li>
+<li>bindParam()</li>
+<li>execute()</li>
+</ul>
+</li>
+<li>结果集的预处理<ul>
+<li>bindColumn()</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- 事务操作</span><br><span class="line"></span><br><span class="line">    将多条 SQL操作(增删改),作为一个 整体单元 来操作.</span><br><span class="line">    都执行成功 则成功,有一条失败 则都失败.</span><br><span class="line">    InnoDB  支持事务 / 行锁机制</span><br><span class="line"></span><br><span class="line">    begin    开启一个事务的回滚点</span><br><span class="line">    rollback 回滚一个事务,回到begin前的状态</span><br><span class="line">    commit   提交一个事务,只有被提交的事务,才会被写入表中</span><br><span class="line"></span><br><span class="line">    MySQL 默认是开启 自动提交的.</span><br></pre></td></tr></table></figure>
+
+
+
+<p>====================================</p>
+<h1 id="命名空间-php-5-3"><a href="#命名空间-php-5-3" class="headerlink" title="命名空间 (php 5.3 +)"></a>命名空间 (php 5.3 +)</h1><ol>
+<li><p>命名空间概述</p>
+</li>
+<li><p>定义命名空间</p>
+</li>
+</ol>
+<p>语法<br>     namespace 命名空间名称;<br>特点<br>    1. namespace 需要 php 5.3 +<br>    2. namespace 前面不允许有任何的代码(除了namespace自己)<br>       它的作用范围 到下一个命名空间开始 或 脚本结束 为止<br>    3. namespace 只对本脚本起作用<br>    4. 文件里如果没有定义命名空间,则默认在全局空间之中</p>
+<ol start="3">
+<li><p>定义子命名空间</p>
+<p>namespace a\b\c\d…</p>
+</li>
+<li><p>在同一个文件中 定义多个命名空间</p>
+<ol>
+<li>不推荐 一般一个文件中只有一个命名空间</li>
+<li>万不得已 建议使用 {}  将对应的代码包裹</li>
+</ol>
+</li>
+<li><p>使用命名空间：基础</p>
+</li>
+</ol>
+<p>非限定名称<br>    直接使用函数/类/常量,没有命名空间成分<br>限定名称<br>    有命名空间成分,但是不以反斜线开头的. (类似于相对路径)<br>完全限定名称<br>    以反斜线开头,又有命名空间成分. (类似于绝对路径)</p>
+<ol start="6">
+<li><p>命名空间 和 动态语言特征</p>
+<p>如果把 函数名/类名/常量名 赋值给变量使用<br>在命名空间里 <code>必须</code>使用完全限定名称<br>PS. 注意完全限定名称时,必须使用单引号.</p>
+</li>
+<li><p>namespace 关键字 和 <strong>NAMESPACE</strong> 常量</p>
+<ul>
+<li>namespace 关键字<ul>
+<li>定义命名空间</li>
+<li>用来简化调用</li>
+</ul>
+</li>
+<li><strong>NAMESPACE</strong> 常量<ul>
+<li>获取本命名空间的名字</li>
+</ul>
+</li>
+</ul>
+<p>::class</p>
+<pre><code>自 PHP 5.5 起，关键词 class 也可用于类名的解析。
+使用 ClassName::class 你可以获取一个字符串，包含了类 ClassName 的完全限定名称。
+这对使用了 命名空间 的类尤其有用。 
+</code></pre>
+</li>
+<li><p>使用命名空间：别名/导入<br>别名</p>
+<pre><code>use 命名空间 [as 别名];
+</code></pre>
+<p>导入</p>
+<pre><code>use 命名空间\类名 [as 别名]; 
+只能导入类 不能导入函数
+</code></pre>
+</li>
+<li><p>全局空间</p>
+</li>
+</ol>
+<p>namespace {}</p>
+<ol start="10">
+<li><p>使用命名空间：后备全局函数/常量</p>
+</li>
+<li><p>命名空间的实用</p>
+</li>
+</ol>
+<p>==============================================</p>
+<h1 id="Trait-php-5-4"><a href="#Trait-php-5-4" class="headerlink" title="Trait (php 5.4 +)"></a>Trait (php 5.4 +)</h1><ol>
+<li><p>Trait的概述<br>Trait 是 PHP5.4 中的新特性，是 PHP 多重继承的一种解决方案。<br>例如，需要同时继承两个类或抽象类，<br>这将会是件很麻烦的事情，Trait 就是为了解决这个问题。</p>
+</li>
+<li><p>Trait的简单使用<br>格式:</p>
+<pre><code>trait 名字 &#123; 属性 + 方法&#125;
+</code></pre>
+<p>特点:</p>
+<pre><code>1. 不能有常量
+2. 不能被实例化的
+3. 在类中 使用use关键字 来混入trait
+</code></pre>
+</li>
+<li><p>多个Trait的引用</p>
+<p>use A,B;</p>
+</li>
+<li><p>Trait之间的嵌套</p>
+<p>一个trait可以由多个trait组成<br>可以在trait中 使用use …</p>
+</li>
+<li><p>Trait的属性</p>
+<p>在trait中 可以定义属性并且可以使用<br>但是在使用了use 的类中,不允许重复定义与trait同名的属性</p>
+</li>
+<li><p>Trait的方法优先级</p>
+<p>class 中 如果有和trait重名的方法 则class附带trait<br>继承时,trait方法会覆盖class的同名方法</p>
+</li>
+<li><p>Trait的修饰符<br>static</p>
+<pre><code>静态的属性只能静态读取,静态的方法可以 动/静 态调用
+</code></pre>
+<p>abstract</p>
+<pre><code>如果在trait中有抽象方法 则 在use的类中必须实现才可使用
+</code></pre>
+</li>
+<li><p>Trait冲突</p>
+<ol>
+<li>代替<br>insteadof  指定替代的方法</li>
+<li>起别名<br>使用 as 给方法起别名</li>
+</ol>
+</li>
+</ol>
+<h1 id="模版引擎"><a href="#模版引擎" class="headerlink" title="模版引擎"></a>模版引擎</h1><ol>
+<li><p>什么是模板引擎</p>
+<p>1.1 定义</p>
+<pre><code>模板引擎实现 前后端的分离
+</code></pre>
+<p>1.2 优势</p>
+<pre><code>分工明确
+程序灵活性
+代码可读性
+提高开发效率
+</code></pre>
+<p>1.3 问题</p>
+<pre><code>会降低执行效率
+</code></pre>
+<p>1.4 模板引擎分类</p>
+<pre><code>编译型
+解释型
+置换型
+</code></pre>
+</li>
+<li><p>选择 smarty 模板引擎</p>
+<p>2.1 为什么选择smarty</p>
+<pre><code>1). 编译型 速度较快
+2). php 官方推荐
+</code></pre>
+<p>2.2 smarty 优势</p>
+<pre><code>1). 开源
+2). 插件机制
+3). 模板继承
+4). 缓存控制
+</code></pre>
+</li>
+<li><p>安装smarty及初始化配置</p>
+<p>3.1 获取smarty</p>
+<pre><code>http://www.smarty.net/
+</code></pre>
+<p>3.2 搭建smarty入口文件</p>
+<pre><code>1). 导入smarty
+2). 实例化smarty
+3). 初始化 配置
+     配置 模板文件 目录
+     配置 编译文件 目录
+     配置 配置文件 目录
+     配置 缓存文件 目录
+     配置 模板变量的定界符
+     配置 缓存控制 (开启缓存/缓存时间)
+4). 分配变量 assign()
+5). 加载模板 display()
+</code></pre>
+</li>
+<li><p>smarty的基本应用</p>
+<p>4.1 程序员(PHP)</p>
+<pre><code>1). smarty初始化配置
+2). 运算操作： 数据库 文件， 数据计算...
+3). 缓存控制， 插件扩展...
+</code></pre>
+<p>4.2 美工(模版)</p>
+<pre><code>1). 把模板变量放在指定的位置
+2(). 其他操作： 遍历数据、 模板函数...
+</code></pre>
+</li>
+<li><p>smarty设计的基本语法</p>
+<p>5.1 注释</p>
+<pre><code>`&#123;**&#125;`
+</code></pre>
+<p>5.2 模板中路径问题</p>
+<pre><code>模版文件中所有的相对路径 都相对于 PHP定位
+link/script/img/a
+</code></pre>
+<p>5.3 模板中读取变量</p>
+<pre><code>输出规则 同 echo 一致
+</code></pre>
+<p>5.4 在模板中定义变量</p>
+<pre><code>&#123;assign var=&quot;&quot; value=&quot;&quot;&#125;
+&#123;assign &quot;param&quot; &quot;value&quot;&#125;
+&#123;$param = value&#125;
+</code></pre>
+<p>5.5 忽略解析</p>
+<pre><code>&#123;literal&#125;&#123;/literal&#125;
+</code></pre>
+</li>
+<li><p>smarty模板中的变量应用</p>
+<p>6.1 在模板中遍历 数组</p>
+<pre><code>&#123;foreach&#125;&#123;/foreach&#125;
+&#123;section&#125;&#123;/section&#125;
+</code></pre>
+<p>6.2 模板中读取内置变量(保留变量)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;smarty.post&#125;        POST</span><br><span class="line">&#123;smarty.get&#125;         GET</span><br><span class="line">&#123;smarty.request&#125;     请求数据</span><br><span class="line">&#123;smarty.session&#125;     SESSION</span><br><span class="line">&#123;smarty.cookies&#125;     COOKIE</span><br><span class="line">&#123;smarty.server&#125;      服务器信息</span><br><span class="line">&#123;smarty.const&#125;       常量</span><br><span class="line">&#123;smarty.version&#125;     Smarty版本</span><br><span class="line">&#123;smarty.template&#125;    模板文件</span><br><span class="line">&#123;smarty.current_dir&#125; 模板文件目录</span><br><span class="line">&#123;smarty.now&#125;         当前时间</span><br><span class="line">&#123;smarty.ldelim&#125;      左定界符</span><br><span class="line">&#123;$smarty.rdelim&#125;     右定界符</span><br></pre></td></tr></table></figure></li>
+<li><p>缓存控制</p>
+<p>7.1 缓存的配置</p>
+<pre><code>caching           是否开启缓存
+cache_lifetime    缓存时间
+cache_dir         缓存目录
+</code></pre>
+<p>7.2 默认 一个模板 对应一个缓存</p>
+<p>7.3 一个模板 产生 多个缓存</p>
+<pre><code>display(url, 缓存号);
+</code></pre>
+</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">7.4 为缓存 减少开销</span><br><span class="line">    isCached(url, 缓存号);</span><br><span class="line"></span><br><span class="line">7.5 清除缓存</span><br><span class="line">    clearCache(url, 缓存号);</span><br><span class="line">    clearCache(url);</span><br><span class="line">    clearAllCache();</span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li><p>模板继承<br>{extends file=””}<br>{block name=””}{/block}</p>
+</li>
+<li><p>内置函数<br>9.1 内置函数</p>
+<pre><code>&#123;include&#125;
+&#123;config_load&#125;
+&#123;extends&#125;
+</code></pre>
+<p>9.2 内置块状函数</p>
+<pre><code>&#123;foreach&#125;&#123;/foreach&#125;
+&#123;if&#125;&#123;/if&#125;
+&#123;block&#125;&#123;/block&#125;
+</code></pre>
+</li>
+</ol>
+<h1 id="smarty模板引擎"><a href="#smarty模板引擎" class="headerlink" title="smarty模板引擎"></a>smarty模板引擎</h1><blockquote>
+<p>版本不同,对于PHP的支持也不相同 , 推荐使用3.1.10版本</p>
+</blockquote>
+<p>新建工作目录:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/emplates/i.html</span><br><span class="line">/emplates/.htaccess(Apache的分布式配置文件)</span><br><span class="line">/libs(smarty库)</span><br></pre></td></tr></table></figure>
+
+<p>配置.htaccess文件,闲置用户直接访问模板引擎</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deny from all</span><br></pre></td></tr></table></figure>
+
+<p>创建基础配置文件init.php</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">// 1). 导入smarty</span><br><span class="line">require &#x27;./libs/Smarty.class.php&#x27;;</span><br><span class="line">// 2). 实例化smarty</span><br><span class="line">$smarty = new Smarty();</span><br><span class="line">// var_dump($smarty);</span><br><span class="line">// 3). 初始化 配置</span><br><span class="line">//         配置 模板文件 目录</span><br><span class="line">$smarty-&gt;template_dir = &#x27;./templates&#x27;;</span><br><span class="line">//         配置 编译文件 目录</span><br><span class="line">$smarty-&gt;compile_dir = &#x27;./templates_c&#x27;;</span><br><span class="line">//         配置 配置文件 目录</span><br><span class="line">$smarty-&gt;config_dir = &#x27;./configs&#x27;;</span><br><span class="line">//         配置 缓存文件 目录</span><br><span class="line">$smarty-&gt;cache_dir = &#x27;./caches&#x27;;</span><br><span class="line">//         配置 模板变量的定界符  </span><br><span class="line">//   原有定界符为&#123;&#125;,可能会和css及js使用冲突,建议修改</span><br><span class="line">//   通常使用&#123;&#123; &#125;&#125;或&lt;&#123; &#125;&gt;   甚至&lt;!-- --&gt; 或 &lt;&lt; &gt;&gt;</span><br><span class="line">$smarty-&gt;left_delimiter = &#x27;&#123;&#123;&#x27;;</span><br><span class="line">$smarty-&gt;right_delimiter = &#x27;&#125;&#125;&#x27;;</span><br><span class="line"></span><br><span class="line">//         配置 缓存控制 (开启缓存/缓存时间)</span><br><span class="line">           #不设置时间默认一个小时</span><br><span class="line">$smarty-&gt;caching = false; #默认false关闭</span><br><span class="line">$smarty-&gt;cache_lifetime = 10; #设置10s</span><br></pre></td></tr></table></figure>
+
+<p>创建入口文件index.php</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">require &#x27;./init.php&#x27;;</span><br><span class="line">//    4). 分配变量 assign()</span><br><span class="line">$smarty-&gt;assign(&#x27;title&#x27;,&#x27;标题&#x27;);</span><br><span class="line">$smarty-&gt;assign(&#x27;content1&#x27;,&#x27;内容1&#x27;);</span><br><span class="line">$smarty-&gt;assign(&#x27;content2&#x27;,&#x27;内容2&#x27;);</span><br><span class="line">$smarty-&gt;assign(&#x27;content3&#x27;,&#x27;内容3&#x27;);</span><br><span class="line">$smarty-&gt;assign(&#x27;content4&#x27;,&#x27;内容4&#x27;);</span><br><span class="line">//    5). 加载模板 display()</span><br><span class="line">$smarty-&gt;display(&#x27;./1.html&#x27;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>注释:</p>
+<p><code>&#123;* 注释内容 *&#125;</code> </p>
+<p>路径问题:</p>
+<ul>
+<li>加载css或图片路径为当前入口位置(index.php)为基准</li>
+<li>但在加载的css文件中引用图片路径时, 是以当前css文件为基准的</li>
+</ul>
+<p>输出类型</p>
+<blockquote>
+<p>模板中所有assign输出都是<code>echo</code> 机制 , true被解析为1 , false被解析为空字符串 , 不能输出数组 和 对象数据</p>
+</blockquote>
+<ul>
+<li>对于数组, 可以使用 <code>&#123;var_dump($arr)&#125;</code> 的格式输出 , 也可以使用 <code>&#123;$arr[2]&#125;</code> 或 <code>&#123;$arr.2&#125;</code> 读取</li>
+<li>对于obj对象 , 首先需要<code>$smarty-&gt;assign(&#39;obj&#39;,new User());</code> ,  然后在html模板中使用<code>    &lt;p&gt;&#123;$obj-&gt;name&#125;&lt;/p&gt;</code> 或 <code>    &lt;p&gt;&#123;$obj-&gt;demo()&#125;&lt;/p&gt;</code> 调用</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2018/09/30/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-PSR%20%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%20trait/" title="框架开发-PSR&#x2F;命名空间&#x2F;trait&#x2F;smarty">https://ni9ne.github.io/2018/09/30/框架开发-PSR 命名空间 trait/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91/" rel="tag"># 框架开发</a>
+              <a href="/tags/trait/" rel="tag"># trait</a>
+              <a href="/tags/smarty/" rel="tag"># smarty</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/09/24/Redis%20%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/" rel="prev" title="Redis-常用操作">
+                  <i class="fa fa-chevron-left"></i> Redis-常用操作
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/10/10/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-TP5/" rel="next" title="框架开发-TP5">
+                  框架开发-TP5 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

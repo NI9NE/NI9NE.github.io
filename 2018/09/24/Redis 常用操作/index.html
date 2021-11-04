@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="php操作redis常用方法1.connect 描述：实例连接到一个Redis.参数：host: string，port: int返回值：BOOL 成功返回：TRUE;失败返回：FALSE示例：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis-常用操作">
+<meta property="og:url" content="https://ni9ne.github.io/2018/09/24/Redis%20%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="php操作redis常用方法1.connect 描述：实例连接到一个Redis.参数：host: string，port: int返回值：BOOL 成功返回：TRUE;失败返回：FALSE示例：">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-09-24T13:35:41.000Z">
+<meta property="article:modified_time" content="2019-09-04T07:42:18.657Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2018/09/24/Redis%20%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2018/09/24/Redis%20%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/","path":"2018/09/24/Redis 常用操作/","title":"Redis-常用操作"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Redis-常用操作 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">37</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">42</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#php%E6%93%8D%E4%BD%9Credis%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">php操作redis常用方法</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2018/09/24/Redis%20%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis-常用操作
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-09-24 21:35:41" itemprop="dateCreated datePublished" datetime="2018-09-24T21:35:41+08:00">2018-09-24</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2019-09-04 15:42:18" itemprop="dateModified" datetime="2019-09-04T15:42:18+08:00">2019-09-04</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="php操作redis常用方法"><a href="#php操作redis常用方法" class="headerlink" title="php操作redis常用方法"></a>php操作redis常用方法</h2><p>1.connect</p>
+<p>描述：实例连接到一个Redis.<br>参数：host: string，port: int<br>返回值：BOOL 成功返回：TRUE;失败返回：FALSE<br>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">result = redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">var_dump(result); //结果：bool(true)  </span><br><span class="line">?&gt;  </span><br></pre></td></tr></table></figure>
+
+<p>2，set<br>描述：设置key和value的值<br>参数：Key Value<br>返回值：BOOL 成功返回：TRUE;失败返回：FALSE<br>示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">result = redis-&gt;set(&#x27;test&#x27;,&quot;11111111111&quot;);  </span><br><span class="line">var_dump($result);    //结果：bool(true)  </span><br><span class="line">?&gt;  </span><br></pre></td></tr></table></figure>
+
+<p>3，get<br>描述：获取有关指定键的值<br>参数：key<br>返回值：string或BOOL 如果键不存在，则返回 FALSE。否则，返回指定键对应的value值。<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">result = redis-&gt;get(&#x27;test&#x27;);  </span><br><span class="line">var_dump($result);   //结果：string(11) &quot;11111111111&quot;  </span><br><span class="line">?&gt;  </span><br></pre></td></tr></table></figure>
+
+<p>4，delete</p>
+<p>描述：删除指定的键<br>参数：一个键，或不确定数目的参数，每一个关键的数组：key1 key2 key3 … keyN<br>返回值：删除的项数<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;set(&#x27;test&#x27;,&quot;1111111111111&quot;);  </span><br><span class="line">echo redis-&gt;get(&#x27;test&#x27;);   //结果：1111111111111  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">var_dump(redis-&gt;get(&#x27;test&#x27;));  //结果：bool(false)  </span><br><span class="line">?&gt;  </span><br></pre></td></tr></table></figure>
+
+<p>5，setnx<br>描述：如果在数据库中不存在该键，设置关键值参数<br>参数：key value<br>返回值：BOOL 成功返回：TRUE;失败返回：FALSE<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;set(&#x27;test&#x27;,&quot;1111111111111&quot;);  </span><br><span class="line">redis-&gt;setnx(&#x27;test&#x27;,&quot;22222222&quot;);  </span><br><span class="line">echo redis-&gt;get(&#x27;test&#x27;);  //结果：1111111111111  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;setnx(&#x27;test&#x27;,&quot;22222222&quot;);  </span><br><span class="line">echo redis-&gt;get(&#x27;test&#x27;);  //结果：22222222  </span><br><span class="line">?&gt;  </span><br></pre></td></tr></table></figure>
+
+<p>6，exists<br>描述：验证指定的键是否存在<br>参数key<br>返回值：Bool 成功返回：TRUE;失败返回：FALSE<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;set(&#x27;test&#x27;,&quot;1111111111111&quot;);  </span><br><span class="line">var_dump(redis-&gt;exists(&#x27;test&#x27;));  //结果：bool(true)  </span><br><span class="line">?&gt;  </span><br></pre></td></tr></table></figure>
+
+<p>7，incr<br>描述：数字递增存储键值键.<br>参数：key value：将被添加到键的值<br>返回值：INT the new value<br>实例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;set(&#x27;test&#x27;,&quot;123&quot;);  </span><br><span class="line">var_dump(redis-&gt;incr(&quot;test&quot;));  //结果：int(124)  </span><br><span class="line">var_dump($redis-&gt;incr(&quot;test&quot;));  //结果：int(125)  </span><br><span class="line">?&gt;</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+<p>8，decr<br>描述：数字递减存储键值。<br>参数：key value：将被添加到键的值<br>返回值：INT the new value<br>实例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;set(&#x27;test&#x27;,&quot;123&quot;);  </span><br><span class="line">var_dump(redis-&gt;decr(&quot;test&quot;));  //结果：int(122)  </span><br><span class="line">var_dump($redis-&gt;decr(&quot;test&quot;));  //结果：int(121)  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>9，getMultiple<br>描述：取得所有指定键的值。如果一个或多个键不存在，该数组中该键的值为假<br>参数：其中包含键值的列表数组<br>返回值：返回包含所有键的值的数组<br>实例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;set(&#x27;test1&#x27;,&quot;1&quot;);  </span><br><span class="line">redis-&gt;set(&#x27;test2&#x27;,&quot;2&quot;);  </span><br><span class="line">result = redis-&gt;getMultiple(array(&#x27;test1&#x27;,&#x27;test2&#x27;));  </span><br><span class="line">print_r($result);   //结果：Array ( [0] =&gt; 1 [1] =&gt; 2 )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>10，lpush<br>描述：由列表头部添加字符串值。如果不存在该键则创建该列表。如果该键存在，而且不是一个列表，返回FALSE。<br>参数：key,value<br>返回值：成功返回数组长度，失败false<br>实例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">var_dump(redis-&gt;lpush(&quot;test&quot;,&quot;111&quot;));   //结果：int(1)  </span><br><span class="line">var_dump($redis-&gt;lpush(&quot;test&quot;,&quot;222&quot;));   //结果：int(2)  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>11，rpush<br>描述：由列表尾部添加字符串值。如果不存在该键则创建该列表。如果该键存在，而且不是一个列表，返回FALSE。<br>参数：key,value<br>返回值：成功返回数组长度，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">var_dump(redis-&gt;lpush(&quot;test&quot;,&quot;111&quot;));   //结果：int(1)  </span><br><span class="line">var_dump(redis-&gt;lpush(&quot;test&quot;,&quot;222&quot;));   //结果：int(2)  </span><br><span class="line">var_dump(redis-&gt;rpush(&quot;test&quot;,&quot;333&quot;));   //结果：int(3)  </span><br><span class="line">var_dump($redis-&gt;rpush(&quot;test&quot;,&quot;444&quot;));   //结果：int(4)  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>12，lpop<br>描述：返回和移除列表的第一个元素<br>参数：key<br>返回值：成功返回第一个元素的值 ，失败返回false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;rpush(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">redis-&gt;rpush(&quot;test&quot;,&quot;444&quot;);  </span><br><span class="line">var_dump(redis-&gt;lpop(&quot;test&quot;));  //结果：string(3) &quot;222&quot;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>13，lsize,llen<br>描述：返回的列表的长度。如果列表不存在或为空，该命令返回0。如果该键不是列表，该命令返回FALSE。<br>参数：Key<br>返回值：成功返回数组长度，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;rpush(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">redis-&gt;rpush(&quot;test&quot;,&quot;444&quot;);  </span><br><span class="line">var_dump(redis-&gt;lsize(&quot;test&quot;));  //结果：int(4)  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>14，lget<br>描述：返回指定键存储在列表中指定的元素。 0第一个元素，1第二个… -1最后一个元素，-2的倒数第二…错误的索引或键不指向列表则返回FALSE。<br>参数：key index<br>返回值：成功返回指定元素的值，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;rpush(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">redis-&gt;rpush(&quot;test&quot;,&quot;444&quot;);  </span><br><span class="line">var_dump(redis-&gt;lget(&quot;test&quot;,3));  //结果：string(3) &quot;444&quot;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>15，lset<br>描述：为列表指定的索引赋新的值,若不存在该索引返回false.<br>参数：key index value<br>返回值：成功返回true,失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">var_dump(redis-&gt;lget(&quot;test&quot;,1));  //结果：string(3) &quot;111&quot;  </span><br><span class="line">var_dump(redis-&gt;lset(&quot;test&quot;,1,&quot;333&quot;));  //结果：bool(true)  </span><br><span class="line">var_dump(redis-&gt;lget(&quot;test&quot;,1));  //结果：string(3) &quot;333&quot;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>16，lgetrange<br>描述：<br>返回在该区域中的指定键列表中开始到结束存储的指定元素，lGetRange(key, start, end)。0第一个元素，1第二个元素… -1最后一个元素，-2的倒数第二…<br>参数：key start end<br>返回值：成功返回查找的值，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;lpush(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">print_r(redis-&gt;lgetrange(&quot;test&quot;,0,-1));  //结果：Array ( [0] =&gt; 222 [1] =&gt; 111 )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>17,lremove<br>描述：从列表中从头部开始移除count个匹配的值。如果count为零，所有匹配的元素都被删除。如果count是负数，内容从尾部开始删除。<br>参数：key count value<br>返回值：成功返回删除的个数，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;lpush(&#x27;test&#x27;,&#x27;a&#x27;);  </span><br><span class="line">redis-&gt;lpush(&#x27;test&#x27;,&#x27;b&#x27;);  </span><br><span class="line">redis-&gt;lpush(&#x27;test&#x27;,&#x27;c&#x27;);  </span><br><span class="line">redis-&gt;rpush(&#x27;test&#x27;,&#x27;a&#x27;);  </span><br><span class="line">print_r(redis-&gt;lgetrange(&#x27;test&#x27;, 0, -1)); //结果：Array ( [0] =&gt; c [1] =&gt; b [2] =&gt; a [3] =&gt; a )  </span><br><span class="line">var_dump(redis-&gt;lremove(&#x27;test&#x27;,&#x27;a&#x27;,2));   //结果：int(2)  </span><br><span class="line">print_r(redis-&gt;lgetrange(&#x27;test&#x27;, 0, -1)); //结果：Array ( [0] =&gt; c [1] =&gt; b )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>18，sadd<br>描述：为一个Key添加一个值。如果这个值已经在这个Key中，则返回FALSE。<br>参数：key value<br>返回值：成功返回true,失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">var_dump(redis-&gt;sadd(&#x27;test&#x27;,&#x27;111&#x27;));   //结果：bool(true)  </span><br><span class="line">var_dump(redis-&gt;sadd(&#x27;test&#x27;,&#x27;333&#x27;));   //结果：bool(true)  </span><br><span class="line">print_r(redis-&gt;sort(&#x27;test&#x27;)); //结果：Array ( [0] =&gt; 111 [1] =&gt; 333 )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>19，sremove<br>描述：删除Key中指定的value值<br>参数：key member<br>返回值：true or false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test&#x27;,&#x27;111&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test&#x27;,&#x27;333&#x27;);  </span><br><span class="line">redis-&gt;sremove(&#x27;test&#x27;,&#x27;111&#x27;);  </span><br><span class="line">print_r($redis-&gt;sort(&#x27;test&#x27;));    //结果：Array ( [0] =&gt; 333 )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>20,smove<br>描述：将Key1中的value移动到Key2中<br>参数：srcKey dstKey member<br>返回值：true or false<br>范例</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;delete(&#x27;test1&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test&#x27;,&#x27;111&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test&#x27;,&#x27;333&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test1&#x27;,&#x27;222&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test1&#x27;,&#x27;444&#x27;);  </span><br><span class="line">redis-&gt;smove(&#x27;test&#x27;,&quot;test1&quot;,&#x27;111&#x27;);  </span><br><span class="line">print_r(redis-&gt;sort(&#x27;test1&#x27;));    //结果：Array ( [0] =&gt; 111 [1] =&gt; 222 [2] =&gt; 444 )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>21，scontains<br>描述：检查集合中是否存在指定的值。<br>参数：key value<br>返回值：true or false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test&#x27;,&#x27;111&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test&#x27;,&#x27;112&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test&#x27;,&#x27;113&#x27;);  </span><br><span class="line">var_dump($redis-&gt;scontains(&#x27;test&#x27;, &#x27;111&#x27;)); //结果：bool(true)  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>22,ssize<br>描述：返回集合中存储值的数量<br>参数：key<br>返回值：成功返回数组个数，失败0<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test&#x27;,&#x27;111&#x27;);  </span><br><span class="line">redis-&gt;sadd(&#x27;test&#x27;,&#x27;112&#x27;);  </span><br><span class="line">echo redis-&gt;ssize(&#x27;test&#x27;);   //结果：2  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>23，spop<br>描述：随机移除并返回key中的一个值<br>参数：key<br>返回值：成功返回删除的值，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">var_dump($redis-&gt;spop(&quot;test&quot;));  //结果：string(3) &quot;333&quot;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>24,sinter<br>描述：返回一个所有指定键的交集。如果只指定一个键，那么这个命令生成这个集合的成员。如果不存在某个键，则返回FALSE。<br>参数：key1, key2, keyN<br>返回值：成功返回数组交集，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;444&quot;);  </span><br><span class="line">var_dump($redis-&gt;sinter(&quot;test&quot;,&quot;test1&quot;));  //结果：array(1) &#123; [0]=&gt; string(3) &quot;111&quot; &#125;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>25,sinterstore<br>描述：执行sInter命令并把结果储存到新建的变量中。<br>参数：<br>Key: dstkey, the key to store the diff into.<br>Keys: key1, key2… keyN. key1..keyN are intersected as in sInter.<br>返回值：成功返回，交集的个数，失败false<br>范例:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;444&quot;);  </span><br><span class="line">var_dump(redis-&gt;sinterstore(&#x27;new&#x27;,&quot;test&quot;,&quot;test1&quot;));  //结果：int(1)  </span><br><span class="line">var_dump(redis-&gt;smembers(&#x27;new&#x27;));  //结果:array(1) &#123; [0]=&gt; string(3) &quot;111&quot; &#125;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>26,sunion<br>描述：<br>返回一个所有指定键的并集<br>参数：<br>Keys: key1, key2, … , keyN<br>返回值：成功返回合并后的集，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;444&quot;);  </span><br><span class="line">print_r($redis-&gt;sunion(&quot;test&quot;,&quot;test1&quot;));  //结果：Array ( [0] =&gt; 111 [1] =&gt; 222 [2] =&gt; 333 [3] =&gt; 444 )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>27,sunionstore<br>描述：执行sunion命令并把结果储存到新建的变量中。<br>参数：<br>Key: dstkey, the key to store the diff into.<br>Keys: key1, key2… keyN. key1..keyN are intersected as in sInter.<br>返回值：成功返回，交集的个数，失败false<br>范例:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;444&quot;);  </span><br><span class="line">var_dump(redis-&gt;sinterstore(&#x27;new&#x27;,&quot;test&quot;,&quot;test1&quot;));  //结果：int(4)  </span><br><span class="line">print_r(redis-&gt;smembers(&#x27;new&#x27;));  //结果:Array ( [0] =&gt; 111 [1] =&gt; 222 [2] =&gt; 333 [3] =&gt; 444 ) </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>28,sdiff<br>描述：返回第一个集合中存在并在其他所有集合中不存在的结果<br>参数：Keys: key1, key2, … , keyN: Any number of keys corresponding to sets in redis.<br>返回值：成功返回数组，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;444&quot;);  </span><br><span class="line">print_r($redis-&gt;sdiff(&quot;test&quot;,&quot;test1&quot;));  //结果：Array ( [0] =&gt; 222 [1] =&gt; 333 )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>29,sdiffstore<br>描述：执行sdiff命令并把结果储存到新建的变量中。<br>参数：<br>Key: dstkey, the key to store the diff into.<br>Keys: key1, key2, … , keyN: Any number of keys corresponding to sets in redis<br>返回值：成功返回数字，失败false<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;333&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test1&quot;,&quot;444&quot;);  </span><br><span class="line">var_dump(redis-&gt;sdiffstore(&#x27;new&#x27;,&quot;test&quot;,&quot;test1&quot;));  //结果：int(2)  </span><br><span class="line">print_r(redis-&gt;smembers(&#x27;new&#x27;));  //结果:Array ( [0] =&gt; 222 [1] =&gt; 333 )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>30,smembers, sgetmembers<br>描述：<br>返回集合的内容<br>参数：Key: key<br>返回值：An array of elements, the contents of the set.<br>范例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">redis = new redis();  </span><br><span class="line">redis-&gt;connect(&#x27;127.0.0.1&#x27;, 6379);  </span><br><span class="line">redis-&gt;delete(&#x27;test&#x27;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;111&quot;);  </span><br><span class="line">redis-&gt;sadd(&quot;test&quot;,&quot;222&quot;);  </span><br><span class="line">print_r(redis-&gt;smembers(&#x27;test&#x27;));  //结果:Array ( [0] =&gt; 111 [1] =&gt; 222 )  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2018/09/24/Redis%20%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/" title="Redis-常用操作">https://ni9ne.github.io/2018/09/24/Redis 常用操作/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/09/23/%E5%BE%AE%E4%BF%A1%E5%BC%80%E5%8F%91/" rel="prev" title="微信开发">
+                  <i class="fa fa-chevron-left"></i> 微信开发
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/09/30/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-PSR%20%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%20trait/" rel="next" title="框架开发-PSR/命名空间/trait/smarty">
+                  框架开发-PSR/命名空间/trait/smarty <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

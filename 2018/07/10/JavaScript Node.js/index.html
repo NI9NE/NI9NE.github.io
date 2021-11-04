@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Node.js1.关于 Node.jsNode.js是一个让 JavaScript 运行在服务器端的开发平台.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript-Node.js">
+<meta property="og:url" content="https://ni9ne.github.io/2018/07/10/JavaScript%20Node.js/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="Node.js1.关于 Node.jsNode.js是一个让 JavaScript 运行在服务器端的开发平台.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-07-10T12:15:03.000Z">
+<meta property="article:modified_time" content="2019-09-04T06:46:10.711Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="express">
+<meta property="article:tag" content="npm">
+<meta property="article:tag" content="ejs">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2018/07/10/JavaScript%20Node.js/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2018/07/10/JavaScript%20Node.js/","path":"2018/07/10/JavaScript Node.js/","title":"JavaScript-Node.js"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>JavaScript-Node.js | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">37</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">42</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Node-js"><span class="nav-number">1.</span> <span class="nav-text">Node.js</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%85%B3%E4%BA%8E-Node-js"><span class="nav-number">1.1.</span> <span class="nav-text">1.关于 Node.js</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1. 介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E7%89%B9%E7%82%B9"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2. 特点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%8D%95%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">1). 单线程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E9%9D%9E%E9%98%BB%E5%A1%9EI-O"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">2). 非阻塞I&#x2F;O</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">3). 事件驱动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E4%B8%89%E7%89%B9%E7%82%B9%E8%AF%B4%E6%98%8E"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">4). 三特点说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-Node-js-%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9-%E9%80%82%E5%90%88%E5%BC%80%E5%8F%91%E4%BB%80%E4%B9%88"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 Node.js 的优缺点,适合开发什么?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E4%BC%98%E7%82%B9"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">1). 优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E7%BC%BA%E7%82%B9"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">2). 缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">3). 适用场景</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8node"><span class="nav-number">1.2.</span> <span class="nav-text">2.安装使用node</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-windows%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 windows环境安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%90%AD%E5%BB%BANode-js%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 搭建Node.js服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%A0%B9%E7%9B%AE%E5%BD%95-%E4%B8%8E-web%E5%AE%B9%E5%99%A8"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 根目录 与 web容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-HTTP%E6%A8%A1%E5%9D%97"><span class="nav-number">1.3.</span> <span class="nav-text">3.HTTP模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-URL%E6%A8%A1%E5%9D%97"><span class="nav-number">1.4.</span> <span class="nav-text">4.URL模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.5.</span> <span class="nav-text">5.文件系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E9%9D%99%E6%80%81%E7%9B%AE%E5%BD%95-%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD-web%E5%AE%B9%E5%99%A8"><span class="nav-number">1.6.</span> <span class="nav-text">6.静态目录 文件加载 (web容器)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%A8%A1%E5%9D%97%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.7.</span> <span class="nav-text">7.模块的概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E8%BE%93%E5%87%BA%E5%8F%98%E9%87%8F-%E5%87%BD%E6%95%B0"><span class="nav-number">1.7.1.</span> <span class="nav-text">7.1 输出变量&#x2F;函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E8%BE%93%E5%87%BA%E4%B8%80%E4%B8%AA%E7%B1%BB-%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="nav-number">1.7.2.</span> <span class="nav-text">7.2 输出一个类(构造函数)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-%E6%A8%A1%E5%9D%97%E5%85%B3%E8%81%94%E5%85%B3%E7%B3%BB"><span class="nav-number">1.7.3.</span> <span class="nav-text">7.3 模块关联关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-%E6%A8%A1%E5%9D%97%E5%B0%81%E8%A3%85"><span class="nav-number">1.7.4.</span> <span class="nav-text">7.4 模块封装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-npm"><span class="nav-number">1.8.</span> <span class="nav-text">8.npm</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-POST%E8%AF%B7%E6%B1%82"><span class="nav-number">1.9.</span> <span class="nav-text">9.POST请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E5%A4%84%E7%90%86"><span class="nav-number">1.10.</span> <span class="nav-text">10.文件上传处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-ejs%E6%A8%A1%E7%89%88"><span class="nav-number">1.11.</span> <span class="nav-text">11.ejs模版</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PS-V8%E5%BC%95%E6%93%8E%E8%AF%B4%E6%98%8E"><span class="nav-number">1.12.</span> <span class="nav-text">PS:V8引擎说明</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2018/07/10/JavaScript%20Node.js/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JavaScript-Node.js
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-07-10 20:15:03" itemprop="dateCreated datePublished" datetime="2018-07-10T20:15:03+08:00">2018-07-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2019-09-04 14:46:10" itemprop="dateModified" datetime="2019-09-04T14:46:10+08:00">2019-09-04</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h1><h2 id="1-关于-Node-js"><a href="#1-关于-Node-js" class="headerlink" title="1.关于 Node.js"></a>1.关于 Node.js</h2><p>Node.js是一个让 JavaScript 运行在服务器端的开发平台.</p>
+<h3 id="1-1-介绍"><a href="#1-1-介绍" class="headerlink" title="1.1. 介绍"></a>1.1. 介绍</h3><p>1). Node.js 不是一种独立的语言，与PHP、JSP、Python、Perl、Ruby的”既是语言，也是平台”不同，Node.js的使用JavaScript进行编程，运行在JavaScript引擎上（V8）。</p>
+<p>2). 与PHP、JSP等相比，Node.js跳过了Apache、Naginx、IIS等HTTP服务器，它自己不用建设在任何服务器软件之上。Node.js的许多设计理念与经典架构（LAMP）有着很大的不同，可以提供强大的伸缩能力。</p>
+<p>官网: <a target="_blank" rel="noopener" href="https://nodejs.org/en/">https://nodejs.org/en/</a><br>中文网: <a target="_blank" rel="noopener" href="http://nodejs.cn/">http://nodejs.cn/</a></p>
+<h3 id="1-2-特点"><a href="#1-2-特点" class="headerlink" title="1.2. 特点"></a>1.2. 特点</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">单线程 | 非阻塞I/O | 事件驱动</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-单线程"><a href="#1-单线程" class="headerlink" title="1). 单线程"></a>1). 单线程</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">所有客户端请求的连接 都使用一个线程来处理.</span><br><span class="line"></span><br><span class="line">Node.js 不是给每个连接去创建新的 线程,而是仅仅使用一个线程来处理.</span><br><span class="line">单线程带来的好处,减少内存的损耗,提高并发量. 操作系统完全不再有线程创建和销毁的开销.</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-非阻塞I-O"><a href="#2-非阻塞I-O" class="headerlink" title="2). 非阻塞I/O"></a>2). 非阻塞I/O</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">I/O操作不会阻塞程序的运行</span><br><span class="line">I: Input  输入</span><br><span class="line">O: Output 输出</span><br><span class="line"></span><br><span class="line">在阻塞模式下,一个线程只能处理一项任务,想要提高吞吐率,必须通过多线程</span><br><span class="line">而非阻塞模式下,一个线程 永远在执行某种运算操作.这个线程的CPU 核心利用率永远是满载的</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-事件驱动"><a href="#3-事件驱动" class="headerlink" title="3). 事件驱动"></a>3). 事件驱动</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">客户端 请求建立连接，提交数据等行为，就会触发 相应的事件.</span><br><span class="line">在Node中，在一个时刻，只能执行 一个事件回调函数，但是在执行 一个事件回调函数的中途，（比如，又有新用户连接了）可以转而处理其他事件，然后返回继续执行原事件的回调函数，这种处理机制，称为“事件环”机制.</span><br></pre></td></tr></table></figure>
+
+<p>Node.js底层是C++(V8引擎也是C++写的).底层代码中，近半数都用于事件队列、回调函数队列的构建.用事件驱动 来完成服务器的 任务调度,是Node.js中 真正底层核心逻辑.</p>
+<h4 id="4-三特点说明"><a href="#4-三特点说明" class="headerlink" title="4). 三特点说明"></a>4). 三特点说明</h4><p>单线程<br>    是为了减少内存的开销,操作系统的内存换页(创建/销毁)<br>    但是,如果某一个请求 有I/O操作,单线程就会被阻塞了!<br>非阻塞I/O<br>    程序不会傻等I/O语句的执行结束,才继续后续代码的运行,而会直接运行后续代码.<br>    但是,非阻塞就能完美的解决问题吗, 比如 小A的业务执行I/O过程中,有小C要新的请求,此时则么办?<br>事件驱动(事件环)<br>    不管是新用户的请求,还是老用户的I/O操作,都将以事件的方式加入到事件环之中,等待调度.</p>
+<p>Node.js 中所有的I/O都是异步的.回调函数 套 回调函数<br>泡茶 : 洗茶壶 4 / 洗茶杯 3 / 用茶壶烧开水 8 / 准备茶叶 2 / 泡茶水 5 / 倒茶水 1<br>4 + 8 + 5 + 1 = 18<br> 3 + 2 </p>
+<h3 id="1-3-Node-js-的优缺点-适合开发什么"><a href="#1-3-Node-js-的优缺点-适合开发什么" class="headerlink" title="1.3 Node.js 的优缺点,适合开发什么?"></a>1.3 Node.js 的优缺点,适合开发什么?</h3><h4 id="1-优点"><a href="#1-优点" class="headerlink" title="1). 优点"></a>1). 优点</h4><p>​    善于I/O,不善于 大量计算<br>​    处理高并发<br>​    服务器推送</p>
+<h4 id="2-缺点"><a href="#2-缺点" class="headerlink" title="2). 缺点"></a>2). 缺点</h4><p>​    单线程的缺点: 单一线程 一旦奔溃则整个服务全奔溃<br>​    服务不是绝对可靠的.</p>
+<h4 id="3-适用场景"><a href="#3-适用场景" class="headerlink" title="3). 适用场景"></a>3). 适用场景</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">不能完全替代 传统的后端语言,但在某些方面优于传统.</span><br><span class="line">当应用程序需要处理大量并发的I/O操作，而在发出响应之前，应用程序内部 并不需要进行非常复杂的计算处理的时候，Node.js非常适合。</span><br><span class="line">Node.js也非常适合与web socket配合，开发长连接的实时交互应用程序。</span><br><span class="line"></span><br><span class="line">- 聊天室</span><br><span class="line">- 图文直播</span><br><span class="line">- 考试系统</span><br><span class="line">- 收集用户数据的表单</span><br><span class="line">- 提供JSON的API</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-安装使用node"><a href="#2-安装使用node" class="headerlink" title="2.安装使用node"></a>2.安装使用node</h2><h3 id="2-1-windows环境安装"><a href="#2-1-windows环境安装" class="headerlink" title="2.1 windows环境安装"></a>2.1 windows环境安装</h3><p><code>node -v </code>查看版本</p>
+<p><code>node 文件名</code>  运行文件</p>
+<h3 id="2-2-搭建Node-js服务器"><a href="#2-2-搭建Node-js服务器" class="headerlink" title="2.2 搭建Node.js服务器"></a>2.2 搭建Node.js服务器</h3><p>​    – 首个nodejs页面页面</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">// 搭建nodejs WEB服务器</span><br><span class="line"></span><br><span class="line">// 引入HTTP模版</span><br><span class="line">var http = require(&#x27;http&#x27;);</span><br><span class="line"></span><br><span class="line">var hostname = &#x27;127.0.0.1&#x27;;</span><br><span class="line">var port = 3000;</span><br><span class="line"></span><br><span class="line">// 创建服务器</span><br><span class="line">// req 表示请求(request) / res 表示响应(response)</span><br><span class="line">var server = http.createServer(function(req, res)&#123;</span><br><span class="line">    // 设置HTTP头信息. 状态码 200; 文件类型是html; 字符集 utf-8</span><br><span class="line">    res.writeHead(200, &#123;&#x27;Content-type&#x27;:&#x27;text/html;charset=UTF-8&#x27;&#125;);</span><br><span class="line">    // 服务器响应输出完成</span><br><span class="line">    res.end(&#x27;Hi~ o(*￣▽￣*)ブ, 首个nodejs页面,您的积分为: &#x27; + (50 + 10) + &#x27;分&#x27;); </span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// 运行服务器</span><br><span class="line">server.listen(port, hostname, function()&#123;</span><br><span class="line">    console.log(`请访问: http://$&#123;hostname&#125;:$&#123;port&#125;`);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>如果修改了程序代码,必须中断当前的node服务,重新在node一次</p>
+<p>node.js是服务器的程序,写好的JS代码,都将运行在服务器上.返回给客户端的, 都是已经处理好的结果</p>
+<p>node就是一个JS的运行环境</p>
+<p>js文件是不能直接拖入浏览器取运行的,必须靠node去执行</p>
+<h3 id="2-3-根目录-与-web容器"><a href="#2-3-根目录-与-web容器" class="headerlink" title="2.3 根目录 与 web容器"></a>2.3 根目录 与 web容器</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1). Node.js没有根目录的概念，因为它根本没有任何的web容器！</span><br></pre></td></tr></table></figure>
+
+<p>​    </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">2). 静态页面的呈现</span><br><span class="line"></span><br><span class="line">URL和真实的物理文件之间 是没有关系的。</span><br><span class="line">URL是通过 Node 的路由设计之后，才呈现出 某一个静态文件的</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">3). HTTP运行原理</span><br></pre></td></tr></table></figure>
+
+<p>由此,我们可以看出,要是使用nodejs 搭建服务器,<br>是需要写 各种回调函数,定义 各种路由规则,来实现 页面的显示.<br>nodejs中就是 回调函数 套回调函数,每个回调函数 都是一个事件</p>
+<p>由此就用到了 nodejs的三个特性:<br>    单线程 | 非阻塞I/O | 事件驱动(事件环)<br>    URL路由规则,与实际的物理文件,不一定有直接的联系. </p>
+<h2 id="3-HTTP模块"><a href="#3-HTTP模块" class="headerlink" title="3.HTTP模块"></a>3.HTTP模块</h2><p>   Node.js将各种功能，都划分为了一个个mudule(模块)<br>   需要用什么模块,就可以使用require(‘’)来引入使用</p>
+<h2 id="4-URL模块"><a href="#4-URL模块" class="headerlink" title="4.URL模块"></a>4.URL模块</h2><p>​    解析URL</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// GET 参数的处理</span><br><span class="line"> var getParams = url.parse(req.url, true).query;</span><br><span class="line"> var name = getParams.name;</span><br><span class="line"> var age = getParams.age;</span><br><span class="line"> var sex = getParams.sex;</span><br><span class="line"> res.end(&#x27;服务器接收到了以下信息: &#x27;+ name + &#x27; | &#x27; + age + &#x27; | &#x27; + sex);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>​    路由设计</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">var http = require(&#x27;http&#x27;);</span><br><span class="line">var url = require(&#x27;url&#x27;);</span><br><span class="line"></span><br><span class="line">var hostname = &#x27;127.0.0.1&#x27;;</span><br><span class="line">var port = 3000;</span><br><span class="line"></span><br><span class="line">// 创建服务器</span><br><span class="line">var server = http.createServer(function(req, res)&#123;</span><br><span class="line">    // 跳过了 chrome 的收藏夹图标的请求</span><br><span class="line">    if (req.url == &#x27;/favicon.ico&#x27;) return;</span><br><span class="line">    res.writeHead(200, &#123;&#x27;content-type&#x27;: &#x27;text/html;charset=utf-8&#x27;&#125;);</span><br><span class="line"></span><br><span class="line">    // /stu/20190212007  查询学员</span><br><span class="line">    // /tch/00128        查询老师</span><br><span class="line">    </span><br><span class="line">    //  获取URL中的path部分</span><br><span class="line">    var user = url.parse(req.url).pathname;</span><br><span class="line"></span><br><span class="line">    // substr</span><br><span class="line">    if (user.substr(0, 5) == &#x27;/stu/&#x27;) &#123;</span><br><span class="line">        var stuid = user.substr(5);</span><br><span class="line">        // console.log(stuid);</span><br><span class="line">        if (/^\d&#123;11&#125;$/.test(stuid)) &#123;</span><br><span class="line">            res.end(&#x27;查询到的学号是: &#x27; + stuid);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            res.end(&#x27;学员的学号有误!!!&#x27;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; else if (user.substr(0, 5) == &#x27;/tch/&#x27;) &#123;</span><br><span class="line">        var tchid = user.substr(5);</span><br><span class="line">        // console.log(tchid);</span><br><span class="line">        if (/^\d&#123;5&#125;$/.test(tchid)) &#123;</span><br><span class="line">            res.end(&#x27;查询到的工号是: &#x27; + tchid);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            res.end(&#x27;工号有误!!!&#x27;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        res.end(&#x27;URL有误,请检查重试!!!&#x27;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// 运行服务器</span><br><span class="line">server.listen(port, hostname);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="5-文件系统"><a href="#5-文件系统" class="headerlink" title="5.文件系统"></a>5.文件系统</h2><p>​    5.1. 新建文件夹 / 删除文件夹 / 文件状态信息 / 读取文件夹</p>
+<p>​    5.2. 读取出 文件夹/文件</p>
+<h2 id="6-静态目录-文件加载-web容器"><a href="#6-静态目录-文件加载-web容器" class="headerlink" title="6.静态目录 文件加载 (web容器)"></a>6.静态目录 文件加载 (web容器)</h2><h2 id="7-模块的概念"><a href="#7-模块的概念" class="headerlink" title="7.模块的概念"></a>7.模块的概念</h2><p>   在Node.js中,不可能用一个js文件去写全部的业务,肯定要有MVC.<br>   它以模块为单位 划分所有功能,并且提供了一个 完整的模块加载机制,我们可以将应用程序 划分为各个不同的部分.</p>
+<p>   每一个JavaScript文件都是一个模块；<br>   而多个JavaScript文件可以使用require引入,使他们共同实现了一个功能模块.</p>
+<h3 id="7-1-输出变量-函数"><a href="#7-1-输出变量-函数" class="headerlink" title="7.1 输出变量/函数"></a>7.1 输出变量/函数</h3><p>​    Node.js中,JS文件中定义的变量、函数,都只在这个文件内部有效.<br>​    其他文件中需要引用变量、函数时,必须使用<code>exports对象</code>进行暴露(输出).<br>​    使用者要用<code>require()</code>命令,引用执行这个JS文件.</p>
+<h3 id="7-2-输出一个类-构造函数"><a href="#7-2-输出一个类-构造函数" class="headerlink" title="7.2 输出一个类(构造函数)"></a>7.2 输出一个类(构造函数)</h3><p>​    可以用<code>module.exports = 构造函数名;</code>的方式 向外输出一个类</p>
+<h3 id="7-3-模块关联关系"><a href="#7-3-模块关联关系" class="headerlink" title="7.3 模块关联关系"></a>7.3 模块关联关系</h3><ul>
+<li>某一个js文件中,有函数或变量: exports.变量 = 变量;</li>
+<li>某一个js文件中,有一个类: module.exports = 构造函数名;</li>
+</ul>
+<h3 id="7-4-模块封装"><a href="#7-4-模块封装" class="headerlink" title="7.4 模块封装"></a>7.4 模块封装</h3><h2 id="8-npm"><a href="#8-npm" class="headerlink" title="8.npm"></a>8.npm</h2><p> (node package management)</p>
+<p>   这是一个工具名字.npm的主要职责是 安装开发包和管理依赖项.<br>   安装开发包:安装 <code>npm install</code>命令；更新 <code>npm update</code>命令.<br>   管理依赖项:借助 package.json 文件;最简单生成 package.json 的方法就是 <code>npm init</code></p>
+<p>   npm不需要单独安装,只要安装了 Node.js 环境,npm 就已经包含在里面了. 查看 npm 版本: <code>npm -v</code></p>
+<p>   <strong>为什么要使用npm?</strong><br>   开发时,会使用到各种功能的组件,所有组件都由我们自己来写代码的话,开发效率就会很低.我们不要重复的去造轮子,要学会使用已有的工具,来完善我们的项目,站在巨人的肩膀上去工作.<br>   npm是js世界里的一个伟大的社区,能够让开发者更加轻松的共享代码和共用代码片段或模块组件.</p>
+<p>   <a target="_blank" rel="noopener" href="https://www.npmjs.com/">https://www.npmjs.com/</a>   # npm官网<br>   <a target="_blank" rel="noopener" href="https://npm.taobao.org/">https://npm.taobao.org/</a>  # 淘宝npm镜像</p>
+<p>   不要修改 [node_modules] + package-lock.json 这两个文件,因为它是使用npm去管理的</p>
+<h2 id="9-POST请求"><a href="#9-POST请求" class="headerlink" title="9.POST请求"></a>9.POST请求</h2><p>   相比较GET请求，POST请求比较复杂。<br>   因为Node.js认为，使用POST请求时，数据量会比较多。<br>   为了追求极致的效率，它将数据拆分成为了众多小的数据块(chunk)，然后通过特定的事件，将这些小数据块有序传递给回调函数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">var http = require(&#x27;http&#x27;);</span><br><span class="line">var fs = require(&#x27;fs&#x27;);</span><br><span class="line">var querystring = require(&#x27;querystring&#x27;);</span><br><span class="line"></span><br><span class="line">var hostname = &#x27;127.0.0.1&#x27;;</span><br><span class="line">var port = 3000;</span><br><span class="line"></span><br><span class="line">var server = http.createServer(function(req,res)&#123;</span><br><span class="line">    if (req.url == &#x27;/form&#x27;) &#123;</span><br><span class="line">        // 读取表单加载页面</span><br><span class="line">        fs.readFile(&#x27;./form.html&#x27;, function(err, data)&#123;</span><br><span class="line">            res.writeHead(200, &#123;&#x27;content-type&#x27;: &#x27;text/html;charset=UTF-8&#x27;&#125;);</span><br><span class="line">            res.end(data);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125; else if (req.url == &#x27;/dopost&#x27; &amp;&amp; req.method.toLocaleLowerCase() == &#x27;post&#x27;) &#123;</span><br><span class="line">        // 如果访问/dopost,且请求类型是post</span><br><span class="line">        // 进行POST数据处理</span><br><span class="line">        var postData = &#x27;&#x27;;</span><br><span class="line">        // node为了实现极致的效率,所以把post分成多个小份去传递</span><br><span class="line">        req.addListener(&#x27;data&#x27;, function (chunk)&#123;</span><br><span class="line">            postData += chunk;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        // 全部接收完毕</span><br><span class="line">        req.addListener(&#x27;end&#x27;, function()&#123;</span><br><span class="line">            console.log(postData);</span><br><span class="line"></span><br><span class="line">            // 将post字串转换为一个对象</span><br><span class="line">            var dataObj = querystring.parse(postData);</span><br><span class="line">            console.log(dataObj);</span><br><span class="line">            console.log(dataObj.name);</span><br><span class="line">            res.end(&#x27;POST DATA Success!&#x27;);</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        res.end(&#x27;404&#x27;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(port, hostname);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="10-文件上传处理"><a href="#10-文件上传处理" class="headerlink" title="10.文件上传处理"></a>10.文件上传处理</h2><pre><code>原生写POST处理,比较复杂,要写两个监听.
+文件上传业务比较麻烦.所以,用第三方模块: `formidable`
+</code></pre>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">var http = require(&#x27;http&#x27;);</span><br><span class="line">var fs = require(&#x27;fs&#x27;);</span><br><span class="line">var querystring = require(&#x27;querystring&#x27;);</span><br><span class="line">var formidable = require(&#x27;formidable&#x27;); // 处理表单数据</span><br><span class="line">var timestamp = require(&#x27;time-stamp&#x27;); // 时间</span><br><span class="line">var path = require(&#x27;path&#x27;); // 时间</span><br><span class="line"></span><br><span class="line">var hostname = &#x27;127.0.0.1&#x27;;</span><br><span class="line">var port = 3000;</span><br><span class="line"></span><br><span class="line">var server = http.createServer(function(req,res)&#123;</span><br><span class="line">    if (req.url == &#x27;/form&#x27;) &#123;</span><br><span class="line">        // 读取表单加载页面</span><br><span class="line">        fs.readFile(&#x27;./form_file.html&#x27;, function(err, data)&#123;</span><br><span class="line">            res.writeHead(200, &#123;&#x27;content-type&#x27;: &#x27;text/html;charset=UTF-8&#x27;&#125;);</span><br><span class="line">            res.end(data);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125; else if (req.url == &#x27;/dopost&#x27; &amp;&amp; req.method.toLocaleLowerCase() == &#x27;post&#x27;) &#123;</span><br><span class="line">        // 如果访问/dopost,且请求类型是post</span><br><span class="line">        // formidable 处理 parse a file upload</span><br><span class="line">        var form = new formidable.IncomingForm();</span><br><span class="line"></span><br><span class="line">        // 设置上传目录</span><br><span class="line">        form.uploadDir = &quot;./uploads&quot;;</span><br><span class="line">        // 该模块已经将 POST数据 和 文件数据 分离处理</span><br><span class="line">        // 当代码执行到parse()方法的回调函数时,表单中的数据 就都已经处理好了</span><br><span class="line">        form.parse(req, function(err, fields, files) &#123;</span><br><span class="line">            // console.log(fields);</span><br><span class="line">            // console.log(files);</span><br><span class="line">            // 处理上传文件的存储</span><br><span class="line">            // 新文件名: 时间 + 随机数 + 后缀</span><br><span class="line">            var t = timestamp(&#x27;YYYYMMDDHHmmss&#x27;);</span><br><span class="line">            var ran = parseInt(Math.random()* 100000);</span><br><span class="line">            var extname = path.extname(files.myfile.name);</span><br><span class="line"></span><br><span class="line">            // 旧文件名</span><br><span class="line">            var oldPath = &#x27;./&#x27; + files.myfile.path;</span><br><span class="line">            // 新文件名</span><br><span class="line">            var newPath = &#x27;./uploads/&#x27; + t + ran + extname;</span><br><span class="line">            console.log(oldPath);</span><br><span class="line">            console.log(newPath);</span><br><span class="line"></span><br><span class="line">            // 实现改名</span><br><span class="line">            fs.rename(oldPath, newPath, function (err)&#123;</span><br><span class="line">                res.end(&#x27;文件上传成功!!&#x27;);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        res.end(&#x27;404&#x27;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(port, hostname);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="11-ejs模版"><a href="#11-ejs模版" class="headerlink" title="11.ejs模版"></a>11.ejs模版</h2><pre><code>https://ejs.co/        #官网
+https://www.npmjs.com/package/ejs #npm上的ejs包
+ejs是Embedded JavaScript templates的简称,意思是嵌入式JavaScript模板.node中的后台模版.
+</code></pre>
+<hr>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">var http = require(&#x27;http&#x27;);</span><br><span class="line">var ejs = require(&#x27;ejs&#x27;);</span><br><span class="line">var fs = require(&#x27;fs&#x27;);</span><br><span class="line">var hostname = &#x27;127.0.0.1&#x27;;</span><br><span class="line">var port = 3000;</span><br><span class="line"></span><br><span class="line">var server = http.createServer(function (req, res) &#123;</span><br><span class="line">    if (req.url == &#x27;/&#x27;) &#123;</span><br><span class="line">        fs.readFile(&#x27;./views/index.ejs&#x27;, function (err, data) &#123;</span><br><span class="line">            // 模版</span><br><span class="line">            // console.log(data);</span><br><span class="line">            var template = data.toString();</span><br><span class="line">            // console.log(template);</span><br><span class="line">            // 数据</span><br><span class="line">            var dict = &#123;</span><br><span class="line">                title: &#x27;EJS 模版的使用&#x27;,</span><br><span class="line">                content: &#x27;我是段落内容....&#x27;,</span><br><span class="line">                pic: &#x27;./imgs/1.jpg&#x27;,</span><br><span class="line">                songci : &#123;</span><br><span class="line">                    title: &#x27;酒调歌头&#x27;,</span><br><span class="line">                    list : [</span><br><span class="line">                        &#x27;12345&#x27;,</span><br><span class="line">                        &#x27;67890&#x27;,</span><br><span class="line">                        &#x27;09876&#x27;,</span><br><span class="line">                        &#x27;54321&#x27;</span><br><span class="line">                    ]</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            // 绑定数据</span><br><span class="line">            var html = ejs.render(template, dict);</span><br><span class="line"></span><br><span class="line">            // 显示输出页面</span><br><span class="line">            res.writeHead(200, &#123;&#x27;content-type&#x27;:&#x27;text/html&#x27;&#125;);</span><br><span class="line">            res.end(html);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125; else if (req.url == &#x27;/imgs/1.jpg&#x27;) &#123;</span><br><span class="line">        fs.readFile(&#x27;./imgs/1.jpg&#x27;, function (err, data) &#123;</span><br><span class="line">            res.writeHead(200, &#123;&#x27;content-type&#x27;:&#x27;image/jpg&#x27;&#125;);</span><br><span class="line">            res.end(data);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(port, hostname);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--index.ejs--&gt;</span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;cn&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;/title&gt;</span><br><span class="line">    &lt;style type=&quot;text/css&quot;&gt;&lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;h1&gt;&lt;%= title %&gt;&gt;&lt;/h1&gt;</span><br><span class="line">    &lt;hr&gt;</span><br><span class="line"></span><br><span class="line">    &lt;p&gt;&lt;%= content %&gt;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;p&gt;&lt;%= content %&gt;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;p&gt;&lt;%= content %&gt;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;p&gt;&lt;%= content %&gt;&gt;&lt;/p&gt;</span><br><span class="line"></span><br><span class="line">    &lt;hr&gt;</span><br><span class="line">    &lt;br&gt;</span><br><span class="line">    &lt;img src=&quot;&lt;%= pic %&gt;&quot; width=&quot;300&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;hr&gt;</span><br><span class="line">    &lt;h2&gt;&lt;%= songci.title %&gt;&lt;/h2&gt;</span><br><span class="line">    &lt;ul&gt;</span><br><span class="line">        &lt;% for (var i = 0; i &lt; songci.list.length; i++) &#123; %&gt;</span><br><span class="line">        &lt;li&gt;&lt;%= songci.list[i] %&gt;&lt;/li&gt;</span><br><span class="line">        &lt;% &#125; %&gt;</span><br><span class="line">    &lt;/ul&gt;</span><br><span class="line"></span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="PS-V8引擎说明"><a href="#PS-V8引擎说明" class="headerlink" title="PS:V8引擎说明"></a>PS:V8引擎说明</h2><p>​    V8 JavaScript引擎是 Google用于其Chrome浏览器的底层JavaScript引擎。<br>​    Google使用V8创建了一个用C++编写的超快解释器，该解释器拥有另一个独特特征：<br>​    您可以下载该引擎并将其嵌入任何应用程序。<br>​    V8 JavaScript引擎并不仅限于在一个浏览器中运行。<br>​    因此，Node.js实际上会使用Google编写的V8 JavaScript引擎，并将其重建为可在服务器上使用。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2018/07/10/JavaScript%20Node.js/" title="JavaScript-Node.js">https://ni9ne.github.io/2018/07/10/JavaScript Node.js/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/express/" rel="tag"># express</a>
+              <a href="/tags/npm/" rel="tag"># npm</a>
+              <a href="/tags/ejs/" rel="tag"># ejs</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/06/28/JavaScript%20Ajax/" rel="prev" title="JavaScript Ajax">
+                  <i class="fa fa-chevron-left"></i> JavaScript Ajax
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/07/13/JavaScript%20jQuery/" rel="next" title="JavaScript jQuery">
+                  JavaScript jQuery <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

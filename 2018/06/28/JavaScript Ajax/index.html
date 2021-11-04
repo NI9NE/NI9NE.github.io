@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="1. Ajax Asyn Javascript And Xml  “异步的 JS 和 xml”  请求: 客户端向服务器请求一个文件响应: 服务端把文件内容 返回给客户端，一般服务端有输出才算真真的响应.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript Ajax">
+<meta property="og:url" content="https://ni9ne.github.io/2018/06/28/JavaScript%20Ajax/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="1. Ajax Asyn Javascript And Xml  “异步的 JS 和 xml”  请求: 客户端向服务器请求一个文件响应: 服务端把文件内容 返回给客户端，一般服务端有输出才算真真的响应.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-06-28T13:01:15.000Z">
+<meta property="article:modified_time" content="2019-09-04T05:09:30.757Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Ajax">
+<meta property="article:tag" content="Jsonp">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2018/06/28/JavaScript%20Ajax/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2018/06/28/JavaScript%20Ajax/","path":"2018/06/28/JavaScript Ajax/","title":"JavaScript Ajax"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>JavaScript Ajax | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">37</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">42</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Ajax"><span class="nav-number">1.</span> <span class="nav-text">1. Ajax</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-XMLHttpRequest%E5%AF%B9%E8%B1%A1-XHR"><span class="nav-number">2.</span> <span class="nav-text">2. XMLHttpRequest对象 XHR</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E5%B8%B8%E7%94%A8%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 常用属性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-readyState-%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94%E7%8A%B6%E6%80%81"><span class="nav-number">2.2.1.</span> <span class="nav-text">1. readyState   请求响应状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-status-%E8%BF%94%E5%9B%9E%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%93%8D%E5%BA%94%E7%8A%B6%E6%80%81%E7%A0%81"><span class="nav-number">2.2.2.</span> <span class="nav-text">2. status  返回服务器的响应状态码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-responseText-%E8%8E%B7%E5%8F%96%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%93%8D%E5%BA%94%E6%96%87%E6%9C%AC"><span class="nav-number">2.2.3.</span> <span class="nav-text">3. responseText 获取服务器的响应文本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 常用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-open-%E5%88%9D%E5%A7%8B%E5%8C%96%E8%AF%B7%E6%B1%82"><span class="nav-number">2.3.1.</span> <span class="nav-text">1. open()  初始化请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-send-%E6%AD%A3%E5%BC%8F%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82"><span class="nav-number">2.3.2.</span> <span class="nav-text">2. send()  正式发送请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-setRequestHeader-%E8%AE%BE%E7%BD%AEPOST%E8%AF%B7%E6%B1%82%E5%A4%B4%E4%BF%A1%E6%81%AF"><span class="nav-number">2.3.3.</span> <span class="nav-text">3. setRequestHeader()  设置POST请求头信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-%E4%BA%8B%E4%BB%B6%E5%8F%A5%E6%9F%84-onreadystatechange"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 事件句柄 onreadystatechange</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Ajax-php-%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">3. Ajax+php 请求流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E5%A4%84%E7%90%86json%E6%95%B0%E6%8D%AE"><span class="nav-number">4.</span> <span class="nav-text">4. 处理json数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E5%90%8C%E6%AD%A5%E5%92%8C%E5%BC%82%E6%AD%A5"><span class="nav-number">5.</span> <span class="nav-text">5. 同步和异步</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-post-%E5%92%8C-get"><span class="nav-number">6.</span> <span class="nav-text">6. post 和 get</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Ajax-%E6%97%A0%E6%B3%95%E8%B7%A8%E5%9F%9F-%E4%B8%8E-jsonp"><span class="nav-number">7.</span> <span class="nav-text">7. Ajax 无法跨域 与 jsonp</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-%E5%B0%81%E8%A3%85Ajax"><span class="nav-number">8.</span> <span class="nav-text">8. 封装Ajax</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PS-%E7%8A%B6%E6%80%81%E7%A0%81"><span class="nav-number">9.</span> <span class="nav-text">PS:状态码</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2018/06/28/JavaScript%20Ajax/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JavaScript Ajax
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-06-28 21:01:15" itemprop="dateCreated datePublished" datetime="2018-06-28T21:01:15+08:00">2018-06-28</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2019-09-04 13:09:30" itemprop="dateModified" datetime="2019-09-04T13:09:30+08:00">2019-09-04</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="1-Ajax"><a href="#1-Ajax" class="headerlink" title="1. Ajax"></a>1. Ajax</h1><blockquote>
+<p>Asyn Javascript And Xml  “异步的 JS 和 xml”</p>
+</blockquote>
+<p>请求: 客户端向服务器请求一个文件<br>响应: 服务端把文件内容 返回给客户端，一般服务端有输出才算真真的响应.</p>
+<p>传统的请求: 通过地址栏 刷新页面请求<br>AJAX的请求: 通过技术 偷偷的请求</p>
+<hr>
+<h1 id="2-XMLHttpRequest对象-XHR"><a href="#2-XMLHttpRequest对象-XHR" class="headerlink" title="2. XMLHttpRequest对象 XHR"></a>2. XMLHttpRequest对象 XHR</h1><h2 id="2-1-概念"><a href="#2-1-概念" class="headerlink" title="2.1 概念"></a>2.1 概念</h2><p>XMLHttpRequest 对象提供了对 HTTP 协议的完全的访问，包括做出 POST 和 HEAD 请求以及普通的 GET 请求的能力。</p>
+<p>XMLHttpRequest 可以同步或异步地返回 Web 服务器的响应，并且能够以文本或者一个 DOM 文档的形式返回内容。</p>
+<hr>
+<h2 id="2-2-常用属性"><a href="#2-2-常用属性" class="headerlink" title="2.2 常用属性"></a>2.2 常用属性</h2><h3 id="1-readyState-请求响应状态"><a href="#1-readyState-请求响应状态" class="headerlink" title="1. readyState   请求响应状态"></a>1. readyState   请求响应状态</h3><table>
+<thead>
+<tr>
+<th>状态</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>Uninitialized</td>
+<td>初始化状态。XMLHttpRequest 对象已创建或已被 abort() 方法重置。</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Open</td>
+<td>open() 方法已调用，但是 send()</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Sent</td>
+<td>Send() 方法已调用，HTTP 请求已发送到 Web 服务器。未接收到响应。</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Receiving</td>
+<td>所有响应头部都已经接收到。响应体开始接收但未完成。</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Loaded</td>
+<td>HTTP 响应已经完全接收。</td>
+</tr>
+</tbody></table>
+<h3 id="2-status-返回服务器的响应状态码"><a href="#2-status-返回服务器的响应状态码" class="headerlink" title="2. status  返回服务器的响应状态码"></a>2. status  返回服务器的响应状态码</h3><ul>
+<li>200  成功响应</li>
+<li>404  文件不存在</li>
+<li>304  文件来自缓存</li>
+<li>500  服务器未知错误</li>
+<li>503  服务器宕机 服务暂时不可用</li>
+</ul>
+<h3 id="3-responseText-获取服务器的响应文本"><a href="#3-responseText-获取服务器的响应文本" class="headerlink" title="3. responseText 获取服务器的响应文本"></a>3. responseText 获取服务器的响应文本</h3><hr>
+<h2 id="2-3-常用方法"><a href="#2-3-常用方法" class="headerlink" title="2.3 常用方法"></a>2.3 常用方法</h2><h3 id="1-open-初始化请求"><a href="#1-open-初始化请求" class="headerlink" title="1. open()  初始化请求"></a>1. open()  初始化请求</h3><ul>
+<li>参1 method 请求类型 GET/POST/HEAD</li>
+<li>参2 url 请求主体</li>
+<li>参3 是否同/异步: true(默认异步) / false(同步)</li>
+<li>参4,5 认证的帐号和密码</li>
+</ul>
+<h3 id="2-send-正式发送请求"><a href="#2-send-正式发送请求" class="headerlink" title="2. send()  正式发送请求"></a>2. send()  正式发送请求</h3><ul>
+<li>GET 方式 无参</li>
+<li>POST 方式 有可选参数</li>
+</ul>
+<h3 id="3-setRequestHeader-设置POST请求头信息"><a href="#3-setRequestHeader-设置POST请求头信息" class="headerlink" title="3. setRequestHeader()  设置POST请求头信息"></a>3. setRequestHeader()  设置POST请求头信息</h3><ul>
+<li><code>xhr.setRequestHeader(&#39;Content-Type&#39;, &#39;application/x-www-form-urlencoded&#39;);</code></li>
+</ul>
+<hr>
+<h2 id="2-4-事件句柄-onreadystatechange"><a href="#2-4-事件句柄-onreadystatechange" class="headerlink" title="2.4 事件句柄 onreadystatechange"></a>2.4 事件句柄 onreadystatechange</h2><p><code>readyState</code> 的值一变化就触发</p>
+<h1 id="3-Ajax-php-请求流程"><a href="#3-Ajax-php-请求流程" class="headerlink" title="3. Ajax+php 请求流程"></a>3. Ajax+php 请求流程</h1><ul>
+<li>创建对象 xml请求对象</li>
+<li>初始化请求</li>
+<li>发送请求</li>
+<li>接收 并 处理响应</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;h2 id=&quot;box&quot;&gt;&lt;/h2&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">// 创建 XHR 对象</span><br><span class="line">var xhr = new XMLHttpRequest();</span><br><span class="line">// console.dir(xhr);</span><br><span class="line"></span><br><span class="line">// 捕获响应结果,绑定事件</span><br><span class="line">xhr.onreadystatechange = function()&#123;</span><br><span class="line">    // console.log(xhr.readyState);</span><br><span class="line">    if (xhr.readyState == 4) &#123;</span><br><span class="line">        if (xhr.status == 200) &#123;</span><br><span class="line">            // 处理结果</span><br><span class="line">            // alert(xhr.responseText);</span><br><span class="line">            box.innerHTML = xhr.responseText;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 请求初始化</span><br><span class="line">// 参1 method 请求类型 GET/POST/HEAD</span><br><span class="line">// 参2 url 请求主体</span><br><span class="line">// 参3 是否同/异步: true(默认异步) / false(同步)</span><br><span class="line">// 参4,5 认证的帐号和密码</span><br><span class="line">xhr.open(&#x27;get&#x27;, &#x27;./php/1.php&#x27;, true);</span><br><span class="line"></span><br><span class="line">// 正式发送请求</span><br><span class="line">xhr.send();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="4-处理json数据"><a href="#4-处理json数据" class="headerlink" title="4. 处理json数据"></a>4. 处理json数据</h1><ul>
+<li>PHP:  json_encode()</li>
+<li>JS :  eval()  或 JSON.parse()</li>
+</ul>
+<h1 id="5-同步和异步"><a href="#5-同步和异步" class="headerlink" title="5. 同步和异步"></a>5. 同步和异步</h1><p>open()方法的参3 决定了是否同异步<br>默认参数为true,表示请求是异步的,AJAX不会影响到其他程序代码的执行<br>参数为false时,表示请求是同步的,AJAX将会阻塞之后程序的运行,直到响应完全接收完毕为止.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;h1&gt;AJAX 同异步&lt;/h1&gt;</span><br><span class="line">&lt;button onclick=&quot;loadHtml(true)&quot;&gt;异步&lt;/button&gt;</span><br><span class="line">&lt;button onclick=&quot;loadHtml(false)&quot;&gt;同步&lt;/button&gt;</span><br><span class="line">&lt;hr&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"></span><br><span class="line">    function loadHtml(b)&#123;</span><br><span class="line">        var msg = &#x27;我是来自于JS的值&#x27;;</span><br><span class="line"></span><br><span class="line">        var xhr = new XMLHttpRequest();</span><br><span class="line">        xhr.onreadystatechange = function()&#123;</span><br><span class="line">            if (xhr.readyState == 4) &#123;</span><br><span class="line">                if (xhr.status == 200) &#123;</span><br><span class="line">                    msg = xhr.responseText;</span><br><span class="line">                    console.log(msg);</span><br><span class="line">                    </span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        xhr.open(&#x27;get&#x27;, &#x27;./php/6.php&#x27;, b);</span><br><span class="line">        xhr.send();</span><br><span class="line"></span><br><span class="line">        alert(msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="6-post-和-get"><a href="#6-post-和-get" class="headerlink" title="6. post 和 get"></a>6. post 和 get</h1><ul>
+<li>POST方式</li>
+<li>GET方式</li>
+</ul>
+<h1 id="7-Ajax-无法跨域-与-jsonp"><a href="#7-Ajax-无法跨域-与-jsonp" class="headerlink" title="7. Ajax 无法跨域 与 jsonp"></a>7. Ajax 无法跨域 与 jsonp</h1><ul>
+<li><p>Ajax 无法跨域</p>
+<p>为什么产生这个问题? (产生跨域的原因:)<br>a. 发出的请求不是本域的,比如协议/域名/端口号,任何一个不一样都算是跨域.<br>b. 浏览器的限制,不是服务器不让你跨域,是浏览器为了安全限制你不能随便跨域.<br>c. XHR对象 不支持跨域. 如果你发送的不是XHR请求,就算是跨域,浏览器也不会报错</p>
+</li>
+</ul>
+<p>PS. 新建浏览器图标, [属性]–[目标] 新增以下: 关闭安全验证<br> –disable-web-security –user-data-dir=d:\temp1</p>
+<ul>
+<li>JSONP<ul>
+<li>不受同源策略的影响</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS. 九种跨域方式实现原理（完整版）</span><br><span class="line">`https://segmentfault.com/a/1190000018017118`</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">    &lt;h1&gt;JSONP&lt;/h1&gt;</span><br><span class="line">    &lt;button onclick=&quot;loadHtml()&quot;&gt;加载&lt;/button&gt;</span><br><span class="line">    &lt;hr&gt;</span><br><span class="line"></span><br><span class="line">    &lt;div id=&quot;box&quot;&gt;&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">    &lt;script&gt;</span><br><span class="line">        function makedata(obj)&#123;</span><br><span class="line">            // alert(obj);</span><br><span class="line">            box.innerHTML = &#x27;&#x27;;</span><br><span class="line">            // JSON.parse()  // NO</span><br><span class="line">            for (var i in obj) &#123;</span><br><span class="line">                box.innerHTML += i  + &#x27; : &#x27; + obj[i] + &#x27;&lt;br&gt;&#x27;;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // JSONP 关键步骤</span><br><span class="line">        function loadHtml()&#123;</span><br><span class="line">            // 创建JS对象</span><br><span class="line">            var js = document.createElement(&#x27;script&#x27;);</span><br><span class="line">            // 设置JS标签的src值</span><br><span class="line">            js.src = &#x27;http://127.0.0.1/s86/JS13/php/7.php&#x27;;</span><br><span class="line">            // 添加这个JS对象到页面之中</span><br><span class="line">            document.body.appendChild(js);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">       /* function loadHtml()&#123;</span><br><span class="line">            var xhr = new XMLHttpRequest();</span><br><span class="line">            xhr.onreadystatechange = function()&#123;</span><br><span class="line">                if (xhr.readyState == 4) &#123;</span><br><span class="line">                    if (xhr.status == 200) &#123;</span><br><span class="line">                        box.innerHTML = &#x27;&#x27;;</span><br><span class="line">                        var obj = JSON.parse(xhr.responseText);</span><br><span class="line">                        for (var i in obj) &#123;</span><br><span class="line">                            box.innerHTML += i  + &#x27; : &#x27; + obj[i] + &#x27;&lt;br&gt;&#x27;;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            xhr.open(&#x27;get&#x27;, &#x27;http://127.0.0.1/s86/JS13/php/7.php&#x27;, true);</span><br><span class="line">            xhr.send();</span><br><span class="line">        &#125;*/</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">   &lt;!--  &lt;script&gt;</span><br><span class="line">        // JS OBJ</span><br><span class="line">        makedata(&#123;&quot;id&quot;:&quot;7&quot;,&quot;name&quot;:&quot;\u5929\u4f7f&quot;,&quot;sex&quot;:&quot;0&quot;,&quot;age&quot;:&quot;30&quot;,&quot;province&quot;:&quot;\u6c5f\u82cf&quot;&#125;)</span><br><span class="line">    &lt;/script&gt; --&gt;</span><br><span class="line">&lt;/body&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="8-封装Ajax"><a href="#8-封装Ajax" class="headerlink" title="8. 封装Ajax"></a>8. 封装Ajax</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;h1&gt;AJAX封装&lt;/h1&gt;</span><br><span class="line">&lt;hr&gt;</span><br><span class="line"></span><br><span class="line">&lt;button onclick=&quot;ajax(&#x27;./php/8.php&#x27;,fun1)&quot;&gt;封装&lt;/button&gt;</span><br><span class="line">&lt;div id=&quot;box&quot;&gt;&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">	</span><br><span class="line">	function ajax(url,fun1)&#123;</span><br><span class="line"></span><br><span class="line">		var xhr = new XMLHttpRequest();</span><br><span class="line">		xhr.open(&#x27;get&#x27;,url,true);</span><br><span class="line">		xhr.send();</span><br><span class="line">		xhr.onreadystatechange = function()&#123;</span><br><span class="line">			if (xhr.readyState==4) &#123;</span><br><span class="line">				if (xhr.status==200) &#123;</span><br><span class="line">					res = xhr.responseText;</span><br><span class="line">					fun1(res);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	function fun1(y)&#123;</span><br><span class="line">		box.innerHTML=y;</span><br><span class="line">	&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="PS-状态码"><a href="#PS-状态码" class="headerlink" title="PS:状态码"></a>PS:状态码</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">HTTP 状态</span><br><span class="line">    1xx: 信息</span><br><span class="line">        消息: 描述: </span><br><span class="line">        100 Continue 服务器仅接收到部分请求，但是一旦服务器并没有拒绝该请求，客户端应该继续发送其余的请求。 </span><br><span class="line">        101 Switching Protocols 服务器转换协议：服务器将遵从客户的请求转换到另外一种协议。 </span><br><span class="line">    2xx: 成功</span><br><span class="line">    消息: 描述: </span><br><span class="line">        200 OK 请求成功（其后是对GET和POST请求的应答文档。） </span><br><span class="line">        201 Created 请求被创建完成，同时新的资源被创建。 </span><br><span class="line">        202 Accepted 供处理的请求已被接受，但是处理未完成。 </span><br><span class="line">        203 Non-authoritative Information 文档已经正常地返回，但一些应答头可能不正确，因为使用的是文档的拷贝。 </span><br><span class="line">        204 No Content 没有新文档。浏览器应该继续显示原来的文档。如果用户定期地刷新页面，而Servlet可以确定用户文档足够新，这个状态代码是很有用的。 </span><br><span class="line">        205 Reset Content 没有新文档。但浏览器应该重置它所显示的内容。用来强制浏览器清除表单输入内容。 </span><br><span class="line">        206 Partial Content 客户发送了一个带有Range头的GET请求，服务器完成了它。 </span><br><span class="line">    3xx: 重定向</span><br><span class="line">    消息: 描述: </span><br><span class="line">        300 Multiple Choices 多重选择。链接列表。用户可以选择某链接到达目的地。最多允许五个地址。 </span><br><span class="line">        301 Moved Permanently 所请求的页面已经转移至新的url。 </span><br><span class="line">        302 Found 所请求的页面已经临时转移至新的url。 </span><br><span class="line">        303 See Other 所请求的页面可在别的url下被找到。 </span><br><span class="line">        304 Not Modified 未按预期修改文档。客户端有缓冲的文档并发出了一个条件性的请求（一般是提供If-Modified-Since头表示客户只想比指定日期更新的文档）。服务器告诉客户，原来缓冲的文档还可以继续使用。 </span><br><span class="line">        305 Use Proxy 客户请求的文档应该通过Location头所指明的代理服务器提取。 </span><br><span class="line">        306 Unused 此代码被用于前一版本。目前已不再使用，但是代码依然被保留。 </span><br><span class="line">        307 Temporary Redirect 被请求的页面已经临时移至新的url。 </span><br><span class="line">    4xx: 客户端错误</span><br><span class="line">    消息: 描述: </span><br><span class="line">        400 Bad Request 服务器未能理解请求。 </span><br><span class="line">        401 Unauthorized 被请求的页面需要用户名和密码。 </span><br><span class="line">        402 Payment Required 此代码尚无法使用。 </span><br><span class="line">        403 Forbidden 对被请求页面的访问被禁止。 </span><br><span class="line">        404 Not Found 服务器无法找到被请求的页面。 </span><br><span class="line">        405 Method Not Allowed 请求中指定的方法不被允许。 </span><br><span class="line">        406 Not Acceptable 服务器生成的响应无法被客户端所接受。 </span><br><span class="line">        407 Proxy Authentication Required 用户必须首先使用代理服务器进行验证，这样请求才会被处理。 </span><br><span class="line">        408 Request Timeout 请求超出了服务器的等待时间。 </span><br><span class="line">        409 Conflict 由于冲突，请求无法被完成。 </span><br><span class="line">        410 Gone 被请求的页面不可用。 </span><br><span class="line">        411 Length Required &quot;Content-Length&quot; 未被定义。如果无此内容，服务器不会接受请求。 </span><br><span class="line">        412 Precondition Failed 请求中的前提条件被服务器评估为失败。 </span><br><span class="line">        413 Request Entity Too Large 由于所请求的实体的太大，服务器不会接受请求。 </span><br><span class="line">        414 Request-url Too Long 由于url太长，服务器不会接受请求。当post请求被转换为带有很长的查询信息的get请求时，就会发生这种情况。 </span><br><span class="line">        415 Unsupported Media Type 由于媒介类型不被支持，服务器不会接受请求。 </span><br><span class="line">        416  服务器不能满足客户在请求中指定的Range头。 </span><br><span class="line">        417 Expectation Failed   </span><br><span class="line">    5xx: 服务器错误</span><br><span class="line">    消息: 描述: </span><br><span class="line">        500 Internal Server Error 请求未完成。服务器遇到不可预知的情况。 </span><br><span class="line">        501 Not Implemented 请求未完成。服务器不支持所请求的功能。 </span><br><span class="line">        502 Bad Gateway 请求未完成。服务器从上游服务器收到一个无效的响应。 </span><br><span class="line">        503 Service Unavailable 请求未完成。服务器临时过载或当机。 宕机</span><br><span class="line">        504 Gateway Timeout 网关超时。 </span><br><span class="line">        505 HTTP Version Not Supported 服务器不支持请求中指明的HTTP协议版本。 </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2018/06/28/JavaScript%20Ajax/" title="JavaScript Ajax">https://ni9ne.github.io/2018/06/28/JavaScript Ajax/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Ajax/" rel="tag"># Ajax</a>
+              <a href="/tags/Jsonp/" rel="tag"># Jsonp</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/06/21/JavaScript%20%E5%9F%BA%E7%A1%8005-DOM/" rel="prev" title="JavaScript 基础05-JS DOM">
+                  <i class="fa fa-chevron-left"></i> JavaScript 基础05-JS DOM
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/07/10/JavaScript%20Node.js/" rel="next" title="JavaScript-Node.js">
+                  JavaScript-Node.js <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="第三方登录&#x2F;短信验证&#x2F;邮箱验证  该登录注册基于tp5框架, 短信验证是基于容联云短信平台接口实现,邮件验证是通过swiftmailer插件实现  1.搭建前端页面">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网页登录验证实现">
+<meta property="og:url" content="https://ni9ne.github.io/2018/11/07/%E7%BD%91%E9%A1%B5%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="第三方登录&#x2F;短信验证&#x2F;邮箱验证  该登录注册基于tp5框架, 短信验证是基于容联云短信平台接口实现,邮件验证是通过swiftmailer插件实现  1.搭建前端页面">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1566974419742.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1566974429645.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567663560489.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567663732898.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567663753322.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567663898668.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567668181364.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567664233414.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567685344661.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567685542905.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567685757072.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567685822254.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567686046099.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567686194361.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567686186865.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567686361773.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1567686653314.png">
+<meta property="article:published_time" content="2018-11-07T13:02:15.000Z">
+<meta property="article:modified_time" content="2019-09-09T10:52:56.051Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="接口">
+<meta property="article:tag" content="ThinkPHP5">
+<meta property="article:tag" content="第三方登录">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.github.io/images/imgs/1566974419742.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2018/11/07/%E7%BD%91%E9%A1%B5%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E5%AE%9E%E7%8E%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2018/11/07/%E7%BD%91%E9%A1%B5%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E5%AE%9E%E7%8E%B0/","path":"2018/11/07/网页登录验证实现/","title":"网页登录验证实现"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>网页登录验证实现 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">37</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">42</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%90%AD%E5%BB%BA%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2"><span class="nav-number">1.</span> <span class="nav-text">1.搭建前端页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%88%9B%E5%BB%BA%E8%B7%AF%E7%94%B1"><span class="nav-number">2.</span> <span class="nav-text">2.创建路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%B9%A6%E5%86%99%E6%B3%A8%E5%86%8C-%E7%99%BB%E5%BD%95%E5%90%8E%E5%8F%B0%E9%80%BB%E8%BE%91%E4%BB%A3%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">3.书写注册,登录后台逻辑代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%88%9B%E5%BB%BA%E9%AA%8C%E8%AF%81%E5%99%A8validate%E6%A8%A1%E5%9D%97"><span class="nav-number">4.</span> <span class="nav-text">4.创建验证器validate模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%B3%A8%E5%86%8C%E9%A1%B5%E9%9D%A2%E5%BC%95%E5%85%A5%E5%9B%BE%E5%BD%A2%E9%AA%8C%E8%AF%81%E5%8F%8A%E9%AA%8C%E8%AF%81%E7%A0%81%E5%8A%9F%E8%83%BD"><span class="nav-number">5.</span> <span class="nav-text">5.注册页面引入图形验证及验证码功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1%E5%BC%95%E5%85%A5%E5%9B%BE%E5%BD%A2%E9%AA%8C%E8%AF%81%E7%A0%81%E5%8A%9F%E8%83%BD"><span class="nav-number">5.1.</span> <span class="nav-text">1.1引入图形验证码功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2%E5%BC%95%E5%85%A5%E7%9F%AD%E4%BF%A1%E9%AA%8C%E8%AF%81%E5%8A%9F%E8%83%BD"><span class="nav-number">5.2.</span> <span class="nav-text">1.2引入短信验证功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3%E5%BC%95%E5%85%A5%E9%82%AE%E4%BB%B6%E9%AA%8C%E8%AF%81%E5%8A%9F%E8%83%BD"><span class="nav-number">5.3.</span> <span class="nav-text">1.3引入邮件验证功能</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">6.</span> <span class="nav-text">6.第三方登录实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%BE%AE%E5%8D%9A"><span class="nav-number">6.1.</span> <span class="nav-text">1.微博</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-qq"><span class="nav-number">6.2.</span> <span class="nav-text">2.qq</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E5%9C%A8-QQ%E4%BA%92%E8%81%94-%E6%B3%A8%E5%86%8C%E5%BC%80%E5%8F%91%E8%80%85%E8%B4%A6%E5%8F%B7"><span class="nav-number">6.2.1.</span> <span class="nav-text">1.在 QQ互联 注册开发者账号,</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E5%88%9B%E5%BB%BA%E5%BA%94%E7%94%A8"><span class="nav-number">6.2.2.</span> <span class="nav-text">2.创建应用,</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-%E4%B8%8B%E8%BD%BDPHP-sdk%E5%BC%80%E5%8F%91%E5%8C%85"><span class="nav-number">6.2.3.</span> <span class="nav-text">3.下载PHP sdk开发包</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-%E9%85%8D%E7%BD%AE"><span class="nav-number">6.2.4.</span> <span class="nav-text">4.配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-%E4%BF%AE%E6%94%B9%E7%B1%BB%E6%96%87%E4%BB%B6"><span class="nav-number">6.2.5.</span> <span class="nav-text">5.修改类文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#6-%E5%BA%94%E7%94%A8"><span class="nav-number">6.2.6.</span> <span class="nav-text">6.应用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#7-%E6%8A%A5%E9%94%99%E5%A4%84%E7%90%86"><span class="nav-number">6.2.7.</span> <span class="nav-text">7.报错处理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#8-%E5%A4%84%E7%90%86%E5%9B%9E%E8%B0%83"><span class="nav-number">6.2.8.</span> <span class="nav-text">8.处理回调</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%BE%AE%E4%BF%A1"><span class="nav-number">6.3.</span> <span class="nav-text">3.微信</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E6%94%AF%E4%BB%98"><span class="nav-number">7.</span> <span class="nav-text">7.支付</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2018/11/07/%E7%BD%91%E9%A1%B5%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网页登录验证实现
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-11-07 21:02:15" itemprop="dateCreated datePublished" datetime="2018-11-07T21:02:15+08:00">2018-11-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2019-09-09 18:52:56" itemprop="dateModified" datetime="2019-09-09T18:52:56+08:00">2019-09-09</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><strong>第三方登录/短信验证/邮箱验证</strong></p>
+<blockquote>
+<p>该登录注册基于tp5框架, 短信验证是基于<code>容联云短信平台</code>接口实现,邮件验证是通过<code>swiftmailer</code>插件实现</p>
+</blockquote>
+<h3 id="1-搭建前端页面"><a href="#1-搭建前端页面" class="headerlink" title="1.搭建前端页面"></a>1.搭建前端页面</h3><p><img src="/images/imgs/1566974419742.png" alt="1566974419742"></p>
+<p><img src="/images/imgs/1566974429645.png" alt="1566974429645"></p>
+<h3 id="2-创建路由"><a href="#2-创建路由" class="headerlink" title="2.创建路由"></a>2.创建路由</h3><h3 id="3-书写注册-登录后台逻辑代码"><a href="#3-书写注册-登录后台逻辑代码" class="headerlink" title="3.书写注册,登录后台逻辑代码"></a>3.书写注册,登录后台逻辑代码</h3><h3 id="4-创建验证器validate模块"><a href="#4-创建验证器validate模块" class="headerlink" title="4.创建验证器validate模块"></a>4.创建验证器validate模块</h3><p>​    validata模块使用basicValidate.php作为入口,其余验证器继承实现</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace app\index\validate;</span><br><span class="line"></span><br><span class="line">use think\Request;</span><br><span class="line">use think\Validate;</span><br><span class="line">use think\Exception;</span><br><span class="line"></span><br><span class="line">class basicValidate extends Validate</span><br><span class="line">&#123;</span><br><span class="line">    /** 获取http传入的参数,对这些参数做校验</span><br><span class="line">     * @return bool</span><br><span class="line">     */</span><br><span class="line">    public function goCheck()</span><br><span class="line">    &#123;</span><br><span class="line">        //获取http传入的参数</span><br><span class="line">        // 对这些参数做校验</span><br><span class="line">        $request = Request::instance();</span><br><span class="line">        $params = $request-&gt;param();</span><br><span class="line"></span><br><span class="line">        $result = $this-&gt;check($params);</span><br><span class="line">        if (!$result)&#123;</span><br><span class="line">            $error = $this-&gt;getError();</span><br><span class="line">            return $error;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">class registerValidate extends basicValidate</span><br><span class="line">&#123;</span><br><span class="line">    protected $rule = [</span><br><span class="line"></span><br><span class="line">        &#x27;nickname&#x27; =&gt; &#x27;alphaDash|length:4,25&#x27;,</span><br><span class="line">        &#x27;email&#x27;=&gt;[&#x27;regex&#x27;=&gt;&#x27;/^[0-9a-zA-Z-_!]&#123;2,18&#125;@[\da-zA-z]&#123;1,10&#125;\.(com|cn|net|org|edu|com\.cn|tv)$/&#x27;],</span><br><span class="line">        &#x27;pwd&#x27;=&gt;&#x27;alphaNum|length:4,20&#x27;,</span><br><span class="line">        &#x27;tel&#x27;=&gt;[&#x27;regex&#x27;=&gt;&#x27;/^1(3\d|4[5-9]|5[0-35-9]|66|7[03-8]|8\d|9[89])\d&#123;8&#125;$/&#x27;],</span><br><span class="line">        &#x27;__token__&#x27;=&gt;&#x27;require|token&#x27;,</span><br><span class="line">    ];</span><br><span class="line">    protected $message = [</span><br><span class="line">        &#x27;nickname.alphaDash&#x27; =&gt; &#x27;只能为字母,数字,下划线&#x27;,</span><br><span class="line">        &#x27;nickname.length&#x27; =&gt; &#x27;用户名长度为4-25位&#x27;,</span><br><span class="line">        &#x27;email.regex&#x27;=&gt;&#x27;邮箱格式错误&#x27;,</span><br><span class="line">        &#x27;pwd.alphaNum&#x27;=&gt;&#x27;密码只能为数字字母组成&#x27;,</span><br><span class="line">        &#x27;pwd.length&#x27;=&gt;&#x27;密码长度为4-20位&#x27;,</span><br><span class="line">        &#x27;tel.regex&#x27;=&gt;&#x27;手机号格式错误&#x27;,</span><br><span class="line">        &#x27;__token__.require&#x27;=&gt;&#x27;非法提交&#x27;,</span><br><span class="line">        &#x27;__token__.token&#x27;=&gt;&#x27;请不要重复提交表单&#x27;,</span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="5-注册页面引入图形验证及验证码功能"><a href="#5-注册页面引入图形验证及验证码功能" class="headerlink" title="5.注册页面引入图形验证及验证码功能"></a>5.注册页面引入图形验证及验证码功能</h3><h4 id="1-1引入图形验证码功能"><a href="#1-1引入图形验证码功能" class="headerlink" title="1.1引入图形验证码功能"></a>1.1引入图形验证码功能</h4><ul>
+<li>安装</li>
+</ul>
+<p>​    <code>composer require topthink/think-captcha 1.*</code></p>
+<ul>
+<li><p>引入页面</p>
+<p><code>&lt;img onclick=&quot;this.src=&#39;&#123;:captcha_src(1)&#125;?&#39;+Math.random()&quot; src=&quot;&#123;:captcha_src(1)&#125;&quot; alt=&quot;captcha&quot; /&gt;</code></p>
+</li>
+<li><p>页面ajax验证</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">function checkCode()&#123;</span><br><span class="line">    cap = $(&#x27;#capCode&#x27;).val();</span><br><span class="line">    $.ajax(&#123;</span><br><span class="line">        method: &#x27;get&#x27;,</span><br><span class="line">        url: &quot;&#123;:url(&#x27;index/index/verify&#x27;)&#125;?code=&quot; + cap +&quot;&amp;id=1&quot;,</span><br><span class="line">        async : &#x27;false&#x27;,</span><br><span class="line">        dataType: &#x27;json&#x27;,</span><br><span class="line">        success: function (data) &#123;</span><br><span class="line">            console.log(data);</span><br><span class="line">            if(data)&#123;</span><br><span class="line">                sendMsg();</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                toastr.error(&#x27;验证码填写出错&#x27;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        error: function () &#123;</span><br><span class="line">            alert(&#x27;AJAX1 执行失败&#x27;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>后台验证</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">use think\captcha\Captcha;</span><br><span class="line"></span><br><span class="line">	/**ajax检测验证码是否正确</span><br><span class="line">    * @param $code</span><br><span class="line">    * @param string $id</span><br><span class="line">    * @return mixed</span><br><span class="line">    */</span><br><span class="line">   function verify($code, $id = &#x27;&#x27;)</span><br><span class="line">   &#123;</span><br><span class="line">       $captcha = new Captcha();</span><br><span class="line">       return $captcha-&gt;check($code, $id);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="1-2引入短信验证功能"><a href="#1-2引入短信验证功能" class="headerlink" title="1.2引入短信验证功能"></a>1.2引入短信验证功能</h4><ul>
+<li><p>依据容联云文档引入<code>REST.php</code>到<code>extend</code>目录</p>
+</li>
+<li><p>页面使用ajax发送短信请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">function sendMsg() &#123;</span><br><span class="line">    tel = $(&#x27;#name&#x27;).val();</span><br><span class="line">    console.log(tel);</span><br><span class="line">    $.ajax(&#123;</span><br><span class="line">        method: &#x27;get&#x27;,</span><br><span class="line">        url: &quot;&#123;:url(&#x27;index/index/send&#x27;)&#125;?tel=&quot; + tel,</span><br><span class="line">        dataType: &#x27;json&#x27;,</span><br><span class="line">        success: function (data) &#123;</span><br><span class="line">            console.log(data);</span><br><span class="line">            if (data.statusCode==&#x27;000000&#x27;) &#123;</span><br><span class="line">                toastr.success(&#x27;短信发送成功&#x27;);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                toastr.error(data.statusMsg);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        error: function () &#123;</span><br><span class="line">            alert(&#x27;AJAX 执行失败&#x27;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>后台处理发送请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">    // ajax请求发送短信</span><br><span class="line">    public function send(Request $request)</span><br><span class="line">    &#123;</span><br><span class="line">        $get = $request-&gt;get();</span><br><span class="line">        $tel = $get[&#x27;tel&#x27;];</span><br><span class="line">        $server = $request-&gt;server();</span><br><span class="line">        // 获取用户ip</span><br><span class="line">        $ip = $server[&#x27;REMOTE_ADDR&#x27;];</span><br><span class="line">        $userre = $this-&gt;index-&gt;checkCount($ip);</span><br><span class="line">        if (!$userre) &#123;</span><br><span class="line">            $data[&#x27;statusMsg&#x27;] = &#x27;同一个ip24小时只能发送10条短信&#x27;;</span><br><span class="line">            $data[&#x27;statusCode&#x27;] =&quot;111111&quot;;</span><br><span class="line">            return $data;</span><br><span class="line">        &#125;</span><br><span class="line">        // 生成随机的验证码, 并存储至session</span><br><span class="line">        $code = mt_rand(1000,9999);</span><br><span class="line">        Session::set(&#x27;code&#x27;,$code);</span><br><span class="line">        // 提示时间</span><br><span class="line">        $time = 10;</span><br><span class="line">        $data = [$code, $time];</span><br><span class="line">        $result = $this-&gt;index-&gt;sendSMS($tel, $data, 1);</span><br><span class="line">        return $result;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">        /**</span><br><span class="line">     * 发送模板短信</span><br><span class="line">     * @param to 手机号码集合,用英文逗号分开</span><br><span class="line">     * @param datas 内容数据 格式为数组 例如：array(&#x27;Marry&#x27;,&#x27;Alon&#x27;)，如不需替换请填 null</span><br><span class="line">     * @param $tempId 模板Id</span><br><span class="line">     */</span><br><span class="line">    function sendSMS($to,$datas,$tempId)</span><br><span class="line">    &#123;</span><br><span class="line">        // 初始化REST SDK</span><br><span class="line">        $rest = new REST(&#x27;app.cloopen.com&#x27;,&#x27;8883&#x27;,&#x27;2013-12-26&#x27;);</span><br><span class="line">        // var_dump($rest);die;</span><br><span class="line">        $rest-&gt;SetAccount(&#x27;8a216da86a58af8b016a900b55cd1cb3&#x27;,&#x27;e4360fc2cfee49f6a5c1cb2c2fab73de&#x27;);</span><br><span class="line">        $rest-&gt;setAppId(&#x27;8a216da86a58af8b016a900b56181cb9&#x27;);</span><br><span class="line"></span><br><span class="line">        // 发送模板短信</span><br><span class="line">//        echo &quot;Sending TemplateSMS to $to &lt;br/&gt;&quot;;</span><br><span class="line">        $result = $rest-&gt;sendTemplateSMS($to,$datas,$tempId);</span><br><span class="line">        if($result == NULL ) &#123;</span><br><span class="line">            echo &quot;result error!&quot;;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">        if($result-&gt;statusCode!=0) &#123;</span><br><span class="line">//            echo &quot;error code :&quot; . $result-&gt;statusCode . &quot;&lt;br&gt;&quot;;</span><br><span class="line">//            echo &quot;error msg :&quot; . $result-&gt;statusMsg . &quot;&lt;br&gt;&quot;;</span><br><span class="line">            //TODO 添加错误处理逻辑</span><br><span class="line">            return $result;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">//            echo &quot;Sendind TemplateSMS success!&lt;br/&gt;&quot;;</span><br><span class="line">            // 获取返回信息</span><br><span class="line">//            $smsmessage = $result-&gt;TemplateSMS;</span><br><span class="line">//            echo &quot;dateCreated:&quot;.$smsmessage-&gt;dateCreated.&quot;&lt;br/&gt;&quot;;</span><br><span class="line">//            echo &quot;smsMessageSid:&quot;.$smsmessage-&gt;smsMessageSid.&quot;&lt;br/&gt;&quot;;</span><br><span class="line">            //TODO 添加成功处理逻辑</span><br><span class="line">            return $result;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意: 默认echo发送的消息可能干扰前端判断发送状态,推荐全部注释, 前端根据返回的statusCode和statusMsg来做做自己的逻辑</p>
+<p>上线时注意要将<code>extends</code> 目录中的ignore文件删掉 , 不然上传不到git</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="1-3引入邮件验证功能"><a href="#1-3引入邮件验证功能" class="headerlink" title="1.3引入邮件验证功能"></a>1.3引入邮件验证功能</h4><ul>
+<li>安装swiftmail</li>
+</ul>
+<p>​    <code>composer require &quot;swiftmailer/swiftmailer:^6.0&quot;</code></p>
+<ul>
+<li><p>前台ajax请求发送邮件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">function sendMail()&#123;</span><br><span class="line">    mail = $(&#x27;#name&#x27;).val();</span><br><span class="line">    //console.log(mail);</span><br><span class="line">    $.ajax(&#123;</span><br><span class="line">        method: &#x27;get&#x27;,</span><br><span class="line">        url: &quot;&#123;:url(&#x27;index/index/sendMail&#x27;)&#125;?mail=&quot; + mail,</span><br><span class="line">        dataType: &#x27;json&#x27;,</span><br><span class="line">        success: function (data) &#123;</span><br><span class="line">            console.log(data);</span><br><span class="line">            if (data==1) &#123;</span><br><span class="line">                toastr.success(&#x27;确认邮件发送成功&#x27;);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                toastr.error(&#x27;确认邮件发送失败&#x27;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        error: function () &#123;</span><br><span class="line">            alert(&#x27;AJAX 执行失败&#x27;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>后台处理请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">// ajax请求发送邮件</span><br><span class="line">public function sendMail($mail)</span><br><span class="line">&#123;</span><br><span class="line">  </span><br><span class="line">    $transport = new \Swift_SmtpTransport(&#x27;smtp.163.com&#x27;, 25); // 邮箱服务器</span><br><span class="line">    $transport-&gt;setUsername(&#x27;xxx@163.com&#x27;)  // 邮箱用户名</span><br><span class="line">    -&gt;setPassword(&#x27;abc123456&#x27;);   // 邮箱密码，有的邮件服务器是授权码</span><br><span class="line">  </span><br><span class="line">    $code = mt_rand(1000,9999);</span><br><span class="line">    Session::set(&#x27;code&#x27;,$code);</span><br><span class="line">    $mailer = new \Swift_Mailer($transport);</span><br><span class="line">  </span><br><span class="line">    $message = (new \Swift_Message(&#x27;您的验证码如下:&#x27;.$code)) // 邮件标题</span><br><span class="line">    -&gt;setFrom([&#x27;xxx@163.com&#x27; =&gt; &#x27;xxx有限责任公司&#x27;]) // 发送者</span><br><span class="line">    -&gt;setTo([$mail =&gt; &#x27;用户&#x27;]) //发送对象，数组形式支持多个</span><br><span class="line">    -&gt;setBody($code); //邮件内容</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">    $result = $mailer-&gt;send($message);</span><br><span class="line">    return $result;</span><br><span class="line">&#125;</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>有许多网上的教程都是使用require_once来加载autoload文件, 通过composer安装后, 插件在/vendor文件夹下,不需要require/include 即可使用. 但在new的时候需要加 \ .</p>
+<p>上线后由于阿里云服务器默认封禁25端口,就算在规则配置打开也没作用, 使用465端口, encryption 改用  ssl ,之后邮件服务才能正常实现</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="6-第三方登录实现"><a href="#6-第三方登录实现" class="headerlink" title="6.第三方登录实现"></a>6.第三方登录实现</h3><h4 id="1-微博"><a href="#1-微博" class="headerlink" title="1.微博"></a>1.微博</h4><p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av14869349/?p=2">https://www.bilibili.com/video/av14869349/?p=2</a></p>
+<p>1.前往微博开放平台注册开发者,创建应用,获取api key和secret</p>
+<p>2.<a target="_blank" rel="noopener" href="https://open.weibo.com/wiki/SDK">https://open.weibo.com/wiki/SDK</a> 下载SDK</p>
+<p><img src="/images/imgs/1567663560489.png" alt="1567663560489"></p>
+<p>3.拆分基础类, 放在<code>vendor/sina/</code>目录下, 符合tp5的命名规范</p>
+<p><code>[SaeTClientV2.php]</code> 和 <code>[SaeTOAuthV2.php]</code></p>
+<p><img src="/images/imgs/1567663732898.png" alt="1567663732898"></p>
+<p><img src="/images/imgs/1567663753322.png" alt="1567663753322"></p>
+<p>4.配置文件定义常量key/secret: 将其放在<code>public/index.php</code> 中</p>
+<p><img src="/images/imgs/1567663898668.png" alt="1567663898668"></p>
+<p><code>composer.json</code>中写入sina路径, 执行<code>composer dump-autoload</code></p>
+<p><img src="/images/imgs/1567668181364.png" alt="1567668181364"></p>
+<p>5.在调用微博登录的页面声明模板变量</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">use sina\SaeTClientV2;</span><br><span class="line">use sina\SaeTOAuthV2;</span><br><span class="line"></span><br><span class="line">		$sina = new SaeTOAuthV2(WB_AKEY,WB_SKEY);</span><br><span class="line">        $codeUrl = $sina-&gt;getAuthorizeURL(WB_CALLBACK_URL);</span><br><span class="line">        $this-&gt;assign(&#x27;code_url&#x27;,$codeUrl);</span><br></pre></td></tr></table></figure>
+
+<p>页面上应用该变量</p>
+<p><img src="/images/imgs/1567664233414.png" alt="1567664233414"></p>
+<p>6.写接受回调函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">    public function callback()</span><br><span class="line">    &#123;</span><br><span class="line">        $sina = new SaeTOAuthV2(WB_AKEY,WB_SKEY);</span><br><span class="line">        $keys = array();</span><br><span class="line">        $param = Request::instance()-&gt;param();</span><br><span class="line">//        dump($param);</span><br><span class="line">        $keys[&#x27;code&#x27;] = $param[&#x27;code&#x27;];</span><br><span class="line">        $keys[&#x27;redirct_uri&#x27;]=WB_CALLBACK_URL;</span><br><span class="line">        $token = $sina-&gt;getAccessToken(&#x27;code&#x27;,$keys);</span><br><span class="line">//        halt($token);</span><br><span class="line">        if ($token) &#123;</span><br><span class="line">            Session::set(&#x27;token&#x27;,$token);</span><br><span class="line">            return $this-&gt;fetch();</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            return $this-&gt;error(&#x27;登录授权失败&#x27;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>7.铺设回调页面,获取当前用户信息,处理登录注册逻辑</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public function findUser()</span><br><span class="line">&#123;</span><br><span class="line">    $sina = new SaeTClientV2(WB_AKEY,WB_SKEY,Session::get(&#x27;token&#x27;)[&#x27;access_token&#x27;]);</span><br><span class="line">    $ms = $sina-&gt;home_timeline();</span><br><span class="line">    $uid_get = $sina-&gt;get_uid();</span><br><span class="line">    $uid = $uid_get[&#x27;uid&#x27;];</span><br><span class="line">    $user_message = $sina-&gt;show_user_by_id($uid);</span><br><span class="line">    return $user_message;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-qq"><a href="#2-qq" class="headerlink" title="2.qq"></a>2.qq</h4><h5 id="1-在-QQ互联-注册开发者账号"><a href="#1-在-QQ互联-注册开发者账号" class="headerlink" title="1.在 QQ互联 注册开发者账号,"></a>1.在 <a target="_blank" rel="noopener" href="https://connect.qq.com/">QQ互联</a> 注册开发者账号,</h5><h5 id="2-创建应用"><a href="#2-创建应用" class="headerlink" title="2.创建应用,"></a>2.创建应用,</h5><p>​    审核通过后获取APPid 和 APPkey, 回调地址</p>
+<p><img src="/images/imgs/1567685344661.png" alt="1567685344661"></p>
+<h5 id="3-下载PHP-sdk开发包"><a href="#3-下载PHP-sdk开发包" class="headerlink" title="3.下载PHP sdk开发包"></a>3.下载PHP sdk开发包</h5><p>​    <a target="_blank" rel="noopener" href="https://wiki.connect.qq.com/sdk%E4%B8%8B%E8%BD%BD">SDK下载</a></p>
+<h5 id="4-配置"><a href="#4-配置" class="headerlink" title="4.配置"></a>4.配置</h5><p>在wamp环境运行D:\wamp\www\Connect2.1\index.php 并配置</p>
+<p><img src="/images/imgs/1567685542905.png" alt="1567685542905"></p>
+<blockquote>
+<p>配置完成后会生成<code>API/comm/inc.php</code>文件, 有用</p>
+</blockquote>
+<h5 id="5-修改类文件"><a href="#5-修改类文件" class="headerlink" title="5.修改类文件"></a>5.修改类文件</h5><p>将<code>Connect2.1\API\class</code>中的五个php类文件按照TP5的命名方式改造后放入TP5<code>extend/qq</code>文件夹</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- 添加namespace</span><br><span class="line">- 去除require_once</span><br><span class="line">- 文件名改为类名</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/imgs/1567685757072.png" alt="1567685757072"></p>
+<p><img src="/images/imgs/1567685822254.png" alt="1567685822254"></p>
+<h5 id="6-应用"><a href="#6-应用" class="headerlink" title="6.应用"></a>6.应用</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">use qq\QC;</span><br><span class="line"></span><br><span class="line">        $qq = new QC();</span><br><span class="line">        $qqUrl = $qq-&gt;qq_login();</span><br><span class="line">        $this-&gt;assign(&#x27;qq_code_url&#x27;,$qqUrl);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/imgs/1567686046099.png" alt="1567686046099"></p>
+<h5 id="7-报错处理"><a href="#7-报错处理" class="headerlink" title="7.报错处理"></a>7.报错处理</h5><p>​    1.使用后点击报错,未定义的ROOT常量, 查看源码 , 可以看出该处是读取我们开头配置生成的<code>comm/inc.php</code>配置文件, 我们直接将其内容赋予Recorder类 </p>
+<p><img src="/images/imgs/1567686194361.png" alt="1567686194361"></p>
+<p><img src="/images/imgs/1567686186865.png" alt="1567686186865"></p>
+<p><img src="/images/imgs/1567686361773.png" alt="1567686361773"></p>
+<p>2.点击按钮不跳转, 查看源码发现,<code>qq_login</code>方法是直接重定向到指点登录网址, 而不是返回url, 修改之</p>
+<p><img src="/images/imgs/1567686653314.png" alt="1567686653314"></p>
+<h5 id="8-处理回调"><a href="#8-处理回调" class="headerlink" title="8.处理回调"></a>8.处理回调</h5><h4 id="3-微信"><a href="#3-微信" class="headerlink" title="3.微信"></a>3.微信</h4><h3 id="7-支付"><a href="#7-支付" class="headerlink" title="7.支付"></a>7.支付</h3><p>1.支付宝</p>
+<p>2.微信支付:</p>
+<p>用户提交订单, </p>
+<p>商户服务器接受信息, 向微信服务器发送请求订单详情信息+商户信息(含回调)</p>
+<p>微信服务器返回商户服务器一段字符串</p>
+<p>商户利用qrcode生成二维码, 供用户扫码支付</p>
+<p>用户扫码, 请求微信服务器完成订单支付</p>
+<p>微信服务器返回支付成功或支付失败信息给商户服务器回调地址(异步)</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2018/11/07/%E7%BD%91%E9%A1%B5%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E5%AE%9E%E7%8E%B0/" title="网页登录验证实现">https://ni9ne.github.io/2018/11/07/网页登录验证实现/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%8E%A5%E5%8F%A3/" rel="tag"># 接口</a>
+              <a href="/tags/ThinkPHP5/" rel="tag"># ThinkPHP5</a>
+              <a href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95/" rel="tag"># 第三方登录</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/10/27/%E4%BA%94%E5%88%86%E9%92%9F%E9%85%8D%E7%BD%AE%E5%A5%BD%E4%B8%80%E5%8F%B0%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="prev" title="五分钟配置好一台阿里云服务器">
+                  <i class="fa fa-chevron-left"></i> 五分钟配置好一台阿里云服务器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/11/12/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-Laravel/" rel="next" title="框架开发-Laravel">
+                  框架开发-Laravel <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
