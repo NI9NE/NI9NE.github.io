@@ -16971,4 +16971,1092 @@ use qq\QC;
         <tag>第三方登录</tag>
       </tags>
   </entry>
+  <entry>
+    <title>PHP设计模式详解</title>
+    <url>/2020/01/07/PHP%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[
+
+
+## 设计模式
+
+### 定义
+
+可以被反复使用,容易被他人理解的,可靠地代码设计的最佳实践
+
+> 如 laravel中的单例模式,工厂模式,门面模式, 注册树模式(DI/IOC), 适配器模式, 观察者模式等
+
+### 用途
+
+- 良好的代码风格
+- 易读性, 可维护性
+- 可扩展性
+- 稳定性
+
+### 六大原则
+
+```
+- 单一职责原则 (single responsibility principle)
+	一个类只负责一项职责
+- 里氏代换原则 (liskov substitution principle)
+	任何基类可以出现的地方, 子类一定可以出现
+- 依赖倒置原则 (dependence inversion principle)
+	针对接口编程, 依赖于抽象而不依赖于具体
+- 接口隔离原则 (interface segregation principle)
+	使用多个隔离的接口, 比使用单个接口要好, 即降低类之间的耦合度
+- 迪米特原则/最少知道原则 (demeter principle)
+	一个实体应当尽量少地与其他实体之间发生相互作用, 使得系统功能模块相对独立
+- 开闭原则 (open close principle)
+	对扩展开放, 对修改关闭, 实现热插拔的效果
+```
+
+### 原则详解
+
+#### 单一职责原则
+
+> 不要存在多于一个导致类变更的原因
+
+当类存在多个职责时, 若其中一个职责需要变更修改, 可能导致其他职责功能受到影响, 从而出现故障风险
+
+使用单一职责设计可以**降低类的复杂度, 可读性, 可维护性和变更引起的风险** 
+
+#### 里氏代换原则
+
+> 子类应扩展父类的功能, 但不能重写 改变父类原有的功能
+
+#### 依赖倒置原则
+
+> 高层模块不应依赖底层模块, 抽象不应依赖于细节, 都应依赖于抽象
+
+高层模块A直接依赖底层模块B, 若需要更改为依赖底层模块C, 需要修改A代码, 会有一定的故障风险
+
+将A修改为依赖接口X, B 和 C各自实现 X, 则会降低修改A的几率
+
+#### 接口隔离原则
+
+> 客户端不应该依赖它不需要的接口, 一个类对另一个类的依赖应该建立在最小的接口上
+
+#### 迪米特原则
+
+> 一个对象应该对其他对象保持最少的了解, 即高内聚低耦合, 内部属性能私有就私有化
+
+#### 开闭原则
+
+> 类、模块和函数应该对扩展开放, 对修改关闭
+
+### 设计模式类型
+
+- 创建型模式
+
+  包括单例模式、工厂模式(简单工厂、抽象工厂)
+
+- 结构型模式
+
+  适配器模式、门面模式、装饰器模式、注册树模式、代理模式、管道模式
+
+- 行为型模式
+
+  策略模式、观察者模式、命令模式、迭代器模式
+
+### 创建型模式
+
+> 利用封装, 从直接获得一个对象修改为通过接口获取对象
+
+#### 单例模式
+
+> 通过使用静态方法, 使得每次都返回同一个实例
+
+##### 用途
+
+- 用于数据库应用, 避免大量数据库操作消耗资源
+- 全局配置信息的存储缓存
+- 分布式存储
+
+##### 特点
+
+```
+- 私有化构造方法  private function __construction(){}
+	防止外部代码new多个对象,即单例类不能在其他类中实例化,仅能被自身实例化
+- 私有化静态属性  private static $instance;
+	用于保存类的实例的静态成员变量
+- 公有化静态方法  public static function getInstance(){}
+	用于外部获取该实例, 可以通过instanceof判断是否实例化
+- 私有化克隆方法  private function __clone(){}
+	防止对象被克隆产生新对象
+```
+
+##### 案例
+
+```php
+class DB
+{
+    private function __construct(){}
+
+    private static $instance = null;
+
+    public static function getInstance()
+    {
+        if (self::$instance == null){
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    private function __clone(){}
+}
+```
+
+#### 工厂模式
+
+> 从new一个对象改为接口, 还可以通过传参实例化不同的类
+
+##### 简单工厂模式(静态工厂模式)
+
+> 为不同的类提供一个生产对象的工厂, 获取对象仅通过工厂获取
+>
+> (增加新的对象类型需要修改工厂类代码, 违反开闭原则)
+
+```php
+class DBMysql
+{
+    public function connection()
+    {
+        echo '连接到MySQL数据库';
+    }
+}
+
+class DBOracle
+{
+    public function connection()
+    {
+        echo '连接到Oracle数据库';
+    }
+}
+
+class DBFactory
+{
+    public static function createObject(String $type)
+    {
+        switch ($type) {
+            case 'mysql':
+                return new DBMysql();
+                break;
+            case 'oracle':
+                return new DBOracle();
+                break;
+            default:
+                throw new ErrorException("No Support Type Like {$type}");
+        }
+    }
+}
+
+$DB = DBFactory::createObject('mysql');
+$DB->connection();
+```
+
+##### 工厂方法模式
+
+> 为工厂方法提供接口, 规范接口方法, 每个工厂针对一个类生产对象, 修复了简单工厂模式违反开闭原则的问题
+
+```php
+interface DB	# 接口规定连接动作
+{
+    public function connection();
+}
+
+class DBMysql implements DB		# 实现接口方法
+{
+    public function connection()
+    {
+        echo '连接到MySQL数据库';
+    }
+}
+
+class DBOracle implements DB	# 实现接口方法
+{
+    public function connection()
+    {
+        echo '连接到Oracle数据库';
+    }
+}
+
+
+interface Factory	# 接口规定工厂动作
+{
+    public static function createObject();
+}
+
+class mysqlFactory implements Factory	# 实现接口方法,返回对应对象
+{
+    public static function createObject()
+    {
+        return new DBMysql();
+    }
+}
+
+class oracleFactory implements Factory	# 实现接口方法,返回对应对象
+{
+    public static function createObject()
+    {
+        return new DBOracle();
+    }
+}
+
+$DB = mysqlFactory::createObject();
+$DB->connection();
+
+$DB = oracleFactory::createObject();
+$DB->connection();
+
+# 若需要添加sqlite, 添加如下类
+class DBSqlite implements DB
+{
+    public function connection()
+    {
+        echo '连接到sqlite数据库';
+    }
+}
+class sqliteFactory implements Factory
+{
+    public static function createObject()
+    {
+        return new DBSqlite();
+    }
+}
+$DB = sqliteFactory::createObject();
+$DB->connection();
+```
+
+##### 抽象工厂模式
+
+> 在不指定具体类的情况下创建一系列相关或依赖对象, 创建的类都实现相同的接口
+>
+> (可以增加产品族, 但无法增加新的产品)
+
+```php
+interface Vehicle
+{
+    public function drive();
+}
+
+class ToyotaVehicle implements  Vehicle
+{
+    public function drive()
+    {
+        echo 'Toyouta 汽车';
+    }
+}
+
+class AudiVehicle implements  Vehicle
+{
+    public function drive()
+    {
+        echo 'Audi 汽车';
+    }
+}
+
+interface AirCondition
+{
+    public function blow();
+}
+
+class GreeAir implements AirCondition
+{
+    public function blow()
+    {
+        echo 'Gree 空调';
+    }
+}
+
+class HaierAir implements AirCondition
+{
+    public function blow()
+    {
+        echo 'Haier 空调';
+    }
+}
+
+interface Factory
+{
+    public static function productVehicle();
+    public static function productAirCondition();
+}
+
+class ToyotaFactory implements Factory
+{
+    public static function productVehicle()
+    {
+        return new ToyotaVehicle();
+    }
+
+    public static function productAirCondition()
+    {
+        return new GreeAir();
+    }
+}
+
+class AudiFactory implements Factory
+{
+    public static function productVehicle()
+    {
+        return new AudiVehicle();
+    }
+
+    public static function productAirCondition()
+    {
+        return new HaierAir();
+    }
+}
+# 使用
+$toyotaVehicle = ToyotaFactory::productVehicle();
+$greeAirCondition = ToyotaFactory::productAirCondition();
+$toyotaVehicle->drive();
+$greeAirCondition->blow();
+
+$audiVehicle = AudiFactory::productVehicle();
+$HaierAirCondition = AudiFactory::productAirCondition();
+$audiVehicle->drive();
+$HaierAirCondition->blow();
+```
+
+组成:
+
+- 抽象工厂 - 确定工厂的业务范围
+- 具体工厂 - 每个具体工厂对应一个产品族
+- 抽象产品 - 同一等级结构的抽象类
+- 具体产品 - 可供生产的具体产品
+
+### 结构型模式
+
+> 解析类与对象的内部结构与外部组合, 通过优化程序结构解决模块的耦合问题
+
+#### 适配器模式
+
+> 将某个类的接口转换成与另一个接口兼容. 通过将原始接口进行转换, 给用户提供兼容接口, 使原来因为接口不同而无法一起使用的类可以得到兼容
+
+适配器模式解决的问题是针对一些原有代码不便修改, 或第三方扩展包, 返回的数据与目标数据格式不同, 此时便可以使用适配器调整原有逻辑
+
+```php
+<?php
+
+interface Weather
+{
+    public function showWeather();
+}
+
+class WeatherSerialized implements Weather
+{
+    public function showWeather()
+    {
+        $weatherInfo = ['weather'=>'wind','temperature' => '12'];
+        return serialize($weatherInfo);
+    }
+}
+
+# 使用
+$weatherObj = new WeatherSerialized();
+$info = $weatherObj->showWeather();
+$info = unserialize($info);
+echo "Today's weather is {$info['weather']}";
+
+# 需求目标: 需要返回标准Json格式数据
+interface WeatherAdapter
+{
+    public function getWeather();
+}
+
+class JsonWeather implements WeatherAdapter
+{
+    protected $instance;
+
+    public function __construct(Weather $weather)
+    {
+        $this->instance = $weather;
+    }
+
+    public function getWeather()
+    {
+        $sourceWeather = $this->instance->showWeather();
+        $weatherArray = unserialize($sourceWeather);
+        return json_encode($weatherArray, 320);
+    }
+}
+
+# 使用
+$jsonWeather = new JsonWeather(new WeatherSerialized());
+$weatherInfo = json_decode($jsonWeather, true);
+echo "Today's weather is {$info['weather']}";
+```
+
+#### 装饰器模式
+
+> 也叫装饰者模式, 在不改变原有类和不使用继承的情况下, 动态的扩展一个对象的功能
+
+使用场景包括:
+
+- 需要动态的给对象添加或撤销功能
+- 需要增加由一些基本功能排列组合产生的大量功能, 继承关系可能非常复杂
+- 不能采用生成子类的方法进行扩展, 可能是有大量独立扩展, 也可能是类定义被隐藏
+
+```php
+<?php
+    
+interface Component	# 组件对象接口
+{
+    public function display();
+}
+
+class Person implements Component	# 需要装饰的组件
+{
+    protected $name;
+
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public function display()
+    {
+        echo "装饰目标:{$this->name}" . PHP_EOL;
+    }
+}
+
+class Decorator implements Component	# 装饰器父类
+{
+    protected $component;
+
+    public function __construct(Component $component)
+    {
+        $this->component = $component;
+    }
+
+    public function display()	# 执行装饰动作
+    {
+        if (!empty($this->component))
+            $this->component->display();
+    }
+}
+
+class TShirt extends Decorator	# 具体的装饰器类
+{
+    public function display()
+    {
+        parent::display();
+        echo "装饰T-Shirt";
+    }
+}
+
+class Hat extends Decorator	# 具体的装饰器类
+{
+    public function display()
+    {
+        parent::display();
+        echo "装饰帽子";
+    }
+}
+
+// 客户端使用
+$target = new Person('张三');
+$target = new TShirt($target);
+$target = new Hat($target);
+$target->display();
+/*
+ * 运行结果:
+ * 装饰目标:张三
+ * 装饰T-Shirt装饰帽子
+ */
+```
+
+#### 注册树模式
+
+> 也叫注册模式或注册器模式, 即将对象实例注册到一颗全局的对象树上, 需要的时候取用即可
+
+```php
+<?php
+
+interface DB
+{
+    public function connection();
+}
+
+class DBMysql implements DB
+{
+    public function connection()
+    {
+        echo "连接到mysql";
+    }
+}
+
+class DBOracle implements DB
+{
+    public function connection()
+    {
+        echo "连接到Oracle";
+    }
+}
+
+interface Factory
+{
+    public static function getInstance();
+}
+
+class MysqlFactory implements Factory
+{
+    public static function getInstance()
+    {
+        return new DBMysql();
+    }
+}
+
+class OracleFactory implements Factory
+{
+    public static function getInstance()
+    {
+        return new DBOracle();
+    }
+}
+
+class RegisterTree
+{
+    protected static $container;	# 注册容器
+
+    public static function set($alias, $object)	# 注册到树
+    {
+        self::$container[$alias] = $object;
+    }
+
+    public static function get($alias)	# 从树上获取
+    {
+        return self::$container[$alias];
+    }
+
+    public static function delete($alias)	# 删除
+    {
+        unset(self::$container[$alias]);
+    }
+}
+
+# 注册到树上
+RegisterTree::set('mysql', MysqlFactory::getInstance());
+RegisterTree::set('oracle', OracleFactory::getInstance());
+# 使用
+$mysql = RegisterTree::get('mysql');
+$mysql->connection();
+# 删除注册树内容
+RegisterTree::delete('oracle');
+```
+
+#### 门面模式
+
+> 又称外观模式, 用于为子系统中的一组接口提供一个一致的界面, 增加了子系统的独立性和易用性
+
+```php
+<?php
+
+class Camera
+{
+    public function turnOn()
+    {
+        echo '开启摄像机';
+    }
+
+    public function turnOff()
+    {
+        echo '关闭摄像机';
+    }
+}
+
+class Light
+{
+    public function turnOn()
+    {
+        echo '开启灯光';
+    }
+
+    public function turnOff()
+    {
+        echo '关闭灯光';
+    }
+}
+
+
+class Facade
+{
+    public static $camera;
+    public static $light;
+    public function __construct()
+    {
+        self::$camera = new Camera();
+        self::$light = new Light();
+    }
+
+    public function photoInDayTime()
+    {
+        self::$camera->turnOn();
+    }
+
+    public function photoInNight()
+    {
+        self::$camera->turnOn();
+        self::$light->turnOn();
+    }
+
+    public function illumination()
+    {
+        self::$light->turnOn();
+    }
+}
+
+// 客户端使用
+$facade = new Facade();
+$facade->photoInDayTime();  # 白天拍照
+$facade->photoInNight();    # 晚上拍照
+$facade->illumination();    # 照明
+```
+
+#### 管道模式
+
+> 流水线式将数据传递到下一个任务序列中, 需要管道, 阀门 和 载荷
+
+```php
+<?php
+
+interface PipelineBuilder
+{
+    public function __construct($payload);
+
+    public function pipe(StageBuilder $stage);
+
+    public function process();
+}
+
+class Pipeline implements PipelineBuilder
+{
+    protected $payload;
+
+    protected $pipes = [];
+
+    public function __construct($payload)
+    {
+        $this->payload = $payload;
+    }
+
+    public function pipe(StageBuilder $stage)	# 添加管道
+    {
+        $this->pipes[] = $stage;
+        return $this;
+    }
+
+    public function process()	# 执行管道动作
+    {
+        foreach ($this->pipes as $pipe) {
+            call_user_func([$pipe,'handle'], $this->payload);
+        }
+    }
+}
+
+interface StageBuilder
+{
+    public function handle($payload);
+}
+
+class StageOne implements StageBuilder	# 管道一
+{
+    public function handle($payload)
+    {
+        echo '步骤一' . PHP_EOL;
+    }
+}
+
+class StageTwo implements StageBuilder	# 管道二
+{
+    public function handle($payload)
+    {
+        echo '步骤二' . PHP_EOL;
+    }
+}
+
+// 客户端使用
+$pipeline = new Pipeline('洗衣服');
+$pipeline->pipe(new StageOne())->pipe(new StageTwo())->process();
+```
+
+#### 代理模式
+
+> 透明置于两个不同对象之内的一个对象, 从而可以截取或代理这两个对象间的通信或访问
+
+
+
+```php
+<?php
+
+interface Request
+{
+    public function request();
+}
+
+class RealRequest implements Request
+{
+    public function request()
+    {
+        echo '真实请求动作';
+    }
+}
+
+class ProxyRequest implements Request
+{
+    protected $requestInstance;
+
+    public function __construct(Request $instance)
+    {
+        $this->requestInstance = $instance;
+    }
+
+    public function request()
+    {
+        echo '代理器中的其他动作;';
+        $this->requestInstance->request();
+    }
+}
+
+// 客户端使用
+
+$request = new ProxyRequest(new RealRequest());
+$request->request();
+
+```
+
+代理模式与装饰器/适配器的区别
+
+装饰器一般是对对象进行装饰, 增加其中的方法行为
+
+适配器一般会改变方法行为, 目的是保持接口的统一
+
+代理模式是让代理类替换真实类的操作
+
+### 行为型模式
+
+> 用于描述程序在运行时复杂的流程控制, 即描述多个类与对象间如何相互协作共同完成单个对象无法完成的任务, 涉及算法与对象间职责的分配
+
+#### 策略模式
+
+> 将一组特定的行为和算法封装, 以适应特定的上下文环境, 让它们可以相互替换
+
+```php
+<?php
+
+interface Strategy	# 策略类接口
+{
+    public function Algorithm();
+}
+
+class ConcreteStrategyA implements Strategy	# 策略A
+{
+    public function Algorithm()
+    {
+        echo '算法A实现';
+    }
+}
+
+class ConcreteStrategyB implements Strategy	# 策略B
+{
+    public function Algorithm()
+    {
+        echo '算法B实现';
+    }
+}
+
+class ConcreteStrategyC implements Strategy # 策略C
+{
+    public function Algorithm()
+    {
+        echo '算法C实现';
+    }
+}
+
+class Context
+{
+    protected $strategy;
+    
+    public function __construct(string $type)
+    {
+        switch ($type){
+            case 'A':
+                $this->strategy = new ConcreteStrategyA();
+                break;
+            case 'B':
+                $this->strategy = new ConcreteStrategyB();
+                break;
+            case 'C':
+                $this->strategy = new ConcreteStrategyC();
+                break;
+            default:
+                throw new ErrorException('no this type strategy');
+        }
+    }
+
+    public function processStrategy()
+    {
+        $this->strategy->Algorithm();
+    }
+}
+
+// 客户端使用
+$context = new Context('A');
+$context->processStrategy();
+```
+
+#### 观察者模式
+
+> 定义对象间的一对多的依赖关系, 当一个对象的状态改变时, 所有依赖于它的对象都得到通知并自动刷新
+
+模式所需角色:
+
+- 抽象主题(Subject) : 把所有观察者对象的引用保存到一个集合中, 每个主题都可以有任意数量的观察者, 它提供了一个接口, 可以增加/删除观察者对象
+- 具体主题(ConcreteSubject) : 将有关状态存入具体观察者对象, 在具体主题内部状态改变时, 给所有观察者发出通知
+- 抽象观察者(Observer) : 为所有具体观察者定义一个接口, 得到主题通知时更新自己
+- 具体观察者(ConcreteObserver) : 实现抽象观察者定义的更新接口, 使自己的状态与主题状态协调
+
+```php
+<?php
+
+interface Subject	# 抽象主题接口
+{
+    public function attach($observer);
+
+    public function detach($observer);
+
+    public function notify();
+}
+
+class ConcreteSubject implements Subject	# 具体主题
+{
+    protected $observers = [];
+
+    public function attach($observer)	# 绑定观察者
+    {
+        array_push($this->observers, $observer);
+    }
+
+    public function detach($observer)	# 解绑观察者
+    {
+        $index = array_search($observer, $this->observers);
+        if ($index === false) return false;
+        unset($this->observers[$index]);
+        return true;
+    }
+
+    public function notify()	# 通知变更
+    {
+        if (!is_array($this->observers)) return false;
+        foreach ($this->observers as $observer) {
+            call_user_func([$observer,'update']);
+        }
+        return true;
+    }
+}
+
+interface Observer	# 抽象观察者接口
+{
+    public function update();
+}
+
+class ConcreteObserver implements Observer	# 具体观察者
+{
+    protected $name;
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    public function update()	# 收到状态变更信息后执行动作
+    {
+        echo "监听者 {$this->name} 收到变更消息";
+    }
+}
+// 客户端使用
+$subject = new ConcreteSubject();
+$subject->attach(new ConcreteObserver('一号'));
+$subject->attach(new ConcreteObserver('二号'));
+$subject->attach(new ConcreteObserver('三号'));
+$subject->notify();
+```
+
+#### 命令模式
+
+> 对命令的封装, 将发出命令的职责和执行命令的职责分割开, 委派给不同的对象
+
+模式所需角色:
+
+- 命令角色(Command) : 声明了一个给所有具体命令的抽象接口,需要实现接口方法execute()
+- 具体命令(ConcreteCommand) : 定义接受者和行为之间的弱耦合, 实现执行方法execute()
+- 请求者(Invoker) : 负责调用命令对象执行请求, 需要传入命令对象
+- 接收者(Receiver) : 负责具体实施和执行请求, 实现action()方法
+
+![image-20211109223010611](/images/imgs/image-20211109223010611.png)
+
+
+
+```php
+<?php
+
+interface Command       # 命令角色
+{
+    public function execute();
+}
+
+class CopyCommand implements Command        # 具体命令,需要指定接收者
+{
+    private $receiver;
+
+    public function __construct(Receiver $receiver)
+    {
+        $this->receiver = $receiver;
+    }
+
+    public function execute()
+    {
+        $this->receiver->action();
+    }
+}
+
+class PasteCommand implements Command       # 具体命令
+{
+    private $receiver;
+
+    public function __construct(Receiver $receiver)
+    {
+        $this->receiver = $receiver;
+    }
+
+    public function execute()
+    {
+        $this->receiver->action();
+    }
+}
+
+interface Receiver      # 接收者
+{
+    public function action();
+}
+
+class CopyReceiver implements Receiver  # 具体接收者
+{
+    private $name;
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    public function action()    # 接收者执行命令
+    {
+        echo "{$this->name} 执行 COPY 操作";
+    }
+}
+
+class PasteReceiver implements Receiver  # 具体接收者
+{
+    private $name;
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    public function action()    # 接收者执行命令
+    {
+        echo "{$this->name} 执行 PASTE 操作";
+    }
+}
+
+class Invoker   # 请求者
+{
+    private $command;
+    public function __construct(Command $command)
+    {
+        $this->command = $command;
+    }
+
+    public function handle()    # 调用命令
+    {
+        $this->command->execute();
+    }
+}
+
+# 客户端使用
+// 单命令执行
+$copyCommand = new CopyCommand(new CopyReceiver('张三'));
+$pasteCommand = new PasteCommand(new PasteReceiver('张三'));
+$invoker = new Invoker($copyCommand);
+$invoker->handle();
+```
+
+#### 迭代器模式
+
+> 封装遍历数据集合模式, 提供访问容器对象内各个元素, 但又不暴露该对象的内部细节
+
+需要角色:
+
+- 迭代器(Iterator) : 迭代器定义访问和遍历元素的接口
+- 具体迭代器(ConcreteIterator) : 实现迭代器接口, 对该聚合遍历时追送当前位置
+- 聚合对象接口(Aggregate) : 聚合定义相应迭代器对象的接口
+- 具体聚合(ConcreteAggregate) : 具体聚合实现创建相应迭代器的接口, 返回迭代器实例
+
+```php
+<?php
+
+class ArrIterator implements Iterator	# 实现PHP迭代器接口
+{
+    private $data;
+
+    private $index;
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+        $this->index = 0;
+    }
+
+    public function current()
+    {
+        return $this->data[$this->index];
+    }
+
+    public function next()
+    {
+        $this->index ++;
+    }
+
+    public function key()
+    {
+        return $this->index;
+    }
+
+    public function valid()
+    {
+        return $this->index < count($this->data);
+    }
+
+    public function rewind()
+    {
+        $this->index = 0;
+    }
+}
+
+// 客户端使用
+$arr = ['one','two','three','four'];
+$iterator = new ArrIterator($arr);
+foreach ($iterator as $item) {
+    echo $item;
+}
+```
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
 </search>
