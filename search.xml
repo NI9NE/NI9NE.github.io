@@ -7804,7 +7804,7 @@ Windows:
       </categories>
       <tags>
         <tag>PHP</tag>
-        <tag>后端</tag>
+        <tag>后端 - MySQL</tag>
       </tags>
   </entry>
   <entry>
@@ -18401,6 +18401,77 @@ sudo composer self-update --1
         <tag>linux</tag>
         <tag>shell</tag>
         <tag>服务器</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL- 用户账号相关操作</title>
+    <url>/2020/09/05/MySQL%20%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[
+## MySQL 用户账号相关操作
+
+```
+-- 查询用户
+SELECT * FROM user;
+-- 创建用户, 仅可看information_schema库
+CREATE USER 'naxx'@'%' IDENTIFIED BY '111111';
+-- 添加该用户对某个库的查询,更新权限
+GRANT SELECT,UPDATE ON qjjfwpt_saas.* TO 'naxx'@'%';
+-- 添加该用户对某个库的删除,更新权限
+GRANT DELETE ON qjjfwpt_saas.* TO 'naxx'@'%';
+-- 添加该用户对某个库的视图查询权限
+GRANT SHOW VIEW ON qjjfwpt_saas.* TO 'naxx'@'%';
+-- 刷新权限
+FLUSH privileges;
+-- 显示该用户在所有IP下的权限
+SHOW GRANTS FOR 'naxx'@'%';
+-- 显示该用户在指定IP下的所有权限
+SHOW GRANTS FOR 'naxx'@'127.0.0.1';
+-- 删除查看视图权限
+REVOKE SHOW VIEW ON qjjfwpt_saas.* FROM 'naxx'@'%';
+-- 删除指定用户
+DROP USER 'naxx'@'%';
+-- 修改用户密码
+SET PASSWORD FOR 'naxx'@'%'=PASSWORD('123456789');
+-- 密码过期(下次登录需要自行修改密码)
+ALTER USER 'naxx'@'%' PASSWORD EXPIRE;
+-- 锁定用户
+ALTER USER 'naxx'@'%' account lock;
+-- 解锁用户
+ALTER USER 'naxx'@'%' account unlock;
+```
+
+![I3wLQVQjl9](/images/imgs/I3wLQVQjl9.png)
+
+初始密码问题
+
+```shell
+刚安装好的mysql登录使用auth_socket
+获取root权限
+	$ su root
+登录mysql
+	$ mysql
+执行SQL
+	mysql> update mysql.user set host='%',plugin='mysql_native_password',authentication_string=password('123456789') where user='root';
+	mysql> flush privileges;
+	mysql> exit;
+修改mysql配置
+	$ sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+注释以下行
+	# bind-address          = 127.0.0.1
+重启mysql服务
+	$ sudo service mysql restart
+即可正常使用Navicat客户端连接数据库
+```
+
+
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端 - MySQL</tag>
       </tags>
   </entry>
 </search>
