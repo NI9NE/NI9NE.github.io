@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="从零配置一台服务器 ubuntu server 18.04  基础服务器镜像安装">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从零配置一台服务器">
+<meta property="og:url" content="https://ni9ne.github.io/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="从零配置一台服务器 ubuntu server 18.04  基础服务器镜像安装">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/image-20211110165537094.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/image-20211110165842607.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/image-20211110171403549.png">
+<meta property="article:published_time" content="2021-03-22T05:13:32.000Z">
+<meta property="article:modified_time" content="2021-11-10T10:51:44.196Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="shell">
+<meta property="article:tag" content="服务器">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.github.io/images/imgs/image-20211110165537094.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/","path":"2021/03/22/空白服务器配置/","title":"从零配置一台服务器"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>从零配置一台服务器 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">42</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">45</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8E%E9%9B%B6%E9%85%8D%E7%BD%AE%E4%B8%80%E5%8F%B0%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">从零配置一台服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%95%9C%E5%83%8F%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.</span> <span class="nav-text">基础服务器镜像安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PHP%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.2.</span> <span class="nav-text">PHP环境搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shell%E8%84%9A%E6%9C%AC%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.</span> <span class="nav-text">shell脚本文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sudo-no-interupt-sh"><span class="nav-number">1.3.1.</span> <span class="nav-text">sudo_no_interupt.sh</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vim-setnum-sh"><span class="nav-number">1.3.2.</span> <span class="nav-text">vim_setnum.sh</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#php-env-install-sh"><span class="nav-number">1.3.3.</span> <span class="nav-text">php_env_install.sh</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从零配置一台服务器
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-03-22 13:13:32" itemprop="dateCreated datePublished" datetime="2021-03-22T13:13:32+08:00">2021-03-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AE%9E%E9%99%85%E6%BC%94%E7%BB%83/" itemprop="url" rel="index"><span itemprop="name">实际演练</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="从零配置一台服务器"><a href="#从零配置一台服务器" class="headerlink" title="从零配置一台服务器"></a>从零配置一台服务器</h1><blockquote>
+<p>ubuntu server 18.04</p>
+</blockquote>
+<h2 id="基础服务器镜像安装"><a href="#基础服务器镜像安装" class="headerlink" title="基础服务器镜像安装"></a>基础服务器镜像安装</h2><p>1.下载镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://cn.ubuntu.com/download</span><br></pre></td></tr></table></figure>
+
+<p>2.使用创建VM虚拟机</p>
+<blockquote>
+<p>在选择安装源的镜像地址时, 记得修改为国内源, 否则可能卡住</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://mirrors.163.com/ubuntu</span><br><span class="line">http://mirrors.aliyun.com/ubuntu</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>3.测试登录</p>
+<p><img src="/images/imgs/image-20211110165537094.png" alt="image-20211110165537094"></p>
+<p>4.使用XShell连接服务器</p>
+<p><img src="/images/imgs/image-20211110165842607.png" alt="image-20211110165842607"></p>
+<p>5.修改root用户密码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo passwd root</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ni9ne@ni9nes:$ sudo passwd root</span><br><span class="line">[sudo] password for ni9ne: </span><br><span class="line">Enter new UNIX password: </span><br><span class="line">Retype new UNIX password: </span><br><span class="line">passwd: password updated successfully</span><br></pre></td></tr></table></figure>
+
+<h2 id="PHP环境搭建"><a href="#PHP环境搭建" class="headerlink" title="PHP环境搭建"></a>PHP环境搭建</h2><p>1.复制环境搭建脚本</p>
+<p><img src="/images/imgs/image-20211110171403549.png" alt="image-20211110171403549"></p>
+<p>2.脚本赋权</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ni9ne@ni9nes:~$ sudo chmod -R 777 ./*</span><br></pre></td></tr></table></figure>
+
+<p>3.脚本文本格式转换</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ni9ne@ni9nes:~$ apt-get install dos2unix</span><br><span class="line">ni9ne@ni9nes:~$ sudo dos2unix ./*</span><br><span class="line">dos2unix: converting file ./php_env_install.sh to Unix format...</span><br><span class="line">dos2unix: converting file ./sudo_no_pass.sh to Unix format...</span><br><span class="line">dos2unix: converting file ./vim_setnum.sh to Unix format...</span><br></pre></td></tr></table></figure>
+
+<p>4.执行脚本</p>
+<ul>
+<li><p>sudo命令无需输入密码</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ni9ne@ni9nes:~$ ./sudo_no_pass.sh </span><br><span class="line">success get current user: ni9ne</span><br><span class="line">successd prepare permit_text: ni9ne ALL=(ALL:ALL) NOPASSWD: ALL</span><br><span class="line">ni9ne ALL=(ALL:ALL) NOPASSWD: ALL</span><br><span class="line">ni9ne ALL=(ALL:ALL) NOPASSWD: ALL</span><br><span class="line">check permit has not been done, do it</span><br><span class="line">successd chmod write permit to /etc/sudoers</span><br><span class="line">successd add permit_text [ ni9ne ALL=(ALL:ALL) NOPASSWD: ALL ] to /etc/sudoers</span><br><span class="line">successd reback permission /etc/sudoers to 440</span><br></pre></td></tr></table></figure></li>
+<li><p>vim默认开启行号</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ni9ne@ni9nes:~$ ./vim_setnum.sh </span><br><span class="line">vim 配置路径: /etc/vim/vimrc</span><br><span class="line">添加vim 默认行号开启</span><br></pre></td></tr></table></figure></li>
+<li><p>php环境安装</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ni9ne@ni9nes:~$ ./php_env_install.sh</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="shell脚本文件"><a href="#shell脚本文件" class="headerlink" title="shell脚本文件"></a>shell脚本文件</h2><h3 id="sudo-no-interupt-sh"><a href="#sudo-no-interupt-sh" class="headerlink" title="sudo_no_interupt.sh"></a>sudo_no_interupt.sh</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">! /bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Author: NI9NE</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Date: 2020/10/19</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Time: 11:32</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Description: 用于修复集团服务器sudo命令延迟并报错的问题</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Email: &lt;ni9ne@outlook.com&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">/</span></span><br><span class="line"></span><br><span class="line">current_hostname=`hostname`</span><br><span class="line">echo &quot;当前计算机名称为: $&#123;current_hostname&#125;&quot;</span><br><span class="line">current_hosts_contain=`sudo cat /etc/hosts`</span><br><span class="line">current_word=&quot;127.0.0.1 $&#123;current_hostname&#125;&quot;</span><br><span class="line">echo &quot;清空原有hosts数据&quot;</span><br><span class="line">sudo sh -c &quot;echo &#x27;$&#123;current_word&#125;&#x27; &gt; /etc/hosts&quot;</span><br><span class="line">echo &quot;添加当前计算机名称Hosts数据&quot;</span><br><span class="line">sudo sh -c &quot;echo &#x27;$&#123;current_hosts_contain&#125;&#x27; &gt;&gt; /etc/hosts&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="vim-setnum-sh"><a href="#vim-setnum-sh" class="headerlink" title="vim_setnum.sh"></a>vim_setnum.sh</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">! /bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Author: NI9NE</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Date: 2020/10/19</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Time: 11:32</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Description: 用于将vim行号默认打开</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Email: &lt;ni9ne@outlook.com&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">/</span></span><br><span class="line"></span><br><span class="line">vimPath=`sudo find /etc/ -name vimrc`</span><br><span class="line">echo &quot;vim 配置路径: $&#123;vimPath&#125;&quot;</span><br><span class="line">sudo sh -c &quot;echo &#x27;set nu&#x27; &gt;&gt; $&#123;vimPath&#125;&quot;</span><br><span class="line">echo &quot;添加vim 默认行号开启&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="php-env-install-sh"><a href="#php-env-install-sh" class="headerlink" title="php_env_install.sh"></a>php_env_install.sh</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">! /bin/bash</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Author: NI9NE</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Time: 12:25</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Date: 2020/10/19</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Description: 用于安装PHP项目环境包括以下内容: tree/Git/Nginx/PHP/PHP扩展/MySql/Composer/libreoffice扩展</span></span><br><span class="line"><span class="meta">#</span><span class="bash">              额外操作包括: Nginx项目目录www所属用户切换,当前用户添加到www组</span></span><br><span class="line"><span class="meta">#</span><span class="bash">                          php-apcu扩展安装并打开</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Email: &lt;ni9ne@outlook.com&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">/</span></span><br><span class="line"></span><br><span class="line">echo &#x27;更新软件包源 : [ sudo apt-get update ]&#x27;</span><br><span class="line">sudo apt-get update</span><br><span class="line">echo &#x27;安装语言包&#x27;</span><br><span class="line">sudo apt-get install -y language-pack-en-base</span><br><span class="line">sudo locale-gen en_US.UTF-8</span><br><span class="line">echo &#x27;安装tree&#x27;</span><br><span class="line">sudo apt-get install -y tree</span><br><span class="line">echo &#x27;安装nginx&#x27;</span><br><span class="line">sudo apt-get install -y nginx</span><br><span class="line">echo &#x27;www文件夹权限添加&#x27;</span><br><span class="line">sudo chmod g+w /var/www</span><br><span class="line">echo &#x27;www文件夹所属人变更为www-data&#x27;</span><br><span class="line">sudo chown -R www-data:www-data /var/www</span><br><span class="line">echo &#x27;当前用户添加到www-data组&#x27;</span><br><span class="line">sudo usermod -g www-data `whoami`</span><br><span class="line">echo &#x27;安装git&#x27;</span><br><span class="line">sudo apt-get install -y git</span><br><span class="line">echo &#x27;安装PHP&#x27;</span><br><span class="line">sudo apt-get install -y php</span><br><span class="line">sudo apt-get install -y php7.0-fpm</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-mysql&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-mysql</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-gd&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-gd</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-soap&#x27;</span><br><span class="line">sudo apt-get install php7.0-soap</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-fileinfo&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-fileinfo</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-mbstring&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-mbstring</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-curl&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-curl</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-zip&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-zip</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-dom&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-dom</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-odbc&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-odbc</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-memcached&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-memcached</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-memcache&#x27;</span><br><span class="line">sudo apt-get install -y php7.0-memcache</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-server&#x27;</span><br><span class="line">sudo apt-get install -y mysql-server</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-apcu&#x27;</span><br><span class="line">sudo apt-get install php7.0-apcu</span><br><span class="line">echo &#x27;安装PHP扩展:php7.0-apcu-bc&#x27;</span><br><span class="line">sudo apt-get install php7.0-apcu-bc</span><br><span class="line">echo &#x27;配置php-apcu 开启&#x27;</span><br><span class="line">sudo sh -c &quot;echo &#x27;apc.enable_cli=On&#x27; &gt;&gt; &#x27;/etc/php/7.0/mods-available/apcu.ini&#x27;&quot;</span><br><span class="line">echo &#x27;重启php7.0&#x27;</span><br><span class="line">sudo service php7.0-fpm restart</span><br><span class="line">echo &#x27;添加仓库源&#x27;</span><br><span class="line">sudo apt install software-properties-common</span><br><span class="line">sudo add-apt-repository ppa:ondrej/php</span><br><span class="line">echo &#x27;更新源&#x27;</span><br><span class="line">sudo apt-get update</span><br><span class="line">echo &#x27;升级 PHP&#x27;</span><br><span class="line">sudo apt-get upgrade php</span><br><span class="line">echo &#x27;更新驱动&#x27;</span><br><span class="line">sudo apt-get install -y  php7.3-fpm</span><br><span class="line">echo &#x27;切换 PHP 版本&#x27;</span><br><span class="line">echo 1 | sudo update-alternatives --config php</span><br><span class="line"></span><br><span class="line">echo &#x27;安裝libreoffice 扩展 :libreoffice-writer&#x27;</span><br><span class="line">sudo apt-get install -y libreoffice-writer</span><br><span class="line">echo &#x27;安裝libreoffice 扩展 :libreoffice-calc&#x27;</span><br><span class="line">sudo apt-get install -y libreoffice-calc</span><br><span class="line">echo &#x27;安裝libreoffice 扩展 :libreoffice-headless&#x27;</span><br><span class="line">sudo apt-get install -y libreoffice-headless</span><br><span class="line">echo &#x27;安裝composer&#x27;</span><br><span class="line">php -r &quot;copy(&#x27;https://install.phpcomposer.com/installer&#x27;, &#x27;composer-setup.php&#x27;);&quot;</span><br><span class="line">php composer-setup.php</span><br><span class="line">php -r &quot;unlink(&#x27;composer-setup.php&#x27;);&quot;</span><br><span class="line">echo &#x27;全局安装（环境变量）&#x27;</span><br><span class="line">sudo mv composer.phar /usr/local/bin/composer</span><br><span class="line">echo &#x27;更换composer阿里镜像&#x27;</span><br><span class="line">composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/</span><br><span class="line">echo &#x27;composer降低版本为1.0&#x27;</span><br><span class="line">sudo composer self-update --1</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">echo</span> <span class="string">&#x27;生成git秘钥&#x27;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ssh-keygen -t rsa -C <span class="string">&quot;ni9ne@outlook.com&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">echo</span> <span class="string">&#x27;安装docker&#x27;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">echo</span> <span class="string">&#x27;添加用户到docker组&#x27;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> sudo usermod -aG docker `whoami`</span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" title="从零配置一台服务器">https://ni9ne.github.io/2021/03/22/空白服务器配置/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/shell/" rel="tag"># shell</a>
+              <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag"># 服务器</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/02/17/UML%E7%B1%BB%E5%9B%BE%E7%BB%98%E5%88%B6/" rel="prev" title="UML类图详解">
+                  <i class="fa fa-chevron-left"></i> UML类图详解
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

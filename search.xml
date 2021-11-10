@@ -18145,4 +18145,262 @@ foreach ($iterator as $item) {
         <tag>UML类图</tag>
       </tags>
   </entry>
+  <entry>
+    <title>从零配置一台服务器</title>
+    <url>/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[
+
+
+# 从零配置一台服务器
+
+> ubuntu server 18.04
+
+## 基础服务器镜像安装
+
+1.下载镜像
+
+```
+https://cn.ubuntu.com/download
+```
+
+2.使用创建VM虚拟机
+
+> 在选择安装源的镜像地址时, 记得修改为国内源, 否则可能卡住
+>
+> ```
+> http://mirrors.163.com/ubuntu
+> http://mirrors.aliyun.com/ubuntu
+> ```
+
+3.测试登录
+
+![image-20211110165537094](/images/imgs/image-20211110165537094.png)
+
+4.使用XShell连接服务器
+
+![image-20211110165842607](/images/imgs/image-20211110165842607.png)
+
+5.修改root用户密码
+
+```
+sudo passwd root
+```
+
+```
+ni9ne@ni9nes:$ sudo passwd root
+[sudo] password for ni9ne: 
+Enter new UNIX password: 
+Retype new UNIX password: 
+passwd: password updated successfully
+```
+
+## PHP环境搭建
+
+1.复制环境搭建脚本
+
+![image-20211110171403549](/images/imgs/image-20211110171403549.png)
+
+2.脚本赋权
+
+```shell
+ni9ne@ni9nes:~$ sudo chmod -R 777 ./*
+```
+
+3.脚本文本格式转换
+
+```shell
+ni9ne@ni9nes:~$ apt-get install dos2unix
+ni9ne@ni9nes:~$ sudo dos2unix ./*
+dos2unix: converting file ./php_env_install.sh to Unix format...
+dos2unix: converting file ./sudo_no_pass.sh to Unix format...
+dos2unix: converting file ./vim_setnum.sh to Unix format...
+```
+
+4.执行脚本
+
+- sudo命令无需输入密码
+
+  ```shell
+  ni9ne@ni9nes:~$ ./sudo_no_pass.sh 
+  success get current user: ni9ne
+  successd prepare permit_text: ni9ne ALL=(ALL:ALL) NOPASSWD: ALL
+  ni9ne ALL=(ALL:ALL) NOPASSWD: ALL
+  ni9ne ALL=(ALL:ALL) NOPASSWD: ALL
+  check permit has not been done, do it
+  successd chmod write permit to /etc/sudoers
+  successd add permit_text [ ni9ne ALL=(ALL:ALL) NOPASSWD: ALL ] to /etc/sudoers
+  successd reback permission /etc/sudoers to 440
+  ```
+
+- vim默认开启行号
+
+  ```shell
+  ni9ne@ni9nes:~$ ./vim_setnum.sh 
+  vim 配置路径: /etc/vim/vimrc
+  添加vim 默认行号开启
+  ```
+
+- php环境安装
+
+  ```shell
+  ni9ne@ni9nes:~$ ./php_env_install.sh
+  ```
+
+## shell脚本文件
+
+### sudo_no_interupt.sh
+
+```shell
+#! /bin/bash
+##
+# Author: NI9NE
+# Date: 2020/10/19
+# Time: 11:32
+# Description: 用于修复集团服务器sudo命令延迟并报错的问题
+# Email: <ni9ne@outlook.com>
+#/
+
+current_hostname=`hostname`
+echo "当前计算机名称为: ${current_hostname}"
+current_hosts_contain=`sudo cat /etc/hosts`
+current_word="127.0.0.1 ${current_hostname}"
+echo "清空原有hosts数据"
+sudo sh -c "echo '${current_word}' > /etc/hosts"
+echo "添加当前计算机名称Hosts数据"
+sudo sh -c "echo '${current_hosts_contain}' >> /etc/hosts"
+```
+
+### vim_setnum.sh
+
+```shell
+#! /bin/bash
+##
+# Author: NI9NE
+# Date: 2020/10/19
+# Time: 11:32
+# Description: 用于将vim行号默认打开
+# Email: <ni9ne@outlook.com>
+#/
+
+vimPath=`sudo find /etc/ -name vimrc`
+echo "vim 配置路径: ${vimPath}"
+sudo sh -c "echo 'set nu' >> ${vimPath}"
+echo "添加vim 默认行号开启"
+```
+
+### php_env_install.sh
+
+```shell
+#! /bin/bash
+
+##
+# Author: NI9NE
+# Time: 12:25
+# Date: 2020/10/19
+# Description: 用于安装PHP项目环境包括以下内容: tree/Git/Nginx/PHP/PHP扩展/MySql/Composer/libreoffice扩展
+#              额外操作包括: Nginx项目目录www所属用户切换,当前用户添加到www组
+#                          php-apcu扩展安装并打开
+# Email: <ni9ne@outlook.com>
+#/
+
+echo '更新软件包源 : [ sudo apt-get update ]'
+sudo apt-get update
+echo '安装语言包'
+sudo apt-get install -y language-pack-en-base
+sudo locale-gen en_US.UTF-8
+echo '安装tree'
+sudo apt-get install -y tree
+echo '安装nginx'
+sudo apt-get install -y nginx
+echo 'www文件夹权限添加'
+sudo chmod g+w /var/www
+echo 'www文件夹所属人变更为www-data'
+sudo chown -R www-data:www-data /var/www
+echo '当前用户添加到www-data组'
+sudo usermod -g www-data `whoami`
+echo '安装git'
+sudo apt-get install -y git
+echo '安装PHP'
+sudo apt-get install -y php
+sudo apt-get install -y php7.0-fpm
+echo '安装PHP扩展:php7.0-mysql'
+sudo apt-get install -y php7.0-mysql
+echo '安装PHP扩展:php7.0-gd'
+sudo apt-get install -y php7.0-gd
+echo '安装PHP扩展:php7.0-soap'
+sudo apt-get install php7.0-soap
+echo '安装PHP扩展:php7.0-fileinfo'
+sudo apt-get install -y php7.0-fileinfo
+echo '安装PHP扩展:php7.0-mbstring'
+sudo apt-get install -y php7.0-mbstring
+echo '安装PHP扩展:php7.0-curl'
+sudo apt-get install -y php7.0-curl
+echo '安装PHP扩展:php7.0-zip'
+sudo apt-get install -y php7.0-zip
+echo '安装PHP扩展:php7.0-dom'
+sudo apt-get install -y php7.0-dom
+echo '安装PHP扩展:php7.0-odbc'
+sudo apt-get install -y php7.0-odbc
+echo '安装PHP扩展:php7.0-memcached'
+sudo apt-get install -y php7.0-memcached
+echo '安装PHP扩展:php7.0-memcache'
+sudo apt-get install -y php7.0-memcache
+echo '安装PHP扩展:php7.0-server'
+sudo apt-get install -y mysql-server
+echo '安装PHP扩展:php7.0-apcu'
+sudo apt-get install php7.0-apcu
+echo '安装PHP扩展:php7.0-apcu-bc'
+sudo apt-get install php7.0-apcu-bc
+echo '配置php-apcu 开启'
+sudo sh -c "echo 'apc.enable_cli=On' >> '/etc/php/7.0/mods-available/apcu.ini'"
+echo '重启php7.0'
+sudo service php7.0-fpm restart
+echo '添加仓库源'
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:ondrej/php
+echo '更新源'
+sudo apt-get update
+echo '升级 PHP'
+sudo apt-get upgrade php
+echo '更新驱动'
+sudo apt-get install -y  php7.3-fpm
+echo '切换 PHP 版本'
+echo 1 | sudo update-alternatives --config php
+
+echo '安裝libreoffice 扩展 :libreoffice-writer'
+sudo apt-get install -y libreoffice-writer
+echo '安裝libreoffice 扩展 :libreoffice-calc'
+sudo apt-get install -y libreoffice-calc
+echo '安裝libreoffice 扩展 :libreoffice-headless'
+sudo apt-get install -y libreoffice-headless
+echo '安裝composer'
+php -r "copy('https://install.phpcomposer.com/installer', 'composer-setup.php');"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+echo '全局安装（环境变量）'
+sudo mv composer.phar /usr/local/bin/composer
+echo '更换composer阿里镜像'
+composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+echo 'composer降低版本为1.0'
+sudo composer self-update --1
+
+# echo '生成git秘钥'
+# ssh-keygen -t rsa -C "ni9ne@outlook.com"
+# 
+# echo '安装docker'
+# curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+# echo '添加用户到docker组'
+# sudo usermod -aG docker `whoami`
+```
+
+]]></content>
+      <categories>
+        <category>实际演练</category>
+      </categories>
+      <tags>
+        <tag>linux</tag>
+        <tag>shell</tag>
+        <tag>服务器</tag>
+      </tags>
+  </entry>
 </search>
