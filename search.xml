@@ -18409,6 +18409,10 @@ sudo composer self-update --1
     <content><![CDATA[
 ## MySQL 用户账号相关操作
 
+### 具体操作命令格式
+
+> 以下为常用命令
+
 ```
 -- 查询用户
 SELECT * FROM user;
@@ -18440,9 +18444,11 @@ ALTER USER 'naxx'@'%' account lock;
 ALTER USER 'naxx'@'%' account unlock;
 ```
 
+### 权限设定关键字
+
 ![I3wLQVQjl9](/images/imgs/I3wLQVQjl9.png)
 
-初始密码问题
+### 初始密码问题
 
 ```shell
 刚安装好的mysql登录使用auth_socket
