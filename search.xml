@@ -21047,4 +21047,392 @@ sudo dpkg -i *.deb
         <tag>后端</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Bat脚本编写用例</title>
+    <url>/2021/05/07/Bat%E8%84%9A%E6%9C%AC%E7%BC%96%E5%86%99%E7%94%A8%E4%BE%8B/</url>
+    <content><![CDATA[
+## 一次Bat脚本的尝试
+
+记录一次Bat脚本的编写使用,
+
+本意是在Windows服务器上用Git实现文件的备份和实时拉取, 但由于仓库的大小限制失败, 改为其他方式实现, 以下为具体bat脚本代码
+
+
+
+### 1_rar_gitpush.bat
+
+```powershell
+@echo on
+
+rem 设置运行脚本变量
+:::: 压缩执行文件路径
+set rar_exe="C:\Program Files\WinRAR\Rar.exe"
+:::: 文件压缩拆分大小
+set file_size=49m
+:::: SQL自动备份文件夹路径,要带\
+set sql_back_file_path=F:\BashTest\sqlfile\
+::::上传git仓库文件夹路径,要带\
+set git_file_path=F:\BashTest\filename3\
+::::git拉取同步分支
+set git_branck=master
+
+:: 创建日志文件
+set dir_path=%~dp0
+set log_path=%dir_path%push_log.txt
+set now_time=%date:~0,4%-%date:~5,2%-%date:~8,2% %time:~0,2%:%time:~3,2%:%time:~6,2%  
+
+echo %log_path%
+if not exist %log_path% (
+		echo "Backup Log">%log_path%
+	)
+
+
+
+rem 拉取最新代码
+cd %git_file_path%
+if %errorlevel% neq 0 goto fail
+git reset --hard
+if %errorlevel% neq 0 goto fail
+git fetch --all
+if %errorlevel% neq 0 goto fail
+git pull origin %git_branck%
+::if %errorlevel% neq 0 goto fail
+
+
+:::: 删除obj文件
+rem rd /s /q .git\objects 
+rem if %errorlevel% neq 0 goto fail
+rem md .git\objects
+rem if %errorlevel% neq 0 goto fail
+rem rd /s /q .git/refs/original/
+rem if %errorlevel% neq 0 goto fail
+rem git reflog expire --expire=now --all
+rem git gc --prune=now
+
+rem 删除原有数据
+del filefolder\*.rar
+if %errorlevel% neq 0 goto fail
+git add . 
+::if %errorlevel% neq 0 goto fail
+git commit -m "daily backup clean"
+::if %errorlevel% neq 0 goto fail
+git push origin %git_branck%:%git_branck%
+::if %errorlevel% neq 0 goto fail
+
+
+
+rem rem 清除大文件
+::git filter-branch --index-filter "git rm --cached --ignore-unmatch *" -- --all
+git filter-branch --force --index-filter "git rm -r --cached --ignore-unmatch filefolder" --prune-empty --tag-name-filter cat -- --all
+rd /s /q .git\refs\original\
+if %errorlevel% neq 0 goto fail
+rd /s /q .git\logs\
+if %errorlevel% neq 0 goto fail
+git reflog expire --expire=now --all
+if %errorlevel% neq 0 goto fail
+git gc --prune=now --aggressive
+if %errorlevel% neq 0 goto fail
+git add .
+git commit -m "data clean"
+git push origin --force --all
+::if %errorlevel% neq 0 goto fail
+rem rem 清空分支
+rem git checkout %git_branck%
+rem if %errorlevel% neq 0 goto fail
+rem git checkout --orphan master-new-line;
+rem if %errorlevel% neq 0 goto fail
+rem git add -A
+rem if %errorlevel% neq 0 goto fail
+rem git commit -am "init project"
+rem if %errorlevel% neq 0 goto fail
+rem git branch -D %git_branck%
+rem if %errorlevel% neq 0 goto fail
+rem git branch -m %git_branck%
+rem if %errorlevel% neq 0 goto fail
+rem git push -f origin %git_branck%:%git_branck%
+rem if %errorlevel% neq 0 goto fail
+
+
+rem git pack-refs --all --prune
+rem git reflog expire --all
+rem git repack -d -l
+rem git prune --expire
+rem git rerere gc
+
+rem git checkout -b %git_branck%
+rem git fetch --all
+
+rem 分卷压缩指定文件夹内文件
+:started
+set now_day_format=%date:~0,4%_%date:~5,2%_%date:~8,2%
+%rar_exe% a -m5 -v%file_size% -ta%now_day_format% -agYYYYMMDD %git_file_path%filefolder\ %sql_back_file_path%
+if %errorlevel% neq 0 goto fail
+
+rem 提交gitee
+:gitpush
+cd %git_file_path%
+if %errorlevel% neq 0 goto fail
+git add .
+if %errorlevel% neq 0 goto fail
+git commit -m "daily backup"
+if %errorlevel% neq 0 goto fail
+git push origin %git_branck%:%git_branck%
+if %errorlevel% neq 0 goto fail
+
+rem rem 上传完毕,清空仓库
+rem :dellocal
+rem del filefolder\*.rar
+goto success
+
+:fail
+echo %now_time%%now_day_format%" daily backup failed">>%log_path%
+echo "daily backup failed,please retry later!" && goto exited
+
+:success
+echo %now_time%%now_day_format%" daily backup success">>%log_path%
+echo "backup success" && goto exited
+
+:exited
+pause
+exit
+
+```
+
+### 2_gitpull_move.bat
+
+```powershell
+@echo off
+
+rem 设置运行脚本变量
+
+::::下载git仓库文件夹路径,要带\
+set git_file_path=F:\BashTest\filename3\
+::::本地存储文件夹路径,要带\
+set storage_file_path=F:\BashTest\filename2\
+::::git拉取同步分支
+set git_branck=file
+
+:: 创建日志文件
+set dir_path=%~dp0
+set log_path=%dir_path%pull_log.txt
+set now_time=%date:~0,4%-%date:~5,2%-%date:~8,2% %time:~0,2%:%time:~3,2%:%time:~6,2%  
+
+echo %log_path%
+if not exist %log_path% (
+		echo "Backup Pull Log">%log_path%
+	)
+
+rem 拉取最新代码
+cd %git_file_path%
+if %errorlevel% neq 0 goto fail
+
+git reset --hard
+if %errorlevel% neq 0 goto fail
+
+git fetch --all
+if %errorlevel% neq 0 goto fail
+
+git pull origin %git_branck%
+if %errorlevel% neq 0 goto fail
+
+rem 移动到备份
+:movefile
+move %git_file_path%\test\* %storage_file_path%
+if %errorlevel% neq 0 goto fail
+goto success
+
+:fail
+echo %now_time%" daily backup pull failed">>%log_path%
+echo "daily backup failed,please retry later!" && goto exited
+
+:success
+echo %now_time%" daily backup pull success">>%log_path%
+echo "backup success" && goto exited
+
+:exited
+pause
+exit
+```
+
+
+
+
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>实际演练</category>
+      </categories>
+      <tags>
+        <tag>后端</tag>
+        <tag>Bat</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/11/13/Gitee%20%E7%A0%81%E4%BA%91Fork+PR%E6%A8%A1%E5%BC%8F%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B/</url>
+    <content><![CDATA[```
+title: 码云 Fork+PR 模式使用流程
+date: 2020-10-05 18:58:26
+tags:
+	- Git
+	- 版本控制
+
+categories:
+	- 开发资料
+```
+
+## 码云 Fork+PR 模式使用流程
+
+流程图展示
+
+![image-20200915122128429](/images/imgs/gitee/image-20200915122128429.png)
+
+## 一.拉取仓库
+
+### 1.加入项目组. fork项目源仓库
+
+![image-20200915104911706](/images/imgs/gitee/image-20200915104911706.png)
+
+### 2.本地Clone拷贝项目
+
+![image-20200914181253718](/images/imgs/gitee/image-20200914181253718.png)
+
+### 3.添加源项目Remote
+
+#### -git bash 操作 (二选一)
+
+`git remote add resource https://gitee.com/NI9NE/laravel_permission_test.git` 
+
+`git remote add [自定义远端名称,类似于origin] [源Fork仓库url/路径]` 
+
+#### -sourcetree操作 (二选一)
+
+- 点击**设置** 
+
+  ![image-20200914181550749](/images/imgs/gitee/image-20200914181550749.png)
+
+- 点击**添加** 
+
+  ![image-20200914181620180](/images/imgs/gitee/image-20200914181620180.png)
+
+- **填写**remote信息
+
+  ![image-20200914181757757](/images/imgs/gitee/image-20200914181757757.png)
+
+- 完成后**显示** 
+
+  ![image-20200914182016101](/images/imgs/gitee/image-20200914182016101.png)
+
+### 4.拉取最新远端信息
+
+- 点击**获取** 
+
+  ![image-20200914182334388](/images/imgs/gitee/image-20200914182334388.png)
+
+- 确认勾选, 点击**确定** 
+
+  ![image-20200914182358232](/images/imgs/gitee/image-20200914182358232.png)
+
+- 显示远端分支与最新提交记录
+
+  ![image-20200914182432946](/images/imgs/gitee/image-20200914182432946.png)
+
+## 二.基于dev分支开发
+
+### 1.获取远端origin/dev分支
+
+![image-20200914182754870](/images/imgs/gitee/image-20200914182754870.png)
+
+![image-20200914182842254](/images/imgs/gitee/image-20200914182842254.png)
+
+### 2.检查分支代码
+
+**注意**:  若 `origin/dev` 分支与 `resource/dev `分支提交记录不在同一条, 如下所示:
+
+​		需要 **拉取最新源仓库代码** 后开始开发
+
+![image-20200914183552091](/images/imgs/gitee/image-20200914183552091.png)
+
+- 获取最新提交记录
+
+  > 等同于`git fetch --all`
+
+  ![image-20200914184401421](/images/imgs/gitee/image-20200914184401421.png)
+
+- 确认当前所在本地分支为想要拉取同步的分支, 右键点击`resource/dev`所在提交, 合并到同名本地分支`dev`
+
+  > 等同于`git checkout dev`  +  `git merge resource/dev` 
+
+  ![image-20200914183703744](/images/imgs/gitee/image-20200914183703744.png)
+
+- 点击确定
+
+  ![image-20200914184448309](/images/imgs/gitee/image-20200914184448309.png)
+
+- 合并完成后点击推送到拷贝仓库`origin/dev` 
+
+  > 注意: 如果提示冲突, 请手动处理冲突后提交至拷贝仓库 `origin` 3.
+
+  ![image-20200914184540196](/images/imgs/gitee/image-20200914184540196.png)
+
+### 3.代码书写
+
+​	......
+
+### 4.提交代码
+
+![image-20200915112403299](/images/imgs/gitee/image-20200915112403299.png)
+
+### 5.检查书写代码期间是否有相关提交
+
+#### - 拉取最新提交
+
+![image-20200915112545436](/images/imgs/gitee/image-20200915112545436.png)
+
+#### - 查看源仓库分支变动
+
+![image-20200915112739052](/images/imgs/gitee/image-20200915112739052.png)
+
+#### -  合并源仓库分支代码到拷贝仓库分支
+
+![image-20200915113030531](/images/imgs/gitee/image-20200915113030531.png)
+
+#### - 若有冲突, 处理冲突
+
+![image-20200915113125306](/images/imgs/gitee/image-20200915113125306.png)
+
+- 查看冲突所在文件
+
+  ![image-20200915113154978](/images/imgs/gitee/image-20200915113154978.png)
+
+- 处理冲突
+
+- 提交代码
+
+  ![image-20200915113918846](/images/imgs/gitee/image-20200915113918846.png)
+
+### 6.提交PR(Pull Request)
+
+#### - 点击远端,进入项目所在网页
+
+![image-20200915114051027](/images/imgs/gitee/image-20200915114051027.png)
+
+#### - 点击新建PR
+
+![image-20200915114144211](/images/imgs/gitee/image-20200915114144211.png)
+
+#### - 创建PR
+
+![image-20200915121855780](/images/imgs/gitee/image-20200915121855780.png)
+
+#### - 完成提交, 等待管理员审核通过合并
+
+![image-20200915122011108](/images/imgs/gitee/image-20200915122011108.png)
+
+]]></content>
+  </entry>
 </search>
