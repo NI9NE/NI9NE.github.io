@@ -88,7 +88,7 @@
         <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
         <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li>
         <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
-        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">61</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">60</span></a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -159,7 +159,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-count">60</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -213,86 +213,6 @@
 
 
     <div class="main-inner index posts-expand">
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2018/06/21/JavaScript%20%E7%89%B9%E6%95%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
-      <meta itemprop="name" content="NI9NE">
-      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="NI9NE's Zone">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/06/21/JavaScript%20%E7%89%B9%E6%95%88/" class="post-title-link" itemprop="url">JavaScript 特效</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2018-06-21 09:41:34" itemprop="dateCreated datePublished" datetime="2018-06-21T09:41:34+08:00">2018-06-21</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AE%9E%E9%99%85%E6%BC%94%E7%BB%83/" itemprop="url" rel="index"><span itemprop="name">实际演练</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="特效扩展"><a href="#特效扩展" class="headerlink" title="特效扩展"></a>特效扩展</h2><h3 id="银行卡自动截断"><a href="#银行卡自动截断" class="headerlink" title="银行卡自动截断"></a>银行卡自动截断</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&lt;h1&gt;请输入银行卡:&lt;/h1&gt;</span><br><span class="line">&lt;hr&gt;</span><br><span class="line"></span><br><span class="line">&lt;input type=&quot;text&quot; id=&quot;bankCard&quot; maxlength=&quot;23&quot;&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var input = document.getElementById(&#x27;bankCard&#x27;);</span><br><span class="line"></span><br><span class="line">    if (document.all) &#123;</span><br><span class="line">        input.onpropertychange = ckInput;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        input.oninput = ckInput;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    function ckInput()&#123;</span><br><span class="line">        // 将输入范围限定在数字范围之内</span><br><span class="line">        // A: </span><br><span class="line">        /*input.value = input.value</span><br><span class="line">            .replace(/\D/g, &#x27;&#x27;)</span><br><span class="line">            .replace(/(\d&#123;4&#125;)/g, &#x27;$1-&#x27;)</span><br><span class="line">            .replace(/-$/g, &#x27;&#x27;);*/</span><br><span class="line">        // B: </span><br><span class="line">        input.value = input.value</span><br><span class="line">            .replace(/\D/g, &#x27;&#x27;)</span><br><span class="line">            .replace(/(\d&#123;4&#125;)(?=\d)/g, &#x27;$1-&#x27;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /*</span><br><span class="line">    (?:)    忽略子模式的匹配</span><br><span class="line">    (?=)    正向预查/先行断言</span><br><span class="line">            匹配过程中,需要用到这个子模式的条件</span><br><span class="line">            但是,获取匹配结果时,忽略该子模式的条件</span><br><span class="line">     */</span><br><span class="line"></span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/06/21/JavaScript%20%E7%89%B9%E6%95%88/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
 
     
 
@@ -1048,8 +968,88 @@
 
 
 
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2018/01/05/PHP%20%E5%9F%BA%E7%A1%8005-%E6%95%B0%E7%BB%84.%E6%AD%A3%E5%88%99.%E6%97%B6%E9%97%B4%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2018/01/05/PHP%20%E5%9F%BA%E7%A1%8005-%E6%95%B0%E7%BB%84.%E6%AD%A3%E5%88%99.%E6%97%B6%E9%97%B4%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">PHP 简介05-数组/正则/时间函数</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-01-05 18:15:22" itemprop="dateCreated datePublished" datetime="2018-01-05T18:15:22+08:00">2018-01-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="1-数组"><a href="#1-数组" class="headerlink" title="1.数组"></a>1.数组</h2><h3 id="1-数组-1"><a href="#1-数组-1" class="headerlink" title="1.数组"></a>1.数组</h3><p>1.分类</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/01/05/PHP%20%E5%9F%BA%E7%A1%8005-%E6%95%B0%E7%BB%84.%E6%AD%A3%E5%88%99.%E6%97%B6%E9%97%B4%E5%87%BD%E6%95%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>
