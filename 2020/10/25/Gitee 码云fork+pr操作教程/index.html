@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="pull request 操作一.单账号Fork_PR操作1.准备账号:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="码云 fork+pr操作教程">
+<meta property="og:url" content="https://ni9ne.github.io/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="pull request 操作一.单账号Fork_PR操作1.准备账号:">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600050343620.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600051268581.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600051387661.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600051479417.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600051676792.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600053781089.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600053940805.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600054310266.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600054321207.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600054512665.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600062213525.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600062395922.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600062711861.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600063510303.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600064116925.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600064152851.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600064173030.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600064276903.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600064495182.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600064530725.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600064811716.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600064886860.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600064981103.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600065480982.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600065554478.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600066019005.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600067187887.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600067406076.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600068317627.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600068550112.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600068867942.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600069183412.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600069033120.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600069530351.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600069597014.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600069801114.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/gitee/1600069780593.png">
+<meta property="article:published_time" content="2020-10-25T14:12:28.000Z">
+<meta property="article:modified_time" content="2021-11-12T20:45:56.204Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="版本控制">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.github.io/images/imgs/gitee/1600050343620.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/","path":"2020/10/25/Gitee 码云fork+pr操作教程/","title":"码云 fork+pr操作教程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>码云 fork+pr操作教程 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">48</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">61</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#pull-request-%E6%93%8D%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">pull request 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E5%8D%95%E8%B4%A6%E5%8F%B7Fork-PR%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.</span> <span class="nav-text">一.单账号Fork_PR操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%87%86%E5%A4%87%E8%B4%A6%E5%8F%B7"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.准备账号:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%B8%BB%E8%B4%A6%E5%8F%B7%E5%BB%BA%E7%AB%8B%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.主账号建立私有仓库:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%89%AF%E8%B4%A6%E5%8F%B71Fork%E8%AF%A5%E4%BB%93%E5%BA%93"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.副账号1Fork该仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E8%AF%A5%E8%B4%A6%E5%8F%B7%E5%88%B0%E9%A1%B9%E7%9B%AE"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">- 添加该账号到项目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Fork%E4%BB%93%E5%BA%93%E5%88%B0%E8%87%AA%E5%B7%B1%E7%9A%84%E9%A1%B9%E7%9B%AE%E4%B8%AD"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">- Fork仓库到自己的项目中</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%89%AF%E8%B4%A6%E5%8F%B71%E5%85%8B%E9%9A%86%E8%87%AA%E5%B7%B1%E7%9A%84%E9%A1%B9%E7%9B%AE%E5%88%B0%E6%9C%AC%E5%9C%B0%E5%BC%80%E5%8F%91"><span class="nav-number">1.1.4.</span> <span class="nav-text">4.副账号1克隆自己的项目到本地开发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%BC%80%E5%8F%91%E5%8A%9F%E8%83%BD%E5%AE%8C%E6%88%90-%E6%8E%A8%E9%80%81%E5%88%B0%E6%9C%AC%E8%B4%A6%E5%8F%B7%E9%A1%B9%E7%9B%AE%E5%88%86%E6%94%AF"><span class="nav-number">1.1.5.</span> <span class="nav-text">5.开发功能完成, 推送到本账号项目分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E8%BF%9B%E5%85%A5%E9%A1%B9%E7%9B%AEGitee%E9%A1%B5%E9%9D%A2-%E5%88%9B%E5%BB%BAPull-Request"><span class="nav-number">1.1.6.</span> <span class="nav-text">6.进入项目Gitee页面, 创建Pull Request</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%82%B9%E5%87%BB%E6%96%B0%E5%BB%BAPull-Request"><span class="nav-number">1.1.6.1.</span> <span class="nav-text">- 点击新建Pull Request</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%9C%AC%E5%9C%B0%E9%A1%B9%E7%9B%AE%E5%88%86%E6%94%AF-%E5%92%8C-%E7%9B%AE%E6%A0%87%E9%A1%B9%E7%9B%AE%E5%88%86%E6%94%AF"><span class="nav-number">1.1.6.2.</span> <span class="nav-text">- 选择本地项目分支 和 目标项目分支</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A1%AB%E5%86%99Pull-Request-%E8%AF%A6%E6%83%85-%E9%80%89%E6%8B%A9%E5%AE%A1%E6%A0%B8-%E6%B5%8B%E8%AF%95%E8%B4%9F%E8%B4%A3%E4%BA%BA"><span class="nav-number">1.1.6.3.</span> <span class="nav-text">- 填写Pull Request 详情, 选择审核&#x2F;测试负责人</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E7%AE%A1%E7%90%86%E5%91%98%E6%9F%A5%E7%9C%8B-%E6%B5%8B%E8%AF%95-%E5%90%88%E5%B9%B6%E5%88%B0%E4%B8%BB%E9%A1%B9%E7%9B%AE%E5%88%86%E6%94%AF"><span class="nav-number">1.1.7.</span> <span class="nav-text">7.管理员查看, 测试, 合并到主项目分支</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8BPull-Request"><span class="nav-number">1.1.7.1.</span> <span class="nav-text">- 查看Pull Request</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%A1%E6%9F%A5%E4%BB%A3%E7%A0%81-%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="nav-number">1.1.7.2.</span> <span class="nav-text">- 审查代码,测试代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AE%E8%AE%A4%E5%90%88%E5%B9%B6"><span class="nav-number">1.1.7.3.</span> <span class="nav-text">- 确认合并</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E6%9F%A5%E7%9C%8B%E5%90%88%E5%B9%B6%E7%BB%93%E6%9E%9C"><span class="nav-number">1.1.8.</span> <span class="nav-text">8.查看合并结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E5%A4%9A%E8%B4%A6%E5%8F%B7Fork-PR%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.</span> <span class="nav-text">二.多账号Fork_PR操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%89%AF%E8%B4%A6%E5%8F%B72Fork%E4%BB%93%E5%BA%93"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.副账号2Fork仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%89%AF%E8%B4%A6%E5%8F%B72Clone%E4%BB%93%E5%BA%93"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.副账号2Clone仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%9F%BA%E4%BA%8Emaster%E5%88%86%E6%94%AF%E5%88%9B%E5%BB%BA%E6%96%B0%E7%89%B9%E6%80%A7%E5%88%86%E6%94%AFFeature2"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.基于master分支创建新特性分支Feature2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%BC%80%E5%8F%91%E5%8A%9F%E8%83%BD-%E6%8F%90%E4%BA%A4%E5%88%86%E6%94%AF"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.开发功能, 提交分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%88%9B%E5%BB%BAPull-Request"><span class="nav-number">1.2.5.</span> <span class="nav-text">5.创建Pull Request</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E5%BB%BAPull-Request"><span class="nav-number">1.2.5.1.</span> <span class="nav-text">- 新建Pull Request</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%8F%90%E4%BA%A4%E5%88%86%E6%94%AF-%E6%8F%90%E4%BA%A4%E7%9B%AE%E6%A0%87%E5%88%86%E6%94%AF"><span class="nav-number">1.2.5.2.</span> <span class="nav-text">- 选择提交分支, 提交目标分支</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4-%E5%B9%B6%E8%87%AA%E6%B5%8B"><span class="nav-number">1.2.5.3.</span> <span class="nav-text">- 查看提交, 并自测</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%88%87%E6%8D%A2%E4%B8%BB%E8%B4%A6%E5%8F%B7%E6%9F%A5%E7%9C%8BPull-Request"><span class="nav-number">1.2.6.</span> <span class="nav-text">6.切换主账号查看Pull Request</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E7%A1%AE%E8%AE%A4%E4%BB%A3%E7%A0%81%E7%AC%A6%E5%90%88%E6%9D%A1%E4%BB%B6-%E5%90%88%E5%B9%B6%E8%87%B3%E5%88%86%E6%94%AF"><span class="nav-number">1.2.7.</span> <span class="nav-text">7.确认代码符合条件, 合并至分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E6%9F%A5%E7%9C%8B%E4%B8%BB%E9%A1%B9%E7%9B%AE%E5%90%88%E5%B9%B6%E7%8A%B6%E5%86%B5"><span class="nav-number">1.2.8.</span> <span class="nav-text">8.查看主项目合并状况</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-%E5%89%AF%E8%B4%A6%E5%8F%B7%E6%9F%A5%E7%9C%8B%E6%BA%90%E4%BB%93%E5%BA%93%E5%8F%98%E5%8A%A8-%E6%9C%80%E6%96%B0-%E4%BB%A3%E7%A0%81"><span class="nav-number">1.3.</span> <span class="nav-text">三.副账号查看源仓库变动(最新)代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%B7%BB%E5%8A%A0-remote-%E5%85%B3%E8%81%94"><span class="nav-number">1.3.1.</span> <span class="nav-text">1.添加 remote 关联</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%9F%A5%E7%9C%8B%E5%85%B3%E8%81%94%E6%83%85%E5%86%B5"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.查看关联情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%8B%89%E5%8F%96%E6%BA%90%E4%BB%93%E5%BA%93%E6%9B%B4%E6%96%B0"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.拉取源仓库更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%90%88%E5%B9%B6%E5%88%B0%E6%9C%AC%E5%9C%B0%E5%88%86%E6%94%AF"><span class="nav-number">1.3.4.</span> <span class="nav-text">4.合并到本地分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%8E%A8%E9%80%81%E5%8F%98%E6%9B%B4%E5%88%B0%E6%9C%AC%E5%9C%B0%E5%AF%B9%E5%BA%94%E8%BF%9C%E7%A8%8Borigin%E4%BB%93%E5%BA%93"><span class="nav-number">1.3.5.</span> <span class="nav-text">5.推送变更到本地对应远程origin仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%9F%A5%E7%9C%8B%E9%A1%B9%E7%9B%AE%E5%90%88%E5%B9%B6%E6%8B%89%E5%8F%96%E7%8A%B6%E5%86%B5"><span class="nav-number">1.3.6.</span> <span class="nav-text">6.查看项目合并拉取状况</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B-%E5%A4%9A%E8%B4%A6%E5%8F%B7%E5%86%B2%E7%AA%81Fork-PR%E6%93%8D%E4%BD%9C"><span class="nav-number">1.4.</span> <span class="nav-text">四.多账号冲突Fork_PR操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%90%8C%E6%AD%A5%E8%B4%A6%E5%8F%B71%E5%92%8C%E8%B4%A6%E5%8F%B72%E6%89%80%E5%9C%A8%E6%BA%90%E9%A1%B9%E7%9B%AE%E5%88%86%E6%94%AF%E4%BB%A3%E7%A0%81"><span class="nav-number">1.4.1.</span> <span class="nav-text">1.同步账号1和账号2所在源项目分支代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%89%AF%E8%B4%A6%E5%8F%B72%E5%85%88%E4%BF%AE%E6%94%B9%E6%8F%90%E4%BA%A4"><span class="nav-number">1.4.2.</span> <span class="nav-text">2.副账号2先修改提交</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A0%E9%99%A4-%E6%96%B0%E5%A2%9E-%E4%BB%A3%E7%A0%81"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">- 删除+新增 代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%A1%E6%A0%B8-%E5%90%88%E5%B9%B6%E4%BB%A3%E7%A0%81-%E6%8B%89%E5%8F%96%E6%9C%80%E6%96%B0%E4%BB%A3%E7%A0%81"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">- 审核&#x2F;合并代码,拉取最新代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%89%AF%E8%B4%A6%E5%8F%B71%E5%90%8C%E6%97%B6%E4%BF%AE%E6%94%B9%E8%AF%A5%E6%96%87%E4%BB%B6"><span class="nav-number">1.4.3.</span> <span class="nav-text">3.副账号1同时修改该文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4Pull-Request"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">- 提交Pull Request</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9A%82%E7%BC%93%E6%8F%90%E4%BA%A4-%E6%8B%89%E5%8F%96%E6%9C%80%E6%96%B0%E4%BB%A3%E7%A0%81-%E6%9F%A5%E7%9C%8B%E5%86%B2%E7%AA%81"><span class="nav-number">1.4.3.2.</span> <span class="nav-text">-  暂缓提交, 拉取最新代码, 查看冲突</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%86%B2%E7%AA%81"><span class="nav-number">1.4.3.3.</span> <span class="nav-text">- 处理冲突</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%B2%E7%AA%81%E5%A4%84%E7%90%86%E5%AE%8C%E6%AF%95-%E9%87%8D%E6%96%B0%E5%8F%91%E8%B5%B7PR"><span class="nav-number">1.4.3.4.</span> <span class="nav-text">-  冲突处理完毕, 重新发起PR</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%B8%BB%E8%B4%A6%E5%8F%B7%E5%AE%A1%E6%A0%B8-%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF"><span class="nav-number">1.4.4.</span> <span class="nav-text">4.主账号审核&#x2F;合并分支</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%90%88%E5%B9%B6%E7%8A%B6%E6%80%81"><span class="nav-number">1.4.4.1.</span> <span class="nav-text">- 查看合并状态</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          码云 fork+pr操作教程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-10-25 22:12:28" itemprop="dateCreated datePublished" datetime="2020-10-25T22:12:28+08:00">2020-10-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="pull-request-操作"><a href="#pull-request-操作" class="headerlink" title="pull request 操作"></a>pull request 操作</h1><h2 id="一-单账号Fork-PR操作"><a href="#一-单账号Fork-PR操作" class="headerlink" title="一.单账号Fork_PR操作"></a>一.单账号Fork_PR操作</h2><h3 id="1-准备账号"><a href="#1-准备账号" class="headerlink" title="1.准备账号:"></a>1.准备账号:</h3><p>主账号:   Mr.NI9NE_<code>ni9ne@outook.com</code>   </p>
+<p>副账号1: Mr.zlb1_ <code>940223345@qq.com</code>      副账号2:   Mr.ZLB2_ <code>488747128@qq.com</code>    </p>
+<h3 id="2-主账号建立私有仓库"><a href="#2-主账号建立私有仓库" class="headerlink" title="2.主账号建立私有仓库:"></a>2.主账号建立私有仓库:</h3><p><img src="/images/imgs/gitee/1600050343620.png" alt="1600050343620"> </p>
+<h3 id="3-副账号1Fork该仓库"><a href="#3-副账号1Fork该仓库" class="headerlink" title="3.副账号1Fork该仓库"></a>3.副账号1Fork该仓库</h3><h4 id="添加该账号到项目"><a href="#添加该账号到项目" class="headerlink" title="- 添加该账号到项目"></a>- 添加该账号到项目</h4><p><img src="/images/imgs/gitee/1600051268581.png" alt="1600051268581"></p>
+<h4 id="Fork仓库到自己的项目中"><a href="#Fork仓库到自己的项目中" class="headerlink" title="- Fork仓库到自己的项目中"></a>- Fork仓库到自己的项目中</h4><p><img src="/images/imgs/gitee/1600051387661.png" alt="1600051387661"></p>
+<p><img src="/images/imgs/gitee/1600051479417.png" alt="1600051479417"></p>
+<h3 id="4-副账号1克隆自己的项目到本地开发"><a href="#4-副账号1克隆自己的项目到本地开发" class="headerlink" title="4.副账号1克隆自己的项目到本地开发"></a>4.副账号1克隆自己的项目到本地开发</h3><p><img src="/images/imgs/gitee/1600051676792.png" alt="1600051676792"></p>
+<h3 id="5-开发功能完成-推送到本账号项目分支"><a href="#5-开发功能完成-推送到本账号项目分支" class="headerlink" title="5.开发功能完成, 推送到本账号项目分支"></a>5.开发功能完成, 推送到本账号项目分支</h3><p><img src="/images/imgs/gitee/1600053781089.png" alt="1600053781089"></p>
+<h3 id="6-进入项目Gitee页面-创建Pull-Request"><a href="#6-进入项目Gitee页面-创建Pull-Request" class="headerlink" title="6.进入项目Gitee页面, 创建Pull Request"></a>6.进入项目Gitee页面, 创建Pull Request</h3><h4 id="点击新建Pull-Request"><a href="#点击新建Pull-Request" class="headerlink" title="- 点击新建Pull Request"></a>- 点击新建Pull Request</h4><p><img src="/images/imgs/gitee/1600053940805.png" alt="1600053940805"></p>
+<h4 id="选择本地项目分支-和-目标项目分支"><a href="#选择本地项目分支-和-目标项目分支" class="headerlink" title="- 选择本地项目分支 和 目标项目分支"></a>- 选择本地项目分支 和 目标项目分支</h4><p><img src="/images/imgs/gitee/1600054310266.png" alt="1600054310266"></p>
+<h4 id="填写Pull-Request-详情-选择审核-测试负责人"><a href="#填写Pull-Request-详情-选择审核-测试负责人" class="headerlink" title="- 填写Pull Request 详情, 选择审核/测试负责人"></a>- 填写Pull Request 详情, 选择审核/测试负责人</h4><p><img src="/images/imgs/gitee/1600054321207.png" alt="1600054321207"></p>
+<blockquote>
+<p>当前显示可自动合并即可, 否则需要自行处理冲突</p>
+</blockquote>
+<h3 id="7-管理员查看-测试-合并到主项目分支"><a href="#7-管理员查看-测试-合并到主项目分支" class="headerlink" title="7.管理员查看, 测试, 合并到主项目分支"></a>7.管理员查看, 测试, 合并到主项目分支</h3><h4 id="查看Pull-Request"><a href="#查看Pull-Request" class="headerlink" title="- 查看Pull Request"></a>- 查看Pull Request</h4><p><img src="/images/imgs/gitee/1600054512665.png" alt="1600054512665"></p>
+<h4 id="审查代码-测试代码"><a href="#审查代码-测试代码" class="headerlink" title="- 审查代码,测试代码"></a>- 审查代码,测试代码</h4><p><img src="/images/imgs/gitee/1600062213525.png" alt="1600062213525"></p>
+<h4 id="确认合并"><a href="#确认合并" class="headerlink" title="- 确认合并"></a>- 确认合并</h4><p><img src="/images/imgs/gitee/1600062395922.png" alt="1600062395922"></p>
+<h3 id="8-查看合并结果"><a href="#8-查看合并结果" class="headerlink" title="8.查看合并结果"></a>8.查看合并结果</h3><p><img src="/images/imgs/gitee/1600062711861.png" alt="1600062711861"></p>
+<h2 id="二-多账号Fork-PR操作"><a href="#二-多账号Fork-PR操作" class="headerlink" title="二.多账号Fork_PR操作"></a>二.多账号Fork_PR操作</h2><h3 id="1-副账号2Fork仓库"><a href="#1-副账号2Fork仓库" class="headerlink" title="1.副账号2Fork仓库"></a>1.副账号2Fork仓库</h3><h3 id="2-副账号2Clone仓库"><a href="#2-副账号2Clone仓库" class="headerlink" title="2.副账号2Clone仓库"></a>2.副账号2Clone仓库</h3><p><img src="/images/imgs/gitee/1600063510303.png" alt="1600063510303"></p>
+<h3 id="3-基于master分支创建新特性分支Feature2"><a href="#3-基于master分支创建新特性分支Feature2" class="headerlink" title="3.基于master分支创建新特性分支Feature2"></a>3.基于master分支创建新特性分支Feature2</h3><p><img src="/images/imgs/gitee/1600064116925.png" alt="1600064116925"></p>
+<h3 id="4-开发功能-提交分支"><a href="#4-开发功能-提交分支" class="headerlink" title="4.开发功能, 提交分支"></a>4.开发功能, 提交分支</h3><blockquote>
+<p>功能代码与其他无冲突</p>
+</blockquote>
+<p><img src="/images/imgs/gitee/1600064152851.png" alt="1600064152851"></p>
+<p><img src="/images/imgs/gitee/1600064173030.png" alt="1600064173030"></p>
+<h3 id="5-创建Pull-Request"><a href="#5-创建Pull-Request" class="headerlink" title="5.创建Pull Request"></a>5.创建Pull Request</h3><h4 id="新建Pull-Request"><a href="#新建Pull-Request" class="headerlink" title="- 新建Pull Request"></a>- 新建Pull Request</h4><p><img src="/images/imgs/gitee/1600064276903.png" alt="1600064276903"></p>
+<h4 id="选择提交分支-提交目标分支"><a href="#选择提交分支-提交目标分支" class="headerlink" title="- 选择提交分支, 提交目标分支"></a>- 选择提交分支, 提交目标分支</h4><p><img src="/images/imgs/gitee/1600064495182.png" alt="1600064495182"></p>
+<h4 id="查看提交-并自测"><a href="#查看提交-并自测" class="headerlink" title="- 查看提交, 并自测"></a>- 查看提交, 并自测</h4><blockquote>
+<p>有显示是否可以自动合并, 说明提交代码没有冲突</p>
+</blockquote>
+<p><img src="/images/imgs/gitee/1600064530725.png" alt="1600064530725"></p>
+<h3 id="6-切换主账号查看Pull-Request"><a href="#6-切换主账号查看Pull-Request" class="headerlink" title="6.切换主账号查看Pull Request"></a>6.切换主账号查看Pull Request</h3><p><img src="/images/imgs/gitee/1600064811716.png" alt="1600064811716"></p>
+<h3 id="7-确认代码符合条件-合并至分支"><a href="#7-确认代码符合条件-合并至分支" class="headerlink" title="7.确认代码符合条件, 合并至分支"></a>7.确认代码符合条件, 合并至分支</h3><p><img src="/images/imgs/gitee/1600064886860.png" alt="1600064886860"></p>
+<p><img src="/images/imgs/gitee/1600064981103.png" alt="1600064981103"></p>
+<h3 id="8-查看主项目合并状况"><a href="#8-查看主项目合并状况" class="headerlink" title="8.查看主项目合并状况"></a>8.查看主项目合并状况</h3><p><img src="/images/imgs/gitee/1600065480982.png" alt="1600065480982"></p>
+<h2 id="三-副账号查看源仓库变动-最新-代码"><a href="#三-副账号查看源仓库变动-最新-代码" class="headerlink" title="三.副账号查看源仓库变动(最新)代码"></a>三.副账号查看源仓库变动(最新)代码</h2><h3 id="1-添加-remote-关联"><a href="#1-添加-remote-关联" class="headerlink" title="1.添加 remote 关联"></a>1.添加 remote 关联</h3><p> <code>git remote add resource https://gitee.com/NI9NE/laravel_permission_test.git</code> </p>
+<p><img src="/images/imgs/gitee/1600065554478.png" alt="1600065554478"></p>
+<h3 id="2-查看关联情况"><a href="#2-查看关联情况" class="headerlink" title="2.查看关联情况"></a>2.查看关联情况</h3><p><code>git remote -v</code> </p>
+<h3 id="3-拉取源仓库更新"><a href="#3-拉取源仓库更新" class="headerlink" title="3.拉取源仓库更新"></a>3.拉取源仓库更新</h3><p><code>git fetch --all   /  git fetch resource </code> </p>
+<h3 id="4-合并到本地分支"><a href="#4-合并到本地分支" class="headerlink" title="4.合并到本地分支"></a>4.合并到本地分支</h3><p><code>git merge resource/dev</code> </p>
+<h3 id="5-推送变更到本地对应远程origin仓库"><a href="#5-推送变更到本地对应远程origin仓库" class="headerlink" title="5.推送变更到本地对应远程origin仓库"></a>5.推送变更到本地对应远程origin仓库</h3><p> <code>git push origin dev</code> </p>
+<p><img src="/images/imgs/gitee/1600066019005.png" alt="1600066019005"></p>
+<h3 id="6-查看项目合并拉取状况"><a href="#6-查看项目合并拉取状况" class="headerlink" title="6.查看项目合并拉取状况"></a>6.查看项目合并拉取状况</h3><p><img src="/images/imgs/gitee/1600067187887.png" alt="1600067187887"></p>
+<h2 id="四-多账号冲突Fork-PR操作"><a href="#四-多账号冲突Fork-PR操作" class="headerlink" title="四.多账号冲突Fork_PR操作"></a>四.多账号冲突Fork_PR操作</h2><h3 id="1-同步账号1和账号2所在源项目分支代码"><a href="#1-同步账号1和账号2所在源项目分支代码" class="headerlink" title="1.同步账号1和账号2所在源项目分支代码"></a>1.同步账号1和账号2所在源项目分支代码</h3><h3 id="2-副账号2先修改提交"><a href="#2-副账号2先修改提交" class="headerlink" title="2.副账号2先修改提交"></a>2.副账号2先修改提交</h3><h4 id="删除-新增-代码"><a href="#删除-新增-代码" class="headerlink" title="- 删除+新增 代码"></a>- 删除+新增 代码</h4><p><img src="/images/imgs/gitee/1600067406076.png" alt="1600067406076"></p>
+<h4 id="审核-合并代码-拉取最新代码"><a href="#审核-合并代码-拉取最新代码" class="headerlink" title="- 审核/合并代码,拉取最新代码"></a>- 审核/合并代码,拉取最新代码</h4><p><img src="/images/imgs/gitee/1600068317627.png" alt="1600068317627"></p>
+<h3 id="3-副账号1同时修改该文件"><a href="#3-副账号1同时修改该文件" class="headerlink" title="3.副账号1同时修改该文件"></a>3.副账号1同时修改该文件</h3><p><img src="/images/imgs/gitee/1600068550112.png" alt="1600068550112"></p>
+<h4 id="提交Pull-Request"><a href="#提交Pull-Request" class="headerlink" title="- 提交Pull Request"></a>- 提交Pull Request</h4><p><img src="/images/imgs/gitee/1600068867942.png" alt="1600068867942"></p>
+<h4 id="暂缓提交-拉取最新代码-查看冲突"><a href="#暂缓提交-拉取最新代码-查看冲突" class="headerlink" title="-  暂缓提交, 拉取最新代码, 查看冲突"></a>-  暂缓提交, 拉取最新代码, 查看冲突</h4><p><img src="/images/imgs/gitee/1600069183412.png" alt="1600069183412"></p>
+<p><img src="/images/imgs/gitee/1600069033120.png" alt="1600069033120"></p>
+<h4 id="处理冲突"><a href="#处理冲突" class="headerlink" title="- 处理冲突"></a>- 处理冲突</h4><p><img src="/images/imgs/gitee/1600069530351.png" alt="1600069530351"></p>
+<h4 id="冲突处理完毕-重新发起PR"><a href="#冲突处理完毕-重新发起PR" class="headerlink" title="-  冲突处理完毕, 重新发起PR"></a>-  冲突处理完毕, 重新发起PR</h4><p><img src="/images/imgs/gitee/1600069597014.png" alt="1600069597014"></p>
+<h3 id="4-主账号审核-合并分支"><a href="#4-主账号审核-合并分支" class="headerlink" title="4.主账号审核/合并分支"></a>4.主账号审核/合并分支</h3><p><img src="/images/imgs/gitee/1600069801114.png" alt="1600069801114"></p>
+<h4 id="查看合并状态"><a href="#查看合并状态" class="headerlink" title="- 查看合并状态"></a>- 查看合并状态</h4><p><img src="/images/imgs/gitee/1600069780593.png" alt="1600069780593"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git:https://gitee.com</span><br><span class="line">488747128@qq.com</span><br><span class="line">940223345@qq.com</span><br><span class="line">ni9ne@outlook.com</span><br></pre></td></tr></table></figure>
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/" title="码云 fork+pr操作教程">https://ni9ne.github.io/2020/10/25/Gitee 码云fork+pr操作教程/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+              <a href="/tags/%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/" rel="tag"># 版本控制</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/10/23/Gitee%20PR%E6%8F%90%E4%BA%A4%E5%85%B3%E8%81%94%E4%BB%BB%E5%8A%A1+Hook%E6%8F%90%E9%86%92/" rel="prev" title="码云 PR提交关联任务+Hook提醒">
+                  <i class="fa fa-chevron-left"></i> 码云 PR提交关联任务+Hook提醒
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/03/Shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/" rel="next" title="Shell脚本编程">
+                  Shell脚本编程 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>
