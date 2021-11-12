@@ -21272,9 +21272,19 @@ exit
       </tags>
   </entry>
   <entry>
-    <title>码云 Fork+PR 模式使用流程</title>
-    <url>/2020/10/05/Gitee%20%E7%A0%81%E4%BA%91Fork+PR%E6%A8%A1%E5%BC%8F%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B/</url>
-    <content><![CDATA[
+    <title></title>
+    <url>/2021/11/13/Gitee%20%E7%A0%81%E4%BA%91Fork+PR%E6%A8%A1%E5%BC%8F%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B/</url>
+    <content><![CDATA[```
+title: 码云 Fork+PR 模式使用流程
+date: 2020-10-05 18:58:26
+tags:
+	- Git
+	- 版本控制
+
+categories:
+	- 开发资料
+```
+
 ## 码云 Fork+PR 模式使用流程
 
 流程图展示
@@ -21424,13 +21434,6 @@ exit
 ![image-20200915122011108](/images/imgs/gitee/image-20200915122011108.png)
 
 ]]></content>
-      <categories>
-        <category>开发资料</category>
-      </categories>
-      <tags>
-        <tag>Git</tag>
-        <tag>版本控制</tag>
-      </tags>
   </entry>
   <entry>
     <title>码云 PR提交关联任务+Hook提醒</title>
@@ -21511,7 +21514,224 @@ exit
 
 提交后(最好在master分支), 后面的PR提交会显示模板内容
 
-![image-20200917145343046](assets/image-20200917145343046.png)
+![image-20200917145343046](/images/imgs/gitee/image-20200917145343046.png)
+
+]]></content>
+      <categories>
+        <category>开发资料</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+        <tag>版本控制</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>码云 fork+pr操作教程</title>
+    <url>/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[
+#  pull request 操作
+
+## 一.单账号Fork_PR操作
+
+### 1.准备账号:
+
+主账号:   Mr.NI9NE_`ni9ne@outook.com`   
+
+副账号1: Mr.zlb1_ `940223345@qq.com`      副账号2:   Mr.ZLB2_ `488747128@qq.com`    
+
+### 2.主账号建立私有仓库:
+
+![1600050343620](/images/imgs/gitee/1600050343620.png) 
+
+
+
+### 3.副账号1Fork该仓库
+
+#### - 添加该账号到项目
+
+![1600051268581](/images/imgs/gitee/1600051268581.png)
+
+#### - Fork仓库到自己的项目中
+
+![1600051387661](/images/imgs/gitee/1600051387661.png)
+
+![1600051479417](/images/imgs/gitee/1600051479417.png)
+
+### 4.副账号1克隆自己的项目到本地开发
+
+![1600051676792](/images/imgs/gitee/1600051676792.png)
+
+### 5.开发功能完成, 推送到本账号项目分支
+
+![1600053781089](/images/imgs/gitee/1600053781089.png)
+
+### 6.进入项目Gitee页面, 创建Pull Request
+
+#### - 点击新建Pull Request
+
+![1600053940805](/images/imgs/gitee/1600053940805.png)
+
+#### - 选择本地项目分支 和 目标项目分支
+
+![1600054310266](/images/imgs/gitee/1600054310266.png)
+
+#### - 填写Pull Request 详情, 选择审核/测试负责人
+
+![1600054321207](/images/imgs/gitee/1600054321207.png)
+
+> 当前显示可自动合并即可, 否则需要自行处理冲突
+
+
+
+### 7.管理员查看, 测试, 合并到主项目分支
+
+#### - 查看Pull Request
+
+![1600054512665](/images/imgs/gitee/1600054512665.png)
+
+#### - 审查代码,测试代码
+
+![1600062213525](/images/imgs/gitee/1600062213525.png)
+
+#### - 确认合并
+
+![1600062395922](/images/imgs/gitee/1600062395922.png)
+
+### 8.查看合并结果
+
+![1600062711861](/images/imgs/gitee/1600062711861.png)
+
+## 二.多账号Fork_PR操作
+
+### 1.副账号2Fork仓库
+
+### 2.副账号2Clone仓库
+
+![1600063510303](/images/imgs/gitee/1600063510303.png)
+
+### 3.基于master分支创建新特性分支Feature2
+
+![1600064116925](/images/imgs/gitee/1600064116925.png)
+
+### 4.开发功能, 提交分支
+
+> 功能代码与其他无冲突
+
+![1600064152851](/images/imgs/gitee/1600064152851.png)
+
+![1600064173030](/images/imgs/gitee/1600064173030.png)
+
+### 5.创建Pull Request
+
+#### - 新建Pull Request
+
+![1600064276903](/images/imgs/gitee/1600064276903.png)
+
+#### - 选择提交分支, 提交目标分支
+
+![1600064495182](/images/imgs/gitee/1600064495182.png)
+
+#### - 查看提交, 并自测
+
+> 有显示是否可以自动合并, 说明提交代码没有冲突
+
+![1600064530725](/images/imgs/gitee/1600064530725.png)
+
+### 6.切换主账号查看Pull Request
+
+![1600064811716](/images/imgs/gitee/1600064811716.png)
+
+### 7.确认代码符合条件, 合并至分支
+
+![1600064886860](/images/imgs/gitee/1600064886860.png)
+
+![1600064981103](/images/imgs/gitee/1600064981103.png)
+
+### 8.查看主项目合并状况
+
+![1600065480982](/images/imgs/gitee/1600065480982.png)
+
+## 三.副账号查看源仓库变动(最新)代码
+
+### 1.添加 remote 关联
+
+ `git remote add resource https://gitee.com/NI9NE/laravel_permission_test.git` 
+
+![1600065554478](/images/imgs/gitee/1600065554478.png)
+
+### 2.查看关联情况
+
+`git remote -v` 
+
+### 3.拉取源仓库更新
+
+`git fetch --all   /  git fetch resource ` 
+
+### 4.合并到本地分支
+
+`git merge resource/dev` 
+
+### 5.推送变更到本地对应远程origin仓库
+
+ `git push origin dev` 
+
+![1600066019005](/images/imgs/gitee/1600066019005.png)
+
+### 6.查看项目合并拉取状况
+
+![1600067187887](/images/imgs/gitee/1600067187887.png)
+
+## 四.多账号冲突Fork_PR操作
+
+### 1.同步账号1和账号2所在源项目分支代码
+
+### 2.副账号2先修改提交
+
+#### - 删除+新增 代码
+
+![1600067406076](/images/imgs/gitee/1600067406076.png)
+
+#### - 审核/合并代码,拉取最新代码
+
+![1600068317627](/images/imgs/gitee/1600068317627.png)
+
+### 3.副账号1同时修改该文件
+
+![1600068550112](/images/imgs/gitee/1600068550112.png)
+
+####  - 提交Pull Request
+
+![1600068867942](/images/imgs/gitee/1600068867942.png)
+
+#### -  暂缓提交, 拉取最新代码, 查看冲突
+
+![1600069183412](/images/imgs/gitee/1600069183412.png)
+
+![1600069033120](/images/imgs/gitee/1600069033120.png)
+
+#### - 处理冲突
+
+![1600069530351](/images/imgs/gitee/1600069530351.png)
+
+#### -  冲突处理完毕, 重新发起PR
+
+![1600069597014](/images/imgs/gitee/1600069597014.png)
+
+### 4.主账号审核/合并分支
+
+![1600069801114](/images/imgs/gitee/1600069801114.png)
+
+#### - 查看合并状态
+
+![1600069780593](/images/imgs/gitee/1600069780593.png)
+
+```
+git:https://gitee.com
+488747128@qq.com
+940223345@qq.com
+ni9ne@outlook.com
+```
+
 
 ]]></content>
       <categories>
