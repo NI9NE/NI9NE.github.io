@@ -19241,6 +19241,22 @@ head -n 1 /etc/issue
     <title>Linux常用命令详解</title>
     <url>/2021/06/12/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E8%AF%A6%E8%A7%A3/</url>
     <content><![CDATA[
+## 目录
+
+cp 复制命令
+
+tar 压缩命令
+
+split 切分文件命令
+
+scp 数据传输命令
+
+df 查看硬盘空间状态
+
+du 查看指定文件夹
+
+wc 统计命令
+
 ## cp 复制命令
 
 ```
