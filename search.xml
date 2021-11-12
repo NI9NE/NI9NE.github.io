@@ -22567,4 +22567,87 @@ sudo supervisorctl stop all 停止所有进程
         <tag>项目</tag>
       </tags>
   </entry>
+  <entry>
+    <title>雪花算法实现</title>
+    <url>/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/</url>
+    <content><![CDATA[
+# 雪花算法实现
+
+
+
+![1599733143891](/images/imgs/1599733143891.png)
+
+```php
+class SnowFake
+{
+	CONST START_TIME = '2020-01-01 00:00:00';       # 起始时间
+    CONST MAX40_BIN_DEC = 1099511627775;
+    CONST MAX12_BIN_DEC = 4095;
+    CONST MAX10_BIN_DEC = 1023;
+
+    STATIC LAST_MID = 0;       # 最新机器码
+    STATIC SEQUENCE_NUM = 0;   # 最新序列码
+
+	
+    /**
+     * @desc 雪花算法生成唯一ID,
+     *       支持从开始时间约69年时间内,
+     *       1024台机器,每秒4096000个唯一ID
+     * @return float|int|string
+     */
+    public static function Union_Id(){
+        $first_bin = '0';                       # 1/64 符号位
+        $now_time = floor(microtime(true) * 1000);
+        $start_time = strtotime(self::START_TIME) * 1000;
+        $diff_time = $now_time - $start_time;
+        $diff_time_bin = base_convert($diff_time, 10, 2);
+        $diff_time_bin = str_pad($diff_time_bin,41,'0', STR_PAD_LEFT);
+        $second_bin = $diff_time_bin;           # 2-42/64 时间戳位
+        self::setSequence();
+        self::getMid();
+        $mid_bin = decbin(self::$LAST_MID);
+        $third_bin = str_pad($mid_bin, 10, '0', STR_PAD_LEFT);          # 42-52/64 数据中心+机器码位
+        $sequence_bin = decbin(self::$SEQUENCE_NUM);
+        $forth_bin = str_pad($sequence_bin, 12, '0', STR_PAD_LEFT);     # 52-64/64 序列编号位
+        $union_bin = $first_bin . $second_bin . $third_bin . $forth_bin;
+        $bin_dec = base_convert($union_bin,2,10);
+        return $bin_dec;
+    }
+    
+    
+    private static function getMid()
+    {
+//        $machine_code = config('original.Machine_Code');
+//        if ($machine_code < 1 || $machine_code > 1023) {
+//            self::Error(5018,['env Config: MACHINE_CODE error, must be int between 1 and 1023']);
+//        }
+//        self::$LAST_MID = $machine_code;
+        if (self::$SEQUENCE_NUM >= self::MAX12_BIN_DEC){
+            self::$LAST_MID ++;
+            if (self::$LAST_MID > self::MAX10_BIN_DEC){
+                self::$LAST_MID = 0;
+            }
+        }
+    }
+
+    private static function setSequence()
+    {
+        self::$SEQUENCE_NUM ++;
+        if (self::$SEQUENCE_NUM > self::MAX12_BIN_DEC){
+            self::$SEQUENCE_NUM = 0;
+        }
+    }
+}
+
+```
+
+]]></content>
+      <categories>
+        <category>实际演练</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
 </search>

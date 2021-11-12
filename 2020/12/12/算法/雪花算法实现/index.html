@@ -22,29 +22,31 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="1.背景属性名：background  子属性名：">
+<meta name="description" content="雪花算法实现 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061class SnowFake&amp;#123;	CONST START_TIME &#x3D; &amp;#x27;2020-01-01 00:00:00&amp;#x27;;       #">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSS 基础-02">
-<meta property="og:url" content="https://ni9ne.github.io/2017/10/22/CSS-02/index.html">
+<meta property="og:title" content="雪花算法实现">
+<meta property="og:url" content="https://ni9ne.github.io/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/index.html">
 <meta property="og:site_name" content="NI9NE&#39;s Zone">
-<meta property="og:description" content="1.背景属性名：background  子属性名：">
+<meta property="og:description" content="雪花算法实现 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061class SnowFake&amp;#123;	CONST START_TIME &#x3D; &amp;#x27;2020-01-01 00:00:00&amp;#x27;;       #">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2017-10-22T05:10:27.000Z">
-<meta property="article:modified_time" content="2019-07-21T12:45:28.657Z">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/1599733143891.png">
+<meta property="article:published_time" content="2020-12-12T11:54:34.000Z">
+<meta property="article:modified_time" content="2021-11-12T21:20:16.007Z">
 <meta property="article:author" content="NI9NE">
-<meta property="article:tag" content="CSS">
-<meta property="article:tag" content="前端">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="后端">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.github.io/images/imgs/1599733143891.png">
 
 
-<link rel="canonical" href="https://ni9ne.github.io/2017/10/22/CSS-02/">
+<link rel="canonical" href="https://ni9ne.github.io/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2017/10/22/CSS-02/","path":"2017/10/22/CSS-02/","title":"CSS 基础-02"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/","path":"2020/12/12/算法/雪花算法实现/","title":"雪花算法实现"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>CSS 基础-02 | NI9NE's Zone</title>
+<title>雪花算法实现 | NI9NE's Zone</title>
   
 
 
@@ -149,7 +151,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">1.背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%9B%92%E5%AD%90%E9%98%B4%E5%BD%B1"><span class="nav-number">2.</span> <span class="nav-text">2.盒子阴影</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B9%B3%E6%BB%91%E8%BF%87%E6%B8%A1"><span class="nav-number">3.</span> <span class="nav-text">3.平滑过渡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%8F%98%E5%BD%A2"><span class="nav-number">4.</span> <span class="nav-text">4.变形</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%88%97%E8%A1%A8%E6%A0%B7%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">5.列表样式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%BA%A2%E5%87%BA"><span class="nav-number">6.</span> <span class="nav-text">6.溢出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%96%87%E6%9C%AC"><span class="nav-number">7.</span> <span class="nav-text">7.文本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E9%BC%A0%E6%A0%87%E6%A0%B7%E5%BC%8F"><span class="nav-number">8.</span> <span class="nav-text">8.鼠标样式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E5%AD%97%E4%BD%93%E5%9B%BE%E6%A0%87"><span class="nav-number">9.</span> <span class="nav-text">9.字体图标</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">雪花算法实现</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -228,7 +230,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2017/10/22/CSS-02/">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
@@ -241,7 +243,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          CSS 基础-02
+          雪花算法实现
         </h1>
 
         <div class="post-meta-container">
@@ -252,7 +254,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2017-10-22 13:10:27" itemprop="dateCreated datePublished" datetime="2017-10-22T13:10:27+08:00">2017-10-22</time>
+      <time title="创建时间：2020-12-12 19:54:34" itemprop="dateCreated datePublished" datetime="2020-12-12T19:54:34+08:00">2020-12-12</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -260,7 +262,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+          <a href="/categories/%E5%AE%9E%E9%99%85%E6%BC%94%E7%BB%83/" itemprop="url" rel="index"><span itemprop="name">实际演练</span></a>
         </span>
     </span>
 
@@ -274,155 +276,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h2><p>属性名：<strong>background</strong> </p>
-<p>子属性名：</p>
-<p>​    <strong>background</strong>-color：        背景颜色</p>
-<p>​    <strong>background</strong>-image:        背景图片    属性值：url（’ 链接地址 ‘）</p>
-<p>​    <strong>background</strong>-<strong>repeat</strong>:        背景重复    属性值：no-repeat | repeat-x |repeat-y |repeat（默认）</p>
-<p>​    position: X Y        若x和y的值为正数，向右或下移动；若x和y 的值为负数，向左或上移动</p>
-<p>​    background-size：        背景大小</p>
-<p>简写：<code>background:[color | image | repeat | position[/size]]</code></p>
-<p><strong>注意：定位position尺寸必须放在size尺寸前面</strong>    <code>10px 10px/200px</code></p>
-<h2 id="2-盒子阴影"><a href="#2-盒子阴影" class="headerlink" title="2.盒子阴影"></a>2.盒子阴影</h2><p>属性名：<strong>box-shadow</strong></p>
-<p>属性值：s1，s2，s3，s4，s5（color），s6（insert）</p>
-<ol>
-<li>s1 水平位移    可负值</li>
-<li>s2 垂直位移    可负值</li>
-<li>s3 模糊度            不能取负值，0为不模糊</li>
-<li>s4 阴影面积        不能取负值，0为原大小，可以省略</li>
-<li>s5 阴影颜色         </li>
-<li>内阴影             后加inset，可省略    <code>            box-shadow: -104px -97px 0px 0px blue inset;</code></li>
-</ol>
-<p><strong>简写</strong>：<code>box-shadow:s1 s2 s3 [s4] s5 [s6;]</code></p>
-<p><strong>拓展</strong>：</p>
-<blockquote>
-<p>移动当前元素到页面中间<code>margin:100px auto;</code></p>
-<p>solid-实线    dashed-虚线    dotted-点状线    double-双实线</p>
-</blockquote>
-<h2 id="3-平滑过渡"><a href="#3-平滑过渡" class="headerlink" title="3.平滑过渡"></a>3.平滑过渡</h2><p>属性名：<strong>transition</strong></p>
-<p>属性值：s1，s2，s3，s4</p>
-<ol>
-<li><p>s1 过渡的标签名（transition-property）    </p>
-<p>​    取值：all（所有可以过渡的属性）  none（不指定过渡的属性）   &lt;标签名&gt;</p>
-</li>
-<li><p>s2 过渡的持续时间（transition-duration）</p>
-<p>​    取值：&lt;持续时间&gt;        1 s = 1000 ms</p>
-</li>
-<li><p>s3 过渡速率（transition-timing-function）</p>
-<p>​    取值：linear（线性）    ease（平滑）    ease[-in|-out]（缓入、缓出、缓入缓出） </p>
-</li>
-<li><p>s4 延迟时间（transition-delay）</p>
-</li>
-</ol>
-<p><strong>注意：transition能起作用的前提条件是该标签的属性值是可以进行 + / - 的值</strong></p>
-<p>eg：<code>transition:a .5s ease</code>  /  <code>transition：all 1s ease ；</code>  /   <code>transition:p1,p2,p3 .5s ease</code></p>
-<h2 id="4-变形"><a href="#4-变形" class="headerlink" title="4.变形"></a>4.变形</h2><p>属性名：<strong>transform</strong></p>
-<p>属性值：</p>
-<ol>
-<li>none        不变形</li>
-<li>rotate        旋转        单位：deg</li>
-<li>skew        扭曲        单位：deg<ol>
-<li>skewX        指定水平方向扭曲</li>
-<li>skewY        指定垂直方向扭曲</li>
-</ol>
-</li>
-<li>scale        中心缩放        单位：倍数<ol>
-<li>scaleX        水平缩放        单位：倍数</li>
-<li>scaleY        垂直缩放        单位：倍数</li>
-</ol>
-</li>
-<li>translate        位移                单位：px<ol>
-<li>translateX        指定x轴方向的位移</li>
-<li>translateY        指定y轴方向的位移</li>
-</ol>
-</li>
-</ol>
-<p><strong>注意：skew扭曲为90*奇数倍时，都会被扭曲成一条线，导致看不见</strong></p>
-<h2 id="5-列表样式"><a href="#5-列表样式" class="headerlink" title="5.列表样式"></a>5.列表样式</h2><p>属性名：<strong>list-style</strong></p>
-<p>属性值：</p>
-<ol>
-<li>list-style-image        项目列表标记图像<ol>
-<li>none        不指定图像</li>
-<li>&lt;url(‘ … ‘)&gt;        使用指定图像作为项目列表标记</li>
-</ol>
-</li>
-<li>list-style-position        <ol>
-<li>outside        标记放在文本外，且文本不依据标记对齐</li>
-<li>inside        标记放置在文本内部，依据标记对其文本</li>
-</ol>
-</li>
-<li>list-style-type        项目列表标记类型<ol>
-<li>disc        实心圆（默认）</li>
-<li>circle        空心圆</li>
-<li>square        实心方块</li>
-<li>none        不适用项目符号</li>
-</ol>
-</li>
-</ol>
-<p>简写：<code>list-style[list-style-image]|[list-style-position]|[list-style-type]</code></p>
-<h2 id="6-溢出"><a href="#6-溢出" class="headerlink" title="6.溢出"></a>6.溢出</h2><p>属性名：<strong>overflow</strong></p>
-<blockquote>
-<p>包括overflow-x，和overflow-y</p>
-</blockquote>
-<p>属性值：</p>
-<ol>
-<li>visible        不剪切（默认）</li>
-<li>hidden        将超出对象尺寸的内容进行裁剪，将不出现滚动条。</li>
-<li>auto        将超出部分内容剪切，并以滚动条方式显示超出对象</li>
-</ol>
-<p>常见属性</p>
-<p>​    width    height    </p>
-<p>​    mingwidth    maxheight    </p>
-<p>​    minheight    maxheight</p>
-<h2 id="7-文本"><a href="#7-文本" class="headerlink" title="7.文本"></a>7.文本</h2><ul>
-<li><p>text-indent:        首行缩进（也可控制图片）（单位：px ，%，em）</p>
-</li>
-<li><p>text-align:        水平对齐方式（left    center    right）（对image标签也起作用）</p>
-</li>
-<li><p>text-decoration        划线方式（underline   overline     line-through    none   blink）</p>
-</li>
-<li><p>text-shadow        文本阴影</p>
-<p>格式：<code>text-shadow：h-shadow   v-shadow    blur   color;</code></p>
-</li>
-<li><p>text-overflow        溢出文本处理</p>
-<ul>
-<li>属性值：clip    修建文本</li>
-<li>属性值：ellipsis    使用省略号代替省略的文本ellipsis</li>
-</ul>
-<blockquote>
-<p>强制转为一行：<code>white-space:nowrap;</code></p>
-<p>将溢出内容隐藏：<code>overflow:hidden</code></p>
-</blockquote>
-</li>
-<li><p>vertical-align        垂直对齐（top   middle    bottom）</p>
-<p>​                    （默认情况情况下，是对外垂直对齐）</p>
-<p>​                    （若对内对齐，则需要配合display属性）</p>
-<blockquote>
-<p>将当前元素转为td单元<code>display:table cell</code></p>
-<p>垂直居中：<code>line-height:500px;</code>    <code>vertical-align:middle;</code></p>
-</blockquote>
-</li>
-</ul>
-<h2 id="8-鼠标样式"><a href="#8-鼠标样式" class="headerlink" title="8.鼠标样式"></a>8.鼠标样式</h2><p><strong>属性名</strong>：cursor（光标，指针）</p>
-<p><strong>属性值</strong>：</p>
-<p>​        pointer            指向（手掌样式）</p>
-<p>​        text            文本（大写的 i 字样式）</p>
-<p>​        move            移动（十字箭头）</p>
-<p>​        default            默认（鼠标指针）</p>
-<p>​        none            隐藏箭头</p>
-<p><strong>补充</strong>：progress（正在进行）|wait（等待）|方向-size（双向箭头）|no-drop（无法拖动）|crosshair（十字准星）</p>
-<h2 id="9-字体图标"><a href="#9-字体图标" class="headerlink" title="9.字体图标"></a>9.字体图标</h2><blockquote>
-<p>计算机中图片分为两类：位图、矢量图</p>
-<p>位图：放大失真</p>
-<p>矢量图：放大不失真</p>
-</blockquote>
-<p>字体图标基本都是矢量图，可以使用字体的属性，但不能使用图片的属性</p>
-<p>字体图标<strong>下载</strong>：阿里巴巴矢量图url（‘ <a target="_blank" rel="noopener" href="https://www.iconfont.cn/">https://www.iconfont.cn/</a> ’）</p>
-<p>阿里字体图标<strong>使用</strong>：</p>
-<p>​    1.下载图标文件</p>
-<p>​    2.导入iconfont.css文件</p>
-<p>​    3.给需要使用字体图标的标签赋予class=”iconfont”</p>
-<p>​    4.给需要使用字体图标的位置填写相应的图标符号（查询demo_unicode.html文件）</p>
+        <h1 id="雪花算法实现"><a href="#雪花算法实现" class="headerlink" title="雪花算法实现"></a>雪花算法实现</h1><p><img src="/images/imgs/1599733143891.png" alt="1599733143891"></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SnowFake</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">CONST</span> START_TIME = <span class="string">&#x27;2020-01-01 00:00:00&#x27;</span>;       <span class="comment"># 起始时间</span></span><br><span class="line">    <span class="keyword">CONST</span> MAX40_BIN_DEC = <span class="number">1099511627775</span>;</span><br><span class="line">    <span class="keyword">CONST</span> MAX12_BIN_DEC = <span class="number">4095</span>;</span><br><span class="line">    <span class="keyword">CONST</span> MAX10_BIN_DEC = <span class="number">1023</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">STATIC</span> LAST_MID = <span class="number">0</span>;       <span class="comment"># 最新机器码</span></span><br><span class="line">    <span class="built_in">STATIC</span> SEQUENCE_NUM = <span class="number">0</span>;   <span class="comment"># 最新序列码</span></span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@desc</span> 雪花算法生成唯一ID,</span></span><br><span class="line"><span class="comment">     *       支持从开始时间约69年时间内,</span></span><br><span class="line"><span class="comment">     *       1024台机器,每秒4096000个唯一ID</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> float|int|string</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">static</span> <span class="function"><span class="keyword">function</span> <span class="title">Union_Id</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="variable">$first_bin</span> = <span class="string">&#x27;0&#x27;</span>;                       <span class="comment"># 1/64 符号位</span></span><br><span class="line">        <span class="variable">$now_time</span> = floor(microtime(<span class="literal">true</span>) * <span class="number">1000</span>);</span><br><span class="line">        <span class="variable">$start_time</span> = strtotime(<span class="built_in">self</span>::START_TIME) * <span class="number">1000</span>;</span><br><span class="line">        <span class="variable">$diff_time</span> = <span class="variable">$now_time</span> - <span class="variable">$start_time</span>;</span><br><span class="line">        <span class="variable">$diff_time_bin</span> = base_convert(<span class="variable">$diff_time</span>, <span class="number">10</span>, <span class="number">2</span>);</span><br><span class="line">        <span class="variable">$diff_time_bin</span> = str_pad(<span class="variable">$diff_time_bin</span>,<span class="number">41</span>,<span class="string">&#x27;0&#x27;</span>, STR_PAD_LEFT);</span><br><span class="line">        <span class="variable">$second_bin</span> = <span class="variable">$diff_time_bin</span>;           <span class="comment"># 2-42/64 时间戳位</span></span><br><span class="line">        <span class="built_in">self</span>::setSequence();</span><br><span class="line">        <span class="built_in">self</span>::getMid();</span><br><span class="line">        <span class="variable">$mid_bin</span> = decbin(<span class="built_in">self</span>::<span class="variable">$LAST_MID</span>);</span><br><span class="line">        <span class="variable">$third_bin</span> = str_pad(<span class="variable">$mid_bin</span>, <span class="number">10</span>, <span class="string">&#x27;0&#x27;</span>, STR_PAD_LEFT);          <span class="comment"># 42-52/64 数据中心+机器码位</span></span><br><span class="line">        <span class="variable">$sequence_bin</span> = decbin(<span class="built_in">self</span>::<span class="variable">$SEQUENCE_NUM</span>);</span><br><span class="line">        <span class="variable">$forth_bin</span> = str_pad(<span class="variable">$sequence_bin</span>, <span class="number">12</span>, <span class="string">&#x27;0&#x27;</span>, STR_PAD_LEFT);     <span class="comment"># 52-64/64 序列编号位</span></span><br><span class="line">        <span class="variable">$union_bin</span> = <span class="variable">$first_bin</span> . <span class="variable">$second_bin</span> . <span class="variable">$third_bin</span> . <span class="variable">$forth_bin</span>;</span><br><span class="line">        <span class="variable">$bin_dec</span> = base_convert(<span class="variable">$union_bin</span>,<span class="number">2</span>,<span class="number">10</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="variable">$bin_dec</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="built_in">static</span> <span class="function"><span class="keyword">function</span> <span class="title">getMid</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line"><span class="comment">//        $machine_code = config(&#x27;original.Machine_Code&#x27;);</span></span><br><span class="line"><span class="comment">//        if ($machine_code &lt; 1 || $machine_code &gt; 1023) &#123;</span></span><br><span class="line"><span class="comment">//            self::Error(5018,[&#x27;env Config: MACHINE_CODE error, must be int between 1 and 1023&#x27;]);</span></span><br><span class="line"><span class="comment">//        &#125;</span></span><br><span class="line"><span class="comment">//        self::$LAST_MID = $machine_code;</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">self</span>::<span class="variable">$SEQUENCE_NUM</span> &gt;= <span class="built_in">self</span>::MAX12_BIN_DEC)&#123;</span><br><span class="line">            <span class="built_in">self</span>::<span class="variable">$LAST_MID</span> ++;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">self</span>::<span class="variable">$LAST_MID</span> &gt; <span class="built_in">self</span>::MAX10_BIN_DEC)&#123;</span><br><span class="line">                <span class="built_in">self</span>::<span class="variable">$LAST_MID</span> = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="built_in">static</span> <span class="function"><span class="keyword">function</span> <span class="title">setSequence</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="built_in">self</span>::<span class="variable">$SEQUENCE_NUM</span> ++;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">self</span>::<span class="variable">$SEQUENCE_NUM</span> &gt; <span class="built_in">self</span>::MAX12_BIN_DEC)&#123;</span><br><span class="line">            <span class="built_in">self</span>::<span class="variable">$SEQUENCE_NUM</span> = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
 
     </div>
 
@@ -440,7 +296,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://ni9ne.github.io/2017/10/22/CSS-02/" title="CSS 基础-02">https://ni9ne.github.io/2017/10/22/CSS-02/</a>
+      <a href="https://ni9ne.github.io/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/" title="雪花算法实现">https://ni9ne.github.io/2020/12/12/算法/雪花算法实现/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -449,21 +305,21 @@
 </div>
 
           <div class="post-tags">
-              <a href="/tags/CSS/" rel="tag"># CSS</a>
-              <a href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag"># 前端</a>
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2017/10/15/CSS-01/" rel="prev" title="CSS 基础-01">
-                  <i class="fa fa-chevron-left"></i> CSS 基础-01
+                <a href="/2020/12/03/Shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/" rel="prev" title="Shell脚本编程">
+                  <i class="fa fa-chevron-left"></i> Shell脚本编程
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2017/10/29/CSS-03/" rel="next" title="CSS 基础-03">
-                  CSS 基础-03 <i class="fa fa-chevron-right"></i>
+                <a href="/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/" rel="next" title="Navicat通过ssh-秘钥方式登录">
+                  Navicat通过ssh-秘钥方式登录 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
