@@ -21432,4 +21432,94 @@ exit
         <tag>版本控制</tag>
       </tags>
   </entry>
+  <entry>
+    <title>码云 PR提交关联任务+Hook提醒</title>
+    <url>/2020/10/23/Gitee%20PR%E6%8F%90%E4%BA%A4%E5%85%B3%E8%81%94%E4%BB%BB%E5%8A%A1+Hook%E6%8F%90%E9%86%92/</url>
+    <content><![CDATA[
+## WebHook实现
+
+### 企业微信端设置:
+
+#### 1.创建企业微信群聊
+
+#### 2.创建自定义机器人
+
+> 需要配置企业后台开启机器人功能
+
+![image-20200917134658399](/images/imgs/gitee/image-20200917134658399.png)
+
+3.获取机器人 `WebHook 地址`
+
+![image-20200917134711636](/images/imgs/gitee/image-20200917134711636.png)
+
+### Gitee仓库设置:
+
+#### 1.打开项目网址, 进入管理选项卡
+
+#### 2.选择WebHooks, 点击添加
+
+![image-20200917134819489](/images/imgs/gitee/image-20200917134819489.png)
+
+#### 3.填写配置信息
+
+- 将机器人WebHook地址填入**URL** 
+
+-  **WebHook 密码/签名密钥** 选择密码, 置空
+
+  > 企业微信未提供秘钥, 钉钉需要勾选签名秘钥并填写
+
+- 勾选需要触发通知的条件
+
+  ![image-20200917134934255](/images/imgs/gitee/image-20200917134934255.png)
+
+#### 4.点击添加
+
+添加完成后, 将自动发送一条企业微信机器人通知, 如下
+
+![image-20200917135104778](/images/imgs/gitee/image-20200917135104778.png)
+
+## PR提交关联任务
+
+具体操作为在提交时, 书写`link #ID`, 即可将任务关联到PR提交
+
+![image-20200917135557587](/images/imgs/gitee/image-20200917135557587.png)
+
+注意: 完成提交, 将PR合并后将自动关闭`Issue` 
+
+## PR提交配置模板
+
+在项目文件中新建文件
+
+`.gitee/PULL_REQUEST_TEMPLATE.zh-CN.md`
+
+内容实例为:
+
+> markdown 书写方式, 可自定义
+
+```
+### 相关的Issue
+
+
+### 原因（目的、解决的问题等）
+
+
+### 描述（做了什么，变更了什么）
+
+
+### 测试用例（新增、改动、可能影响的功能）
+```
+
+提交后(最好在master分支), 后面的PR提交会显示模板内容
+
+![image-20200917145343046](assets/image-20200917145343046.png)
+
+]]></content>
+      <categories>
+        <category>开发资料</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+        <tag>版本控制</tag>
+      </tags>
+  </entry>
 </search>
