@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="基本操作1.使用镜像执行动作1$ docker run ubuntu:15.10 &#x2F;bin&#x2F;echo &amp;#x27;hello docer&amp;#x27;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker使用">
+<meta property="og:url" content="https://ni9ne.github.io/2021/05/07/Docker%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="基本操作1.使用镜像执行动作1$ docker run ubuntu:15.10 &#x2F;bin&#x2F;echo &amp;#x27;hello docer&amp;#x27;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-05-07T10:23:12.000Z">
+<meta property="article:modified_time" content="2021-11-12T19:17:17.296Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2021/05/07/Docker%E4%BD%BF%E7%94%A8/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/05/07/Docker%E4%BD%BF%E7%94%A8/","path":"2021/05/07/Docker使用/","title":"Docker使用"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Docker使用 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">45</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">5</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BD%BF%E7%94%A8%E9%95%9C%E5%83%8F%E6%89%A7%E8%A1%8C%E5%8A%A8%E4%BD%9C"><span class="nav-number">1.1.</span> <span class="nav-text">1.使用镜像执行动作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BA%A4%E4%BA%92%E5%BC%8F%E8%BF%90%E8%A1%8C"><span class="nav-number">1.2.</span> <span class="nav-text">2.交互式运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B%E8%BF%90%E8%A1%8C"><span class="nav-number">1.3.</span> <span class="nav-text">3.守护进程运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B%E8%BF%90%E8%A1%8C%E7%9A%84docker"><span class="nav-number">1.4.</span> <span class="nav-text">4.查看当前守护进程运行的docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E9%80%80%E5%87%BA%E5%BD%93%E5%89%8Ddocker"><span class="nav-number">1.5.</span> <span class="nav-text">5.退出当前docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%9F%A5%E7%9C%8B%E6%8C%87%E5%AE%9A%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E6%97%A5%E5%BF%97"><span class="nav-number">1.6.</span> <span class="nav-text">6.查看指定容器执行日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E5%81%9C%E6%AD%A2%E5%AE%B9%E5%99%A8%E8%BF%90%E8%A1%8C"><span class="nav-number">1.7.</span> <span class="nav-text">7.停止容器运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E6%93%8D%E4%BD%9C%E5%B7%B2%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="nav-number">1.8.</span> <span class="nav-text">8.操作已运行容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E5%88%A0%E9%99%A4%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%B8%AD%E5%AE%B9%E5%99%A8"><span class="nav-number">1.9.</span> <span class="nav-text">9.删除未使用中容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%95%9C%E5%83%8F%E6%93%8D%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">镜像操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%88%97%E5%87%BA%E6%9C%AC%E6%9C%BA%E9%95%9C%E5%83%8F"><span class="nav-number">2.1.</span> <span class="nav-text">1.列出本机镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%9F%A5%E6%89%BE%E9%95%9C%E5%83%8F"><span class="nav-number">2.2.</span> <span class="nav-text">2.查找镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%89%8B%E5%8A%A8%E6%8B%89%E5%8F%96%E9%95%9C%E5%83%8F"><span class="nav-number">2.3.</span> <span class="nav-text">3.手动拉取镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%88%A0%E9%99%A4%E9%95%9C%E5%83%8F"><span class="nav-number">2.4.</span> <span class="nav-text">4.删除镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%9B%B4%E6%96%B0%E9%95%9C%E5%83%8F"><span class="nav-number">2.5.</span> <span class="nav-text">5.更新镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%88%9B%E5%BB%BA%E9%95%9C%E5%83%8F"><span class="nav-number">2.6.</span> <span class="nav-text">6.创建镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E4%B8%BA%E9%95%9C%E5%83%8F%E6%B7%BB%E5%8A%A0tag"><span class="nav-number">2.7.</span> <span class="nav-text">7.为镜像添加tag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E5%8F%91%E5%B8%83%E9%95%9C%E5%83%8F%E5%88%B0docker-hub"><span class="nav-number">2.8.</span> <span class="nav-text">8.发布镜像到docker_hub</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E8%BF%9E%E6%8E%A5"><span class="nav-number">3.</span> <span class="nav-text">容器连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%AB%AF%E5%8F%A3%E5%BC%80%E6%94%BE"><span class="nav-number">3.1.</span> <span class="nav-text">1.端口开放</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E7%AB%AF%E5%8F%A3%E5%BC%80%E6%94%BE%E7%8A%B6%E6%80%81"><span class="nav-number">3.2.</span> <span class="nav-text">2.查看容器端口开放状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%B9%E5%99%A8%E5%91%BD%E5%90%8D"><span class="nav-number">3.3.</span> <span class="nav-text">3.容器命名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%96%B0%E5%BB%BA%E7%BD%91%E7%BB%9C"><span class="nav-number">3.4.</span> <span class="nav-text">4.新建网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E8%BF%9E%E6%8E%A5%E5%AE%B9%E5%99%A8%E5%88%B0%E7%BD%91%E7%BB%9C"><span class="nav-number">3.5.</span> <span class="nav-text">5.连接容器到网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%B5%8B%E8%AF%95"><span class="nav-number">3.6.</span> <span class="nav-text">6.测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E9%85%8D%E7%BD%AEDNS"><span class="nav-number">3.7.</span> <span class="nav-text">7.配置DNS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E9%85%8D%E7%BD%AE%E5%85%A8%E5%B1%80DNS"><span class="nav-number">3.7.1.</span> <span class="nav-text">1.配置全局DNS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%8D%95%E5%AE%B9%E5%99%A8%E9%85%8D%E7%BD%AEDNS"><span class="nav-number">3.7.2.</span> <span class="nav-text">2.单容器配置DNS</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/05/07/Docker%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker使用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-05-07 18:23:12" itemprop="dateCreated datePublished" datetime="2021-05-07T18:23:12+08:00">2021-05-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><h3 id="1-使用镜像执行动作"><a href="#1-使用镜像执行动作" class="headerlink" title="1.使用镜像执行动作"></a>1.使用镜像执行动作</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run ubuntu:15.10 /bin/echo &#x27;hello docer&#x27;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">结果:</span><br><span class="line">Unable to find image &#x27;ubuntu:15.10&#x27; locally</span><br><span class="line">15.10: Pulling from library/ubuntu</span><br><span class="line">7dcf5a444392: Pull complete </span><br><span class="line">759aa75f3cee: Pull complete </span><br><span class="line">3fa871dc8a2b: Pull complete </span><br><span class="line">224c42ae46e7: Pull complete </span><br><span class="line">Digest: sha256:02521a2d079595241c6793b2044f02eecf294034f31d6e235ac4b2b54ffc41f3</span><br><span class="line">Status: Downloaded newer image for ubuntu:15.10</span><br><span class="line">hello world</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-交互式运行"><a href="#2-交互式运行" class="headerlink" title="2.交互式运行"></a>2.交互式运行</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -i -t ubuntu:15.10 /bin/bash</span><br><span class="line">$ docker run --interactive --tty ubuntu /bin/bash   #(不指定版本,默认latest)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-守护进程运行"><a href="#3-守护进程运行" class="headerlink" title="3.守护进程运行"></a>3.守护进程运行</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d ubuntu:15.10 /bin/sh -c &quot;while true; do echo hello world; sleep 1; done&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">结果</span><br><span class="line">2e3b96095dd69911032f02d44cb483b1d5cc824f15a3296a9ddbd1070b054b9e</span><br><span class="line">2e3b96095dd6</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-查看当前守护进程运行的docker"><a href="#4-查看当前守护进程运行的docker" class="headerlink" title="4.查看当前守护进程运行的docker"></a>4.查看当前守护进程运行的docker</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">结果</span><br><span class="line">CONTAINER ID | IMAGE        | COMMAND     | CREATED       |STATUS      |PORTS      |NAMES</span><br><span class="line">9e3c78addf64 | ubuntu:15.10 | &quot;/bin/bash&quot; | 13 minutes ago|Up 13 minutes|    |loving_shaw</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-退出当前docker"><a href="#5-退出当前docker" class="headerlink" title="5.退出当前docker"></a>5.退出当前docker</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ exit</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-查看指定容器执行日志"><a href="#6-查看指定容器执行日志" class="headerlink" title="6.查看指定容器执行日志"></a>6.查看指定容器执行日志</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker logs 9e3c78addf64</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-停止容器运行"><a href="#7-停止容器运行" class="headerlink" title="7.停止容器运行"></a>7.停止容器运行</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker stop [9e3c78addf64/loving_shaw]</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-操作已运行容器"><a href="#8-操作已运行容器" class="headerlink" title="8.操作已运行容器"></a>8.操作已运行容器</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker exec -it 8dfd51f8b37c /bin/bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="9-删除未使用中容器"><a href="#9-删除未使用中容器" class="headerlink" title="9.删除未使用中容器"></a>9.删除未使用中容器</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker rm [容器ID]</span><br></pre></td></tr></table></figure>
+
+<h2 id="镜像操作"><a href="#镜像操作" class="headerlink" title="镜像操作"></a>镜像操作</h2><h3 id="1-列出本机镜像"><a href="#1-列出本机镜像" class="headerlink" title="1.列出本机镜像"></a>1.列出本机镜像</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker images</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">结果</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              bf756fb1ae65        9 months ago        13.3kB</span><br><span class="line">ubuntu              15.10               9b9cb95443b5        4 years ago         137MB</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-查找镜像"><a href="#2-查找镜像" class="headerlink" title="2.查找镜像"></a>2.查找镜像</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker search httpd</span><br></pre></td></tr></table></figure>
+
+
+
+<table>
+<thead>
+<tr>
+<th>NAME</th>
+<th>DESCRIPTION</th>
+<th>STARS</th>
+<th>OFFICIAL</th>
+<th>AUTOMATED</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>httpd</td>
+<td>The Apache HTTP Server Project</td>
+<td>3219</td>
+<td>[OK]</td>
+<td></td>
+</tr>
+<tr>
+<td>centos/httpd-24-centos7</td>
+<td>Platform for running Apache httpd 2.4 or bui…</td>
+<td>36</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>centos/httpd</td>
+<td></td>
+<td>32</td>
+<td></td>
+<td>[OK]</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> 或者 <a target="_blank" rel="noopener" href="https://hub.docker.com/">Docker Hub</a> </p>
+</blockquote>
+<h3 id="3-手动拉取镜像"><a href="#3-手动拉取镜像" class="headerlink" title="3.手动拉取镜像"></a>3.手动拉取镜像</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull ubuntu:13.10</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-删除镜像"><a href="#4-删除镜像" class="headerlink" title="4.删除镜像"></a>4.删除镜像</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker rmi hello-world</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ docker rmi --force hello-world:latest </span><br><span class="line">Untagged: hello-world:latest</span><br><span class="line">Untagged: hello-world@sha256:8c5aeeb6a5f3ba4883347d3747a7249f491766ca1caa47e5da5dfcf6b9b717c0</span><br><span class="line">Deleted: sha256:bf756fb1ae65adf866bd8c456593cd24beb6a0a061dedf42b26a993176745f6b</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-更新镜像"><a href="#5-更新镜像" class="headerlink" title="5.更新镜像"></a>5.更新镜像</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker commit -m=&#x27;done some things&#x27; -a=&#x27;ni9ne&#x27; cc7adb4b2145 ni9ne/ubuntu:V1</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">sha256:3de2fb0fa6533c64256e085959e358030544bbd819154a4ccb04ab902ffae6e0</span><br><span class="line">$ docker images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">ni9ne/ubuntu        v1                  3de2fb0fa653        12 seconds ago      137MB</span><br><span class="line">httpd               latest              3dd970e6b110        10 days ago         138MB</span><br><span class="line">ubuntu              latest              9140108b62dc        3 weeks ago         72.9MB</span><br><span class="line">ubuntu              15.10               9b9cb95443b5        4 years ago         137MB</span><br><span class="line">ubuntu              13.10               7f020f7bf345        6 years ago         185MB</span><br><span class="line">$ docker run -ti ni9ne/ubuntu</span><br><span class="line">ni9ne/ubuntu     ni9ne/ubuntu:v1 </span><br><span class="line">$ docker run -ti ni9ne/ubuntu:v1 /bin/bash</span><br><span class="line">root@f8cab436a299:/#</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-创建镜像"><a href="#6-创建镜像" class="headerlink" title="6.创建镜像"></a>6.创建镜像</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -t ni9ne/centos6.7 docker/</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>指定以<code>docker</code>文件夹下的<code>Dockerfile</code>创建名为<code>ni9ne/centos6.7</code>的镜像</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vi docker/Dockerfile</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> FROM cento<span class="variable">s:6</span>.<span class="number">7</span></span><br><span class="line"> <span class="number">2</span> MAINTAINER Ni9ne <span class="string">&quot;ni9ne@outlook.com&quot;</span> </span><br><span class="line"> <span class="number">3</span> </span><br><span class="line"> <span class="number">4</span> RUN /bin/<span class="keyword">echo</span> <span class="string">&#x27;root:123456&#x27;</span> | chpasswd</span><br><span class="line"> <span class="number">5</span> RUN useradd ni9ne</span><br><span class="line"> <span class="number">6</span> RUN /bin/<span class="keyword">echo</span> <span class="string">&#x27;ni9ne:ni9ne&#x27;</span> | chpasswd</span><br><span class="line"> <span class="number">7</span> RUN /bin/<span class="keyword">echo</span> -<span class="keyword">e</span> <span class="string">&quot;LANG=\&quot;en_US.UTF-8\&quot;&quot;</span> &gt; /etc/default/local</span><br><span class="line"> <span class="number">8</span> EXPOSE <span class="number">22</span></span><br><span class="line"> <span class="number">9</span> EXPOSE <span class="number">80</span></span><br><span class="line"><span class="number">10</span> CMD /usr/sbin/sshd -D</span><br></pre></td></tr></table></figure>
+
+<p>查看创建镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ubuntu@ubuntu:~$ docker images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">ni9ne/centos6.7     latest              95cc1d4ddbfe        11 minutes ago      191MB</span><br><span class="line"> ...</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-为镜像添加tag"><a href="#7-为镜像添加tag" class="headerlink" title="7.为镜像添加tag"></a>7.为镜像添加tag</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker tag 95cc1d4ddbfe ni9nee/centos6.7:dev</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ubuntu@ubuntu:~$ docker images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">ni9nee/centos6.7    dev.1               95cc1d4ddbfe        13 minutes ago      191MB</span><br><span class="line">ni9ne/centos6.7     latest              95cc1d4ddbfe        13 minutes ago      191MB</span><br><span class="line"> ...</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>生成相同 <code>IMAGE ID</code> 的不同镜像</p>
+</blockquote>
+<h3 id="8-发布镜像到docker-hub"><a href="#8-发布镜像到docker-hub" class="headerlink" title="8.发布镜像到docker_hub"></a>8.发布镜像到docker_hub</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker login  / docker login -u [USER_NAME]         	# 登录docker_hub</span><br><span class="line">$ docker tag [IMAGE_NAME] [USER_NAME]/[IMAGE_NAME]		# 给镜像打标签,重命名</span><br><span class="line">$ docker push [USER_NAME]/[IMAGE_NAME]					# 推送</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="容器连接"><a href="#容器连接" class="headerlink" title="容器连接"></a>容器连接</h2><h3 id="1-端口开放"><a href="#1-端口开放" class="headerlink" title="1.端口开放"></a>1.端口开放</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d -P training/webapp python app.py</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-d --detach 			守护进程运行并打印出容器id</span><br><span class="line">-P --publish-all list 	将容器端口随机映射到主机高端口</span><br><span class="line">-p --publish list 		将容器端口映射到指定主机端口</span><br><span class="line">--name 					重命名为指定容器名</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d -p 127.0.0.1:5000:5000/udp training/webapp python app.py</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-查看容器端口开放状态"><a href="#2-查看容器端口开放状态" class="headerlink" title="2.查看容器端口开放状态"></a>2.查看容器端口开放状态</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker port d1f753a28378</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">5000/tcp -&gt; 0.0.0.0:32768</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-容器命名"><a href="#3-容器命名" class="headerlink" title="3.容器命名"></a>3.容器命名</h3><p>除系统随机命名外, 还可用选项 <code>--name </code> 指定该容器的名称</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d -P --name test_name ubuntu /bin/bash</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">e086aa4536def6b30efe6302e43d2dc457013cc3b4ddc32f0d8dc6b86e7af3dd</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-新建网络"><a href="#4-新建网络" class="headerlink" title="4.新建网络"></a>4.新建网络</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker network create -d bridge test-net</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c01cbf143f2ab43100d55b93910d0082980a99bbfb7a739f03fcd73625aec4f2</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-d, --driver string        Driver to manage the Network (default &quot;bridge&quot;)</span><br><span class="line">						   指定 Docker 网络类型，有 bridge、overlay。</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>docker network COMMAND</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>功能</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>connect</td>
+<td>Connect a container to a network</td>
+<td></td>
+</tr>
+<tr>
+<td>create</td>
+<td>Create a network</td>
+<td></td>
+</tr>
+<tr>
+<td>disconnect</td>
+<td>Disconnect a container from a network</td>
+<td></td>
+</tr>
+<tr>
+<td>inspect</td>
+<td>Display detailed information on one or more networks</td>
+<td></td>
+</tr>
+<tr>
+<td>ls</td>
+<td>List networks</td>
+<td></td>
+</tr>
+<tr>
+<td>prune</td>
+<td>Remove all unused networks</td>
+<td></td>
+</tr>
+<tr>
+<td>rm</td>
+<td>Remove one or more networks</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="5-连接容器到网络"><a href="#5-连接容器到网络" class="headerlink" title="5.连接容器到网络"></a>5.连接容器到网络</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -itd --name test1 --network test-net ubuntu /bin/bash</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -itd --name test2 --network test-net ubuntu /bin/bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-测试"><a href="#6-测试" class="headerlink" title="6.测试"></a>6.测试</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt-get update</span><br><span class="line">apt install iputils-ping</span><br><span class="line">ping test1</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-配置DNS"><a href="#7-配置DNS" class="headerlink" title="7.配置DNS"></a>7.配置DNS</h3><h4 id="1-配置全局DNS"><a href="#1-配置全局DNS" class="headerlink" title="1.配置全局DNS"></a>1.配置全局DNS</h4><ul>
+<li>宿主机配置</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo vim etc/docker/daemon.json</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;dns&quot;</span> : [</span><br><span class="line">    <span class="string">&quot;114.114.114.114&quot;</span>,</span><br><span class="line">    <span class="string">&quot;8.8.8.8&quot;</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>重启docker</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo service docker restart </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看是否生效</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -it --rm ubuntu cat etc/resolv.conf</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-单容器配置DNS"><a href="#2-单容器配置DNS" class="headerlink" title="2.单容器配置DNS"></a>2.单容器配置DNS</h4><blockquote>
+<p> 启动时配置</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -it --rm -h host_ubuntu --dns=114.114.114.114 --dns-search=test.com ubuntu</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">--rm  					Automatically remove the container when it exits </span><br><span class="line">						容器退出时自动清理容器内部的文件系统。</span><br><span class="line">-h, --hostname string 	Container host name</span><br><span class="line">						设定容器的主机名，它会被写到容器内的 /etc/hostname 和 /etc/hosts</span><br><span class="line">--dns=IP_ADDRESS       Set custom DNS servers</span><br><span class="line">添加 DNS 服务器到容器的 /etc/resolv.conf 中，让容器用这个服务器来解析所有不在 /etc/hosts 中的主机名</span><br><span class="line">--dns-search=DOMAIN    Set custom DNS search domains</span><br><span class="line"> 设定容器的搜索域，当设定搜索域为 .example.com 时，在搜索一个名为 host 的主机时，DNS 不仅搜索 host，还会搜索 host.example.com。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">ubuntu@ubuntu:~$ docker run -it --rm -h host_ubuntu --dns=114.114.114.114 --dns-search=test.com ubuntu</span><br><span class="line">root@host_ubuntu:/# cat /etc/hostname </span><br><span class="line">host_ubuntu</span><br><span class="line">root@host_ubuntu:/# cat /etc/hosts    </span><br><span class="line">127.0.0.1	localhost</span><br><span class="line">::1	localhost ip6-localhost ip6-loopback</span><br><span class="line">fe00::0	ip6-localnet</span><br><span class="line">ff00::0	ip6-mcastprefix</span><br><span class="line">ff02::1	ip6-allnodes</span><br><span class="line">ff02::2	ip6-allrouters</span><br><span class="line">172.17.0.2	host_ubuntu</span><br><span class="line">root@host_ubuntu:/# cat /etc/resolv.conf </span><br><span class="line">search test.com</span><br><span class="line">nameserver 114.114.114.114</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+<p> <a target="_blank" rel="noopener" href="https://httpd.apache.org/security/vulnerabilities_24.html">https://httpd.apache.org/security/vulnerabilities_24.html</a> </p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2021/05/07/Docker%E4%BD%BF%E7%94%A8/" title="Docker使用">https://ni9ne.github.io/2021/05/07/Docker使用/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" rel="prev" title="从零配置一台服务器">
+                  <i class="fa fa-chevron-left"></i> 从零配置一台服务器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/05/07/Docker%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85/" rel="next" title="Docker使用">
+                  Docker使用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>

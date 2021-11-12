@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Docker文件数据备份该脚本运行需要要求环境有 scp 应用, 配置好远端及本地备份路径后, 直接运行即可,  配置文件目录:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker_文件数据备份实战">
+<meta property="og:url" content="https://ni9ne.github.io/2021/07/15/Docker_%E6%96%87%E4%BB%B6%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="Docker文件数据备份该脚本运行需要要求环境有 scp 应用, 配置好远端及本地备份路径后, 直接运行即可,  配置文件目录:">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-15T13:02:33.000Z">
+<meta property="article:modified_time" content="2021-11-12T19:29:55.306Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="Shell">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2021/07/15/Docker_%E6%96%87%E4%BB%B6%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E5%AE%9E%E6%88%98/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/07/15/Docker_%E6%96%87%E4%BB%B6%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E5%AE%9E%E6%88%98/","path":"2021/07/15/Docker_文件数据备份实战/","title":"Docker_文件数据备份实战"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Docker_文件数据备份实战 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">45</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">5</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker%E6%96%87%E4%BB%B6%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD"><span class="nav-number">1.</span> <span class="nav-text">Docker文件数据备份</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95"><span class="nav-number">1.1.</span> <span class="nav-text">配置文件目录:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD"><span class="nav-number">1.2.</span> <span class="nav-text">功能:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">1.3.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E8%87%AA%E5%90%AF%E5%8A%A8"><span class="nav-number">1.4.</span> <span class="nav-text">容器自启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Bcrond%E6%97%A5%E5%BF%97%E8%AF%A6%E6%83%85"><span class="nav-number">1.5.</span> <span class="nav-text">查看crond日志详情</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%80%BB%E8%BE%91"><span class="nav-number">1.6.</span> <span class="nav-text">自定义逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dockerfile%E6%96%87%E4%BB%B6"><span class="nav-number">1.7.</span> <span class="nav-text">Dockerfile文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scp-back-up-sh%E8%84%9A%E6%9C%AC"><span class="nav-number">1.8.</span> <span class="nav-text">scp_back_up.sh脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#config%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">1.9.</span> <span class="nav-text">config配置文件</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/07/15/Docker_%E6%96%87%E4%BB%B6%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker_文件数据备份实战
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-07-15 21:02:33" itemprop="dateCreated datePublished" datetime="2021-07-15T21:02:33+08:00">2021-07-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AE%9E%E9%99%85%E6%BC%94%E7%BB%83/" itemprop="url" rel="index"><span itemprop="name">实际演练</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="Docker文件数据备份"><a href="#Docker文件数据备份" class="headerlink" title="Docker文件数据备份"></a>Docker文件数据备份</h2><p>该脚本运行需要要求环境有 <code>scp</code> 应用, 配置好远端及本地备份路径后, 直接运行即可, </p>
+<h3 id="配置文件目录"><a href="#配置文件目录" class="headerlink" title="配置文件目录:"></a>配置文件目录:</h3><p> <code>config.sh</code></p>
+<h3 id="功能"><a href="#功能" class="headerlink" title="功能:"></a>功能:</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">拉取远端服务器文件到本脚本所在目录:File_Bak</span><br></pre></td></tr></table></figure>
+
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker build --no-cache -t file_back_up .</span><br><span class="line">docker run --name c_file_back_up -v [主机备份目录]:/File/[配置容器备份目录] -d file_back_up</span><br></pre></td></tr></table></figure>
+
+<h3 id="容器自启动"><a href="#容器自启动" class="headerlink" title="容器自启动"></a>容器自启动</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker update --restart=always c_file_back_up</span><br></pre></td></tr></table></figure>
+
+<h3 id="查看crond日志详情"><a href="#查看crond日志详情" class="headerlink" title="查看crond日志详情"></a>查看crond日志详情</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /var/log/crond.log</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义逻辑"><a href="#自定义逻辑" class="headerlink" title="自定义逻辑"></a>自定义逻辑</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1.备份日志为/File/log.txt</span><br><span class="line">2.crond定时任务日志在/var/log/crond.log</span><br><span class="line">3.最新一次拉取日志debug信息在/File/currentlog.txt</span><br><span class="line">4.备份文件在/File/File_Bak, 可以通过修改config.sh中[local_path]更改</span><br><span class="line">5.ssh证书密钥请放在env文件中, 并修改config.sh读取路径</span><br><span class="line">6.当前设置为每5分钟定时拉取一次, 失败尝试三次, 三次后放弃, 需要请修改时长</span><br></pre></td></tr></table></figure>
+
+<h3 id="Dockerfile文件"><a href="#Dockerfile文件" class="headerlink" title="Dockerfile文件"></a>Dockerfile文件</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> alpine:<span class="number">3.12</span>.<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> File</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> . .</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> sed -i <span class="string">&#x27;s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g&#x27;</span> /etc/apk/repositories; \</span></span><br><span class="line"><span class="bash">    apk add --no-cache openssh tzdata; \</span></span><br><span class="line"><span class="bash">    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; \</span></span><br><span class="line"><span class="bash">    apk del tzdata; \</span></span><br><span class="line"><span class="bash">    apk add --no-cache dos2unix curl; \</span></span><br><span class="line"><span class="bash">    dos2unix *.sh; \</span></span><br><span class="line"><span class="bash">    dos2unix config; \</span></span><br><span class="line"><span class="bash">    apk del dos2unix; \</span></span><br><span class="line"><span class="bash">    chmod 600 ./env/id_rsa_190; \</span></span><br><span class="line"><span class="bash">    sed -i <span class="string">&quot;s/#PermitRootLogin.*/PermitRootLogin yes/g&quot;</span> /etc/ssh/sshd_config; \</span></span><br><span class="line"><span class="bash">    ssh-keygen -t dsa -P <span class="string">&quot;&quot;</span> -f /etc/ssh/ssh_host_dsa_key; \</span></span><br><span class="line"><span class="bash">    ssh-keygen -t rsa -P <span class="string">&quot;&quot;</span> -f /etc/ssh/ssh_host_rsa_key; \</span></span><br><span class="line"><span class="bash">    ssh-keygen -t ecdsa -P <span class="string">&quot;&quot;</span> -f /etc/ssh/ssh_host_ecdsa_key; \</span></span><br><span class="line"><span class="bash">    ssh-keygen -t ed25519 -P <span class="string">&quot;&quot;</span> -f /etc/ssh/ssh_host_ed25519_key; \</span></span><br><span class="line"><span class="bash">    <span class="built_in">echo</span> <span class="string">&quot;root:admin&quot;</span> | chpasswd; \</span></span><br><span class="line"><span class="bash">    <span class="built_in">echo</span> <span class="string">&quot;*/2 * * * * cd /File &amp;&amp; /bin/sh ./scp_back_up.sh &gt; currentlog.txt&quot;</span> &gt;&gt; /var/spool/cron/crontabs/root;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">22</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> crond -L /var/<span class="built_in">log</span>/crond.log -f</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="scp-back-up-sh脚本"><a href="#scp-back-up-sh脚本" class="headerlink" title="scp_back_up.sh脚本"></a>scp_back_up.sh脚本</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">! /bin/sh</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">######################## ↓↓↓ 方法区域  ↓↓↓ ############################</span></span></span><br><span class="line">sendMsg()&#123;</span><br><span class="line">    if [ $&#123;production&#125; -eq &#x27;true&#x27; ]; then</span><br><span class="line">        MessageUrl=$&#123;alert_notice_product&#125;</span><br><span class="line">    else</span><br><span class="line">        MessageUrl=$&#123;alert_notice_debug&#125;</span><br><span class="line">    fi</span><br><span class="line">    PostData=&quot;&#123;\&quot;msgtype\&quot;:\&quot;markdown\&quot;,\&quot;markdown\&quot;:&#123;\&quot;content\&quot;:\&quot;### 项目: 文件备份\n &gt;$&#123;IP&#125;$&#123;NAME&#125;\n$&#123;1&#125;\n$&#123;2&#125;\&quot;&#125;&#125;&quot;</span><br><span class="line">    echo -e &quot;\n $&#123;current_time&#125;&quot; &gt;&gt; $&#123;notice_file&#125;</span><br><span class="line">    echo &quot;curl -H \&quot;Content-Type: application/json;charset=utf-8\&quot; -X POST -d \&quot;$&#123;PostData&#125;\&quot; \&quot;$&#123;MessageUrl&#125;\&quot;&quot; &gt;&gt; $&#123;notice_file&#125;</span><br><span class="line">    curl -H &quot;Content-Type: application/json;charset=utf-8&quot; -X POST -d &quot;$&#123;PostData&#125;&quot; &quot;$&#123;MessageUrl&#125;&quot; &gt;&gt; $&#123;notice_file&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取远端文件夹内创建时间在规定期间的文件</span></span><br><span class="line">getFile()&#123;</span><br><span class="line">    echo &quot;ssh -i $&#123;identify_file&#125; -o StrictHostKeyChecking=no -p $&#123;PORT&#125; $&#123;USER&#125;@$&#123;IP&#125; \&quot;find $&#123;back_up_file_path&#125; -type f -ctime $&#123;back_time&#125;\&quot;&quot;</span><br><span class="line">    ssh -i $&#123;identify_file&#125; -o StrictHostKeyChecking=no -p $&#123;PORT&#125; $&#123;USER&#125;@$&#123;IP&#125; &quot;find $&#123;back_up_file_path&#125; -type f -ctime $&#123;back_time&#125;&quot; &gt; $&#123;current_time&#125;.txt</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">######################## ↑↑↑ 方法区域  ↑↑↑ ############################</span></span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 引入配置文件</span></span><br><span class="line">source config</span><br><span class="line"><span class="meta">#</span><span class="bash"> 当前时间</span></span><br><span class="line">current_time=`date &quot;+%Y-%m-%d_%H:%M:%S&quot;`</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建文件夹</span></span><br><span class="line">if [[ ! -d $&#123;local_tmp_path&#125; ]]; then</span><br><span class="line">        mkdir -p $&#123;local_tmp_path&#125;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if [[ ! -d $&#123;local_path&#125; ]]; then</span><br><span class="line">        mkdir -p $&#123;local_path&#125;</span><br><span class="line">fi</span><br><span class="line">if [[ ! -f $&#123;log_file&#125; ]]; then</span><br><span class="line">        touch $&#123;log_file&#125;</span><br><span class="line">fi</span><br><span class="line">if [[ ! -f $&#123;notice_file&#125; ]]; then</span><br><span class="line">        touch $&#123;notice_file&#125;</span><br><span class="line">fi</span><br><span class="line">if [[ ! -f $&#123;current_time&#125;.txt ]]; then</span><br><span class="line">        touch $&#123;current_time&#125;.txt</span><br><span class="line">fi</span><br><span class="line">if [[ ! -f $&#123;current_time&#125;false.txt ]]; then</span><br><span class="line">        touch $&#123;current_time&#125;false.txt</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">getFile</span><br><span class="line"></span><br><span class="line">if [ ! -s $&#123;current_time&#125;.txt ]; then</span><br><span class="line">  rm -f $&#123;current_time&#125;.txt</span><br><span class="line">  rm -f $&#123;current_time&#125;false.txt</span><br><span class="line">  sendMsg &quot;$&#123;IP&#125;:$&#123;file_path&#125;&quot; &quot;$&#123;current_time&#125;备份文件为空,备份失败&quot;</span><br><span class="line">  exit 0</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">cat $&#123;current_time&#125;.txt | while read LINE ; do</span><br><span class="line">    file_path=$&#123;LINE&#125;</span><br><span class="line">    file_name=`basename $&#123;LINE&#125;`</span><br><span class="line">    # 普通ssh登录</span><br><span class="line">    # scp -r -v -p -P $&#123;PORT&#125; -l $&#123;transfer_speed&#125; $&#123;USER&#125;@$&#123;IP&#125;:$&#123;back_up_file_path&#125;$&#123;back_up_file_name&#125; $&#123;local_path&#125;</span><br><span class="line"></span><br><span class="line">    # 使用密钥文件登录</span><br><span class="line">    count_times=0</span><br><span class="line"></span><br><span class="line">    # 尝试最多三次拉取远端文件</span><br><span class="line">    while [[ $&#123;count_times&#125; -lt 3 ]]; do</span><br><span class="line">        count_times=`expr $&#123;count_times&#125; + 1`</span><br><span class="line">        # echo &quot;scp -r -v -p -i $&#123;identify_file&#125; -P $&#123;PORT&#125; -l $&#123;transfer_speed&#125; $&#123;USER&#125;@$&#123;IP&#125;:$&#123;back_up_file_path&#125;$&#123;back_up_file_name&#125; $&#123;local_tmp_path&#125;&quot;</span><br><span class="line">        echo &quot;scp -r -v -p -i $&#123;identify_file&#125; -o StrictHostKeyChecking=no -P $&#123;PORT&#125; -l $&#123;transfer_speed&#125; $&#123;USER&#125;@$&#123;IP&#125;:$&#123;file_path&#125; $&#123;local_tmp_path&#125;&quot;</span><br><span class="line">        scp -r -v -p -i $&#123;identify_file&#125; -o StrictHostKeyChecking=no -P $&#123;PORT&#125; -l $&#123;transfer_speed&#125; $&#123;USER&#125;@$&#123;IP&#125;:$&#123;file_path&#125; $&#123;local_tmp_path&#125;</span><br><span class="line">        cmd_result=$?</span><br><span class="line">        # 拉取成功后跳出</span><br><span class="line">        if [[ $&#123;cmd_result&#125; -eq 0 ]]; then</span><br><span class="line">                sh -c &quot;echo &#x27;$&#123;current_time&#125;第$&#123;count_times&#125;次拉取数据$&#123;file_path&#125;成功&#x27; &gt;&gt;  $&#123;log_file&#125;&quot;</span><br><span class="line">                break</span><br><span class="line">        fi</span><br><span class="line">        sleep 5</span><br><span class="line">    done</span><br><span class="line"></span><br><span class="line">    # 判读是否成功移动,写入日志</span><br><span class="line">    if [[ $&#123;cmd_result&#125; -eq 0 ]]; then</span><br><span class="line">        echo &quot;$&#123;current_time&#125;移动文件到缓存目录 $&#123;local_tmp_path&#125; 成功&quot;</span><br><span class="line">        sh -c &quot;echo &#x27;$&#123;current_time&#125;移动文件到缓存目录 $&#123;local_tmp_path&#125; 成功&#x27;  &gt;&gt; $&#123;log_file&#125;&quot;</span><br><span class="line">    else</span><br><span class="line">        echo &quot;$&#123;cmd_result&#125;&quot; &gt; $&#123;current_time&#125;false.txt</span><br><span class="line">        echo &quot;!!! $&#123;current_time&#125;拉取远端文件到缓存目录 $&#123;local_tmp_path&#125; 失败&quot;</span><br><span class="line">        sh -c &quot;echo &#x27;!!! $&#123;current_time&#125;拉取远端文件到缓存目录 $&#123;local_tmp_path&#125; 失败&#x27;  &gt;&gt; $&#123;log_file&#125;&quot;</span><br><span class="line">        # 调用通知函数发送失败通知</span><br><span class="line">        sendMsg &quot;$&#123;IP&#125;$&#123;file_path&#125;&quot; &quot;!!!$&#123;current_time&#125;拉取远端文件到缓存目录$&#123;local_tmp_path&#125;失败&quot;</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    # 从缓存目录移动文件到实际备份文件夹</span><br><span class="line">    mv $&#123;local_tmp_path&#125;/$&#123;file_name&#125; $&#123;local_path&#125;</span><br><span class="line">    mv_result=$?</span><br><span class="line">    if [[ $&#123;mv_result&#125; -ne 0 ]]; then</span><br><span class="line">        echo &quot;$&#123;mv_result&#125;&quot; &gt; $&#123;current_time&#125;false.txt</span><br><span class="line">        echo &quot;!!! $&#123;current_time&#125;移动文件$&#123;local_tmp_path&#125;$&#123;file_name&#125; 到目录 $&#123;local_path&#125; 失败&quot;</span><br><span class="line">        sh -c &quot;echo &#x27;!!! $&#123;current_time&#125;移动文件$&#123;local_tmp_path&#125;$&#123;file_name&#125; 到目录 $&#123;local_path&#125; 失败&#x27; &gt;&gt; $&#123;log_file&#125;&quot;</span><br><span class="line">        sendMsg &quot;$&#123;IP&#125;$&#123;file_name&#125;&quot; &quot;!!!$&#123;current_time&#125;移动文件$&#123;local_tmp_path&#125;$&#123;file_name&#125;到目录$&#123;local_path&#125;失败&quot;</span><br><span class="line">    else</span><br><span class="line">        echo &quot;!!! $&#123;current_time&#125;移动文件$&#123;local_tmp_path&#125;$&#123;file_name&#125; 到目录 $&#123;local_path&#125; 成功&quot;</span><br><span class="line">    fi</span><br><span class="line">    echo &#x27;end&#x27;</span><br><span class="line">done</span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除文件清单</span></span><br><span class="line">rm -r $&#123;current_time&#125;.txt</span><br><span class="line"></span><br><span class="line">if [ ! -s $&#123;current_time&#125;false.txt ]; then</span><br><span class="line">  sendMsg &quot;$&#123;IP&#125;:$&#123;file_path&#125;&quot; &quot;$&#123;current_time&#125;备份文件成功&quot;</span><br><span class="line">else</span><br><span class="line">  sendMsg &quot;$&#123;IP&#125;:$&#123;file_path&#125;&quot; &quot;!!!$&#123;current_time&#125;备份文件有错误,请查看日志详情&quot;</span><br><span class="line">fi</span><br><span class="line">rm -r $&#123;current_time&#125;false.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="config配置文件"><a href="#config配置文件" class="headerlink" title="config配置文件"></a>config配置文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 远端配置</span><br><span class="line">NAME=&#x27;日常备份&#x27;              # 项目名称</span><br><span class="line">USER=&#x27;[使用用户]&#x27;                    # 用户名</span><br><span class="line">IP=&#x27;xxx.xxx.xxx.xxx&#x27;              # IP地址</span><br><span class="line">PORT=&#x27;[端口]&#x27;                    # 端口</span><br><span class="line"></span><br><span class="line"># 功能配置</span><br><span class="line">identify_file=&#x27;./env/[公钥文件名]&#x27;                # 登录公钥文件</span><br><span class="line">transfer_speed=&#x27;200000&#x27;                           # 最大传输速度 kb/s</span><br><span class="line"></span><br><span class="line"># 项目文件配置</span><br><span class="line">back_up_file_path=&#x27;/var/www/[备份文件夹名]/&#x27;                # 远端备份路径</span><br><span class="line">local_tmp_path=&#x27;/var/www/LocalCFS/temp&#x27;                      # 本地缓存路径</span><br><span class="line">local_path=&#x27;/File/File_Bak/[项目名]/&#x27;  	        # 本地存储路径</span><br><span class="line">back_time=&#x27;-1&#x27;                                  # 遵循find命令格式,-1代表一天之内的文件</span><br><span class="line"></span><br><span class="line"># 日志文件/通知配置</span><br><span class="line">alert_notice_product=&#x27;https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxx&#x27;</span><br><span class="line">alert_notice_debug=&#x27;https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxx&#x27;</span><br><span class="line">log_file=&#x27;log.txt&#x27;                              # 日志名称</span><br><span class="line">notice_file=&#x27;notice.txt&#x27;                        # 消息日志名称</span><br><span class="line">production=false                                # 消息发送环境设定</span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2021/07/15/Docker_%E6%96%87%E4%BB%B6%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E5%AE%9E%E6%88%98/" title="Docker_文件数据备份实战">https://ni9ne.github.io/2021/07/15/Docker_文件数据备份实战/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+              <a href="/tags/Shell/" rel="tag"># Shell</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/06/12/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E8%AF%A6%E8%A7%A3/" rel="prev" title="Linux常用命令详解">
+                  <i class="fa fa-chevron-left"></i> Linux常用命令详解
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/07/25/Shell_%E6%96%87%E4%BB%B6%E6%81%A2%E5%A4%8D%E8%84%9A%E6%9C%AC/" rel="next" title="Shell_文件恢复脚本">
+                  Shell_文件恢复脚本 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>
