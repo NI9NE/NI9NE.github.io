@@ -21739,4 +21739,587 @@ ni9ne@outlook.com
         <tag>版本控制</tag>
       </tags>
   </entry>
+  <entry>
+    <title>IoT物联网接入</title>
+    <url>/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/</url>
+    <content><![CDATA[
+## 阿里云平台功能页面
+
+### 1.设备生命周期
+
+设备注册、功能定义、数据解析、在线调试、远程配置、固件升级、远程维护、实时监控、分组管理、设备删除
+
+### 2.[阿里云平台API列表](https://help.aliyun.com/document_detail/69893.html?spm=a2c4g.11186623.6.737.7fb77d9eYGo3Jd) 
+
+![1589334935827](/images/imgs/Iot/1589334935827.png)
+
+#### 2.1 [API调用详情页](https://help.aliyun.com/document_detail/69123.html?spm=a2c4g.11186623.2.16.496931123iaPXc#reference-mjn-n5l-vdb) ![1589335056739](assets/1589335056739.png)
+
+#### 2.2 [ OpenAPI Explorer(开放平台接口)](https://api.aliyun.com/#/?product=Iot&api=CreateProduct&params={}&tab=DEMO&lang=PHP) 
+
+![1589335226192](/images/imgs/Iot/1589335226192.png)
+
+
+
+## 测试产品生命周期调用接口测试
+
+### 1.注册产品
+
+```
+CreateProduct-调用该接口新建产品。
+$result = AlibabaCloud::rpc()
+                          ->product('Iot')
+                          // ->scheme('https') // https | http
+                          ->version('2018-01-20')
+                          ->action('CreateProduct')
+                          ->method('POST')
+                          ->host('iot.cn-shanghai.aliyuncs.com')
+                          ->options([
+                                        'query' => [
+                                          'RegionId' => "cn-shanghai",
+                                          'NodeType' => "0",
+                                          'ProductName' => "测试设备",
+                                          'Description' => "测试设备描述信息",
+                                        ],
+                                    ])
+                          ->request();
+    print_r($result->toArray());
+```
+
+```
+返回数据
+{
+	"RequestId": "EF546A4E-BC53-43C6-AA00-41FBC945B2C8",
+	"Data": {
+		"Description": "测试设备描述信息",
+		"ProductName": "测试设备",
+		"AliyunCommodityCode": "iothub",
+		"NodeType": 0,
+		"ProductKey": "a1WWzwKZcvd"
+	},
+	"Code": "",
+	"Success": true,
+	"ProductKey": "a1WWzwKZcvd"
+}
+```
+
+### 2.注册设备
+
+```
+RegisterDevice-调用该接口在指定产品下注册设备。
+
+$result = AlibabaCloud::rpc()
+                          ->product('Iot')
+                          // ->scheme('https') // https | http
+                          ->version('2018-01-20')
+                          ->action('RegisterDevice')
+                          ->method('POST')
+                          ->host('iot.cn-shanghai.aliyuncs.com')
+                          ->options([
+                                        'query' => [
+                                          'RegionId' => "cn-shanghai",
+                                          'ProductKey' => "a1WWzwKZcvd",
+                                          'Nickname' => "这是备注名",
+                                        ],
+                                    ])
+                          ->request();
+    print_r($result->toArray());
+```
+
+```
+返回数据-自动生成
+{
+	"RequestId": "8B4CC93D-A515-4469-B054-323DCA1BF913",
+	"Data": {
+		"IotId": "8B8MvTIuD8qgAz8Q6jhW000000",   #设备的唯一标识符
+		"DeviceSecret": "npjzVfRuA6WSG9PrGNPaKEIXTMa8Dv0v",  #设备密钥
+		"ProductKey": "a1WWzwKZcvd",  #所属产品
+		"JoinEui": "",
+		"DeviceName": "8B8MvTIuD8qgAz8Q6jhW",  #设备名称
+		"Nickname": "这是备注名"
+	},
+	"Code": "",
+	"Success": true
+}
+```
+
+### 3.启用设备
+
+```
+EnableThing-调用该接口解除指定设备的禁用状态，即启用被禁用的设备。
+
+    $result = AlibabaCloud::rpc()
+                          ->product('Iot')
+                          // ->scheme('https') // https | http
+                          ->version('2018-01-20')
+                          ->action('EnableThing')
+                          ->method('POST')
+                          ->host('iot.cn-shanghai.aliyuncs.com')
+                          ->options([
+                                        'query' => [
+                                          'RegionId' => "cn-shanghai",
+                                          'ProductKey' => "a1WWzwKZcvd",
+                                          'DeviceName' => "8B8MvTIuD8qgAz8Q6jhW",
+                                        ],
+                                    ])
+                          ->request();
+    print_r($result->toArray());
+```
+
+```
+返回数据-成功/失败
+{
+	"RequestId": "95094861-499A-48BC-A000-601CDA4E7116",
+	"Code": "",
+	"Success": true
+}
+```
+
+>  显示设备未激活(需要绑定真实的设备)
+
+![1589337285038](/images/imgs/Iot/1589337285038.png)
+
+### 4.查询设备状态
+
+```
+GetDeviceStatus-查看指定设备的运行状态。
+	$result = AlibabaCloud::rpc()
+                          ->product('Iot')
+                          // ->scheme('https') // https | http
+                          ->version('2018-01-20')
+                          ->action('GetDeviceStatus')
+                          ->method('POST')
+                          ->host('iot.cn-shanghai.aliyuncs.com')
+                          ->options([
+                                        'query' => [
+                                          'RegionId' => "cn-shanghai",
+                                          'ProductKey' => "a1WWzwKZcvd",
+                                          'DeviceName' => "8B8MvTIuD8qgAz8Q6jhW",
+                                        ],
+                                    ])
+                          ->request();
+    print_r($result->toArray());
+```
+
+```
+返回数据
+{
+	"RequestId": "D1510E6D-D871-4E5C-9C99-22B8F501E104",
+	"Data": {
+		"Status": "UNACTIVE"  #未激活
+	},
+	"Code": "",
+	"Success": true
+}
+```
+
+### 5.创建本地模拟设备(nodejs)
+
+>  每5秒发送温度+湿度随机参数
+
+![1589435890759](/images/imgs/Iot/1589435890759.png)
+
+![1589435938715](/images/imgs/Iot/1589435938715.png) 
+
+### 6.创建物模型
+
+```
+CreateThingModel-为指定产品的物模型新增功能
+    "productKey": "a1WWzwKZcvd",
+    "properties": [
+        {
+            "productKey": "a1WWzwKZcvd",
+            "identifier": "temperature",
+            "dataType": {
+		        "type": "double",
+		        "specs": {
+		          "min": "0",
+		          "max": "100",
+		          "unit": "%",
+		          "unitName": "百分比",
+		          "step": "0.01"
+		        }
+      		}
+            "name": "温度",
+            "rwFlag": "READ_WRITE"
+        }
+    ],
+    "services": [],
+    "events": []
+}
+```
+
+```
+返回数据
+{
+  "RequestId": "9E76053E-26ED-4AB4-AE58-8AFC3F1E7E8E",
+  "Success": true
+}
+```
+
+### 7.显示设备即时数据
+
+![1589443197759](/images/imgs/Iot/1589443197759.png)
+
+![1589443989620](/images/imgs/Iot/1589443989620.png)
+
+
+
+## 调用API请求结构
+
+### 1.请求结构
+
+#### 1.接口
+
+```
+http://Endpoint/?Action=xx&Parameters
+```
+
+> 可发送HTTP/HTTPS请求
+
+#### 2.参数
+
+| 参数       | 说明                                                         |
+| ---------- | ------------------------------------------------------------ |
+| Endpoint   | 调用云服务的接入地址。物联网平台的接入地址格式：`iot.${RegionId}.aliyuncs.com`。其中，变量${RegionId}需替换为您的物联网平台服务的地域代码。<br />例如: 华东2（上海）：`iot.cn-shanghai.aliyuncs.com` |
+| Action     | 要执行的操作，即云端API接口的名称。例如，调用Pub接口向指定Topic发布消息，**Action**对应的值就是Pub，即`Action=Pub`。 |
+| Parameters | 请求参数。每个参数之间用（&）符号分隔。<br />请求参数由[公共请求参数](https://help.aliyun.com/document_detail/30561.html#reference-tjr-twc-xdb)和API自定义参数组成。公共参数中包含API版本号、身份验证等信息。 |
+
+公共请求参数如下:
+
+> 公共请求参数是调用每个API时都需要使用的请求参数。
+
+| 名称             | 类型   | 是否必需 | 描述                                                         |
+| :--------------- | :----- | :------- | :----------------------------------------------------------- |
+| Format           | String | 否       | 返回值的类型，支持JSON和XML类型。默认为XML。                 |
+| Version          | String | 是       | API版本号，为日期形式：`YYYY-MM-DD`，最新版本为`2018-01-20` 。每个接口可以存在多个版本。 |
+| AccessKeyId      | String | 是       | 阿里云颁发给用户的访问服务所用的密钥ID。登录阿里云控制台，将光标移至账号头像上，然后单击**accesskeys**，跳转至**用户信息管理**页，即可创建和查看AccessKey。 |
+| Signature        | String | 是       | 签名结果串。                                                 |
+| SignatureMethod  | String | 是       | 签名方式，目前支持HMAC-SHA1。                                |
+| Timestamp        | String | 是       | 请求的时间戳。日期格式按照ISO8601标准表示，并需要使用UTC时间。格式为`YYYY-MM-DDThh:mm:ssZ`。例如，`2016-01-04T12:00:00Z`表示北京时间2016年01月04日20点0分0秒。 |
+| SignatureVersion | String | 是       | 签名算法版本。目前版本是1.0。                                |
+| SignatureNonce   | String | 是       | 唯一随机数。用于防止网络重放攻击。用户在不同请求中要使用不同的随机数值。 |
+| RegionId         | String | 是       | 设备所在地域（与控制台上的地域对应），如cn-shanghai。        |
+
+#### 3.案例
+
+> 调用Pub接口向指定Topic发布消息
+
+```
+https://iot.cn-shanghai.aliyuncs.com/?Action=Pub
+&Format=XML
+&Version=2017-04-20
+&Signature=Pc5WB8gokVn0xfeu%2FZV%2BiNM1dgI%3D
+&SignatureMethod=HMAC-SHA1
+&SignatureNonce=15215528852396
+&SignatureVersion=1.0
+&AccessKeyId=...
+&Timestamp=2017-07-19T12:00:00Z
+&RegionId=cn-shanghai
+...
+```
+
+#### 4.返回参数
+
+- 成功:
+
+  - XML格式
+
+    ```
+    <?xml version="1.0" encoding="UTF-8"?> 
+    <!—结果的根结点-->
+    <接口名称+Response>
+        <!—返回请求标签-->
+        <RequestId>4C467B38-3910-447D-87BC-AC049166F216</RequestId>
+        <!—返回结果数据-->
+    </接口名称+Response>
+    ```
+
+  - JSON格式
+
+    ```
+    {
+        "RequestId": "4C467B38-3910-447D-87BC-AC049166F216"
+        /* 返回结果数据 */
+    }
+    ```
+
+- 失败
+
+  - XML格式
+
+    ```
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Error>
+       <RequestId>8906582E-6722-409A-A6C4-0E7863B733A5</RequestId>
+       <Code>UnsupportedOperation</Code>
+       <Message>The specified action is not supported.</Message>
+    </Error>
+    ```
+
+  - JSON格式
+
+    ```
+    {
+        "RequestId": "8906582E-6722-409A-A6C4-0E7863B733A5",
+        "Code": "UnsupportedOperation",
+        "Message": "The specified action is not supported."
+    }
+    ```
+
+>  注意:  需要**授权调用**的接口的**Action参数**由原来的 `操作名`变为`iot:操作名`
+
+### 2.签名机制
+
+物联网平台会对每个接口访问请求的发送者进行身份验证，所以无论使用HTTP还是HTTPS协议提交请求，都需要在请求中包含签名（Signature）信息。
+
+#### 签名方法
+
+签名时，您需在控制台 [AccessKey 管理](https://usercenter.console.aliyun.com/#/manage/ak)页面查看您的账号的AccessKeyId和AccessKeySecret，然后进行对称加密。其中，AccessKeyId用于标识访问者身份；AccessKeySecret是用于加密签名字符串和服务器端验证签名字符串的密钥，必须严格保密。
+
+#### 签名示例
+
+以调用Pub接口为例。假设您的`AccessKeyId=testid`，`AccessKeySecret=testsecret`。
+
+1. 组成签名前的请求URL。
+
+   ```
+   http://iot.cn-shanghai.aliyuncs.com/?MessageContent=aGVsbG93b3JsZA%3D&Action=Pub&Timestamp=2017-10-02T09%3A39%3A41Z&SignatureVersion=1.0&ServiceCode=iot&Format=XML&Qos=0&SignatureNonce=0715a395-aedf-4a41-bab7-746b43d38d88&Version=2017-04-20&AccessKeyId=testid&SignatureMethod=HMAC-SHA1&RegionId=cn-shanghai&ProductKey=12345abcdeZ&TopicFullName=%2FproductKey%2Ftestdevice%2Fget
+   ```
+
+2. 计算得到待签名字符串
+
+   StringToSign
+
+   ```
+   GET&%2F&AccessKeyId%3Dtestid%26Action%3DPub%26Format%3DXML%26MessageContent%3DaGVsbG93b3JsZA%253D%26ProductKey%3D12345abcdeZ%26Qos%3D0%26RegionId%3Dcn-shanghai%26ServiceCode%3Diot%26SignatureMethod%3DHMAC-SHA1%26SignatureNonce%3D0715a395-aedf-4a41-bab7-746b43d38d88%26SignatureVersion%3D1.0%26Timestamp%3D2017-10-02T09%253A39%253A41Z%26TopicFullName%3D%252FproductKey%252Ftestdevice%252Fget%26Version%3D2017-04-20
+   ```
+
+3. 计算签名值。
+
+   因为`AccessKeySecret=testsecret`，用于计算的Key为testsecret&，计算得到的签名值为：
+
+   ```
+   Y9eWn4nF8QPh3c4zAFkM/k/u7eA=
+   ```
+
+4. 将签名作为
+
+   `Signature`参数加入到URL请求中，最后得到的URL为：
+
+   ```
+   http://iot.cn-shanghai.aliyuncs.com/?MessageContent=aGVsbG93b3JsZA%3D
+   &Action=Pub
+   &Timestamp=2017-10-02T09%3A39%3A41Z
+   &SignatureVersion=1.0
+   &ServiceCode=iot
+   &Format=XML
+   &Qos=0
+   &SignatureNonce=0715a395-aedf-4a41-bab7-746b43d38d88
+   &Version=2017-04-20
+   &AccessKeyId=testid
+   &Signature=Y9eWn4nF8QPh3c4zAFkM%2Fk%2Fu7eA%3D
+   &SignatureMethod=HMAC-SHA1
+   &RegionId=cn-shanghai
+   &ProductKey=12345abcdeZ
+   &TopicFullName=%2FproductKey%2Ftestdevice%2Fget
+   ```
+
+
+
+## 企业基于物联网平台的业务链路
+
+![企业基于物联网平台的业务链路](https://static-aliyun-doc.oss-cn-hangzhou.aliyuncs.com/assets/img/zh-CN/3621418851/p101379.png)
+
+## 产品名词解释
+
+| 名词          | 描述                                                         |
+| :------------ | :----------------------------------------------------------- |
+| 产品          | 设备的集合，通常指一组具有相同功能的设备。物联网平台为每个产品颁发全局唯一的ProductKey。每个产品下最多可以包含50万个设备。 |
+| 设备          | 归属于某个产品下的具体设备。物联网平台为设备颁发产品内唯一的证书DeviceName。设备可以直接连接物联网平台，也可以作为子设备通过网关连接物联网平台。 |
+| 分组          | 物联网平台支持建立设备分组，分组中可包含不同产品下的设备。通过设备组来进行跨产品管理设备。 |
+| 网关          | 能够直接连接物联网平台的设备，且具有子设备管理功能，能够代理子设备连接云端。 |
+| 子设备        | 本质上也是设备。子设备不能直接连接物联网平台，只能通过网关连接。 |
+| 设备证书      | 设备证书指**ProductKey**、**DeviceName**、**DeviceSecret**。**ProductKey**：是物联网平台为产品颁发的全局唯一标识。该参数很重要，在设备认证以及通信中都会用到，因此需要您保管好。**DeviceName**：在注册设备时，自定义的或系统生成的设备名称，具备产品维度内的唯一性。该参数很重要，在设备认证以及通信中都会用到，因此需要您保管好。**DeviceSecret**：物联网平台为设备颁发的设备密钥，和DeviceName成对出现。该参数很重要，在设备认证时会用到，因此需要您保管好并且不能泄露。 |
+| ProductSecret | 由物联网平台颁发的产品密钥，通常与ProductKey成对出现，可用于一型一密的认证方案。该参数很重要，需要您保管好，不能泄露。 |
+| 设备X.509证书 | 物联网平台支持设备使用X.509数字证书进行身份验证。您创建认证方式为X.509证书的设备后，物联网平台为设备颁发对应的X.509证书，证书信息包括：X.509数字证书（**Certificate**）、X.509证书ID（**CertSN**）和X.509证书密钥（**PrivateKey**）。 |
+| Topic         | Topic是UTF-8字符串，是发布（Pub）/订阅（Sub）消息的传输中介。可以向Topic发布或者订阅消息。 |
+| Topic类       | 同一产品下不同设备的Topic集合，用`${productkey}`和`${deviceName}`通配一个唯一的设备，一个Topic类对一个ProductKey下所有设备通用。 |
+| 发布          | 操作Topic的权限类型，对应的英文名称为Pub。可以往此类Topic中发布消息。 |
+| 订阅          | 操作Topic的权限类型，对应的英文名称为Sub。可以从此类Topic中订阅消息。 |
+| RRPC          | 全称：Revert-RPC。RPC（Remote Procedure Call）采用客户机/服务器模式，用户不需要了解底层技术协议，即可远程请求服务。RRPC则可以实现由服务端请求设备端，并能够使设备端响应的功能。 |
+| 标签          | 标签分为产品标签、设备标签和分组标签。产品标签：描述同一个产品下，所有设备所具有的共性信息。设备标签：通常根据设备的特性为设备添加的特有标记，您可以自定义标签内容。分组标签：描述同一个分组下，所有设备所具有的共性信息。 |
+| Alink协议     | 阿里云定义的设备与云端之间的通信协议。                       |
+| 物模型        | 是对设备在云端的功能描述，包括设备的属性、服务和事件。物联网平台通过定义一种物的描述语言来描述物模型，称之为 TSL（即 Thing Specification Language），采用JSON格式，您可以根据TSL组装上报设备的数据。 |
+| 属性          | 设备的功能模型之一，一般用于描述设备运行时的状态，如环境监测设备所读取的当前环境温度等。属性支持 GET 和 SET 请求方式。应用系统可发起对属性的读取和设置请求。 |
+| 服务          | 设备的功能模型之一，设备可被外部调用的能力或方法，可设置输入参数和输出参数。相比于属性，服务可通过一条指令实现更复杂的业务逻辑，如执行某项特定的任务。 |
+| 事件          | 设备的功能模型之一，设备运行时的事件。事件一般包含需要被外部感知和处理的通知信息，可包含多个输出参数。例如，某项任务完成的信息，或者设备发生故障或告警时的温度等，事件可以被订阅和推送。 |
+| 数据解析脚本  | 针对采用透传格式/自定义数据格式的设备，需要在云端编写数据解析脚本，将设备上报的二进制数据或自定义的JSON数据，转换为物联网平台支持的Alink JSON数据格式；将平台下发的Alink JSON格式数据，转换为设备支持的格式。 |
+| 设备影子      | 是一个JSON文档，用于存储设备或者应用的当前状态信息。每个设备都会在云端有唯一的设备影子。无论该设备是否连接到Internet，您都可以使用设备影子通过MQTT协议或HTTP协议获取和设置设备的状态。 |
+| 规则引擎      | 通过创建、配置规则，以实现数据流转和场景联动。               |
+| 数据流转      | 物联网平台规则引擎的数据流转功能，可将Topic中的数据转发至其他Topic或其他阿里云服务进行存储或处理。 |
+| 场景联动      | 场景联动是一种开发自动化业务逻辑的可视化编程方式。您可以通过可视化的方式定义设备之间联动规则，并将规则部署至云端或者边缘端。 |
+| 服务端订阅    | 服务端订阅产品下所有类型的消息：设备上报消息、设备状态变化通知、网关发现子设备上报消息、设备生命周期变更消息和设备拓扑关系变更消息。目前支持两种方式实现服务端订阅：AMQP：Advanced Message Queuing Protocol即高级消息队列协议。服务端通过AMQP协议接入云端，接收云端推送的消息。MNS：将消息流转到指定MNS队列中，您的服务端从MNS队列中接收消息。 |
+| 一型一密      | 同一产品下所有设备可以烧录相同产品证书（即ProductKey和ProductSecret）。设备发送激活请求时，物联网平台进行产品身份确认，认证通过，下发该设备对应的DeviceSecret。 |
+| 一机一密      | 每个设备烧录其唯一的设备证书（ProductKey、DeviceName和DeviceSecret）。当设备与物联网平台建立连接时，物联网平台对其携带的设备证书信息进行认证。 |
+| 期望属性值    | 通过期望属性值功能，设置您希望的设备属性值。若设备在线，将实时更新属性值；若设备离线，期望属性值将缓存在云端。设备上线后，获取期望属性值，并更新属性值。 |
+| 公共实例      | 在阿里云官网线上开通的物联网平台服务为公共实例。公共实例部署于阿里云经典网络。多账号共用一个公共实例，账号之间逻辑隔离。产品、设备、规则等资源可在[阿里云物联网平台控制台](https://iot.console.aliyun.com/product/region/cn-shanghai)上进行操作管理。 |
+| 独享实例      | 部署于阿里云VPC网络的物联网平台独享实例。一个账号独享一个实例资源。独享实例适用于设备数量达10万及以上的客户、资源隔离性要求高的行业客户或物联网平台转售商等。购买独享实例，请联系阿里云商务人员（电话：95187转1）或[提交工单](https://selfservice.console.aliyun.com/ticket/createIndex)。 |
+
+## API列表
+
+`https://help.aliyun.com/document_detail/69893.html` 
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+        <tag>Iot</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Supervisor线上进程监护工具配置</title>
+    <url>/2020/01/19/Supervisor%E7%BA%BF%E4%B8%8A%E8%BF%9B%E7%A8%8B%E7%9B%91%E6%8A%A4%E5%B7%A5%E5%85%B7%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[
+# Supervisor 使用总结
+
+**Supervisor 是一个进程监护工具，在 Laravel 中，我们用来监护消息队列、Horizon 进程，以便在其意外退出时自动重启。**
+
+Ubuntu 环境下，运行：`apt-get install -y supervisor`。
+
+安装完毕后，配置文件位于：`/etc/supervior`，在该文件夹下，有
+
+```
+conf.d  # 自定义配置文件存放目录
+supervisord.conf # 主配置文件，自定义文件会在这里include进来
+```
+
+为了监护 Horizon 进程，我们在 conf.d 文件夹下创建一份配置，文件名随意，各项作用见注释：
+
+```
+[program:laravel_horizon]    ;监护程序名称，随意起，但不能跟其他的重复
+process_name=%(program_name)s_%(process_num)02d    ;进程名称
+directory=/var/www/html/larabbs    ;命令运行的目录
+command=php artisan horizon    ;要执行的命令
+autostart=true    ;当supervisor启动时,程序自动启动
+autorestart=true    ;自动重启
+numprocs=1    ; 进程数
+user=root     ;执行命令的账号
+stopasgroup=true    ;这个和下面一个配置可以防止监护的进程意外重启后子进程残留
+killasgroup=true
+redirect_stderr=true    ;这里设为true，就可以配置下面的目录
+stdout_logfile=/var/www/html/larabbs/storage/laravel_horizon.log    ;日志目录
+```
+
+## 使用
+
+运行 `supervisord -c /etc/supervisor/supervisord.conf` 启动，启动后就可以使用 `supervisorctl` 命令来进行一些进程管理操作，比如：
+
+```
+supervisorctl status # 查看状态
+
+ # 以下针对laravel_horizon:laravel_horizon_00进程操作：
+ supervisorctl stop laravel_horizon:laravel_horizon_00 
+ supervisorctl start laravel_horizon:laravel_horizon_00
+ supervisorctl restart laravel_horizon:laravel_horizon_00
+ 
+
+supervisorctl shutdown  # 关闭supervisor
+
+supervisorctl reread
+supervisorctl update   配置文件修改后可以使用该命令加载新的配置
+supervisorctl start mch-register:*
+supervisorctl start mch-project:*
+supervisorctl start mch-settled:*
+supervisorctl help：帮助命令
+supervisorctl reload： 重新启动配置中的所有程序
+
+sudo supervisorctl stop all 停止所有进程
+```
+
+> 如果 supervisor 成功启动，在日志文件中可以看到：`Horizon started successfully.`，当有队列被执行了，日志中可以看到信息，比如：
+
+```
+[2019-11-19 14:27:30][8] Processing: App\Jobs\TranslateSlug
+[2019-11-19 14:27:30][8] Processed:  App\Jobs\TranslateSlug
+```
+
+## 遇到的问题
+
+- 启动时报错，找不到 unix:///var/run/supervisor.sock
+
+  解决：Linux 命令中断依次运行以下命令：
+
+  ```php
+  touch /var/run/supervisor.sock
+  chmod 777 /var/run/supervisor.sock
+  ```
+
+- 启动时报错：Unlinking stale socket /var/run/supervisor.sock
+
+  解决：运行：`unlink /var/run/supervisor.sock`
+
+- supervisor: couldn't chdir to /var/html/www/larabbs: ENOENT
+  supervisor: child process was not spawned
+
+  解决：directory 目录路径写错了，调整回正确路径
+
+- `no such file or directory line224`
+
+  ```undefined
+  启动服务
+  systemctl start supervisord
+  再继续执行 supervisorctl reread
+  ```
+
+- 跨库插入失败, 实际上插入成功, 出现失败记录, 导致一直尝试重复插入
+
+  尝试1: 将t_job/t_failed_job 均改为v_t_job/ v_t_failed_job 同库查询操作
+
+- **如果遇到 Failed to cache access token 的问题，一般有两种可能**
+
+  ------
+
+  第一种情况，你可能使用的是 overtrue/wechat 4.1.16 版本，因为作者的大意引发的BUG，作者紧接着在4.1.17就修复了，更新新版就可以了。
+
+  第二种情况就是
+
+  问题的源起是我修改了php-fpm的运行用户，处理完一些常见的目录权限之后，报了Failed to cache access token 这个错误，于是我去 overtrue/wechat/src/Kernel/AccessToken.php:141 看了下源码，发现是因为token缓存文件没写成功。
+
+  然后在文档( [缓存](https://www.easywechat.com/docs/master/customize/cache) )中找到了缓存方式。
+  overtrue/wechat 默认使用的是 symfony/cache 来进行缓存操作，ubuntu中，symfony/cache会在`/tmp`目录下建立`symfony_cache`来储存临时缓存。
+  ps:如果不是/tmp目录，可以使用 sys_get_temp_dir() 方法获取你的临时文件目录。
+
+  因为之前使用www-data用户运行的项目，所以symfony_cache目录已被www-data创建，且其他用户不可写，直接删掉这个目录或者修改权限就可以了！
+
+  ```
+  chmod -R 777 /tmp/symfony_cache
+  ```
+
+- **Throw问题**
+
+  项目部署到Linux 服务器上后有时会出现 每日日志无法写入的问题。由此汇总一下常出现的问题及解决方式。
+
+  **权限问题**
+
+  导致无法写入日志的问题，是由于代码更新时添加了文件是 root 用户，所以创建日志文件也是root 权限，导致其它用户的 www 权限无法写入日志文件中。
+
+  所以修改 storage/logs/ 的用户权限为 www
+
+  **chown www:www storage/logs -R**
+
+  注意：如果用户使用supervisord服务运行队列的话，如果队列里有日志记录，那么运行的用户也需要改成 www 用户。
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+        <tag>Supervisor</tag>
+      </tags>
+  </entry>
 </search>

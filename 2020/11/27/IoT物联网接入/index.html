@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="阿里云平台功能页面1.设备生命周期设备注册、功能定义、数据解析、在线调试、远程配置、固件升级、远程维护、实时监控、分组管理、设备删除">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IoT物联网接入">
+<meta property="og:url" content="https://ni9ne.github.io/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="阿里云平台功能页面1.设备生命周期设备注册、功能定义、数据解析、在线调试、远程配置、固件升级、远程维护、实时监控、分组管理、设备删除">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Iot/1589334935827.png">
+<meta property="og:image" content="https://ni9ne.github.io/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/assets/1589335056739.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Iot/1589335226192.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Iot/1589337285038.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Iot/1589435890759.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Iot/1589435938715.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Iot/1589443197759.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Iot/1589443989620.png">
+<meta property="og:image" content="https://static-aliyun-doc.oss-cn-hangzhou.aliyuncs.com/assets/img/zh-CN/3621418851/p101379.png">
+<meta property="article:published_time" content="2020-11-27T11:13:52.000Z">
+<meta property="article:modified_time" content="2021-11-12T21:03:12.921Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="Iot">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.github.io/images/imgs/Iot/1589334935827.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/","path":"2020/11/27/IoT物联网接入/","title":"IoT物联网接入"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>IoT物联网接入 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">63</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BF%E9%87%8C%E4%BA%91%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E9%A1%B5%E9%9D%A2"><span class="nav-number">1.</span> <span class="nav-text">阿里云平台功能页面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%AE%BE%E5%A4%87%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">1.1.</span> <span class="nav-text">1.设备生命周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E9%98%BF%E9%87%8C%E4%BA%91%E5%B9%B3%E5%8F%B0API%E5%88%97%E8%A1%A8"><span class="nav-number">1.2.</span> <span class="nav-text">2.阿里云平台API列表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-API%E8%B0%83%E7%94%A8%E8%AF%A6%E6%83%85%E9%A1%B5"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 API调用详情页 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-OpenAPI-Explorer-%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0%E6%8E%A5%E5%8F%A3"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2  OpenAPI Explorer(开放平台接口)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E4%BA%A7%E5%93%81%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%B0%83%E7%94%A8%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95"><span class="nav-number">2.</span> <span class="nav-text">测试产品生命周期调用接口测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%B3%A8%E5%86%8C%E4%BA%A7%E5%93%81"><span class="nav-number">2.1.</span> <span class="nav-text">1.注册产品</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%B3%A8%E5%86%8C%E8%AE%BE%E5%A4%87"><span class="nav-number">2.2.</span> <span class="nav-text">2.注册设备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%90%AF%E7%94%A8%E8%AE%BE%E5%A4%87"><span class="nav-number">2.3.</span> <span class="nav-text">3.启用设备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%9F%A5%E8%AF%A2%E8%AE%BE%E5%A4%87%E7%8A%B6%E6%80%81"><span class="nav-number">2.4.</span> <span class="nav-text">4.查询设备状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%88%9B%E5%BB%BA%E6%9C%AC%E5%9C%B0%E6%A8%A1%E6%8B%9F%E8%AE%BE%E5%A4%87-nodejs"><span class="nav-number">2.5.</span> <span class="nav-text">5.创建本地模拟设备(nodejs)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%88%9B%E5%BB%BA%E7%89%A9%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.6.</span> <span class="nav-text">6.创建物模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E6%98%BE%E7%A4%BA%E8%AE%BE%E5%A4%87%E5%8D%B3%E6%97%B6%E6%95%B0%E6%8D%AE"><span class="nav-number">2.7.</span> <span class="nav-text">7.显示设备即时数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E7%94%A8API%E8%AF%B7%E6%B1%82%E7%BB%93%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">调用API请求结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%AF%B7%E6%B1%82%E7%BB%93%E6%9E%84"><span class="nav-number">3.1.</span> <span class="nav-text">1.请求结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%8E%A5%E5%8F%A3"><span class="nav-number">3.1.1.</span> <span class="nav-text">1.接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%8F%82%E6%95%B0"><span class="nav-number">3.1.2.</span> <span class="nav-text">2.参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%A1%88%E4%BE%8B"><span class="nav-number">3.1.3.</span> <span class="nav-text">3.案例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E8%BF%94%E5%9B%9E%E5%8F%82%E6%95%B0"><span class="nav-number">3.1.4.</span> <span class="nav-text">4.返回参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%AD%BE%E5%90%8D%E6%9C%BA%E5%88%B6"><span class="nav-number">3.2.</span> <span class="nav-text">2.签名机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%BE%E5%90%8D%E6%96%B9%E6%B3%95"><span class="nav-number">3.2.1.</span> <span class="nav-text">签名方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%BE%E5%90%8D%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.2.2.</span> <span class="nav-text">签名示例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%81%E4%B8%9A%E5%9F%BA%E4%BA%8E%E7%89%A9%E8%81%94%E7%BD%91%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%B8%9A%E5%8A%A1%E9%93%BE%E8%B7%AF"><span class="nav-number">4.</span> <span class="nav-text">企业基于物联网平台的业务链路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A7%E5%93%81%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A"><span class="nav-number">5.</span> <span class="nav-text">产品名词解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#API%E5%88%97%E8%A1%A8"><span class="nav-number">6.</span> <span class="nav-text">API列表</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IoT物联网接入
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-11-27 19:13:52" itemprop="dateCreated datePublished" datetime="2020-11-27T19:13:52+08:00">2020-11-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="阿里云平台功能页面"><a href="#阿里云平台功能页面" class="headerlink" title="阿里云平台功能页面"></a>阿里云平台功能页面</h2><h3 id="1-设备生命周期"><a href="#1-设备生命周期" class="headerlink" title="1.设备生命周期"></a>1.设备生命周期</h3><p>设备注册、功能定义、数据解析、在线调试、远程配置、固件升级、远程维护、实时监控、分组管理、设备删除</p>
+<h3 id="2-阿里云平台API列表"><a href="#2-阿里云平台API列表" class="headerlink" title="2.阿里云平台API列表"></a>2.<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/69893.html?spm=a2c4g.11186623.6.737.7fb77d9eYGo3Jd">阿里云平台API列表</a></h3><p><img src="/images/imgs/Iot/1589334935827.png" alt="1589334935827"></p>
+<h4 id="2-1-API调用详情页"><a href="#2-1-API调用详情页" class="headerlink" title="2.1 API调用详情页 "></a>2.1 <a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/69123.html?spm=a2c4g.11186623.2.16.496931123iaPXc#reference-mjn-n5l-vdb">API调用详情页</a> <img src="assets/1589335056739.png" alt="1589335056739"></h4><h4 id="2-2-OpenAPI-Explorer-开放平台接口"><a href="#2-2-OpenAPI-Explorer-开放平台接口" class="headerlink" title="2.2  OpenAPI Explorer(开放平台接口)"></a>2.2 <a target="_blank" rel="noopener" href="https://api.aliyun.com/#/?product=Iot&api=CreateProduct&params={}&tab=DEMO&lang=PHP"> OpenAPI Explorer(开放平台接口)</a></h4><p><img src="/images/imgs/Iot/1589335226192.png" alt="1589335226192"></p>
+<h2 id="测试产品生命周期调用接口测试"><a href="#测试产品生命周期调用接口测试" class="headerlink" title="测试产品生命周期调用接口测试"></a>测试产品生命周期调用接口测试</h2><h3 id="1-注册产品"><a href="#1-注册产品" class="headerlink" title="1.注册产品"></a>1.注册产品</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">CreateProduct-调用该接口新建产品。</span><br><span class="line">$result = AlibabaCloud::rpc()</span><br><span class="line">                          -&gt;product(&#x27;Iot&#x27;)</span><br><span class="line">                          // -&gt;scheme(&#x27;https&#x27;) // https | http</span><br><span class="line">                          -&gt;version(&#x27;2018-01-20&#x27;)</span><br><span class="line">                          -&gt;action(&#x27;CreateProduct&#x27;)</span><br><span class="line">                          -&gt;method(&#x27;POST&#x27;)</span><br><span class="line">                          -&gt;host(&#x27;iot.cn-shanghai.aliyuncs.com&#x27;)</span><br><span class="line">                          -&gt;options([</span><br><span class="line">                                        &#x27;query&#x27; =&gt; [</span><br><span class="line">                                          &#x27;RegionId&#x27; =&gt; &quot;cn-shanghai&quot;,</span><br><span class="line">                                          &#x27;NodeType&#x27; =&gt; &quot;0&quot;,</span><br><span class="line">                                          &#x27;ProductName&#x27; =&gt; &quot;测试设备&quot;,</span><br><span class="line">                                          &#x27;Description&#x27; =&gt; &quot;测试设备描述信息&quot;,</span><br><span class="line">                                        ],</span><br><span class="line">                                    ])</span><br><span class="line">                          -&gt;request();</span><br><span class="line">    print_r($result-&gt;toArray());</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">返回数据</span><br><span class="line">&#123;</span><br><span class="line">	&quot;RequestId&quot;: &quot;EF546A4E-BC53-43C6-AA00-41FBC945B2C8&quot;,</span><br><span class="line">	&quot;Data&quot;: &#123;</span><br><span class="line">		&quot;Description&quot;: &quot;测试设备描述信息&quot;,</span><br><span class="line">		&quot;ProductName&quot;: &quot;测试设备&quot;,</span><br><span class="line">		&quot;AliyunCommodityCode&quot;: &quot;iothub&quot;,</span><br><span class="line">		&quot;NodeType&quot;: 0,</span><br><span class="line">		&quot;ProductKey&quot;: &quot;a1WWzwKZcvd&quot;</span><br><span class="line">	&#125;,</span><br><span class="line">	&quot;Code&quot;: &quot;&quot;,</span><br><span class="line">	&quot;Success&quot;: true,</span><br><span class="line">	&quot;ProductKey&quot;: &quot;a1WWzwKZcvd&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-注册设备"><a href="#2-注册设备" class="headerlink" title="2.注册设备"></a>2.注册设备</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">RegisterDevice-调用该接口在指定产品下注册设备。</span><br><span class="line"></span><br><span class="line">$result = AlibabaCloud::rpc()</span><br><span class="line">                          -&gt;product(&#x27;Iot&#x27;)</span><br><span class="line">                          // -&gt;scheme(&#x27;https&#x27;) // https | http</span><br><span class="line">                          -&gt;version(&#x27;2018-01-20&#x27;)</span><br><span class="line">                          -&gt;action(&#x27;RegisterDevice&#x27;)</span><br><span class="line">                          -&gt;method(&#x27;POST&#x27;)</span><br><span class="line">                          -&gt;host(&#x27;iot.cn-shanghai.aliyuncs.com&#x27;)</span><br><span class="line">                          -&gt;options([</span><br><span class="line">                                        &#x27;query&#x27; =&gt; [</span><br><span class="line">                                          &#x27;RegionId&#x27; =&gt; &quot;cn-shanghai&quot;,</span><br><span class="line">                                          &#x27;ProductKey&#x27; =&gt; &quot;a1WWzwKZcvd&quot;,</span><br><span class="line">                                          &#x27;Nickname&#x27; =&gt; &quot;这是备注名&quot;,</span><br><span class="line">                                        ],</span><br><span class="line">                                    ])</span><br><span class="line">                          -&gt;request();</span><br><span class="line">    print_r($result-&gt;toArray());</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">返回数据-自动生成</span><br><span class="line">&#123;</span><br><span class="line">	&quot;RequestId&quot;: &quot;8B4CC93D-A515-4469-B054-323DCA1BF913&quot;,</span><br><span class="line">	&quot;Data&quot;: &#123;</span><br><span class="line">		&quot;IotId&quot;: &quot;8B8MvTIuD8qgAz8Q6jhW000000&quot;,   #设备的唯一标识符</span><br><span class="line">		&quot;DeviceSecret&quot;: &quot;npjzVfRuA6WSG9PrGNPaKEIXTMa8Dv0v&quot;,  #设备密钥</span><br><span class="line">		&quot;ProductKey&quot;: &quot;a1WWzwKZcvd&quot;,  #所属产品</span><br><span class="line">		&quot;JoinEui&quot;: &quot;&quot;,</span><br><span class="line">		&quot;DeviceName&quot;: &quot;8B8MvTIuD8qgAz8Q6jhW&quot;,  #设备名称</span><br><span class="line">		&quot;Nickname&quot;: &quot;这是备注名&quot;</span><br><span class="line">	&#125;,</span><br><span class="line">	&quot;Code&quot;: &quot;&quot;,</span><br><span class="line">	&quot;Success&quot;: true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-启用设备"><a href="#3-启用设备" class="headerlink" title="3.启用设备"></a>3.启用设备</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">EnableThing-调用该接口解除指定设备的禁用状态，即启用被禁用的设备。</span><br><span class="line"></span><br><span class="line">    $result = AlibabaCloud::rpc()</span><br><span class="line">                          -&gt;product(&#x27;Iot&#x27;)</span><br><span class="line">                          // -&gt;scheme(&#x27;https&#x27;) // https | http</span><br><span class="line">                          -&gt;version(&#x27;2018-01-20&#x27;)</span><br><span class="line">                          -&gt;action(&#x27;EnableThing&#x27;)</span><br><span class="line">                          -&gt;method(&#x27;POST&#x27;)</span><br><span class="line">                          -&gt;host(&#x27;iot.cn-shanghai.aliyuncs.com&#x27;)</span><br><span class="line">                          -&gt;options([</span><br><span class="line">                                        &#x27;query&#x27; =&gt; [</span><br><span class="line">                                          &#x27;RegionId&#x27; =&gt; &quot;cn-shanghai&quot;,</span><br><span class="line">                                          &#x27;ProductKey&#x27; =&gt; &quot;a1WWzwKZcvd&quot;,</span><br><span class="line">                                          &#x27;DeviceName&#x27; =&gt; &quot;8B8MvTIuD8qgAz8Q6jhW&quot;,</span><br><span class="line">                                        ],</span><br><span class="line">                                    ])</span><br><span class="line">                          -&gt;request();</span><br><span class="line">    print_r($result-&gt;toArray());</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">返回数据-成功/失败</span><br><span class="line">&#123;</span><br><span class="line">	&quot;RequestId&quot;: &quot;95094861-499A-48BC-A000-601CDA4E7116&quot;,</span><br><span class="line">	&quot;Code&quot;: &quot;&quot;,</span><br><span class="line">	&quot;Success&quot;: true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 显示设备未激活(需要绑定真实的设备)</p>
+</blockquote>
+<p><img src="/images/imgs/Iot/1589337285038.png" alt="1589337285038"></p>
+<h3 id="4-查询设备状态"><a href="#4-查询设备状态" class="headerlink" title="4.查询设备状态"></a>4.查询设备状态</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">GetDeviceStatus-查看指定设备的运行状态。</span><br><span class="line">	$result = AlibabaCloud::rpc()</span><br><span class="line">                          -&gt;product(&#x27;Iot&#x27;)</span><br><span class="line">                          // -&gt;scheme(&#x27;https&#x27;) // https | http</span><br><span class="line">                          -&gt;version(&#x27;2018-01-20&#x27;)</span><br><span class="line">                          -&gt;action(&#x27;GetDeviceStatus&#x27;)</span><br><span class="line">                          -&gt;method(&#x27;POST&#x27;)</span><br><span class="line">                          -&gt;host(&#x27;iot.cn-shanghai.aliyuncs.com&#x27;)</span><br><span class="line">                          -&gt;options([</span><br><span class="line">                                        &#x27;query&#x27; =&gt; [</span><br><span class="line">                                          &#x27;RegionId&#x27; =&gt; &quot;cn-shanghai&quot;,</span><br><span class="line">                                          &#x27;ProductKey&#x27; =&gt; &quot;a1WWzwKZcvd&quot;,</span><br><span class="line">                                          &#x27;DeviceName&#x27; =&gt; &quot;8B8MvTIuD8qgAz8Q6jhW&quot;,</span><br><span class="line">                                        ],</span><br><span class="line">                                    ])</span><br><span class="line">                          -&gt;request();</span><br><span class="line">    print_r($result-&gt;toArray());</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">返回数据</span><br><span class="line">&#123;</span><br><span class="line">	&quot;RequestId&quot;: &quot;D1510E6D-D871-4E5C-9C99-22B8F501E104&quot;,</span><br><span class="line">	&quot;Data&quot;: &#123;</span><br><span class="line">		&quot;Status&quot;: &quot;UNACTIVE&quot;  #未激活</span><br><span class="line">	&#125;,</span><br><span class="line">	&quot;Code&quot;: &quot;&quot;,</span><br><span class="line">	&quot;Success&quot;: true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-创建本地模拟设备-nodejs"><a href="#5-创建本地模拟设备-nodejs" class="headerlink" title="5.创建本地模拟设备(nodejs)"></a>5.创建本地模拟设备(nodejs)</h3><blockquote>
+<p> 每5秒发送温度+湿度随机参数</p>
+</blockquote>
+<p><img src="/images/imgs/Iot/1589435890759.png" alt="1589435890759"></p>
+<p><img src="/images/imgs/Iot/1589435938715.png" alt="1589435938715"> </p>
+<h3 id="6-创建物模型"><a href="#6-创建物模型" class="headerlink" title="6.创建物模型"></a>6.创建物模型</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">CreateThingModel-为指定产品的物模型新增功能</span><br><span class="line">    &quot;productKey&quot;: &quot;a1WWzwKZcvd&quot;,</span><br><span class="line">    &quot;properties&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;productKey&quot;: &quot;a1WWzwKZcvd&quot;,</span><br><span class="line">            &quot;identifier&quot;: &quot;temperature&quot;,</span><br><span class="line">            &quot;dataType&quot;: &#123;</span><br><span class="line">		        &quot;type&quot;: &quot;double&quot;,</span><br><span class="line">		        &quot;specs&quot;: &#123;</span><br><span class="line">		          &quot;min&quot;: &quot;0&quot;,</span><br><span class="line">		          &quot;max&quot;: &quot;100&quot;,</span><br><span class="line">		          &quot;unit&quot;: &quot;%&quot;,</span><br><span class="line">		          &quot;unitName&quot;: &quot;百分比&quot;,</span><br><span class="line">		          &quot;step&quot;: &quot;0.01&quot;</span><br><span class="line">		        &#125;</span><br><span class="line">      		&#125;</span><br><span class="line">            &quot;name&quot;: &quot;温度&quot;,</span><br><span class="line">            &quot;rwFlag&quot;: &quot;READ_WRITE&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;services&quot;: [],</span><br><span class="line">    &quot;events&quot;: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">返回数据</span><br><span class="line">&#123;</span><br><span class="line">  &quot;RequestId&quot;: &quot;9E76053E-26ED-4AB4-AE58-8AFC3F1E7E8E&quot;,</span><br><span class="line">  &quot;Success&quot;: true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-显示设备即时数据"><a href="#7-显示设备即时数据" class="headerlink" title="7.显示设备即时数据"></a>7.显示设备即时数据</h3><p><img src="/images/imgs/Iot/1589443197759.png" alt="1589443197759"></p>
+<p><img src="/images/imgs/Iot/1589443989620.png" alt="1589443989620"></p>
+<h2 id="调用API请求结构"><a href="#调用API请求结构" class="headerlink" title="调用API请求结构"></a>调用API请求结构</h2><h3 id="1-请求结构"><a href="#1-请求结构" class="headerlink" title="1.请求结构"></a>1.请求结构</h3><h4 id="1-接口"><a href="#1-接口" class="headerlink" title="1.接口"></a>1.接口</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://Endpoint/?Action=xx&amp;Parameters</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>可发送HTTP/HTTPS请求</p>
+</blockquote>
+<h4 id="2-参数"><a href="#2-参数" class="headerlink" title="2.参数"></a>2.参数</h4><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Endpoint</td>
+<td>调用云服务的接入地址。物联网平台的接入地址格式：<code>iot.$&#123;RegionId&#125;.aliyuncs.com</code>。其中，变量${RegionId}需替换为您的物联网平台服务的地域代码。<br />例如: 华东2（上海）：<code>iot.cn-shanghai.aliyuncs.com</code></td>
+</tr>
+<tr>
+<td>Action</td>
+<td>要执行的操作，即云端API接口的名称。例如，调用Pub接口向指定Topic发布消息，<strong>Action</strong>对应的值就是Pub，即<code>Action=Pub</code>。</td>
+</tr>
+<tr>
+<td>Parameters</td>
+<td>请求参数。每个参数之间用（&amp;）符号分隔。<br />请求参数由<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/30561.html#reference-tjr-twc-xdb">公共请求参数</a>和API自定义参数组成。公共参数中包含API版本号、身份验证等信息。</td>
+</tr>
+</tbody></table>
+<p>公共请求参数如下:</p>
+<blockquote>
+<p>公共请求参数是调用每个API时都需要使用的请求参数。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">名称</th>
+<th align="left">类型</th>
+<th align="left">是否必需</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Format</td>
+<td align="left">String</td>
+<td align="left">否</td>
+<td align="left">返回值的类型，支持JSON和XML类型。默认为XML。</td>
+</tr>
+<tr>
+<td align="left">Version</td>
+<td align="left">String</td>
+<td align="left">是</td>
+<td align="left">API版本号，为日期形式：<code>YYYY-MM-DD</code>，最新版本为<code>2018-01-20</code> 。每个接口可以存在多个版本。</td>
+</tr>
+<tr>
+<td align="left">AccessKeyId</td>
+<td align="left">String</td>
+<td align="left">是</td>
+<td align="left">阿里云颁发给用户的访问服务所用的密钥ID。登录阿里云控制台，将光标移至账号头像上，然后单击<strong>accesskeys</strong>，跳转至<strong>用户信息管理</strong>页，即可创建和查看AccessKey。</td>
+</tr>
+<tr>
+<td align="left">Signature</td>
+<td align="left">String</td>
+<td align="left">是</td>
+<td align="left">签名结果串。</td>
+</tr>
+<tr>
+<td align="left">SignatureMethod</td>
+<td align="left">String</td>
+<td align="left">是</td>
+<td align="left">签名方式，目前支持HMAC-SHA1。</td>
+</tr>
+<tr>
+<td align="left">Timestamp</td>
+<td align="left">String</td>
+<td align="left">是</td>
+<td align="left">请求的时间戳。日期格式按照ISO8601标准表示，并需要使用UTC时间。格式为<code>YYYY-MM-DDThh:mm:ssZ</code>。例如，<code>2016-01-04T12:00:00Z</code>表示北京时间2016年01月04日20点0分0秒。</td>
+</tr>
+<tr>
+<td align="left">SignatureVersion</td>
+<td align="left">String</td>
+<td align="left">是</td>
+<td align="left">签名算法版本。目前版本是1.0。</td>
+</tr>
+<tr>
+<td align="left">SignatureNonce</td>
+<td align="left">String</td>
+<td align="left">是</td>
+<td align="left">唯一随机数。用于防止网络重放攻击。用户在不同请求中要使用不同的随机数值。</td>
+</tr>
+<tr>
+<td align="left">RegionId</td>
+<td align="left">String</td>
+<td align="left">是</td>
+<td align="left">设备所在地域（与控制台上的地域对应），如cn-shanghai。</td>
+</tr>
+</tbody></table>
+<h4 id="3-案例"><a href="#3-案例" class="headerlink" title="3.案例"></a>3.案例</h4><blockquote>
+<p>调用Pub接口向指定Topic发布消息</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">https://iot.cn-shanghai.aliyuncs.com/?Action=Pub</span><br><span class="line">&amp;Format=XML</span><br><span class="line">&amp;Version=2017-04-20</span><br><span class="line">&amp;Signature=Pc5WB8gokVn0xfeu%2FZV%2BiNM1dgI%3D</span><br><span class="line">&amp;SignatureMethod=HMAC-SHA1</span><br><span class="line">&amp;SignatureNonce=15215528852396</span><br><span class="line">&amp;SignatureVersion=1.0</span><br><span class="line">&amp;AccessKeyId=...</span><br><span class="line">&amp;Timestamp=2017-07-19T12:00:00Z</span><br><span class="line">&amp;RegionId=cn-shanghai</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-返回参数"><a href="#4-返回参数" class="headerlink" title="4.返回参数"></a>4.返回参数</h4><ul>
+<li><p>成功:</p>
+<ul>
+<li><p>XML格式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; </span><br><span class="line">&lt;!—结果的根结点--&gt;</span><br><span class="line">&lt;接口名称+Response&gt;</span><br><span class="line">    &lt;!—返回请求标签--&gt;</span><br><span class="line">    &lt;RequestId&gt;4C467B38-3910-447D-87BC-AC049166F216&lt;/RequestId&gt;</span><br><span class="line">    &lt;!—返回结果数据--&gt;</span><br><span class="line">&lt;/接口名称+Response&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>JSON格式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;RequestId&quot;: &quot;4C467B38-3910-447D-87BC-AC049166F216&quot;</span><br><span class="line">    /* 返回结果数据 */</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>失败</p>
+<ul>
+<li><p>XML格式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;Error&gt;</span><br><span class="line">   &lt;RequestId&gt;8906582E-6722-409A-A6C4-0E7863B733A5&lt;/RequestId&gt;</span><br><span class="line">   &lt;Code&gt;UnsupportedOperation&lt;/Code&gt;</span><br><span class="line">   &lt;Message&gt;The specified action is not supported.&lt;/Message&gt;</span><br><span class="line">&lt;/Error&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>JSON格式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;RequestId&quot;: &quot;8906582E-6722-409A-A6C4-0E7863B733A5&quot;,</span><br><span class="line">    &quot;Code&quot;: &quot;UnsupportedOperation&quot;,</span><br><span class="line">    &quot;Message&quot;: &quot;The specified action is not supported.&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p> 注意:  需要<strong>授权调用</strong>的接口的<strong>Action参数</strong>由原来的 <code>操作名</code>变为<code>iot:操作名</code></p>
+</blockquote>
+<h3 id="2-签名机制"><a href="#2-签名机制" class="headerlink" title="2.签名机制"></a>2.签名机制</h3><p>物联网平台会对每个接口访问请求的发送者进行身份验证，所以无论使用HTTP还是HTTPS协议提交请求，都需要在请求中包含签名（Signature）信息。</p>
+<h4 id="签名方法"><a href="#签名方法" class="headerlink" title="签名方法"></a>签名方法</h4><p>签名时，您需在控制台 <a target="_blank" rel="noopener" href="https://usercenter.console.aliyun.com/#/manage/ak">AccessKey 管理</a>页面查看您的账号的AccessKeyId和AccessKeySecret，然后进行对称加密。其中，AccessKeyId用于标识访问者身份；AccessKeySecret是用于加密签名字符串和服务器端验证签名字符串的密钥，必须严格保密。</p>
+<h4 id="签名示例"><a href="#签名示例" class="headerlink" title="签名示例"></a>签名示例</h4><p>以调用Pub接口为例。假设您的<code>AccessKeyId=testid</code>，<code>AccessKeySecret=testsecret</code>。</p>
+<ol>
+<li><p>组成签名前的请求URL。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://iot.cn-shanghai.aliyuncs.com/?MessageContent=aGVsbG93b3JsZA%3D&amp;Action=Pub&amp;Timestamp=2017-10-02T09%3A39%3A41Z&amp;SignatureVersion=1.0&amp;ServiceCode=iot&amp;Format=XML&amp;Qos=0&amp;SignatureNonce=0715a395-aedf-4a41-bab7-746b43d38d88&amp;Version=2017-04-20&amp;AccessKeyId=testid&amp;SignatureMethod=HMAC-SHA1&amp;RegionId=cn-shanghai&amp;ProductKey=12345abcdeZ&amp;TopicFullName=%2FproductKey%2Ftestdevice%2Fget</span><br></pre></td></tr></table></figure></li>
+<li><p>计算得到待签名字符串</p>
+<p>StringToSign</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET&amp;%2F&amp;AccessKeyId%3Dtestid%26Action%3DPub%26Format%3DXML%26MessageContent%3DaGVsbG93b3JsZA%253D%26ProductKey%3D12345abcdeZ%26Qos%3D0%26RegionId%3Dcn-shanghai%26ServiceCode%3Diot%26SignatureMethod%3DHMAC-SHA1%26SignatureNonce%3D0715a395-aedf-4a41-bab7-746b43d38d88%26SignatureVersion%3D1.0%26Timestamp%3D2017-10-02T09%253A39%253A41Z%26TopicFullName%3D%252FproductKey%252Ftestdevice%252Fget%26Version%3D2017-04-20</span><br></pre></td></tr></table></figure></li>
+<li><p>计算签名值。</p>
+<p>因为<code>AccessKeySecret=testsecret</code>，用于计算的Key为testsecret&amp;，计算得到的签名值为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Y9eWn4nF8QPh3c4zAFkM/k/u7eA=</span><br></pre></td></tr></table></figure></li>
+<li><p>将签名作为</p>
+<p><code>Signature</code>参数加入到URL请求中，最后得到的URL为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">http://iot.cn-shanghai.aliyuncs.com/?MessageContent=aGVsbG93b3JsZA%3D</span><br><span class="line">&amp;Action=Pub</span><br><span class="line">&amp;Timestamp=2017-10-02T09%3A39%3A41Z</span><br><span class="line">&amp;SignatureVersion=1.0</span><br><span class="line">&amp;ServiceCode=iot</span><br><span class="line">&amp;Format=XML</span><br><span class="line">&amp;Qos=0</span><br><span class="line">&amp;SignatureNonce=0715a395-aedf-4a41-bab7-746b43d38d88</span><br><span class="line">&amp;Version=2017-04-20</span><br><span class="line">&amp;AccessKeyId=testid</span><br><span class="line">&amp;Signature=Y9eWn4nF8QPh3c4zAFkM%2Fk%2Fu7eA%3D</span><br><span class="line">&amp;SignatureMethod=HMAC-SHA1</span><br><span class="line">&amp;RegionId=cn-shanghai</span><br><span class="line">&amp;ProductKey=12345abcdeZ</span><br><span class="line">&amp;TopicFullName=%2FproductKey%2Ftestdevice%2Fget</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="企业基于物联网平台的业务链路"><a href="#企业基于物联网平台的业务链路" class="headerlink" title="企业基于物联网平台的业务链路"></a>企业基于物联网平台的业务链路</h2><p><img src="https://static-aliyun-doc.oss-cn-hangzhou.aliyuncs.com/assets/img/zh-CN/3621418851/p101379.png" alt="企业基于物联网平台的业务链路"></p>
+<h2 id="产品名词解释"><a href="#产品名词解释" class="headerlink" title="产品名词解释"></a>产品名词解释</h2><table>
+<thead>
+<tr>
+<th align="left">名词</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">产品</td>
+<td align="left">设备的集合，通常指一组具有相同功能的设备。物联网平台为每个产品颁发全局唯一的ProductKey。每个产品下最多可以包含50万个设备。</td>
+</tr>
+<tr>
+<td align="left">设备</td>
+<td align="left">归属于某个产品下的具体设备。物联网平台为设备颁发产品内唯一的证书DeviceName。设备可以直接连接物联网平台，也可以作为子设备通过网关连接物联网平台。</td>
+</tr>
+<tr>
+<td align="left">分组</td>
+<td align="left">物联网平台支持建立设备分组，分组中可包含不同产品下的设备。通过设备组来进行跨产品管理设备。</td>
+</tr>
+<tr>
+<td align="left">网关</td>
+<td align="left">能够直接连接物联网平台的设备，且具有子设备管理功能，能够代理子设备连接云端。</td>
+</tr>
+<tr>
+<td align="left">子设备</td>
+<td align="left">本质上也是设备。子设备不能直接连接物联网平台，只能通过网关连接。</td>
+</tr>
+<tr>
+<td align="left">设备证书</td>
+<td align="left">设备证书指<strong>ProductKey</strong>、<strong>DeviceName</strong>、<strong>DeviceSecret</strong>。<strong>ProductKey</strong>：是物联网平台为产品颁发的全局唯一标识。该参数很重要，在设备认证以及通信中都会用到，因此需要您保管好。<strong>DeviceName</strong>：在注册设备时，自定义的或系统生成的设备名称，具备产品维度内的唯一性。该参数很重要，在设备认证以及通信中都会用到，因此需要您保管好。<strong>DeviceSecret</strong>：物联网平台为设备颁发的设备密钥，和DeviceName成对出现。该参数很重要，在设备认证时会用到，因此需要您保管好并且不能泄露。</td>
+</tr>
+<tr>
+<td align="left">ProductSecret</td>
+<td align="left">由物联网平台颁发的产品密钥，通常与ProductKey成对出现，可用于一型一密的认证方案。该参数很重要，需要您保管好，不能泄露。</td>
+</tr>
+<tr>
+<td align="left">设备X.509证书</td>
+<td align="left">物联网平台支持设备使用X.509数字证书进行身份验证。您创建认证方式为X.509证书的设备后，物联网平台为设备颁发对应的X.509证书，证书信息包括：X.509数字证书（<strong>Certificate</strong>）、X.509证书ID（<strong>CertSN</strong>）和X.509证书密钥（<strong>PrivateKey</strong>）。</td>
+</tr>
+<tr>
+<td align="left">Topic</td>
+<td align="left">Topic是UTF-8字符串，是发布（Pub）/订阅（Sub）消息的传输中介。可以向Topic发布或者订阅消息。</td>
+</tr>
+<tr>
+<td align="left">Topic类</td>
+<td align="left">同一产品下不同设备的Topic集合，用<code>$&#123;productkey&#125;</code>和<code>$&#123;deviceName&#125;</code>通配一个唯一的设备，一个Topic类对一个ProductKey下所有设备通用。</td>
+</tr>
+<tr>
+<td align="left">发布</td>
+<td align="left">操作Topic的权限类型，对应的英文名称为Pub。可以往此类Topic中发布消息。</td>
+</tr>
+<tr>
+<td align="left">订阅</td>
+<td align="left">操作Topic的权限类型，对应的英文名称为Sub。可以从此类Topic中订阅消息。</td>
+</tr>
+<tr>
+<td align="left">RRPC</td>
+<td align="left">全称：Revert-RPC。RPC（Remote Procedure Call）采用客户机/服务器模式，用户不需要了解底层技术协议，即可远程请求服务。RRPC则可以实现由服务端请求设备端，并能够使设备端响应的功能。</td>
+</tr>
+<tr>
+<td align="left">标签</td>
+<td align="left">标签分为产品标签、设备标签和分组标签。产品标签：描述同一个产品下，所有设备所具有的共性信息。设备标签：通常根据设备的特性为设备添加的特有标记，您可以自定义标签内容。分组标签：描述同一个分组下，所有设备所具有的共性信息。</td>
+</tr>
+<tr>
+<td align="left">Alink协议</td>
+<td align="left">阿里云定义的设备与云端之间的通信协议。</td>
+</tr>
+<tr>
+<td align="left">物模型</td>
+<td align="left">是对设备在云端的功能描述，包括设备的属性、服务和事件。物联网平台通过定义一种物的描述语言来描述物模型，称之为 TSL（即 Thing Specification Language），采用JSON格式，您可以根据TSL组装上报设备的数据。</td>
+</tr>
+<tr>
+<td align="left">属性</td>
+<td align="left">设备的功能模型之一，一般用于描述设备运行时的状态，如环境监测设备所读取的当前环境温度等。属性支持 GET 和 SET 请求方式。应用系统可发起对属性的读取和设置请求。</td>
+</tr>
+<tr>
+<td align="left">服务</td>
+<td align="left">设备的功能模型之一，设备可被外部调用的能力或方法，可设置输入参数和输出参数。相比于属性，服务可通过一条指令实现更复杂的业务逻辑，如执行某项特定的任务。</td>
+</tr>
+<tr>
+<td align="left">事件</td>
+<td align="left">设备的功能模型之一，设备运行时的事件。事件一般包含需要被外部感知和处理的通知信息，可包含多个输出参数。例如，某项任务完成的信息，或者设备发生故障或告警时的温度等，事件可以被订阅和推送。</td>
+</tr>
+<tr>
+<td align="left">数据解析脚本</td>
+<td align="left">针对采用透传格式/自定义数据格式的设备，需要在云端编写数据解析脚本，将设备上报的二进制数据或自定义的JSON数据，转换为物联网平台支持的Alink JSON数据格式；将平台下发的Alink JSON格式数据，转换为设备支持的格式。</td>
+</tr>
+<tr>
+<td align="left">设备影子</td>
+<td align="left">是一个JSON文档，用于存储设备或者应用的当前状态信息。每个设备都会在云端有唯一的设备影子。无论该设备是否连接到Internet，您都可以使用设备影子通过MQTT协议或HTTP协议获取和设置设备的状态。</td>
+</tr>
+<tr>
+<td align="left">规则引擎</td>
+<td align="left">通过创建、配置规则，以实现数据流转和场景联动。</td>
+</tr>
+<tr>
+<td align="left">数据流转</td>
+<td align="left">物联网平台规则引擎的数据流转功能，可将Topic中的数据转发至其他Topic或其他阿里云服务进行存储或处理。</td>
+</tr>
+<tr>
+<td align="left">场景联动</td>
+<td align="left">场景联动是一种开发自动化业务逻辑的可视化编程方式。您可以通过可视化的方式定义设备之间联动规则，并将规则部署至云端或者边缘端。</td>
+</tr>
+<tr>
+<td align="left">服务端订阅</td>
+<td align="left">服务端订阅产品下所有类型的消息：设备上报消息、设备状态变化通知、网关发现子设备上报消息、设备生命周期变更消息和设备拓扑关系变更消息。目前支持两种方式实现服务端订阅：AMQP：Advanced Message Queuing Protocol即高级消息队列协议。服务端通过AMQP协议接入云端，接收云端推送的消息。MNS：将消息流转到指定MNS队列中，您的服务端从MNS队列中接收消息。</td>
+</tr>
+<tr>
+<td align="left">一型一密</td>
+<td align="left">同一产品下所有设备可以烧录相同产品证书（即ProductKey和ProductSecret）。设备发送激活请求时，物联网平台进行产品身份确认，认证通过，下发该设备对应的DeviceSecret。</td>
+</tr>
+<tr>
+<td align="left">一机一密</td>
+<td align="left">每个设备烧录其唯一的设备证书（ProductKey、DeviceName和DeviceSecret）。当设备与物联网平台建立连接时，物联网平台对其携带的设备证书信息进行认证。</td>
+</tr>
+<tr>
+<td align="left">期望属性值</td>
+<td align="left">通过期望属性值功能，设置您希望的设备属性值。若设备在线，将实时更新属性值；若设备离线，期望属性值将缓存在云端。设备上线后，获取期望属性值，并更新属性值。</td>
+</tr>
+<tr>
+<td align="left">公共实例</td>
+<td align="left">在阿里云官网线上开通的物联网平台服务为公共实例。公共实例部署于阿里云经典网络。多账号共用一个公共实例，账号之间逻辑隔离。产品、设备、规则等资源可在<a target="_blank" rel="noopener" href="https://iot.console.aliyun.com/product/region/cn-shanghai">阿里云物联网平台控制台</a>上进行操作管理。</td>
+</tr>
+<tr>
+<td align="left">独享实例</td>
+<td align="left">部署于阿里云VPC网络的物联网平台独享实例。一个账号独享一个实例资源。独享实例适用于设备数量达10万及以上的客户、资源隔离性要求高的行业客户或物联网平台转售商等。购买独享实例，请联系阿里云商务人员（电话：95187转1）或<a target="_blank" rel="noopener" href="https://selfservice.console.aliyun.com/ticket/createIndex">提交工单</a>。</td>
+</tr>
+</tbody></table>
+<h2 id="API列表"><a href="#API列表" class="headerlink" title="API列表"></a>API列表</h2><p><code>https://help.aliyun.com/document_detail/69893.html</code> </p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/" title="IoT物联网接入">https://ni9ne.github.io/2020/11/27/IoT物联网接入/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+              <a href="/tags/Iot/" rel="tag"># Iot</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/" rel="prev" title="码云 fork+pr操作教程">
+                  <i class="fa fa-chevron-left"></i> 码云 fork+pr操作教程
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/03/Shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/" rel="next" title="Shell脚本编程">
+                  Shell脚本编程 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>
