@@ -22322,4 +22322,249 @@ sudo supervisorctl stop all 停止所有进程
         <tag>Supervisor</tag>
       </tags>
   </entry>
+  <entry>
+    <title>导入导出系统使用手册</title>
+    <url>/2021/10/22/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/%E7%94%B5%E5%AD%90%E5%90%88%E5%90%8C%E5%B9%B3%E5%8F%B0%E6%93%8D%E4%BD%9C%E6%96%87%E6%A1%A3/</url>
+    <content><![CDATA[
+## 电子合同平台操作
+
+### 配置-报表配置:
+
+#### 配置入口: 
+
+`站点级: 智能云顶部->操作->系统配置->报表配置` / `系统级: qb软件->xml`
+
+![image-20211020152208296](/images/imgs/电子合同平台/image-20211020152208296.png)
+
+![image-20211020152318370](/images/imgs/电子合同平台/image-20211020152318370.png)
+
+#### 新版配置案例:
+
+> 配置具体作用请查询开发手册
+
+```json
+{
+    "beforeCreateContract": {
+        "column": "sign_target_id,sign_target_phone,sign_target_email",
+        "sql": "SELECT k.ID as sign_target_id,k.kehushouji as sign_target_phone,if(ifnull(k.dzyx,'')='',x.jfdzyx,k.dzyx) sign_target_email FROM t_xsdd x left join t_kehu k on k.ID = x.khbh WHERE x.ID = '[OID]'"
+    },
+    "beforeSignPDF": [
+        {
+            "action": "camera",
+            "camera": [
+                {
+                    "column": "id_card_front",
+                    "chname": "身份证正面",
+                    "remind": "请拍摄身份证正面",
+                    "required": true
+                },
+                {
+                    "column": "head_picture",
+                    "chname": "头像",
+                    "remind": "请拍摄本人头像"
+                }
+            ],
+            "actionHook": {
+                "sql": [
+                    "update t_xsdd set htspg='[id_card_front],[head_picture]' where ID = '[OID]'"
+                ],
+                "api": []
+            }
+        }
+    ],
+    "afterSignPDF": {
+        "needApproval": {
+            "sql": [
+                "UPDATE `t_xsdd` SET `htfj` = if(ifnull(htfj,'')='','[FILE_NAME]',concat(htfj,',','[FILE_NAME]')) ,updated_at=NOW() WHERE `ID` = '[OID]' AND _site = '[SITE]'"
+            ],
+            "api": [
+                {
+                    "target": "https://eqbsdemo.quanzhuyun.com/api/v1.Api.Approve",
+                    "post": {
+                        "Func": "Core",
+                        "Token": "88888888",
+                        "Pack": {
+                            "Builder": "[module]",
+                            "Record_ID": "[OID]",
+                            "User_ID": "[createuser]",
+                            "Use_Site": "[SITE]",
+                            "Action": "SUBMIT"
+                        }
+                    }
+                }
+            ]
+        },
+        "approveSuccess": {
+            "sql": [],
+            "api": [
+                {
+                    "target": "https://testapi.quanzhuejia.com/api/push",
+                    "post": {
+                        "Package": {
+                            "Version": "V1",
+                            "Func": "SendEmail",
+                            "Body": {
+                                "config": {
+                                    "MAIL_DRIVER": "smtp",
+                                    "MAIL_HOST": "smtphz.qiye.163.com",
+                                    "MAIL_PORT": "994",
+                                    "MAIL_ENCRYPTION": "ssl",
+                                    "MAIL_FROM_ADDRESS": "e-home@trendzone.com.cn",
+                                    "MAIL_FROM_NAME": "全筑e家",
+                                    "MAIL_USERNAME": "e-home@trendzone.com.cn",
+                                    "MAIL_PASSWORD": "Trendzone2019"
+                                },
+                                "from": "全筑e家",
+                                "to": "[EMAIL]",
+                                "message": "您好，感谢您对我公司的支持与信任！附件为您的合同文件，请查收。您线上签署的电子合同已经生效，此合同与纸质合同具有同等法律效力。谢谢~",
+                                "title": "请查收您的合同文件",
+                                "file": "[FILE_URL]"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+```
+
+#### 配置分析:
+
+-  该配置比普通电子签约多出一项 `beforeSignPDF`, 用于用户签约前验证信息的填写, 用户签约提交后会执行该项下`actionHook` 配置, 将验证信息通过SQL或接口存入指定字段
+
+- 该配置`afterSignPDF`使用了第二种模式: 审批模式. 
+  - 通过配置 下属 `needApproval` 项, 实现了将签约后文件存入对应单据字段, 且自动提交对应单据审批的动作. 
+  - 通过配置 下属 `approveSuccess` 项, 提供了归档触发回调接口, 实现归档后自动修改推送状态为`审批完成`, 并发送配置邮件通知
+
+### 配置-审批流程
+
+#### 配置入口:
+
+`智能云顶部->操作->系统配置->审批流程`
+
+![image-20211020153526829](/images/imgs/电子合同平台/image-20211020153526829.png)
+
+#### 配置案例:
+
+- 无前置配置接口, 直接配置如下:
+
+  ```
+  [HTTP_DIR]/core/sign_report.php?opr=approveCallBack&type=[MODULE]&ID=[ID]
+  ```
+
+- 存在前置配置 , 修改对应文件, 加入如下代码: 
+
+  ```php
+  <?php
+  	$showFileProtocol = ( (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || ( isset($_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') ) ? 'https' : 'http';
+  	# 请自行替换参数: type为当前模块, 替换ID为当前单据ID
+  	$url = $showFileProtocol."://".$_SERVER['HTTP_HOST']."/core/sign_report.php?opr=approveCallBack&type={$_GET['type']}&ID={$_GET['ID']}";
+  	file_get_contents($url);
+  ```
+
+### 操作流程
+
+#### 业务人员发起签约
+
+发起电子合同签约
+
+![image-20211020155751967](/images/imgs/电子合同平台/image-20211020155751967.png)
+
+确认信息后发送给用户
+
+![image-20211020155828123](/images/imgs/电子合同平台/image-20211020155828123.png)
+
+确认发送结果
+
+![image-20211020155900876](/images/imgs/电子合同平台/image-20211020155900876.png)
+
+#### 用户签约
+
+用户打开链接查看合同
+
+![image-20211021145427335](/images/imgs/电子合同平台/image-20211021145427335.png)
+
+用户签约
+
+![无标题](/images/imgs/电子合同平台/无标题.png)
+
+#### 后台执行配置动作
+
+##### 平台级别动作
+
+- 修改签约清单对应模板记录为已签约, 并存储签约后合同及签名数据
+
+  ![image-20211021151358186](/images/imgs/电子合同平台/image-20211021151358186.png)
+
+- 修改推送记录中审批状态为 `审批中` 
+
+  ![image-20211021151439787](/images/imgs/电子合同平台/image-20211021151439787.png)
+
+##### 配置级别动作
+
+- 存储验证图片到订单单据字段 `beforeSignPDF -> afterHook` 
+
+  ![image-20211021150955258](/images/imgs/电子合同平台/image-20211021150955258.png)
+
+- 存储签约后合同到订单单据字段就 `afterSignPDF -> needApprovel -> sql` 
+
+  ![image-20211021151136475](/images/imgs/电子合同平台/image-20211021151136475.png)
+
+- 提交对应订单单据审批 `afterSignPDF -> needApprovel -> api` 
+
+  ![image-20211021151213782](/images/imgs/电子合同平台/image-20211021151213782.png)
+
+#### 流程审批归档
+
+完成归档后触发归档脚本接口
+
+![image-20211021151607989](/images/imgs/电子合同平台/image-20211021151607989.png)
+
+![image-20211021151624472](/images/imgs/电子合同平台/image-20211021151624472.png)
+
+![image-20211021151712158](/images/imgs/电子合同平台/image-20211021151712158.png)
+
+#### 后台执行动作
+
+##### 平台级别动作
+
+- 修改推送记录审批状态为 `审批通过` 
+
+  ![image-20211021151840421](/images/imgs/电子合同平台/image-20211021151840421.png)
+
+##### 配置级别动作
+
+- 审批完成, 发送通知给用户 `afterSignPDF -> approveSuccess -> api`
+
+  ![image-20211021152029270](/images/imgs/电子合同平台/image-20211021152029270.png)
+
+
+
+### 扩展能力
+
+#### 审批状态单据无法发起电子合同
+
+![image-20211021152204118](/images/imgs/电子合同平台/image-20211021152204118.png)
+
+#### 废弃当前合同重新签约
+
+>  修改存储状态为废弃, 即可保证用户无法查看之前推送, 且可以在对应单据重新发起签约
+
+![image-20211021152249944](/images/imgs/电子合同平台/image-20211021152249944.png)
+
+![image-20211021152344740](/images/imgs/电子合同平台/image-20211021152344740.png)
+
+![image-20211021152430706](/images/imgs/电子合同平台/image-20211021152430706.png)
+
+]]></content>
+      <categories>
+        <category>开发手册</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+        <tag>项目</tag>
+      </tags>
+  </entry>
 </search>
