@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="1.准备私钥文件: id_rsa_2048.pub">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Navicat通过ssh-秘钥方式登录">
+<meta property="og:url" content="https://ni9ne.github.io/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="1.准备私钥文件: id_rsa_2048.pub">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767009388.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767129649.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767239840.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767321155.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767348706.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767449908.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767605626.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767822670.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767945543.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596768055237.png">
+<meta property="article:published_time" content="2021-01-15T11:22:56.000Z">
+<meta property="article:modified_time" content="2021-11-12T20:13:18.582Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="后端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767009388.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/","path":"2021/01/15/MySQL navicat通过ssh-秘钥方式登录/","title":"Navicat通过ssh-秘钥方式登录"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Navicat通过ssh-秘钥方式登录 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">47</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">57</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%87%86%E5%A4%87%E7%A7%81%E9%92%A5%E6%96%87%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">1.准备私钥文件:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BD%AC%E6%8D%A2-pub%E6%96%87%E4%BB%B6%E4%B8%BAPEM%E6%96%87%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">2.转换.pub文件为PEM文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E4%BD%BF%E7%94%A8xshell-%E6%89%93%E5%BC%80%E5%B7%A5%E5%85%B7-%E7%94%A8%E6%88%B7%E7%A7%98%E9%92%A5%E7%AE%A1%E7%90%86%E8%80%85"><span class="nav-number">2.1.</span> <span class="nav-text">2.1.使用xshell, 打开工具-用户秘钥管理者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-%E7%82%B9%E5%87%BB%E9%80%89%E4%B8%AD%E7%A7%98%E9%92%A5-%E7%82%B9%E5%87%BB%E5%AF%BC%E5%87%BA"><span class="nav-number">2.2.</span> <span class="nav-text">2.2.点击选中秘钥, 点击导出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-%E9%80%89%E6%8B%A9%E4%BF%9D%E5%AD%98%E7%9B%AE%E5%BD%95%E5%8F%8A%E6%96%87%E4%BB%B6%E5%90%8D-%E9%BB%98%E8%AE%A4%E4%B8%BAPEM%E6%A0%BC%E5%BC%8F-%E4%B8%8D%E7%94%A8%E4%BF%AE%E6%94%B9"><span class="nav-number">2.3.</span> <span class="nav-text">2.3.选择保存目录及文件名, 默认为PEM格式, 不用修改</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-%E8%BE%93%E5%85%A5%E5%AF%86%E7%A0%81-%E5%AF%BC%E5%87%BA%E5%AE%8C%E6%88%90-%E6%97%A0%E6%8F%90%E7%A4%BA"><span class="nav-number">2.4.</span> <span class="nav-text">2.4.输入密码, 导出完成(无提示)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8Navicat%E9%93%BE%E6%8E%A5%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">3.</span> <span class="nav-text">3.使用Navicat链接数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E6%89%93%E5%BC%80Navicat-%E9%80%89%E6%8B%A9%E6%96%B0%E5%BB%BA%E9%93%BE%E6%8E%A5"><span class="nav-number">3.1.</span> <span class="nav-text">3.1.打开Navicat, 选择新建链接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-%E5%A1%AB%E5%86%99%E5%B8%B8%E8%A7%84%E9%A1%B9"><span class="nav-number">3.2.</span> <span class="nav-text">3.2.填写常规项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-%E5%A1%AB%E5%86%99SSH%E9%A1%B9"><span class="nav-number">3.3.</span> <span class="nav-text">3.3.填写SSH项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-%E8%BE%93%E5%85%A5%E7%94%9F%E6%88%90%E5%85%AC%E9%92%A5%E6%97%B6%E7%9A%84%E5%AF%86%E7%A0%81-%E6%B5%8B%E8%AF%95%E8%BF%9E%E6%8E%A5"><span class="nav-number">3.4.</span> <span class="nav-text">3.5.输入生成公钥时的密码,测试连接</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Navicat通过ssh-秘钥方式登录
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-01-15 19:22:56" itemprop="dateCreated datePublished" datetime="2021-01-15T19:22:56+08:00">2021-01-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">环境配置</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="1-准备私钥文件"><a href="#1-准备私钥文件" class="headerlink" title="1.准备私钥文件:"></a>1.准备私钥文件:</h3><p> <code>id_rsa_2048.pub</code></p>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767009388.png" alt="1596767009388"></p>
+<h3 id="2-转换-pub文件为PEM文件"><a href="#2-转换-pub文件为PEM文件" class="headerlink" title="2.转换.pub文件为PEM文件"></a>2.转换.pub文件为PEM文件</h3><h4 id="2-1-使用xshell-打开工具-用户秘钥管理者"><a href="#2-1-使用xshell-打开工具-用户秘钥管理者" class="headerlink" title="2.1.使用xshell, 打开工具-用户秘钥管理者"></a>2.1.使用<code>xshell</code>, 打开<code>工具</code>-<code>用户秘钥管理者</code></h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767129649.png" alt="1596767129649"></p>
+<h4 id="2-2-点击选中秘钥-点击导出"><a href="#2-2-点击选中秘钥-点击导出" class="headerlink" title="2.2.点击选中秘钥, 点击导出"></a>2.2.点击选中秘钥, 点击导出</h4><blockquote>
+<p>如果没有秘钥, 请手动生成并将其发给管理员, 供其写入服务器验证文件</p>
+</blockquote>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767239840.png" alt="1596767239840"></p>
+<h4 id="2-3-选择保存目录及文件名-默认为PEM格式-不用修改"><a href="#2-3-选择保存目录及文件名-默认为PEM格式-不用修改" class="headerlink" title="2.3.选择保存目录及文件名, 默认为PEM格式, 不用修改"></a>2.3.选择保存目录及文件名, 默认为PEM格式, 不用修改</h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767321155.png" alt="1596767321155"></p>
+<h4 id="2-4-输入密码-导出完成-无提示"><a href="#2-4-输入密码-导出完成-无提示" class="headerlink" title="2.4.输入密码, 导出完成(无提示)"></a>2.4.输入密码, 导出完成(无提示)</h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767348706.png" alt="1596767348706"></p>
+<h3 id="3-使用Navicat链接数据库"><a href="#3-使用Navicat链接数据库" class="headerlink" title="3.使用Navicat链接数据库"></a>3.使用<code>Navica</code>t链接数据库</h3><h4 id="3-1-打开Navicat-选择新建链接"><a href="#3-1-打开Navicat-选择新建链接" class="headerlink" title="3.1.打开Navicat, 选择新建链接"></a>3.1.打开Navicat, 选择新建链接</h4><blockquote>
+<p>不要在原有数据库链接上修改, 否则有可能报错: <code>connectiong has been used</code></p>
+</blockquote>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767449908.png" alt="1596767449908"></p>
+<h4 id="3-2-填写常规项"><a href="#3-2-填写常规项" class="headerlink" title="3.2.填写常规项"></a>3.2.填写常规项</h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767605626.png" alt="1596767605626"></p>
+<h4 id="3-3-填写SSH项"><a href="#3-3-填写SSH项" class="headerlink" title="3.3.填写SSH项"></a>3.3.填写SSH项</h4><p>勾选使用SSH通道, 填写内容, 选择验证方法为公钥</p>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767822670.png" alt="1596767822670"></p>
+<p>3.4.选择生成的PEM公钥文件</p>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767945543.png" alt="1596767945543"></p>
+<h4 id="3-5-输入生成公钥时的密码-测试连接"><a href="#3-5-输入生成公钥时的密码-测试连接" class="headerlink" title="3.5.输入生成公钥时的密码,测试连接"></a>3.5.输入生成公钥时的密码,测试连接</h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596768055237.png" alt="1596768055237"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/" title="Navicat通过ssh-秘钥方式登录">https://ni9ne.github.io/2021/01/15/MySQL navicat通过ssh-秘钥方式登录/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/03/Shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/" rel="prev" title="Shell脚本编程">
+                  <i class="fa fa-chevron-left"></i> Shell脚本编程
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/01/15/Libreoffice%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97/" rel="next" title="Libreoffice升级指南">
+                  Libreoffice升级指南 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>

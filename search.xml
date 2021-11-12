@@ -20937,4 +20937,114 @@ UUID=ca6874b1-60b1-4864-a8cd-c5eff3075395 /var/www/LocalCFS  ext4  defaults    1
         <tag>项目</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Libreoffice升级指南</title>
+    <url>/2021/01/15/Libreoffice%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97/</url>
+    <content><![CDATA[
+由于低版本libreoffice转化PDF时, 会存在样式错误, 需要提高到6.4以上才能避免
+
+如果服务器已有libreoffice, 可通过命令查看版本`soffice --version` 或 `libreoffice --version`
+
+```
+升级命令: 
+ sudo add-apt-repository ppa:libreoffice/ppa
+ sudo apt update
+ sudo apt-get install -y libreoffice
+ 该命令为完整安装升级, 大约占用250M空间, 可酌情使用(推荐)
+```
+
+```
+手动安装
+- 访问网址 , 下载最新安装包 
+https://www.libreoffice.org/download/download/
+移动安装包到服务器, 执行解压安装命令
+或
+- 命令下载
+1: wget https://mirrors.nju.edu.cn/tdf/libreoffice/stable/7.0.4/deb/x86_64/LibreOffice_7.0.4_Linux_x86-64_deb.tar.gz
+
+2: wget https://download.documentfoundation.org/libreoffice/stable/7.0.4/deb/x86_64/LibreOffice_7.0.4_Linux_x86-64_deb.tar.gz
+
+```
+
+```shell
+安装
+tar zxvf LibreOffice_$version_Linux_x86-deb.tar.gz 
+cd LibreOffice_$version_Linux_x86-deb/DEBS
+sudo dpkg -i *.deb
+```
+
+]]></content>
+      <categories>
+        <category>环境配置</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+        <tag>LibreOffice</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Navicat通过ssh-秘钥方式登录</title>
+    <url>/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/</url>
+    <content><![CDATA[
+### 1.准备私钥文件:
+
+ `id_rsa_2048.pub`
+
+![1596767009388](/images/imgs/Navicat使用/1596767009388.png)
+
+### 2.转换.pub文件为PEM文件
+
+#### 2.1.使用`xshell`, 打开`工具`-`用户秘钥管理者`
+
+![1596767129649](/images/imgs/Navicat使用/1596767129649.png)
+
+#### 2.2.点击选中秘钥, 点击导出
+
+> 如果没有秘钥, 请手动生成并将其发给管理员, 供其写入服务器验证文件
+
+![1596767239840](/images/imgs/Navicat使用/1596767239840.png)
+
+#### 2.3.选择保存目录及文件名, 默认为PEM格式, 不用修改
+
+![1596767321155](/images/imgs/Navicat使用/1596767321155.png)
+
+#### 2.4.输入密码, 导出完成(无提示)
+
+![1596767348706](/images/imgs/Navicat使用/1596767348706.png)
+
+### 3.使用`Navica`t链接数据库
+
+#### 3.1.打开Navicat, 选择新建链接
+
+> 不要在原有数据库链接上修改, 否则有可能报错: `connectiong has been used`
+
+![1596767449908](/images/imgs/Navicat使用/1596767449908.png)
+
+#### 3.2.填写常规项
+
+![1596767605626](/images/imgs/Navicat使用/1596767605626.png)
+
+#### 3.3.填写SSH项
+
+勾选使用SSH通道, 填写内容, 选择验证方法为公钥
+
+![1596767822670](/images/imgs/Navicat使用/1596767822670.png)
+
+3.4.选择生成的PEM公钥文件
+
+![1596767945543](/images/imgs/Navicat使用/1596767945543.png)
+
+#### 3.5.输入生成公钥时的密码,测试连接
+
+![1596768055237](/images/imgs/Navicat使用/1596768055237.png)]]></content>
+      <categories>
+        <category>环境配置</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
 </search>
