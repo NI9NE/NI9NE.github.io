@@ -21272,19 +21272,9 @@ exit
       </tags>
   </entry>
   <entry>
-    <title></title>
-    <url>/2021/11/13/Gitee%20%E7%A0%81%E4%BA%91Fork+PR%E6%A8%A1%E5%BC%8F%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B/</url>
-    <content><![CDATA[```
-title: 码云 Fork+PR 模式使用流程
-date: 2020-10-05 18:58:26
-tags:
-	- Git
-	- 版本控制
-
-categories:
-	- 开发资料
-```
-
+    <title>码云 Fork+PR 模式使用流程</title>
+    <url>/2020/10/05/Gitee%20%E7%A0%81%E4%BA%91Fork+PR%E6%A8%A1%E5%BC%8F%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B/</url>
+    <content><![CDATA[
 ## 码云 Fork+PR 模式使用流程
 
 流程图展示
@@ -21434,6 +21424,13 @@ categories:
 ![image-20200915122011108](/images/imgs/gitee/image-20200915122011108.png)
 
 ]]></content>
+      <categories>
+        <category>开发资料</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+        <tag>版本控制</tag>
+      </tags>
   </entry>
   <entry>
     <title>码云 PR提交关联任务+Hook提醒</title>
