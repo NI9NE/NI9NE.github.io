@@ -22652,4 +22652,133 @@ class SnowFake
         <tag>后端</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Composer包从零搭建</title>
+    <url>/2021/08/13/Composer%E5%8C%85%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[
+# Composer搭建
+
+搭建一个自己的PHP Composer包并发布
+
+## Git操作
+
+### 1.Git创建仓库
+
+进入Git页面, 创建仓库
+
+![image-20211113192619005](/images/imgs/Composer包搭建/image-20211113192619005.png)
+
+### 2.克隆该仓库到本地
+
+```
+git clone git@github.com:NI9NE/excelexport.git
+```
+
+![image-20211113192914990](/images/imgs/Composer包搭建/image-20211113192914990.png)
+
+### 3.初始化composer包
+
+```
+composer init
+```
+
+![image-20211113193005218](/images/imgs/Composer包搭建/image-20211113193005218.png)
+
+![image-20211113193248507](/images/imgs/Composer包搭建/image-20211113193248507.png)
+
+> 暂不定义包依赖, 后续编写逻辑时再添加
+
+### 4.编写包类逻辑
+
+依照psr-4规范创建对应目录, 加入逻辑
+
+![image-20211113200840420](/images/imgs/Composer包搭建/image-20211113200840420.png)
+
+在 composer.json 文件中加入包依赖并注册类命名空间
+
+![image-20211113194837850](/images/imgs/Composer包搭建/image-20211113194837850.png)
+
+编写测试使用demo
+
+```
+需要先安装依赖包  composer install
+```
+
+![image-20211113200942087](/images/imgs/Composer包搭建/image-20211113200942087.png)
+
+运行测试是否成功
+
+![image-20211113201001589](/images/imgs/Composer包搭建/image-20211113201001589.png)
+
+### 5.上传Git
+
+```
+git add .
+git commit -m 'init'
+git push 
+```
+
+![image-20211113201104246](/images/imgs/Composer包搭建/image-20211113201104246.png)
+
+### 6.添加tag并发布release
+
+打标签(版本号规则请查看文档)
+
+```
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+![image-20211113201339556](/images/imgs/Composer包搭建/image-20211113201339556.png)
+
+发布Realease
+
+![image-20211113201457927](/images/imgs/Composer包搭建/image-20211113201457927.png)
+
+![image-20211113201536914](/images/imgs/Composer包搭建/image-20211113201536914.png)
+
+## composer发布操作
+
+### 1.登录packagist.org
+
+![image-20211113201730169](/images/imgs/Composer包搭建/image-20211113201730169.png)
+
+### 2.发布包
+
+![image-20211113201820239](/images/imgs/Composer包搭建/image-20211113201820239.png)
+
+### 3.发布完成
+
+![image-20211113201916645](/images/imgs/Composer包搭建/image-20211113201916645.png)
+
+## 测试使用该composer包
+
+### 1.安装发布的composer包
+
+> 推荐使用国内composer镜像源, 否则可能拉取失败
+
+```
+composer require ni9ne/excelexport
+```
+
+![image-20211113202052070](/images/imgs/Composer包搭建/image-20211113202052070.png)
+
+### 2.编写使用代码,运行测试
+
+![image-20211113202314900](/images/imgs/Composer包搭建/image-20211113202314900.png)
+
+## 后续发布版本
+
+后续变更只需要变更后提交修改, 打好tag, 发布release, composer会通过githook自动实现版本发布
+
+![image-20211113202443901](/images/imgs/Composer包搭建/image-20211113202443901.png)]]></content>
+      <categories>
+        <category>实际演练</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+        <tag>Composer</tag>
+      </tags>
+  </entry>
 </search>
