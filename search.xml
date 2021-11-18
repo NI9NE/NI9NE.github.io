@@ -22782,9 +22782,10 @@ composer require ni9ne/excelexport
       </tags>
   </entry>
   <entry>
-    <title></title>
-    <url>/2021/11/19/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/</url>
-    <content><![CDATA[## Nginx静态资源部署
+    <title>Nginx静态资源部署</title>
+    <url>/2021/10/15/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[
+## Nginx静态资源部署
 
 ### 1.nginx静态资源配置指令
 
@@ -23328,5 +23329,13 @@ gzip /var/www/test/images/jquery.js
 ```
 
 ]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+      </tags>
   </entry>
 </search>
