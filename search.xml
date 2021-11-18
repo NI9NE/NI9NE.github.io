@@ -22781,4 +22781,552 @@ composer require ni9ne/excelexport
         <tag>Composer</tag>
       </tags>
   </entry>
+  <entry>
+    <title></title>
+    <url>/2021/11/19/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[## Nginx静态资源部署
+
+### 1.nginx静态资源配置指令
+
+#### listen 用于配置监听端口
+
+##### 指令语法
+
+`listen address[:port] [default_server] ...` / `listen port [default_server]...`
+
+##### 指令文档
+
+```
+http://nginx.org/en/docs/http/ngx_http_core_module.html#listen
+```
+
+##### 用例
+
+```
+listen 127.0.0.1:8080;
+listen 127.0.0.1;
+listen 8080;
+listen *:8080;
+```
+
+##### default_server
+
+> 默认主机标识符, 即没有匹配到对应的address:port时, 默认执行的server块
+>
+> 若不指定, 默认使用第一个server
+
+```
+listen 8080 default_server; # 当前监听所在server块为默认服务
+```
+
+#### server_name 用于设置虚拟主机服务名称
+
+##### 指令语法
+
+`server_name  name1 [name2...]`  中间用空格分隔
+
+##### 指令文档
+
+```
+http://nginx.org/en/docs/http/ngx_http_core_module.html#server_name
+```
+
+##### 匹配方式
+
+- 精确匹配
+
+  ```
+  server{
+  	listen 80;
+  	server_name www.host1.com www.host2.com;
+  }
+  ```
+
+- 匹配通配符
+
+  > `*` 可以放在域名首段或者尾段, 但不能出现在域名中间
+
+  ```
+  server{
+  	listen 80;
+  	server_name *.host1.com www.host2.*;
+  }
+  ```
+
+- 正则匹配
+
+  > `~` 为正则表达式开启标记
+
+  ```
+  server{
+  	listen 80;
+  	server_name ~^www\.(\w+)\.com$;
+  	return 200 $1;
+  }
+  ```
+
+##### 匹配执行顺序
+
+精确匹配 > 前通配符 > 后通配符 > 正则匹配 > 默认server
+
+#### location 用于设置请求URI
+
+##### 指令语法
+
+`location [ = | ~ | ~* | ^~ | @ ] uri{...}`
+
+> 以匹配度最高的路由作为实际转发路由
+
+##### 指令文档
+
+```
+http://nginx.org/en/docs/http/ngx_http_core_module.html#location
+```
+
+##### 匹配方式
+
+- 以指定模式访问
+
+  ```
+  server{
+  	listen 80;
+  	server_name 127.0.0.1;
+  	location /abc{
+  		default_type text/plain;
+  		return 200 'access success';
+  	}
+  }
+  ```
+
+  ```
+  则如下方式均可访问
+  http://127.0.0.1/abc
+  http://127.0.0.1/abc?p1=test
+  http://127.0.0.1/abcde
+  ```
+
+- 以精确匹配模式访问(不含正则)
+
+  ```
+  server{
+  	listen 80;
+  	server_name 127.0.0.1;
+  	location =/abc{
+  		default_type text/plain;
+  		return 200 'access success';
+  	}
+  }
+  ```
+
+  ```
+  则以下方式可访问:
+  http://127.0.0.1/abc
+  http://127.0.0.1/abc?p1=test
+  以下无法访问:
+  http://127.0.0.1/abc/
+  http://127.0.0.1/abcde
+  ```
+
+- 以正则匹配模式访问
+
+  `~ `  : 用于表示当前URI中包含正则, 且区分大小写
+
+  `~*` : 用于表示当前URI包含正则, 且不区分大小写
+
+  ```
+  server{
+  	listen 80;
+  	server_name 127.0.0.1;
+  	# location ~*^/abc\w${	# 不区分大小写
+  	location ~^/abc\w${
+  		default_type text/plain;
+  		return 200 'access success';
+  	}
+  }
+  ```
+
+  ```
+  则以下方式可访问:
+  http://127.0.0.1/abcd
+  以下无法访问:
+  http://127.0.0.1/abc
+  http://127.0.0.1/abc/
+  http://127.0.0.1/abcde
+  ```
+
+- 匹配后停止
+
+  `^~` : 用于不包含正则的URI前, 功能和不加符号的一致, 表示如果模式匹配, 就停止搜索其他模式
+
+  ```
+  server{
+  	listen 80;
+  	server_name 127.0.0.1;
+  	location ^~/abcd{
+  		default_type text/plain;
+  		return 200 'abcd access success';
+  	}
+  	location ~^/abc\w${
+  		default_type text/plain;
+  		return 200 'access success';
+  	}
+  }
+  ```
+
+  ```
+  http://127.0.0.1/abcd
+  访问到第一个location块后匹配, 就不再向后搜索, 直接使用该URI
+  ```
+
+- nginx内部跳转
+
+  `@` 表示在nginx中跳转到对应的location
+
+  ```
+  location /404 {
+  	error_page 404 @404_error;
+  }
+  location @404_error {
+  	...
+  }
+  ```
+
+#### root/alias 设置请求资源的目录
+
+##### 指令语法
+
+`root path`  设置请求的根目录
+
+```
+root html;
+```
+
+`path` 为Nginx服务器收到请求后查找资源的根目录路径
+
+`alias path`  用于更改location的URI
+
+`path` 为修改后的根目录
+
+##### root/alias 区别
+
+```
+root  处理结果为: root路径+location路径
+alias 处理结果为: 使用alias路径替换location路径
+```
+
+```
+以下三个配置功效相同
+location /images {
+	root /var/www/test;	# 结果为: /var/www/test/images
+}
+
+location /images {
+	alias /var/www/test/images;	# 替换原有images为 /var/www/test/images
+}
+location /images/ {
+	alias /var/www/test/images/;# 替换原有images/为 /var/www/test/images/
+}
+```
+
+#### index 用于设置网站的默认首页
+
+##### 指令语法
+
+`index file;`
+
+```
+index index index.html;
+```
+
+> index 后可以跟多个设置, 如果访问URI没有指定具体访问的资源, 则会依次查找, 直到找到第一个
+
+##### 指令位置
+
+```
+http / server / location
+```
+
+如:
+
+```
+location / {
+	root /var/www/test;
+	index index index.html index.htm;
+}
+访问时, 可以直接使用 http://test.project.com 访问, 后面不加任何参数
+```
+
+#### error_page 设置网站的错误页面
+
+##### 指令语法
+
+`error_page code ...[=[reponse]] rui;`
+
+##### 指令位置
+
+```
+http / server / location
+```
+
+##### 实例
+
+```
+1. 具体跳转页面地址
+server {
+	error_page 404 http://test.project.com/404.html;
+}
+2. 指定重定向地址
+server {
+	error_page 404 /50x.html;
+	error_page 500 502 503 504 /50x.html;
+	location =/50x.html{
+		root html;
+	}
+}
+3. 使用location的@符号完成错误信息展示
+server {
+	error_page 404 @to_error_page;
+	location @to_error_page{
+		default_type text/plain;
+		return 404 'Not Found Page!';
+	}
+}
+```
+
+##### response
+
+可选项 `=[response]` 用于将匹配状态码改为另一个状态码返回浏览器
+
+```
+server{
+	error_page 404 =200 /50x.html;
+	location =/50x.html{
+		...
+	}
+}
+```
+
+### 2.nginx静态资源优化配置语法
+
+#### sendfile
+
+`sendfile on|off` 用于开启高效文件传输模式
+
+![image-20211118235723693](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211118235723693.png)
+
+![image-20211118235844001](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211118235844001.png)
+
+```
+使用sendfil()之后, 减少了两次copy(), 以及用户态与内核态切换的耗费
+```
+
+#### tcp_nopush
+
+`tcp_nopush on|off`
+
+用于提升网络包的传输效率, 必须在sendfile打开的状态下才会生效
+
+#### tcp_nodelay
+
+`tcp_nodelay on|off`
+
+用于提高网络包传输的实时性, 必须在keep-alive 连接开启时才生效
+
+![image-20211119001043741](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119001043741.png)
+
+```
+tcp_nopush和tcp_nodelay在linux 2.5.9之后可以兼容, 两者都开启可以大大加快数据传输效率
+```
+
+### 3.nginx静态资源压缩实战
+
+在Nginx的配置文件中可以通过gzip来对静态资源进行压缩
+
+```
+ngx_http_gzip_module模块		# nginx自带
+ngx_http_gzip_static_module模块	# 需要安装
+ngx_http_gunzip_module模块		# 需要安装
+```
+
+#### Gzip各模块支持配置指令
+
+以下指令都来自于ngx_http_gzip_module模块支持, 该模块nginx内置, 可以直接使用
+
+```
+模块文档: http://nginx.org/en/docs/http/ngx_http_gzip_module.html
+```
+
+##### gzip 
+
+`gzip on|off`  用于开启或关闭gzip功能
+
+```
+http{
+	gzip on;
+}
+```
+
+> 可以用于http/server/loaction
+
+##### gzip_types
+
+`gzip_types mime-type ...` 设置需要压缩的文件mime类型
+
+默认压缩text/html 
+
+```
+http{
+	gzip_types application/javascript;
+}
+```
+
+> 所选值可以从mime.types文件中查找, 也可以使用* 代表所有类型, 但不推荐
+
+##### gzip_comp_level 
+
+`gzip_comp_level level` 设置Gzip压缩程度
+
+级别从1到9, 压缩程度上升, 压缩效率降低, 9 代表压缩程度最高, 但效率最低
+
+```
+http{
+	gzip_comp_level 6;
+}
+```
+
+##### gzip_vary 
+
+`gzip_vary on|off ` 设置是否携带gzip响应头
+
+`gzip_vary` 用于设置进行压缩发送是否携带 `Vary:Accept-Encoding` 响应头, 告诉接收方该资源经过了Gzip压缩处理
+
+```
+http{
+	gzip_vary on;
+}
+```
+
+> 可用于http/server/location
+
+##### gzip_buffers
+
+`gzip_buffers number size` 用于设置压缩的缓冲区数量及大小
+
+该值设定一般和服务器操作系统有关, 一般使用默认值即可
+
+```
+http{
+	gzip_buffers 4 16k;
+}
+```
+
+##### gzip_disable
+
+`gzip_disable regex ..` 用于使用正则针对不同的浏览器禁用Gzip功能
+
+regex匹配`Request Headers`中`User-Agent` 数据
+
+```
+http{
+	gzip_disable "MSIE [1-6]\."; # 排除IE6以下版本
+}
+```
+
+##### gzip_http_version
+
+`gzip_http_version 1.0|1.1`  针对不同的HTTP协议版本, 选择性开启或关闭gzip
+
+该指令用于指定最低HTTP协议版本, 一般用默认值即可
+
+```
+http{
+	gzip_http_version 1.1;
+}
+```
+
+##### gzip_min_length
+
+`gzip_min_length` 指定需要压缩的最小文件长度
+
+默认20, 从头信息中的`Content-Length`中获取
+
+```
+nginx 计量但对: bytes[字节] / kb[千字节] / M[兆]
+如: 1024 / 10k / 10m
+```
+
+```
+http{
+	gzip_min_length 20;
+}
+```
+
+##### gzip_proxied
+
+`gzip_proxied off|expired|no-cache|no-store|private|no_last_modified|no-etag|auth|any` 设置是否对服务端返回结果进行Gzip压缩
+
+> 反向代理相关
+
+- off  关闭nginx服务器对后台服务器返回结果的压缩, 忽略其他参数
+- expired  启用压缩, 如果响应头headers头中包含`Expires` 头信息
+- no-cache  启用压缩, 如果响应头headers头中包含`Cache-Control:no-cache`头信息
+- no-store  启用压缩, 如果响应头headers头中包含`Cache-Control:no-store`头信息
+- private  启用压缩, 如果响应头headers头中包含`Cache-Control:private`头信息
+- no-last-modified  启用压缩, 如果响应头headers头中不包含`Last-Modified` 头信息
+- no-etag  启用压缩, 如果响应头headers头中不包含 `ETag` 头信息
+- auth  启用压缩, 如果响应头headers头中包含`Authorization` 头信息
+- any  为所有代理请求无条件启用压缩
+
+#### Gzip压缩功能配置
+
+编辑新建nginx_zip.conf文件
+
+```
+gzip on;			# 开启gzip功能
+gzip_types *;		# 压缩文件类型,mime-type
+gzip_comp_level 6;	# gzip 压缩等级
+gzip_min_length 1024;# 需要进行压缩响应页面的最小长度 content-length
+gzip_buffers 4 16k;	# 缓存空间数量及大小
+gzip_http_version 1.1;# 指定压缩响应需要的最低HTTP协议版本
+gzip_vary on;		# 向响应头中添加压缩表示
+gzip_disable "MSIE [1-6]\.";	# 过滤浏览器禁用压缩
+gzip_proxied off;	# nginx作为反向代理压缩服务端返回数据的条件
+```
+
+将配置文件引入nginx.conf
+
+```
+include nginx_zip.conf;
+```
+
+#### Gzip和sendfile的冲突解决
+
+Gzip需要应用程序用户态进行操作文件并压缩发送, 但sendfile是直接从内核缓冲区发送到Socket缓冲区的, 会导致功能冲突
+
+可以使用`ngx_http_gzip_static_module` 模块的 `gzip_static` 指令解决问题
+
+![image-20211119012700914](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119012700914.png)
+
+解决方案是在请求资源之前, 就将资源压缩, `jquery.js` 压缩为 `jquery.js.gz`, 在用户请求资源时, 发送压缩后的文件给用户, 由浏览器进行解压缩显示
+
+##### gzip_static
+
+`gzip_static on|off|always;` 
+
+访问与资源同名的`.gz` 文件时, response中以gzip相关的header返回`.gz`文件内容
+
+> 添加上述命令后, 若报错 unknown directiove 'gzip_static', 原因是Nginx默认没有添加对应模块, 需要手动安装 ./configure --with-http_gzip_static_module
+
+```
+http{
+	gzip_static on;
+}
+```
+
+```shell
+gzip /var/www/test/images/jquery.js
+```
+
+]]></content>
+  </entry>
 </search>
