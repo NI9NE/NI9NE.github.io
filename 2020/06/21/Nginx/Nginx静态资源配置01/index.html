@@ -24,17 +24,16 @@
 <script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 <meta name="description" content="Nginx静态资源部署1.nginx静态资源配置指令listen 用于配置监听端口">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Nginx静态资源部署">
-<meta property="og:url" content="https://ni9ne.github.io/2021/10/15/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:title" content="Nginx静态资源部署优化01">
+<meta property="og:url" content="https://ni9ne.github.io/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/index.html">
 <meta property="og:site_name" content="NI9NE&#39;s Zone">
 <meta property="og:description" content="Nginx静态资源部署1.nginx静态资源配置指令listen 用于配置监听端口">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211118235723693.png">
 <meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211118235844001.png">
 <meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119001043741.png">
-<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119012700914.png">
-<meta property="article:published_time" content="2021-10-15T13:53:43.000Z">
-<meta property="article:modified_time" content="2021-11-18T18:03:56.509Z">
+<meta property="article:published_time" content="2020-06-21T12:53:43.000Z">
+<meta property="article:modified_time" content="2021-11-19T20:36:16.889Z">
 <meta property="article:author" content="NI9NE">
 <meta property="article:tag" content="Nginx">
 <meta property="article:tag" content="PHP">
@@ -43,14 +42,14 @@
 <meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211118235723693.png">
 
 
-<link rel="canonical" href="https://ni9ne.github.io/2021/10/15/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/">
+<link rel="canonical" href="https://ni9ne.github.io/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/10/15/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/","path":"2021/10/15/Nginx/Nginx静态资源配置/","title":"Nginx静态资源部署"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/","path":"2020/06/21/Nginx/Nginx静态资源配置01/","title":"Nginx静态资源部署优化01"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Nginx静态资源部署 | NI9NE's Zone</title>
+<title>Nginx静态资源部署优化01 | NI9NE's Zone</title>
   
 
 
@@ -98,7 +97,7 @@
         <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
         <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li>
         <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
-        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">67</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">69</span></a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -155,7 +154,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%83%A8%E7%BD%B2"><span class="nav-number">1.</span> <span class="nav-text">Nginx静态资源部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4"><span class="nav-number">1.1.</span> <span class="nav-text">1.nginx静态资源配置指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#listen-%E7%94%A8%E4%BA%8E%E9%85%8D%E7%BD%AE%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3"><span class="nav-number">1.1.1.</span> <span class="nav-text">listen 用于配置监听端口</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%96%87%E6%A1%A3"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">指令文档</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%94%A8%E4%BE%8B"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">用例</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#default-server"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">default_server</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#server-name-%E7%94%A8%E4%BA%8E%E8%AE%BE%E7%BD%AE%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA%E6%9C%8D%E5%8A%A1%E5%90%8D%E7%A7%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">server_name 用于设置虚拟主机服务名称</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-1"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%96%87%E6%A1%A3-1"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">指令文档</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">匹配方式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">匹配执行顺序</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#location-%E7%94%A8%E4%BA%8E%E8%AE%BE%E7%BD%AE%E8%AF%B7%E6%B1%82URI"><span class="nav-number">1.1.3.</span> <span class="nav-text">location 用于设置请求URI</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-2"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%96%87%E6%A1%A3-2"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">指令文档</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E6%96%B9%E5%BC%8F-1"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">匹配方式</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#root-alias-%E8%AE%BE%E7%BD%AE%E8%AF%B7%E6%B1%82%E8%B5%84%E6%BA%90%E7%9A%84%E7%9B%AE%E5%BD%95"><span class="nav-number">1.1.4.</span> <span class="nav-text">root&#x2F;alias 设置请求资源的目录</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-3"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#root-alias-%E5%8C%BA%E5%88%AB"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">root&#x2F;alias 区别</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#index-%E7%94%A8%E4%BA%8E%E8%AE%BE%E7%BD%AE%E7%BD%91%E7%AB%99%E7%9A%84%E9%BB%98%E8%AE%A4%E9%A6%96%E9%A1%B5"><span class="nav-number">1.1.5.</span> <span class="nav-text">index 用于设置网站的默认首页</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-4"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.1.5.2.</span> <span class="nav-text">指令位置</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#error-page-%E8%AE%BE%E7%BD%AE%E7%BD%91%E7%AB%99%E7%9A%84%E9%94%99%E8%AF%AF%E9%A1%B5%E9%9D%A2"><span class="nav-number">1.1.6.</span> <span class="nav-text">error_page 设置网站的错误页面</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-5"><span class="nav-number">1.1.6.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E4%BD%8D%E7%BD%AE-1"><span class="nav-number">1.1.6.2.</span> <span class="nav-text">指令位置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.1.6.3.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#response"><span class="nav-number">1.1.6.4.</span> <span class="nav-text">response</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E4%BC%98%E5%8C%96%E9%85%8D%E7%BD%AE%E8%AF%AD%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">2.nginx静态资源优化配置语法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sendfile"><span class="nav-number">1.2.1.</span> <span class="nav-text">sendfile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tcp-nopush"><span class="nav-number">1.2.2.</span> <span class="nav-text">tcp_nopush</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tcp-nodelay"><span class="nav-number">1.2.3.</span> <span class="nav-text">tcp_nodelay</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A9%E5%AE%9E%E6%88%98"><span class="nav-number">1.3.</span> <span class="nav-text">3.nginx静态资源压缩实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Gzip%E5%90%84%E6%A8%A1%E5%9D%97%E6%94%AF%E6%8C%81%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4"><span class="nav-number">1.3.1.</span> <span class="nav-text">Gzip各模块支持配置指令</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">gzip</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip-types"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">gzip_types</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip-comp-level"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">gzip_comp_level</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip-vary"><span class="nav-number">1.3.1.4.</span> <span class="nav-text">gzip_vary</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip-buffers"><span class="nav-number">1.3.1.5.</span> <span class="nav-text">gzip_buffers</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip-disable"><span class="nav-number">1.3.1.6.</span> <span class="nav-text">gzip_disable</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip-http-version"><span class="nav-number">1.3.1.7.</span> <span class="nav-text">gzip_http_version</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip-min-length"><span class="nav-number">1.3.1.8.</span> <span class="nav-text">gzip_min_length</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip-proxied"><span class="nav-number">1.3.1.9.</span> <span class="nav-text">gzip_proxied</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Gzip%E5%8E%8B%E7%BC%A9%E5%8A%9F%E8%83%BD%E9%85%8D%E7%BD%AE"><span class="nav-number">1.3.2.</span> <span class="nav-text">Gzip压缩功能配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Gzip%E5%92%8Csendfile%E7%9A%84%E5%86%B2%E7%AA%81%E8%A7%A3%E5%86%B3"><span class="nav-number">1.3.3.</span> <span class="nav-text">Gzip和sendfile的冲突解决</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#gzip-static"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">gzip_static</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%83%A8%E7%BD%B2"><span class="nav-number">1.</span> <span class="nav-text">Nginx静态资源部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4"><span class="nav-number">1.1.</span> <span class="nav-text">1.nginx静态资源配置指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#listen-%E7%94%A8%E4%BA%8E%E9%85%8D%E7%BD%AE%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3"><span class="nav-number">1.1.1.</span> <span class="nav-text">listen 用于配置监听端口</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%96%87%E6%A1%A3"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">指令文档</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%94%A8%E4%BE%8B"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">用例</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#default-server"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">default_server</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#server-name-%E7%94%A8%E4%BA%8E%E8%AE%BE%E7%BD%AE%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA%E6%9C%8D%E5%8A%A1%E5%90%8D%E7%A7%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">server_name 用于设置虚拟主机服务名称</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-1"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%96%87%E6%A1%A3-1"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">指令文档</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">匹配方式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">匹配执行顺序</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#location-%E7%94%A8%E4%BA%8E%E8%AE%BE%E7%BD%AE%E8%AF%B7%E6%B1%82URI"><span class="nav-number">1.1.3.</span> <span class="nav-text">location 用于设置请求URI</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-2"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%96%87%E6%A1%A3-2"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">指令文档</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E6%96%B9%E5%BC%8F-1"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">匹配方式</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#root-alias-%E8%AE%BE%E7%BD%AE%E8%AF%B7%E6%B1%82%E8%B5%84%E6%BA%90%E7%9A%84%E7%9B%AE%E5%BD%95"><span class="nav-number">1.1.4.</span> <span class="nav-text">root&#x2F;alias 设置请求资源的目录</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-3"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#root-alias-%E5%8C%BA%E5%88%AB"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">root&#x2F;alias 区别</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#index-%E7%94%A8%E4%BA%8E%E8%AE%BE%E7%BD%AE%E7%BD%91%E7%AB%99%E7%9A%84%E9%BB%98%E8%AE%A4%E9%A6%96%E9%A1%B5"><span class="nav-number">1.1.5.</span> <span class="nav-text">index 用于设置网站的默认首页</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-4"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.1.5.2.</span> <span class="nav-text">指令位置</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#error-page-%E8%AE%BE%E7%BD%AE%E7%BD%91%E7%AB%99%E7%9A%84%E9%94%99%E8%AF%AF%E9%A1%B5%E9%9D%A2"><span class="nav-number">1.1.6.</span> <span class="nav-text">error_page 设置网站的错误页面</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95-5"><span class="nav-number">1.1.6.1.</span> <span class="nav-text">指令语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E4%BD%8D%E7%BD%AE-1"><span class="nav-number">1.1.6.2.</span> <span class="nav-text">指令位置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.1.6.3.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#response"><span class="nav-number">1.1.6.4.</span> <span class="nav-text">response</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E4%BC%98%E5%8C%96%E9%85%8D%E7%BD%AE%E8%AF%AD%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">2.nginx静态资源优化配置语法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sendfile"><span class="nav-number">1.2.1.</span> <span class="nav-text">sendfile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tcp-nopush"><span class="nav-number">1.2.2.</span> <span class="nav-text">tcp_nopush</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tcp-nodelay"><span class="nav-number">1.2.3.</span> <span class="nav-text">tcp_nodelay</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -170,7 +169,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">69</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -234,7 +233,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/10/15/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
@@ -247,7 +246,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Nginx静态资源部署
+          Nginx静态资源部署优化01
         </h1>
 
         <div class="post-meta-container">
@@ -258,7 +257,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2021-10-15 21:53:43" itemprop="dateCreated datePublished" datetime="2021-10-15T21:53:43+08:00">2021-10-15</time>
+      <time title="创建时间：2020-06-21 20:53:43" itemprop="dateCreated datePublished" datetime="2020-06-21T20:53:43+08:00">2020-06-21</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -380,89 +379,6 @@
 <p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119001043741.png" alt="image-20211119001043741"></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcp_nopush和tcp_nodelay在linux 2.5.9之后可以兼容, 两者都开启可以大大加快数据传输效率</span><br></pre></td></tr></table></figure>
 
-<h3 id="3-nginx静态资源压缩实战"><a href="#3-nginx静态资源压缩实战" class="headerlink" title="3.nginx静态资源压缩实战"></a>3.nginx静态资源压缩实战</h3><p>在Nginx的配置文件中可以通过gzip来对静态资源进行压缩</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ngx_http_gzip_module模块		# nginx自带</span><br><span class="line">ngx_http_gzip_static_module模块	# 需要安装</span><br><span class="line">ngx_http_gunzip_module模块		# 需要安装</span><br></pre></td></tr></table></figure>
-
-<h4 id="Gzip各模块支持配置指令"><a href="#Gzip各模块支持配置指令" class="headerlink" title="Gzip各模块支持配置指令"></a>Gzip各模块支持配置指令</h4><p>以下指令都来自于ngx_http_gzip_module模块支持, 该模块nginx内置, 可以直接使用</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">模块文档: http://nginx.org/en/docs/http/ngx_http_gzip_module.html</span><br></pre></td></tr></table></figure>
-
-<h5 id="gzip"><a href="#gzip" class="headerlink" title="gzip"></a>gzip</h5><p><code>gzip on|off</code>  用于开启或关闭gzip功能</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">	gzip on;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>可以用于http/server/loaction</p>
-</blockquote>
-<h5 id="gzip-types"><a href="#gzip-types" class="headerlink" title="gzip_types"></a>gzip_types</h5><p><code>gzip_types mime-type ...</code> 设置需要压缩的文件mime类型</p>
-<p>默认压缩text/html </p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">	gzip_types application/javascript;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>所选值可以从mime.types文件中查找, 也可以使用* 代表所有类型, 但不推荐</p>
-</blockquote>
-<h5 id="gzip-comp-level"><a href="#gzip-comp-level" class="headerlink" title="gzip_comp_level"></a>gzip_comp_level</h5><p><code>gzip_comp_level level</code> 设置Gzip压缩程度</p>
-<p>级别从1到9, 压缩程度上升, 压缩效率降低, 9 代表压缩程度最高, 但效率最低</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">	gzip_comp_level 6;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h5 id="gzip-vary"><a href="#gzip-vary" class="headerlink" title="gzip_vary"></a>gzip_vary</h5><p><code>gzip_vary on|off </code> 设置是否携带gzip响应头</p>
-<p><code>gzip_vary</code> 用于设置进行压缩发送是否携带 <code>Vary:Accept-Encoding</code> 响应头, 告诉接收方该资源经过了Gzip压缩处理</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">	gzip_vary on;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>可用于http/server/location</p>
-</blockquote>
-<h5 id="gzip-buffers"><a href="#gzip-buffers" class="headerlink" title="gzip_buffers"></a>gzip_buffers</h5><p><code>gzip_buffers number size</code> 用于设置压缩的缓冲区数量及大小</p>
-<p>该值设定一般和服务器操作系统有关, 一般使用默认值即可</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">	gzip_buffers 4 16k;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h5 id="gzip-disable"><a href="#gzip-disable" class="headerlink" title="gzip_disable"></a>gzip_disable</h5><p><code>gzip_disable regex ..</code> 用于使用正则针对不同的浏览器禁用Gzip功能</p>
-<p>regex匹配<code>Request Headers</code>中<code>User-Agent</code> 数据</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">	gzip_disable &quot;MSIE [1-6]\.&quot;; # 排除IE6以下版本</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h5 id="gzip-http-version"><a href="#gzip-http-version" class="headerlink" title="gzip_http_version"></a>gzip_http_version</h5><p><code>gzip_http_version 1.0|1.1</code>  针对不同的HTTP协议版本, 选择性开启或关闭gzip</p>
-<p>该指令用于指定最低HTTP协议版本, 一般用默认值即可</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">	gzip_http_version 1.1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h5 id="gzip-min-length"><a href="#gzip-min-length" class="headerlink" title="gzip_min_length"></a>gzip_min_length</h5><p><code>gzip_min_length</code> 指定需要压缩的最小文件长度</p>
-<p>默认20, 从头信息中的<code>Content-Length</code>中获取</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nginx 计量但对: bytes[字节] / kb[千字节] / M[兆]</span><br><span class="line">如: 1024 / 10k / 10m</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">	gzip_min_length 20;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h5 id="gzip-proxied"><a href="#gzip-proxied" class="headerlink" title="gzip_proxied"></a>gzip_proxied</h5><p><code>gzip_proxied off|expired|no-cache|no-store|private|no_last_modified|no-etag|auth|any</code> 设置是否对服务端返回结果进行Gzip压缩</p>
-<blockquote>
-<p>反向代理相关</p>
-</blockquote>
-<ul>
-<li>off  关闭nginx服务器对后台服务器返回结果的压缩, 忽略其他参数</li>
-<li>expired  启用压缩, 如果响应头headers头中包含<code>Expires</code> 头信息</li>
-<li>no-cache  启用压缩, 如果响应头headers头中包含<code>Cache-Control:no-cache</code>头信息</li>
-<li>no-store  启用压缩, 如果响应头headers头中包含<code>Cache-Control:no-store</code>头信息</li>
-<li>private  启用压缩, 如果响应头headers头中包含<code>Cache-Control:private</code>头信息</li>
-<li>no-last-modified  启用压缩, 如果响应头headers头中不包含<code>Last-Modified</code> 头信息</li>
-<li>no-etag  启用压缩, 如果响应头headers头中不包含 <code>ETag</code> 头信息</li>
-<li>auth  启用压缩, 如果响应头headers头中包含<code>Authorization</code> 头信息</li>
-<li>any  为所有代理请求无条件启用压缩</li>
-</ul>
-<h4 id="Gzip压缩功能配置"><a href="#Gzip压缩功能配置" class="headerlink" title="Gzip压缩功能配置"></a>Gzip压缩功能配置</h4><p>编辑新建nginx_zip.conf文件</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">gzip on;			# 开启gzip功能</span><br><span class="line">gzip_types *;		# 压缩文件类型,mime-type</span><br><span class="line">gzip_comp_level 6;	# gzip 压缩等级</span><br><span class="line">gzip_min_length 1024;# 需要进行压缩响应页面的最小长度 content-length</span><br><span class="line">gzip_buffers 4 16k;	# 缓存空间数量及大小</span><br><span class="line">gzip_http_version 1.1;# 指定压缩响应需要的最低HTTP协议版本</span><br><span class="line">gzip_vary on;		# 向响应头中添加压缩表示</span><br><span class="line">gzip_disable &quot;MSIE [1-6]\.&quot;;	# 过滤浏览器禁用压缩</span><br><span class="line">gzip_proxied off;	# nginx作为反向代理压缩服务端返回数据的条件</span><br></pre></td></tr></table></figure>
-
-<p>将配置文件引入nginx.conf</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">include nginx_zip.conf;</span><br></pre></td></tr></table></figure>
-
-<h4 id="Gzip和sendfile的冲突解决"><a href="#Gzip和sendfile的冲突解决" class="headerlink" title="Gzip和sendfile的冲突解决"></a>Gzip和sendfile的冲突解决</h4><p>Gzip需要应用程序用户态进行操作文件并压缩发送, 但sendfile是直接从内核缓冲区发送到Socket缓冲区的, 会导致功能冲突</p>
-<p>可以使用<code>ngx_http_gzip_static_module</code> 模块的 <code>gzip_static</code> 指令解决问题</p>
-<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119012700914.png" alt="image-20211119012700914"></p>
-<p>解决方案是在请求资源之前, 就将资源压缩, <code>jquery.js</code> 压缩为 <code>jquery.js.gz</code>, 在用户请求资源时, 发送压缩后的文件给用户, 由浏览器进行解压缩显示</p>
-<h5 id="gzip-static"><a href="#gzip-static" class="headerlink" title="gzip_static"></a>gzip_static</h5><p><code>gzip_static on|off|always;</code> </p>
-<p>访问与资源同名的<code>.gz</code> 文件时, response中以gzip相关的header返回<code>.gz</code>文件内容</p>
-<blockquote>
-<p>添加上述命令后, 若报错 unknown directiove ‘gzip_static’, 原因是Nginx默认没有添加对应模块, 需要手动安装 ./configure –with-http_gzip_static_module</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">	gzip_static on;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gzip /var/www/test/images/jquery.js</span><br></pre></td></tr></table></figure>
-
-
     </div>
 
     
@@ -479,7 +395,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://ni9ne.github.io/2021/10/15/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/" title="Nginx静态资源部署">https://ni9ne.github.io/2021/10/15/Nginx/Nginx静态资源配置/</a>
+      <a href="https://ni9ne.github.io/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/" title="Nginx静态资源部署优化01">https://ni9ne.github.io/2020/06/21/Nginx/Nginx静态资源配置01/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -497,13 +413,13 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2021/08/13/Composer%E5%8C%85%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA/" rel="prev" title="Composer包从零搭建">
-                  <i class="fa fa-chevron-left"></i> Composer包从零搭建
+                <a href="/2020/05/22/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BA%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C/" rel="prev" title="导入导出系统使用手册">
+                  <i class="fa fa-chevron-left"></i> 导入导出系统使用手册
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2021/10/22/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/%E7%94%B5%E5%AD%90%E5%90%88%E5%90%8C%E5%B9%B3%E5%8F%B0%E6%93%8D%E4%BD%9C%E6%96%87%E6%A1%A3/" rel="next" title="电子合同平台操作文档">
-                  电子合同平台操作文档 <i class="fa fa-chevron-right"></i>
+                <a href="/2020/06/28/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A902/" rel="next" title="Nginx静态资源压缩02">
+                  Nginx静态资源压缩02 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>

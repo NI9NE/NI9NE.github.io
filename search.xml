@@ -22782,8 +22782,488 @@ composer require ni9ne/excelexport
       </tags>
   </entry>
   <entry>
-    <title>Nginx静态资源部署</title>
-    <url>/2021/10/15/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/</url>
+    <title>Nginx静态资源压缩02</title>
+    <url>/2020/06/28/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A902/</url>
+    <content><![CDATA[
+## Nginx静态资源压缩
+
+在Nginx的配置文件中可以通过gzip来对静态资源进行压缩
+
+```
+ngx_http_gzip_module模块		# nginx自带
+ngx_http_gzip_static_module模块	# 需要安装
+ngx_http_gunzip_module模块		# 需要安装
+```
+
+### Gzip各模块支持配置指令
+
+以下指令都来自于ngx_http_gzip_module模块支持, 该模块nginx内置, 可以直接使用
+
+```
+模块文档: http://nginx.org/en/docs/http/ngx_http_gzip_module.html
+```
+
+#### gzip 
+
+`gzip on|off`  用于开启或关闭gzip功能
+
+```
+http{
+	gzip on;
+}
+```
+
+> 可以用于http/server/loaction
+
+#### gzip_types
+
+`gzip_types mime-type ...` 设置需要压缩的文件mime类型
+
+默认压缩text/html 
+
+```
+http{
+	gzip_types application/javascript;
+}
+```
+
+> 所选值可以从mime.types文件中查找, 也可以使用* 代表所有类型, 但不推荐
+
+#### gzip_comp_level 
+
+`gzip_comp_level level` 设置Gzip压缩程度
+
+级别从1到9, 压缩程度上升, 压缩效率降低, 9 代表压缩程度最高, 但效率最低
+
+```
+http{
+	gzip_comp_level 6;
+}
+```
+
+#### gzip_vary 
+
+`gzip_vary on|off ` 设置是否携带gzip响应头
+
+`gzip_vary` 用于设置进行压缩发送是否携带 `Vary:Accept-Encoding` 响应头, 告诉接收方该资源经过了Gzip压缩处理
+
+```
+http{
+	gzip_vary on;
+}
+```
+
+> 可用于http/server/location
+
+#### gzip_buffers
+
+`gzip_buffers number size` 用于设置压缩的缓冲区数量及大小
+
+该值设定一般和服务器操作系统有关, 一般使用默认值即可
+
+```
+http{
+	gzip_buffers 4 16k;
+}
+```
+
+#### gzip_disable
+
+`gzip_disable regex ..` 用于使用正则针对不同的浏览器禁用Gzip功能
+
+regex匹配`Request Headers`中`User-Agent` 数据
+
+```
+http{
+	gzip_disable "MSIE [1-6]\."; # 排除IE6以下版本
+}
+```
+
+#### gzip_http_version
+
+`gzip_http_version 1.0|1.1`  针对不同的HTTP协议版本, 选择性开启或关闭gzip
+
+该指令用于指定最低HTTP协议版本, 一般用默认值即可
+
+```
+http{
+	gzip_http_version 1.1;
+}
+```
+
+#### gzip_min_length
+
+`gzip_min_length` 指定需要压缩的最小文件长度
+
+默认20, 从头信息中的`Content-Length`中获取
+
+```
+nginx 计量但对: bytes[字节] / kb[千字节] / M[兆]
+如: 1024 / 10k / 10m
+```
+
+```
+http{
+	gzip_min_length 20;
+}
+```
+
+#### gzip_proxied
+
+`gzip_proxied off|expired|no-cache|no-store|private|no_last_modified|no-etag|auth|any` 设置是否对服务端返回结果进行Gzip压缩
+
+> 反向代理相关
+
+- off  关闭nginx服务器对后台服务器返回结果的压缩, 忽略其他参数
+- expired  启用压缩, 如果响应头headers头中包含`Expires` 头信息
+- no-cache  启用压缩, 如果响应头headers头中包含`Cache-Control:no-cache`头信息
+- no-store  启用压缩, 如果响应头headers头中包含`Cache-Control:no-store`头信息
+- private  启用压缩, 如果响应头headers头中包含`Cache-Control:private`头信息
+- no-last-modified  启用压缩, 如果响应头headers头中不包含`Last-Modified` 头信息
+- no-etag  启用压缩, 如果响应头headers头中不包含 `ETag` 头信息
+- auth  启用压缩, 如果响应头headers头中包含`Authorization` 头信息
+- any  为所有代理请求无条件启用压缩
+
+### Gzip压缩功能配置
+
+编辑新建nginx_zip.conf文件
+
+```
+gzip on;			# 开启gzip功能
+gzip_types *;		# 压缩文件类型,mime-type
+gzip_comp_level 6;	# gzip 压缩等级
+gzip_min_length 1024;# 需要进行压缩响应页面的最小长度 content-length
+gzip_buffers 4 16k;	# 缓存空间数量及大小
+gzip_http_version 1.1;# 指定压缩响应需要的最低HTTP协议版本
+gzip_vary on;		# 向响应头中添加压缩表示
+gzip_disable "MSIE [1-6]\.";	# 过滤浏览器禁用压缩
+gzip_proxied off;	# nginx作为反向代理压缩服务端返回数据的条件
+```
+
+将配置文件引入nginx.conf
+
+```
+include nginx_zip.conf;
+```
+
+### Gzip和sendfile的冲突解决
+
+Gzip需要应用程序用户态进行操作文件并压缩发送, 但sendfile是直接从内核缓冲区发送到Socket缓冲区的, 会导致功能冲突
+
+可以使用`ngx_http_gzip_static_module` 模块的 `gzip_static` 指令解决问题
+
+![image-20211119012700914](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119012700914.png)
+
+解决方案是在请求资源之前, 就将资源压缩, `jquery.js` 压缩为 `jquery.js.gz`, 在用户请求资源时, 发送压缩后的文件给用户, 由浏览器进行解压缩显示
+
+#### gzip_static
+
+`gzip_static on|off|always;` 
+
+访问与资源同名的`.gz` 文件时, response中以gzip相关的header返回`.gz`文件内容
+
+> 添加上述命令后, 若报错 unknown directiove 'gzip_static', 原因是Nginx默认没有添加对应模块, 需要手动安装 ./configure --with-http_gzip_static_module
+
+```
+http{
+	gzip_static on;
+}
+```
+
+```shell
+gzip /var/www/test/images/jquery.js
+```
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx静态资源缓存、跨域、防盗链03</title>
+    <url>/2020/07/05/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E7%BC%93%E5%AD%98%E3%80%81%E8%B7%A8%E5%9F%9F%E3%80%81%E9%98%B2%E7%9B%97%E9%93%BE03/</url>
+    <content><![CDATA[
+## 静态资源缓存处理
+
+> web 缓存: 一个web资源存在于web服务器和客户端之间的副本
+
+### web缓存分类
+
+```
+客户端缓存
+	浏览器缓存 - 浏览器在用户磁盘上的资源缓存
+服务端缓存
+	Nginx/Redis/Memcache等
+```
+
+###  浏览器缓存执行流程
+
+HTTP协议中与页面缓存相关的字段:
+
+| headers       | 说明                                |
+| ------------- | ----------------------------------- |
+| Expires       | 缓存过期的日期时间                  |
+| Cache-Control | 设置缓存相关配置信息                |
+| Last-Modified | 请求资源最后修改时间                |
+| ETag          | 请求实体标签的当前值, 如文件的MD5值 |
+
+![image-20211120005659396](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120005659396.png)
+
+```
+强缓存: 直接从浏览器端使用缓存, 不与服务端交互
+协商缓存: 发现本地缓存过期后, 发送请求与服务端协商, 服务端判定资源未发生变化, 返回304, 仍使用浏览器缓存
+```
+
+### Nginx浏览器缓存指令
+
+Nginx实现对应缓存设置, 需要如下指令
+
+#### expires
+
+用于控制页面资源过期时间, 可以通过控制HTTP响应头中的`Expires` 和 `Cache-Control` 实现
+
+##### 指令格式
+
+`expires [modified] time;  ||  expires epoch|max|off;`
+
+```
+time: 可以为任意整数指定过期时间, 单位为秒. 
+	如果是负数, Cache-Control值设定为no-cache
+	如果为正数或0, 则Cache-Control被设定为max-age=time
+epoch: 指定Expires值为'1 January,1970,00:00:00 GMT', 即1970-01-01 00:00:00,
+	Cache-Control值为no-cache
+max: 指定Expires值为'31December,2037,23:59:59 GMT', 即2037-12-31 23:59:59
+	Cache-Control值为315360000 (10年)
+off: 不缓存
+```
+
+> 注: HTTP响应头中, Expires和Cache-Control共同控制缓存过期配置. 
+>
+> 其中, Expires为1.0版本协议, 使用GMT时间对照浏览器与服务器资源过期时间, 在时间配置不同步时会出现问题.
+>
+> 所以在1.1版本中, 使用Cache-Control:max-age=time, 以相对时间对照过期时间, 实现资源缓存的配置
+
+##### 指令配置
+
+```nginx
+location ~ .*\.(html|js|css|png)${
+    expires 1000;
+}
+```
+
+![image-20211120012032536](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120012032536.png)
+
+#### add_header
+
+用于添加HTTP响应头信息, 值
+
+##### 指令语法
+
+`add_header name value [always];`
+
+```
+其中缓存配置主要修改Cache-Control值, 值包括:
+must-revalidate		可缓存但必须向服务器进行确认协商
+no-cache			指示请求或响应消息不能缓存,不是说可以设置不缓存,而是需要和服务器确认
+no-store			不缓存请求或响应的任何内容
+no-transform		代理不可更改媒体类型
+public				可向任意方提供响应缓存
+private				可向特定用户提供响应缓存
+proxy-revalidate	要求中间缓存服务器对缓存的响应有效性再次确认
+max-age=<seconds>	最大响应缓存Age时间
+s-maxage=<seconds>	公共缓存服务器响应的最大Age值
+```
+
+##### 指令配置
+
+```nginx
+location ~ .*\.(html|js|css|png)${
+    add_header Cache-Control no-store;
+}
+```
+
+## Nginx跨域问题解决
+
+### 浏览器同源策略
+
+浏览器的一种约定策略, 将协议、域名(IP)、端口相同的请求称为同源请求. 
+
+### 跨域问题
+
+即存在两台服务器A, B. 如果从A的页面发送异步请求到B获取数据, 如果服务器A和B不满足同源策略, 就会出现跨域问题
+
+### 跨域演示
+
+新建nginx配置server
+
+```nginx
+server {
+    listen 8081;
+    server_name test.project.com;
+    location / {
+        root /var/www/test;
+        index index.html;
+    }
+}
+server {
+    listen 8082;
+    server_name localhost;
+    location / {
+        root /var/www/test/another;
+        index index.html index.php;
+    }
+}
+```
+
+新建/var/www/test/index.html文件
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>跨域演示</title>
+	<script src="jquery.js"></script>
+</head>
+<body>
+	<input type="button" name="bt" value="获取跨域数据" id="btn">
+</body>
+<script type="text/javascript">
+	$(function(){
+		$("#btn").click(function(){
+			$.get('http://192.168.253.134:8082/getUser', function(data){
+				alert(JSON.stringify(data));
+			})
+		});
+	});
+</script>
+</html>
+```
+
+请求结果如下:
+
+![image-20211120023920588](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120023920588.png)
+
+### 跨域解决方案
+
+使用Nginx指令add_header 添加响应头信息
+
+```
+需要添加两个信息:
+Access-Control-Allow-Origin		# 允许访问域名, 可配置多个,逗号分隔, 或 * 代表所有 
+Access-Control-Allow-Methods	# 允许访问方式, 可配置多个,逗号分隔
+```
+
+如修改上述案例的nginx配置如下
+
+```nginx
+server {
+    listen 8081;
+    server_name test.project.com;
+    location / {
+        root /var/www/test;
+        index index.html;
+    }
+}
+server {
+    listen 8082;
+    server_name localhost;
+    location / {
+        add_header Access-Control-Allow-Origin http://test.project.com:8081;
+        add_header Access-Control-Allow-Methods *;
+        root /var/www/test/another;
+        index index.html index.php;
+    }
+}
+```
+
+重新请求结果如下:
+
+![image-20211120024917471](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120024917471.png)
+
+## 静态资源防盗链
+
+**资源盗链**: 将不在自己服务器上的静态资源通过技术手段, 绕过限制放置到自己的页面上展示给用户, 依次盗取大网站的空间和流量
+
+如下所示代码:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>盗链演示</title>
+</head>
+<body>
+	<img src="https://m.360buyimg.com/babel/jfs/t1/169821/25/23076/279367/6191c359E738f3e96/64e56f4355e3cd20.gif">
+</body>
+</html>
+```
+
+### 实现原理
+
+使用HTTP请求头中的`Referer` , 获取来源网站地址是否为信任地址, 若是则放行访问, 若不是则返回403(拒绝访问)状态码
+
+使用Nginx指令`valid_referers` 实现匹配
+
+### 指令格式
+
+`valid_referers none|blocked|server_names|string ...`
+
+```
+指令valid_referers会通过匹配Referer和配置后面的内容, 将结果赋给变量$invalid_referer, 若匹配成功, 该值等于0, 匹配失败, 该值等于1, 匹配时不区分大小写
+```
+
+```
+none: 如果Header中的Referer为空, 允许访问
+blocker: Header中的Referer不为空, 但该值被防火墙或代理伪装过, 如不带http:// https://等协议头, 允许访问
+server_names: 具体的域名或IP
+string: 支持正则表达式和*的统配符表达式如: *.example.com  ~.*\.google\..*
+```
+
+### Nginx配置实例
+
+```nginx
+location ~ ^.*\.(png|jpg|gif)$ {	# 针对文件类型防盗链
+    valid_referers none blocked www.baidu.com;
+    if ($invalid_referer) {
+        return 403;
+    }
+}
+
+location /images {	# 针对目录防盗链
+    valid_referers none blocked www.baidu.com;
+    if ($invalid_referer) {
+        return 403;
+    }
+    root /var/www/test;
+}
+```
+
+### 效果展示 
+
+![image-20211120042313902](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120042313902.png)
+
+### 通过模块精细化设置
+
+需要使用Nginx模块 `ngx_http_accesskey_module` ]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx静态资源部署优化01</title>
+    <url>/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/</url>
     <content><![CDATA[
 ## Nginx静态资源部署
 
@@ -23138,196 +23618,6 @@ server{
 ```
 tcp_nopush和tcp_nodelay在linux 2.5.9之后可以兼容, 两者都开启可以大大加快数据传输效率
 ```
-
-### 3.nginx静态资源压缩实战
-
-在Nginx的配置文件中可以通过gzip来对静态资源进行压缩
-
-```
-ngx_http_gzip_module模块		# nginx自带
-ngx_http_gzip_static_module模块	# 需要安装
-ngx_http_gunzip_module模块		# 需要安装
-```
-
-#### Gzip各模块支持配置指令
-
-以下指令都来自于ngx_http_gzip_module模块支持, 该模块nginx内置, 可以直接使用
-
-```
-模块文档: http://nginx.org/en/docs/http/ngx_http_gzip_module.html
-```
-
-##### gzip 
-
-`gzip on|off`  用于开启或关闭gzip功能
-
-```
-http{
-	gzip on;
-}
-```
-
-> 可以用于http/server/loaction
-
-##### gzip_types
-
-`gzip_types mime-type ...` 设置需要压缩的文件mime类型
-
-默认压缩text/html 
-
-```
-http{
-	gzip_types application/javascript;
-}
-```
-
-> 所选值可以从mime.types文件中查找, 也可以使用* 代表所有类型, 但不推荐
-
-##### gzip_comp_level 
-
-`gzip_comp_level level` 设置Gzip压缩程度
-
-级别从1到9, 压缩程度上升, 压缩效率降低, 9 代表压缩程度最高, 但效率最低
-
-```
-http{
-	gzip_comp_level 6;
-}
-```
-
-##### gzip_vary 
-
-`gzip_vary on|off ` 设置是否携带gzip响应头
-
-`gzip_vary` 用于设置进行压缩发送是否携带 `Vary:Accept-Encoding` 响应头, 告诉接收方该资源经过了Gzip压缩处理
-
-```
-http{
-	gzip_vary on;
-}
-```
-
-> 可用于http/server/location
-
-##### gzip_buffers
-
-`gzip_buffers number size` 用于设置压缩的缓冲区数量及大小
-
-该值设定一般和服务器操作系统有关, 一般使用默认值即可
-
-```
-http{
-	gzip_buffers 4 16k;
-}
-```
-
-##### gzip_disable
-
-`gzip_disable regex ..` 用于使用正则针对不同的浏览器禁用Gzip功能
-
-regex匹配`Request Headers`中`User-Agent` 数据
-
-```
-http{
-	gzip_disable "MSIE [1-6]\."; # 排除IE6以下版本
-}
-```
-
-##### gzip_http_version
-
-`gzip_http_version 1.0|1.1`  针对不同的HTTP协议版本, 选择性开启或关闭gzip
-
-该指令用于指定最低HTTP协议版本, 一般用默认值即可
-
-```
-http{
-	gzip_http_version 1.1;
-}
-```
-
-##### gzip_min_length
-
-`gzip_min_length` 指定需要压缩的最小文件长度
-
-默认20, 从头信息中的`Content-Length`中获取
-
-```
-nginx 计量但对: bytes[字节] / kb[千字节] / M[兆]
-如: 1024 / 10k / 10m
-```
-
-```
-http{
-	gzip_min_length 20;
-}
-```
-
-##### gzip_proxied
-
-`gzip_proxied off|expired|no-cache|no-store|private|no_last_modified|no-etag|auth|any` 设置是否对服务端返回结果进行Gzip压缩
-
-> 反向代理相关
-
-- off  关闭nginx服务器对后台服务器返回结果的压缩, 忽略其他参数
-- expired  启用压缩, 如果响应头headers头中包含`Expires` 头信息
-- no-cache  启用压缩, 如果响应头headers头中包含`Cache-Control:no-cache`头信息
-- no-store  启用压缩, 如果响应头headers头中包含`Cache-Control:no-store`头信息
-- private  启用压缩, 如果响应头headers头中包含`Cache-Control:private`头信息
-- no-last-modified  启用压缩, 如果响应头headers头中不包含`Last-Modified` 头信息
-- no-etag  启用压缩, 如果响应头headers头中不包含 `ETag` 头信息
-- auth  启用压缩, 如果响应头headers头中包含`Authorization` 头信息
-- any  为所有代理请求无条件启用压缩
-
-#### Gzip压缩功能配置
-
-编辑新建nginx_zip.conf文件
-
-```
-gzip on;			# 开启gzip功能
-gzip_types *;		# 压缩文件类型,mime-type
-gzip_comp_level 6;	# gzip 压缩等级
-gzip_min_length 1024;# 需要进行压缩响应页面的最小长度 content-length
-gzip_buffers 4 16k;	# 缓存空间数量及大小
-gzip_http_version 1.1;# 指定压缩响应需要的最低HTTP协议版本
-gzip_vary on;		# 向响应头中添加压缩表示
-gzip_disable "MSIE [1-6]\.";	# 过滤浏览器禁用压缩
-gzip_proxied off;	# nginx作为反向代理压缩服务端返回数据的条件
-```
-
-将配置文件引入nginx.conf
-
-```
-include nginx_zip.conf;
-```
-
-#### Gzip和sendfile的冲突解决
-
-Gzip需要应用程序用户态进行操作文件并压缩发送, 但sendfile是直接从内核缓冲区发送到Socket缓冲区的, 会导致功能冲突
-
-可以使用`ngx_http_gzip_static_module` 模块的 `gzip_static` 指令解决问题
-
-![image-20211119012700914](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119012700914.png)
-
-解决方案是在请求资源之前, 就将资源压缩, `jquery.js` 压缩为 `jquery.js.gz`, 在用户请求资源时, 发送压缩后的文件给用户, 由浏览器进行解压缩显示
-
-##### gzip_static
-
-`gzip_static on|off|always;` 
-
-访问与资源同名的`.gz` 文件时, response中以gzip相关的header返回`.gz`文件内容
-
-> 添加上述命令后, 若报错 unknown directiove 'gzip_static', 原因是Nginx默认没有添加对应模块, 需要手动安装 ./configure --with-http_gzip_static_module
-
-```
-http{
-	gzip_static on;
-}
-```
-
-```shell
-gzip /var/www/test/images/jquery.js
-```
-
 ]]></content>
       <categories>
         <category>学习笔记</category>
