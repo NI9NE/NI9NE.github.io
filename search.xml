@@ -23628,4 +23628,458 @@ tcp_nopush和tcp_nodelay在linux 2.5.9之后可以兼容, 两者都开启可以�
         <tag>后端</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Nginx配置指令Rewrite04</title>
+    <url>/2020/07/15/Nginx/Nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite04/</url>
+    <content><![CDATA[
+# Nginx配置指令Rewrite
+
+## Rewrite功能配置
+
+Rewrite功能是Nginx服务器提供的一个重要基本功能, 主要用于实现URL的重写. 其具体实现需要依赖PCRE的支持, Nginx通过 `ngx_http_rewrite_module` 模块解析处理Rewrite功能相关配置
+
+```
+文档: http://nginx.org/en/docs/http/ngx_http_rewrite_module.html
+```
+
+### Rewrite相关命令
+
+#### set
+
+> 用于设置一个Nginx变量, 可用于 server/location/if 块中
+
+##### 指令格式
+
+`set $variable value`
+
+variables: 变量的名称. 该变量名要用 `$` 作为变量开头, 且不能与nginx全局变量同名
+
+value: 变量的值.
+
+##### Nginx常用全局变量
+
+```
+请求: http://192.168.200.133/server?arg1=value1&arg2=value2
+```
+
+| 变量名             | 说明                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| $args              | 请求URL中参数, 功能与 `$query_string` 一样<br />"`arg1=value1&arg2=value2`" |
+| $http_user_agent   | 用户访问客户端或代理的信息, 同`Request Headers->User-Agent`  |
+| $host              | 服务器的`server_name` 值<br />"`192.168.200.133`"            |
+| $document_uri      | 当前访问地址的URI, 功能与 `$uri` 一样<br />"`/server`"       |
+| $content_length    | 请求头中的 `Content-Length` 值                               |
+| $content_type      | 请求头中的 `Content-Type` 值                                 |
+| $http_cookie       | 客户端的cookie信息                                           |
+| $limit_rate        | Nginx服务器对网络连接速率的限制, 默认为0, 不限制             |
+| $remote_addr       | 客户端的IP地址                                               |
+| $remote_port       | 客户端与服务端连接的端口号                                   |
+| $remote_user       | 客户端的用户名, 需要认证模块                                 |
+| $scheme            | 访问协议                                                     |
+| $server_addr       | 服务端的地址                                                 |
+| $server_name       | 服务端的名称                                                 |
+| $server_port       | 服务端的端口                                                 |
+| $server_protocol   | 客户端请求协议版本                                           |
+| $request_body_file | 发给服务器的本地资源名称                                     |
+| $request_method    | 客户端的请求方式                                             |
+| $request_filename  | 当前请求资源文件的路径名                                     |
+| $request_uri       | 当前请求的URI, 且携带请求参数<br />"`/server?arg1=value1&arg2=value2`" |
+
+#### if
+
+> 用于支持条件判断, 根据不同记过选择不同Nginx配置, 可用于server/location 块中
+
+##### 指令格式
+
+`if (condition){...}`		
+
+注意: if后必须带一个空格
+
+condition: 判定条件, 支持一下写法:
+
+```
+1.变量名. 如果变量对应值为空字符串或0, if判断都为false, 其余情况均为true
+	if ($param){}
+2.使用 = 和 != 比较变量和字符串, 满足为true, 不满足为false(字符串不需要引号)
+	if ($request_method = POST){return 405;}
+3.使用正则表达式匹配, 匹配成功为true,匹配失败为false, 以 ~ | ~* | !~ | !~* 开头
+	if ($http_user_agent ~ Safari){return 200 Chrome;}
+4.使用 -f | !-f 判断请求静态文件是否存在
+	if (!-f $request_filename){return 200 "file $request_filename not found";}
+5.使用 -d | !-d 判断请求目录是否存在
+6.使用 -e | !-e 判断请求的文件或目录是否可用
+7.使用 -x | !-x 判断请求的文件是否可执行
+```
+
+#### break
+
+> 1.用于中断当前作用域的其他nginx配置. 在同一作用域中, break之后的配置不再执行生效
+>
+> 2.终止当前匹配并将当前URI在本location中进行301重定向访问
+
+##### 指令格式
+
+`break;`
+
+##### 使用案例
+
+访问: `http://test.project.com:8081/testbreak`
+
+```nginx
+location /testbreak{
+    root /var/www/test;
+    index break.html;
+    default_type text/plain;
+    set $username number1;
+    if ($username){
+        set $username number2;
+        break;	
+        # 终止匹配并跳转至路由 http://test.project.com:8081/testbreak/break.html
+        set $username number3;
+    }
+    add_header username $username;
+    return 200 $username;
+}
+```
+
+```
+同时创建目录 /var/www/test/testbreak, 创建文件 /var/www/test/testbreak/break.html 
+```
+
+显示结果如下, break不仅中断了本作用域的 `set $username number3;` 配置, 而且301永久重定向到了本location下的root+index配置页面
+
+![image-20211120064013787](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120064013787.png)
+
+
+
+#### return
+
+> 用于完成对请求的处理, 直接向客户端返回. 在return后的所有Nginx配置都无效
+
+##### 指令格式
+
+`return code [text];  || return code URL; || return URL;`
+
+code: 返回客户端的HTTP状态, 0-999
+
+text: 返回客户端的响应体内容, 支持变量使用
+
+URL: 返回给客户端的URL地址 (302跳转)
+
+```nginx
+location /testreturn{
+	# return 200 success;
+    # return https://www.baidu.com;
+    return 302 https://www.baidu.com;
+}
+```
+
+#### rewrite
+
+> 通过正则表达式改变URI. 可以同时存在多个指令, Nginx按照顺序依次执行匹配
+
+##### 指令格式
+
+`rewrite regex replacement [flag]` 
+
+regex: 用来匹配URI的正则表达式
+
+replacement: 匹配成功后, 用于替换URI内容的字符串. 若该配置以 `http://` 或 `https://` 开头, 则不会继续执行其他rewrite, 直接返回重写后的URI给客户端
+
+flag: 用于设置rewrite对URI的处理行为, 有如下值:
+
+```
+last - 终止继续在本location块中处理接收到的URI, 并将此处重写的URI作为一个新的URI, 使用各location块进行处理. 该标识将重写后的URI重新载server块中执行, 为重写后的URI提供了在其他location块中执行的机会, 不会修改当前浏览器的URL
+
+break - 将此处重写的URI作为一个新的URI, 在本location块中继续处理. 该标识将重写后的地址在当前location中执行(root+index), 不会将新的URI转向其他location块, 不会修改当前浏览器的URL
+
+redirect - 将重写后的URI返回给客户端, 状态码为302, 指明是临时重定向, 主要用于replacement不是以http:// 或 https:// 开头的情况. 会修改当前浏览器的URL
+
+permanent - 将重写后的URI返回给客户端, 状态码为301, 指明是永久重定向, 主要用于replacement不是以http:// 或 https:// 开头的情况. 会修改当前浏览器的URL
+```
+
+##### 使用案例
+
+```nginx
+location /rewrite{
+    # rewrite ^/rewrite/url\w*$ https://www.baidu.com;
+    rewrite ^/rewrite/(test)\w*$ /$1;
+    rewrite ^/rewrite/(demo)\w*$ /$1;
+}
+
+location /test{
+    default_type text/plain;
+    return 200 success_test;
+}
+location /demo{
+    default_type text/plain;
+    return 200 success_demo;
+}
+```
+
+访问 `http://test.project.com:8081/rewrite/urlxxx`
+
+![image-20211120074841710](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120074841710.png)
+
+访问 `http://test.project.com:8081/rewrite/testxxx`
+
+![image-20211120074744772](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120074744772.png)
+
+#### rewrite_log
+
+> 开启URL重写日志的输出功能, 可用于http/server/location/if
+
+##### 指令语法
+
+`rewrite_log on|off;`
+
+开启后,URL重写日志将会以notice级别输出到error_log中
+
+```nginx
+rewrite_log on;
+error_log /var/log/nginx/error.log notice;  # 需要设置默认日志级别
+```
+
+日志数据如下:
+
+![image-20211120075013711](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120075013711.png)
+
+### Rewrite应用场景
+
+#### 域名跳转
+
+访问京东商城, 可以使用`www.jd.com` , 也可以使用`www.360buy.com` , 除了单server块指定多`server_name`外, 还可以利用Rewrite实现该效果
+
+```
+准备三个域名
+192.168.253.134 test.project.com
+192.168.253.134 test1.project.com
+192.168.253.134 test2.project.com
+```
+
+编写nginx配置文件
+
+```nginx
+server{
+    listen 80;
+    server_name test.project.com;
+    location /{
+        default_type text/plain;
+        return 200 'test.project.com page';
+    }
+}
+
+server{
+    listen 80;
+    server_name test1.project.com test2.project.com;
+    # rewrite ^/ http://test.project.com;	# 无法携带URI
+    rewrite ^(.*) http://test.project.com$1;
+}
+```
+
+访问域名 `http://test1.project.com/getUser/id?test=111`
+
+![](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120122634521.png)
+
+#### 独立域名
+
+一个完整项目包含多个模块, 如何为每个模块设置独立域名
+
+```
+需求为:
+http://test1.project.com 访问搜索模块 /search
+http://test2.project.com 访问详情模块 /detail
+http://test3.project.com 访问列表模块 /list
+```
+
+编写nginx配置文件
+
+```nginx
+server{
+    listen 80;
+    server_name test.project.com;
+    default_type text/plain;
+    location /{
+        return 200 'test.project.com index page';
+    }
+    location /search{
+        return 200 'test.project.com search page';
+    }
+    location /detail{
+        return 200 'test.project.com detail page';
+    }
+    location /list{
+        return 200 'test.project.com list page';
+    }
+}
+
+server{
+    listen 80;
+    server_name test1.project.com;
+    rewrite ^(.*) http://test.project.com/search$1;
+}
+
+server{
+    listen 80;
+    server_name test2.project.com;
+    rewrite ^(.*) http://test.project.com/detail$1;
+}
+
+server{
+    listen 80;
+    server_name test3.project.com;
+    rewrite ^(.*) http://test.project.com/list$1;
+}
+```
+
+访问效果如下
+
+![image-20211120123838920](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120123838920.png)
+
+![image-20211120123933761](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120123933761.png)
+
+![image-20211120124019223](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120124019223.png)
+
+
+
+#### 域名镜像
+
+域名跳转部分中, 我们将`test1.project.com`和`test2.project.com` 均跳转到`test.project.com`, 即两个备份域名跳转到主域名, 如果不想把整个网站都做镜像, 仅为其中一个子目录下的资源做镜像, 可以在location块中配置Rewrite实现
+
+```nginx
+server{
+    listen 80;
+    server_name test.project.com;
+    default_type text/plain;
+    location /{
+        return 200 'test.project.com index page';
+    }
+    location /user{
+        return 200 'test.project.com user module page';
+    }
+
+}
+
+server{
+    listen 80;
+    default_type text/plain;
+    server_name test1.project.com test2.project.com;
+    location /user{
+        rewrite ^(/user.*)$ http://test.project.com$1;
+    }
+    location /goods{
+        return 200 'goods page';
+    }
+}
+
+```
+
+访问效果如下:
+
+![image-20211120125424948](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120125424948.png)
+
+![image-20211120125634725](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120125634725.png)
+
+
+
+#### 目录自动添加"/"
+
+创建nginx配置如下
+
+```nginx
+root /var/www/test;
+index index.html;
+# server_name_in_redirect on;
+server{
+    listen 8088;
+    server_name localhost;
+    default_type text/plain;
+    location /goods{
+        
+    }
+}
+
+```
+
+访问网址 `http://test.project.com/goods`, 显示如下:
+
+![image-20211120131411135](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120131411135.png)
+
+可见可以访问, 但实际上是nginx做了301转发, 实际是去找`root+index` 文件展示出来
+
+```
+nginx配置中的server_name_in_redirect, 在Nginx 0.8.48版本之前, 默认为on, 之后为off
+
+当server_name_in_redirect等于on时,访问使用server_name替换请求host, 即访问的是
+	http://192.168.253.134:8088/goods -> http://localhost:8088/goods/
+当server_name_in_redirect等于off时, 正常转发, 只在后面加了 / 符号
+```
+
+可以通过Rewrite在URI后面手动加`/`解决问题
+
+修改nginx配置为:
+
+```nginx
+root /var/www/test;
+index index.html;
+server_name_in_redirect on;
+server{
+    listen 8088;
+    server_name localhost;
+    default_type text/plain;
+    location /goods{
+        if (-d $request_filename){
+            rewrite ^/(.*)([^/])$ http://$host:$server_port/$1$2/ permanent;
+        }
+    }
+}
+```
+
+即可正常访问
+
+#### 合并目录
+
+SEO要求包含URL的目录层级不要超过三层, 可以使用Rewrite简化输入目录层级
+
+如: 需要访问服务器中的URI`/server/11/22/33/44/55.html`, 则完整URL应该是`http://test.project.com/server/11/22/33/44/55.html`, 在Rewrite后可以访问`http://test.project.com/server-11-22-33-44/55.html` 达成同样效果
+
+```nginx
+server{
+    root /var/www/test;
+    listen 80;
+    server_name test.project.com;
+    default_type text/plain;
+    location /server{
+        rewrite ^/server-([0-9]+)-([0-9]+)-([0-9]+)-([0-9]+)/(.*)$ /server/$1/$2/$3/$4/$5 last;
+    }
+}
+```
+
+访问效果如下
+
+![image-20211120134903700](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120134903700.png)
+
+#### 防盗链
+
+当访问来源非授权时, 可以通过Rewrite到一张自定义图片资源上
+
+```nginx
+location /images{
+    valid_referers none blocked www.baidu.com;
+    if (invalid_referer){
+        rewrite ^/ /images/forbidden.png break;
+    }
+}
+```
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
 </search>
