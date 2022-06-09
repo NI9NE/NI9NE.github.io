@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Nginx缓存集成缓存概述客户端的所有请求直接请求服务端, 会影响服务端的性能. 如: 接收过多请求, 压力增大, 某些操作比较耗时, 影响响应速度. 所以引入缓存机制可以大大减轻服务器压力.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx缓存集成07">
+<meta property="og:url" content="https://ni9ne.github.io/2021/06/21/Nginx/Nginx07%E7%BC%93%E5%AD%98%E9%9B%86%E6%88%90/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="Nginx缓存集成缓存概述客户端的所有请求直接请求服务端, 会影响服务端的性能. 如: 接收过多请求, 压力增大, 某些操作比较耗时, 影响响应速度. 所以引入缓存机制可以大大减轻服务器压力.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2f2c3c8c4bc9e883b630047f955b54b1-78f1e1d.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/50ea7e6f265435f33ccd8cba5155fc14-1bacbdf.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a60125c18078aa4c9da2d187ff185484-5c4cef1.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a85383c41eaeee2620e25f6173b2e843-cb76d65.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f0f39cb50e89291ba583b9bad8b74866-1bfd046.png">
+<meta property="article:published_time" content="2021-06-21T12:53:43.000Z">
+<meta property="article:modified_time" content="2022-06-09T09:51:38.115Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="Nginx">
+<meta property="article:tag" content="后端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2f2c3c8c4bc9e883b630047f955b54b1-78f1e1d.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2021/06/21/Nginx/Nginx07%E7%BC%93%E5%AD%98%E9%9B%86%E6%88%90/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/06/21/Nginx/Nginx07%E7%BC%93%E5%AD%98%E9%9B%86%E6%88%90/","path":"2021/06/21/Nginx/Nginx07缓存集成/","title":"Nginx缓存集成07"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Nginx缓存集成07 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">80</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx%E7%BC%93%E5%AD%98%E9%9B%86%E6%88%90"><span class="nav-number">1.</span> <span class="nav-text">Nginx缓存集成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">缓存概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.1.1.</span> <span class="nav-text">缓存使用场景:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E4%BC%98%E7%82%B9"><span class="nav-number">1.1.2.</span> <span class="nav-text">缓存优点:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%BC%BA%E7%82%B9"><span class="nav-number">1.1.3.</span> <span class="nav-text">缓存缺点:</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx%E7%9A%84web%E7%BC%93%E5%AD%98%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.2.</span> <span class="nav-text">Nginx的web缓存服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nginx%E7%BC%93%E5%AD%98%E8%AE%BE%E7%BD%AE%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.1.</span> <span class="nav-text">Nginx缓存设置指令</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#proxy-cache-path%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">proxy_cache_path指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#proxy-cache%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">proxy_cache指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#proxy-cache-key%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">proxy_cache_key指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#proxy-cache-valid%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">proxy_cache_valid指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#proxy-cache-min-uses%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.1.5.</span> <span class="nav-text">proxy_cache_min_uses指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#proxy-cache-methods%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.1.6.</span> <span class="nav-text">proxy_cache_methods指令</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nginx%E7%BC%93%E5%AD%98%E8%AE%BE%E7%BD%AE%E6%A1%88%E4%BE%8B"><span class="nav-number">1.2.2.</span> <span class="nav-text">Nginx缓存设置案例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E7%BC%93%E5%AD%98%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">添加缓存配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E7%BC%93%E5%AD%98%E7%BB%93%E6%9E%9C"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">验证缓存结果</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nginx%E7%BC%93%E5%AD%98%E6%B8%85%E9%99%A4"><span class="nav-number">1.2.3.</span> <span class="nav-text">Nginx缓存清除</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%80-%E5%88%A0%E9%99%A4%E5%AF%B9%E5%BA%94%E7%BC%93%E5%AD%98%E7%9B%AE%E5%BD%95"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">方式一: 删除对应缓存目录</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%BA%8C-%E7%AC%AC%E4%B8%89%E6%96%B9%E6%89%A9%E5%B1%95%E6%A8%A1%E5%9D%97"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">方式二: 第三方扩展模块</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nginx%E8%AE%BE%E7%BD%AE%E8%B5%84%E6%BA%90%E4%B8%8D%E7%BC%93%E5%AD%98"><span class="nav-number">1.2.4.</span> <span class="nav-text">Nginx设置资源不缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#proxy-no-cache%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">proxy_no_cache指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#proxy-cache-bypass%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">proxy_cache_bypass指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B6%89%E5%8F%8A%E5%86%85%E7%BD%AE%E5%8F%98%E9%87%8F%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.2.4.3.</span> <span class="nav-text">涉及内置变量介绍</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.2.4.4.</span> <span class="nav-text">案例实现</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/06/21/Nginx/Nginx07%E7%BC%93%E5%AD%98%E9%9B%86%E6%88%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nginx缓存集成07
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-21 20:53:43" itemprop="dateCreated datePublished" datetime="2021-06-21T20:53:43+08:00">2021-06-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="Nginx缓存集成"><a href="#Nginx缓存集成" class="headerlink" title="Nginx缓存集成"></a>Nginx缓存集成</h2><h3 id="缓存概述"><a href="#缓存概述" class="headerlink" title="缓存概述"></a>缓存概述</h3><p>客户端的所有请求直接请求服务端, 会影响服务端的性能. 如: 接收过多请求, 压力增大, 某些操作比较耗时, 影响响应速度. 所以引入缓存机制可以大大减轻服务器压力.</p>
+<p>用户请求资源数据时, 先从缓存中查看, 若缓存中存在则直接返回给客户, 若不存在, 才请求服务器资源获取, 在返回用户的同时将其放入缓存, 下次就可以直接从缓存中获取</p>
+<h4 id="缓存使用场景"><a href="#缓存使用场景" class="headerlink" title="缓存使用场景:"></a>缓存使用场景:</h4><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>操作系统磁盘缓存</td>
+<td>减少磁盘机械操作</td>
+</tr>
+<tr>
+<td>数据库缓存</td>
+<td>减少文件系统IO操作</td>
+</tr>
+<tr>
+<td>应用程序缓存</td>
+<td>减少对数据库的查询</td>
+</tr>
+<tr>
+<td>Web服务器缓存</td>
+<td>减少对应用服务器请求次数</td>
+</tr>
+<tr>
+<td>浏览器缓存</td>
+<td>减少后台交互次数</td>
+</tr>
+</tbody></table>
+<h4 id="缓存优点"><a href="#缓存优点" class="headerlink" title="缓存优点:"></a>缓存优点:</h4><p>减少数据传输, 节省网络带宽流量, 加快响应速度, 提升用户体验</p>
+<p>减轻服务器压力</p>
+<p>提供服务端高可用性</p>
+<h4 id="缓存缺点"><a href="#缓存缺点" class="headerlink" title="缓存缺点:"></a>缓存缺点:</h4><p>数据的即时性和一致性可能有延迟</p>
+<p>增加成本</p>
+<h3 id="Nginx的web缓存服务"><a href="#Nginx的web缓存服务" class="headerlink" title="Nginx的web缓存服务"></a>Nginx的web缓存服务</h3><p>基于proxy store实现, 将URL及相关组合当做key, 在使用MD5算法对key进行哈希, 的到硬盘对应的哈希目录路径, 从而将缓存内容保存在该目录中. Nginx支持对指定URL或者状态码设置过期时间, 也可以使用purge命令手动清除指定URL缓存</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2f2c3c8c4bc9e883b630047f955b54b1-78f1e1d.png" alt="image-20220605014002839"></p>
+<h4 id="Nginx缓存设置指令"><a href="#Nginx缓存设置指令" class="headerlink" title="Nginx缓存设置指令"></a>Nginx缓存设置指令</h4><p>Nginx的web缓存服务主要是使用ngx_http_proxy_module完成,常用指令如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">文档: https://nginx.org/en/docs/http/ngx_http_proxy_module.html</span><br></pre></td></tr></table></figure>
+
+<h5 id="proxy-cache-path指令"><a href="#proxy-cache-path指令" class="headerlink" title="proxy_cache_path指令"></a>proxy_cache_path指令</h5><p>用于设置缓存文件的存储路径</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">语法:</span><br><span class="line">	proxy_cache_path path [levels=number]  keys_zone=zone_name:zone_size [inactive=time] [max_size=size]</span><br><span class="line">位置:</span><br><span class="line">	http块</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">- path 为缓存路径地址, 如: /usr/local/proxy_cache</span><br><span class="line"></span><br><span class="line">- levels 指定缓存空间子目录等级, 最多设置三层, 每层取值为1或2. 如:</span><br><span class="line">	levels=1:2	代表缓存空间有两层, 第一层是一个字符, 第二层是两个字符 </span><br><span class="line">	设置key=ni9ne, 通过MD5编码后为:f5d6316dd7ab283c02f90cd236dce1cc</span><br><span class="line">	levels=1:2	最终存储路径为: /usr/local/proxy_path/c/1c</span><br><span class="line">	levels=2:1:2最终存储路径为: /usr/local/proxy_path/cc/1/ce</span><br><span class="line"></span><br><span class="line">- key_zone 指定该缓存区名称和大小. 如:</span><br><span class="line">	key_zone=ni9ne:200m	代表缓存区的名称为ni9ne,大小为200m</span><br><span class="line"></span><br><span class="line">- inactive 指定缓存数据多久时间未访问才会删除.如:</span><br><span class="line">	inactive=1d	代表数据仅缓存1天, 1天内没有访问就会删除</span><br><span class="line"></span><br><span class="line">- max_size 设置最大缓存空间, 若空间已满, 默认覆盖缓存时间最长的资源</span><br><span class="line">	max-size=20g</span><br></pre></td></tr></table></figure>
+
+<p>配置实例:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">http&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="attribute">proxy_cache_path</span> /usr/local/proxy_cache levels=<span class="number">2</span>:<span class="number">2</span> keys_zone=ni9ne:<span class="number">200m</span> inactive=<span class="number">1d</span> max_size=<span class="number">20g</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="proxy-cache指令"><a href="#proxy-cache指令" class="headerlink" title="proxy_cache指令"></a>proxy_cache指令</h5><p>用于开启或关闭指定缓存配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">语法:</span><br><span class="line">	proxy_cache zone_name [off];</span><br><span class="line">默认值:</span><br><span class="line">	proxy_cache off;</span><br><span class="line">位置:</span><br><span class="line">	http server location块</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- zone_name 指定用于缓存区的名称</span><br></pre></td></tr></table></figure>
+
+<h5 id="proxy-cache-key指令"><a href="#proxy-cache-key指令" class="headerlink" title="proxy_cache_key指令"></a>proxy_cache_key指令</h5><p>用于指定web缓存的key值, Nginx会依据key值MD5哈希存储缓存</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">语法:</span><br><span class="line">	proxy_cache_key key;</span><br><span class="line">默认值: </span><br><span class="line">	proxy_cache_key $scheme$proxy_host$request_uri;</span><br><span class="line">位置:</span><br><span class="line">	http server location块</span><br></pre></td></tr></table></figure>
+
+<h5 id="proxy-cache-valid指令"><a href="#proxy-cache-valid指令" class="headerlink" title="proxy_cache_valid指令"></a>proxy_cache_valid指令</h5><p>用于对不同返回状态码的URL设置不同的缓存时间</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">语法:</span><br><span class="line">	proxy_cache_valid [code] time;</span><br><span class="line">位置:</span><br><span class="line">	http server location块</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">如:</span><br><span class="line">proxy_cache_valid 200 302 10m;</span><br><span class="line">proxy_cache_valid 404 1m;</span><br><span class="line"># 设置200和302响应的URL缓存10分钟, 响应404的URL缓存1分钟</span><br><span class="line">proxy_cache_valid any 1m;</span><br><span class="line"># 对所有响应状态码的URL都设置1分钟缓存</span><br></pre></td></tr></table></figure>
+
+<h5 id="proxy-cache-min-uses指令"><a href="#proxy-cache-min-uses指令" class="headerlink" title="proxy_cache_min_uses指令"></a>proxy_cache_min_uses指令</h5><p>用于设置资源被访问多少次后备缓存</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">语法:</span><br><span class="line">	proxy_cache_min_uses;</span><br><span class="line">默认值:</span><br><span class="line">	proxy_cache_min_uses 1;</span><br><span class="line">位置:</span><br><span class="line">	http server location块</span><br></pre></td></tr></table></figure>
+
+<h5 id="proxy-cache-methods指令"><a href="#proxy-cache-methods指令" class="headerlink" title="proxy_cache_methods指令"></a>proxy_cache_methods指令</h5><p>用于设置缓存哪些方法的请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">语法:</span><br><span class="line">	proxy_cache_methods GET|HEAD|POST;</span><br><span class="line">默认值:</span><br><span class="line">	proxy_cache_methods GET HEAD;</span><br><span class="line">位置: </span><br><span class="line">	http server location块</span><br></pre></td></tr></table></figure>
+
+<h4 id="Nginx缓存设置案例"><a href="#Nginx缓存设置案例" class="headerlink" title="Nginx缓存设置案例"></a>Nginx缓存设置案例</h4><p>客户端请求134服务器, 获取jquery.js文件, 但文件存在于135服务器中, 服务器134在获取135资源后, 将其缓存, 后续请求资源将从缓存中获取</p>
+<h5 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h5><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 135服务器配置jquery.js路径</span></span><br><span class="line">    server&#123;</span><br><span class="line">        <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span> localhost;</span><br><span class="line">        <span class="attribute">location</span> /js&#123;</span><br><span class="line">            <span class="attribute">root</span> /var/www/project/;</span><br><span class="line">            <span class="attribute">index</span> index.html;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment"># 配置完成后测试是否可以访问路径: http://192.168.253.135/js/jquery.js</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 134配置代理转发</span></span><br><span class="line">	<span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line">        <span class="attribute">location</span> /js &#123;</span><br><span class="line">            <span class="attribute">proxy_pass</span> http://192.168.253.135/js/;</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="comment"># 配置完成后测试是否可以获取文件 http://192.168.253.134/js/jquery.js</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="添加缓存配置"><a href="#添加缓存配置" class="headerlink" title="添加缓存配置"></a>添加缓存配置</h5><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改134服务器配置为:</span></span><br><span class="line">http&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="attribute">proxy_cache_path</span> /usr/local/proxy_cache levels=<span class="number">2</span>:<span class="number">2</span> keys_zone=ni9ne:<span class="number">200m</span> inactive=<span class="number">30s</span> max_size=<span class="number">20g</span></span><br><span class="line">    ...</span><br><span class="line">	server &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line">        <span class="attribute">location</span> /js &#123;</span><br><span class="line">            <span class="attribute">proxy_cache</span> ni9ne;</span><br><span class="line">            <span class="attribute">proxy_cache_key</span> $scheme$proxy_host$request_uri;</span><br><span class="line">            <span class="attribute">proxy_cache_valid</span> <span class="number">200</span> <span class="number">20s</span>;	</span><br><span class="line">            <span class="attribute">proxy_cache_valid</span> <span class="number">404</span> <span class="number">30s</span>;	<span class="comment"># 访问404状态保存30秒</span></span><br><span class="line">            <span class="attribute">proxy_cache_valid</span> any <span class="number">1m</span>;</span><br><span class="line">            <span class="attribute">proxy_cache_min_uses</span> <span class="number">5</span>; 	<span class="comment"># 最少使用5次后才缓存</span></span><br><span class="line">        	<span class="comment"># 添加header,验证缓存命中状态 HIT/MISS</span></span><br><span class="line">            <span class="attribute">add_header</span> Nginx-Cache-Status <span class="string">&quot;$upstream_cache_status&quot;</span>;</span><br><span class="line">            <span class="attribute">proxy_pass</span> http://192.168.253.135/js/;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="验证缓存结果"><a href="#验证缓存结果" class="headerlink" title="验证缓存结果"></a>验证缓存结果</h5><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/50ea7e6f265435f33ccd8cba5155fc14-1bacbdf.png" alt="image-20220605202848657"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a60125c18078aa4c9da2d187ff185484-5c4cef1.png" alt="image-20220605203305150"></p>
+<h4 id="Nginx缓存清除"><a href="#Nginx缓存清除" class="headerlink" title="Nginx缓存清除"></a>Nginx缓存清除</h4><h5 id="方式一-删除对应缓存目录"><a href="#方式一-删除对应缓存目录" class="headerlink" title="方式一: 删除对应缓存目录"></a>方式一: 删除对应缓存目录</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo rm -rf /usr/<span class="built_in">local</span>/proxy_pass/...</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="方式二-第三方扩展模块"><a href="#方式二-第三方扩展模块" class="headerlink" title="方式二: 第三方扩展模块"></a>方式二: 第三方扩展模块</h5><p>使用<code>ngx_cache_purge</code>模块清除缓存, 需要安装模块</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">模块: https://github.com/FRiCKLE/ngx_cache_purge</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置清除路由</span></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">proxy_cache_path</span> /usr/local/proxy_cache levels=<span class="number">2</span>:<span class="number">2</span> keys_zone=ni9ne:<span class="number">200m</span> inactive=<span class="number">30s</span> max_size=<span class="number">2g</span>;</span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">location</span> /js &#123;</span><br><span class="line">            <span class="attribute">proxy_cache</span> ni9ne;</span><br><span class="line">            <span class="attribute">proxy_cache_key</span> $scheme$host$request_uri;</span><br><span class="line">            <span class="attribute">proxy_cache_valid</span> any <span class="number">1m</span>; </span><br><span class="line">            <span class="attribute">add_header</span> Nginx-Cache-Status <span class="string">&quot;$upstream_cache_status&quot;</span>;</span><br><span class="line">            <span class="attribute">add_header</span> Nginx-Cache-Key <span class="string">&quot;$scheme$host$request_uri&quot;</span>;</span><br><span class="line">            <span class="attribute">proxy_pass</span> http://192.168.253.135/js/;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="attribute">location</span> <span class="regexp">~ /purge(/.*)</span> &#123;</span><br><span class="line">            <span class="attribute">proxy_cache_purge</span> ni9ne $scheme$host<span class="variable">$1</span>;	<span class="comment"># 无法获取$proxy_host</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问清除页面结果</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a85383c41eaeee2620e25f6173b2e843-cb76d65.png" alt="image-20220606010637248"></p>
+<h4 id="Nginx设置资源不缓存"><a href="#Nginx设置资源不缓存" class="headerlink" title="Nginx设置资源不缓存"></a>Nginx设置资源不缓存</h4><p>对不需要缓存的数据进行指定, 使用以下指令可以实现</p>
+<h5 id="proxy-no-cache指令"><a href="#proxy-no-cache指令" class="headerlink" title="proxy_no_cache指令"></a>proxy_no_cache指令</h5><p>定义不缓存数据的条件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">语法:</span><br><span class="line">	proxy_no_cache string ...;</span><br><span class="line">位置: </span><br><span class="line">	http server location块</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置实例</span></span><br><span class="line"><span class="attribute">proxy_no_cache</span> $cookie_nocache $arg_nocache $arg_comment;</span><br></pre></td></tr></table></figure>
+
+<h5 id="proxy-cache-bypass指令"><a href="#proxy-cache-bypass指令" class="headerlink" title="proxy_cache_bypass指令"></a>proxy_cache_bypass指令</h5><p>设置不从缓存中获取数据的条件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">语法: </span><br><span class="line">	proxy_cache_bypass string ...;</span><br><span class="line">位置:</span><br><span class="line">	http server location块</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置实例</span></span><br><span class="line"><span class="attribute">proxy_cache_bypass</span> $cookie_nocache $arg_nocache $arg_comment;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述两个指令均支持多个条件, 且可以同时使用, 条件中只要至少有一个不为空且不等于’0’, 则条件满足成立, 不缓存或不获取缓存数据</p>
+</blockquote>
+<h5 id="涉及内置变量介绍"><a href="#涉及内置变量介绍" class="headerlink" title="涉及内置变量介绍"></a>涉及内置变量介绍</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- $cookie_nocache</span><br><span class="line">	当前请求的cookie中键为nocache对应的值</span><br><span class="line">	测试可使用 add_header Set-Cookie &#x27;nocache=1&#x27;</span><br><span class="line">- $arg_nocache/$arg_comment</span><br><span class="line">	当前请求的参数中属性名为nocache和comment对应的属性值</span><br></pre></td></tr></table></figure>
+
+<h5 id="案例实现"><a href="#案例实现" class="headerlink" title="案例实现"></a>案例实现</h5><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">	<span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">location</span> /js &#123;</span><br><span class="line">            <span class="attribute">if</span> ($request_uri <span class="regexp">~ /.*\.js$)</span>&#123;</span><br><span class="line">                <span class="attribute">set</span> $my_cache_sign <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="attribute">proxy_cache</span> ni9ne;</span><br><span class="line">            <span class="attribute">proxy_pass</span> http://192.168.253.135/js/;</span><br><span class="line">            <span class="comment"># proxy_no_cache $cookie_nocache $arg_nocache $arg_comment $my_cache_sign;</span></span><br><span class="line">            <span class="attribute">proxy_cache_bypass</span> $cookie_nocache $arg_nocache $arg_comment $my_cache_sign;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f0f39cb50e89291ba583b9bad8b74866-1bfd046.png" alt="image-20220606014448985"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2021/06/21/Nginx/Nginx07%E7%BC%93%E5%AD%98%E9%9B%86%E6%88%90/" title="Nginx缓存集成07">https://ni9ne.github.io/2021/06/21/Nginx/Nginx07缓存集成/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/06/21/Nginx/Nginx08%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/" rel="prev" title="Nginx服务端集群搭建08">
+                  <i class="fa fa-chevron-left"></i> Nginx服务端集群搭建08
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/06/21/Nginx/Nginx06%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="next" title="Nginx负载均衡06">
+                  Nginx负载均衡06 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>

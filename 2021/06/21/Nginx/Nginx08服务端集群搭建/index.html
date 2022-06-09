@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Nginx服务端集群搭建准备环境搭建构建可访问路径:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx服务端集群搭建08">
+<meta property="og:url" content="https://ni9ne.github.io/2021/06/21/Nginx/Nginx08%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="Nginx服务端集群搭建准备环境搭建构建可访问路径:">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/12192f412dac2fbd1b864292a9e6edbe-7ec1046.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/918afd8edea919c2a05c8d6b29d40dff-4456f0a.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c12e2239ea060640adb2b087caddda0e-1fb3d17.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c3d219941f1aa3e873b69c9c7febc615-a33074b.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/02ae83f1e2277edd0ff27e9bce7cf2de-9da4f7d.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/cd1be24aa182b5c84836826c107908d3-e036e01.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9ee1680b83cbf50602b78363ba9e5ccc-cfaa654.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4e2f9a15d4fa1620a70689f2268753ac-c8e3215.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/855d40885069bff5b8979cd7dfd29966-cd24672.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1dd7d806d29f2f8f11bcef4fe2cf1016-62a21a3.png">
+<meta property="article:published_time" content="2021-06-21T12:53:43.000Z">
+<meta property="article:modified_time" content="2022-06-09T09:52:08.071Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="Nginx">
+<meta property="article:tag" content="后端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/12192f412dac2fbd1b864292a9e6edbe-7ec1046.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2021/06/21/Nginx/Nginx08%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/06/21/Nginx/Nginx08%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/","path":"2021/06/21/Nginx/Nginx08服务端集群搭建/","title":"Nginx服务端集群搭建08"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Nginx服务端集群搭建08 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">80</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA"><span class="nav-number">1.</span> <span class="nav-text">Nginx服务端集群搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">准备环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx%E5%AE%9E%E7%8E%B0%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB"><span class="nav-number">1.2.</span> <span class="nav-text">Nginx实现动静分离</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB"><span class="nav-number">1.2.1.</span> <span class="nav-text">动静分离</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">1.2.2.</span> <span class="nav-text">实现方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%88%E6%9E%9C"><span class="nav-number">1.2.3.</span> <span class="nav-text">效果</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx%E5%AE%9E%E7%8E%B0%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA"><span class="nav-number">1.3.</span> <span class="nav-text">Nginx实现集群搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1%E5%99%A8134"><span class="nav-number">1.3.1.</span> <span class="nav-text">配置代理服务器134</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx%E9%AB%98%E5%8F%AF%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.4.</span> <span class="nav-text">Nginx高可用解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Keepalived"><span class="nav-number">1.4.1.</span> <span class="nav-text">Keepalived</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#VRRP%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">VRRP协议简介</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.4.2.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Keepalived"><span class="nav-number">1.4.3.</span> <span class="nav-text">安装Keepalived</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Keepalived%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.4.4.</span> <span class="nav-text">Keepalived配置文件介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEKeepalived"><span class="nav-number">1.4.5.</span> <span class="nav-text">配置Keepalived</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8Keepalived%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.4.6.</span> <span class="nav-text">启动Keepalived服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%90%AF%E5%8A%A8%E7%BB%93%E6%9E%9C"><span class="nav-number">1.4.7.</span> <span class="nav-text">查看启动结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vrrp-script%E7%9B%91%E6%8E%A7Nginx%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.4.8.</span> <span class="nav-text">vrrp_script监控Nginx服务</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9keepalived%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">1.4.8.1.</span> <span class="nav-text">修改keepalived配置文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%BC%96%E5%86%99ck-nginx-sh%E8%84%9A%E6%9C%AC"><span class="nav-number">1.4.8.2.</span> <span class="nav-text">编写ck_nginx.sh脚本</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%87%8D%E5%90%AFkeepalived%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.4.8.3.</span> <span class="nav-text">重启keepalived服务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E8%84%9A%E6%9C%AC"><span class="nav-number">1.4.8.4.</span> <span class="nav-text">验证脚本</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/06/21/Nginx/Nginx08%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nginx服务端集群搭建08
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-21 20:53:43" itemprop="dateCreated datePublished" datetime="2021-06-21T20:53:43+08:00">2021-06-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="Nginx服务端集群搭建"><a href="#Nginx服务端集群搭建" class="headerlink" title="Nginx服务端集群搭建"></a>Nginx服务端集群搭建</h2><h3 id="准备环境搭建"><a href="#准备环境搭建" class="headerlink" title="准备环境搭建"></a>准备环境搭建</h3><p>构建可访问路径:</p>
+<p>192.168.253.135/cluster/getAddress </p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/12192f412dac2fbd1b864292a9e6edbe-7ec1046.png" alt="image-20220606205305319"></p>
+<p>192.168.253.135/cluster/index.html</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">title</span>&gt;</span>后端服务器<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span> <span class="attr">src</span>=<span class="string">&quot;js/jquery.min.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;./img/ni9ne.png&quot;</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">h1</span>&gt;</span>后端服务器: <span class="tag">&lt;<span class="name">span</span> <span class="attr">id</span>=<span class="string">&quot;msg&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></span><br><span class="line"><span class="javascript">	$(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">		$.get(<span class="string">&#x27;cluster/getAddress&#x27;</span>, <span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">			$(<span class="string">&#x27;#msg&#x27;</span>).html(data);</span></span><br><span class="line"><span class="javascript">		&#125;);</span></span><br><span class="line"><span class="javascript">	&#125;);</span></span><br><span class="line"><span class="javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>由134服务器代理路径, 访问<code>192.168.253.135/demo/index.html</code>转发到135</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/918afd8edea919c2a05c8d6b29d40dff-4456f0a.png" alt="image-20220606205335429"></p>
+<blockquote>
+<p>实现动静分离, 搭建服务集群</p>
+</blockquote>
+<h3 id="Nginx实现动静分离"><a href="#Nginx实现动静分离" class="headerlink" title="Nginx实现动静分离"></a>Nginx实现动静分离</h3><h4 id="动静分离"><a href="#动静分离" class="headerlink" title="动静分离"></a>动静分离</h4><p><strong>动态资源</strong>指的是后台应用程序的业务处理结果, </p>
+<p><strong>静态资源</strong>则是html,js,css,image等资源</p>
+<p>分离处理可以降低动静资源的耦合度, 提高可用性, 同时, 静态资源也可以部署CDN</p>
+<h4 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h4><p>1.将静态资源移动到代理服务器本地硬盘</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c12e2239ea060640adb2b087caddda0e-1fb3d17.png" alt="image-20220606205415848"></p>
+<p>2.修改代理服务器nginx配置文件</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">	<span class="attribute">upstream</span> webservice&#123;</span><br><span class="line">        <span class="attribute">server</span> <span class="number">192.168.253.135</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">		<span class="comment"># 动态资源配置</span></span><br><span class="line">        <span class="attribute">location</span> /cluster &#123;</span><br><span class="line">            <span class="attribute">proxy_pass</span> http://webservice;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment"># 静态资源配置</span></span><br><span class="line">        <span class="attribute">location</span> ~/.*\.(png|jpg|gif|js)&#123;</span><br><span class="line">            <span class="attribute">root</span> /var/www/static;</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h4><p>此时, 当动态资源服务宕机时, 静态资源还可以正常显示</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c3d219941f1aa3e873b69c9c7febc615-a33074b.png" alt="image-20220606205700820"></p>
+<h3 id="Nginx实现集群搭建"><a href="#Nginx实现集群搭建" class="headerlink" title="Nginx实现集群搭建"></a>Nginx实现集群搭建</h3><h4 id="配置代理服务器134"><a href="#配置代理服务器134" class="headerlink" title="配置代理服务器134"></a>配置代理服务器134</h4><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">	<span class="attribute">upstream</span> webservice&#123;</span><br><span class="line">		<span class="attribute">server</span> <span class="number">192.168.253.135</span>;</span><br><span class="line">        <span class="attribute">server</span> <span class="number">192.168.253.136</span>;</span><br><span class="line">        <span class="attribute">server</span> <span class="number">192.168.253.137</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">		<span class="comment"># 动态资源配置</span></span><br><span class="line">        <span class="attribute">location</span> /cluster &#123;</span><br><span class="line">            <span class="attribute">proxy_pass</span> http://webservice;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment"># 静态资源配置</span></span><br><span class="line">        <span class="attribute">location</span> ~/.*\.(png|jpg|gif|js)&#123;</span><br><span class="line">            <span class="attribute">root</span> /var/www/static;</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/02ae83f1e2277edd0ff27e9bce7cf2de-9da4f7d.png" alt="image-20220606214400402"></p>
+<h3 id="Nginx高可用解决方案"><a href="#Nginx高可用解决方案" class="headerlink" title="Nginx高可用解决方案"></a>Nginx高可用解决方案</h3><p>动态资源集群中, 当某一服务器服务中断时, 可以切换到其余服务器获取动态数据, 当如果代理服务器宕机, 则需要通过其他手段解决问题</p>
+<h4 id="Keepalived"><a href="#Keepalived" class="headerlink" title="Keepalived"></a>Keepalived</h4><p>使用Keepalived解决可用性问题, Keepalived使用C语言编写, 通过<strong>虚拟路由冗余协议</strong>VRRP(Virtual Route Redundancy Protocol)实现功能</p>
+<h5 id="VRRP协议简介"><a href="#VRRP协议简介" class="headerlink" title="VRRP协议简介"></a>VRRP协议简介</h5><p>类似于Redis中的哨兵机制, 对外提供一个接口提供服务, 内部由多台设备动态选举一个master, 其余为backup, 当master心跳中断时, 其余backup竞争提升为master, 对外提供服务. </p>
+<p>其中主要包含选择协议(竞争master)与路由容错协议(master心跳监测_backup竞争)</p>
+<h4 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h4><table>
+<thead>
+<tr>
+<th>VIP</th>
+<th>IP</th>
+<th>主机名</th>
+<th>主/从</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td>192.168.253.134</td>
+<td>keepalived1</td>
+<td>master</td>
+</tr>
+<tr>
+<td>192.168.253.200</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>192.168.253.138</td>
+<td>keepalived2</td>
+<td>backup</td>
+</tr>
+</tbody></table>
+<h4 id="安装Keepalived"><a href="#安装Keepalived" class="headerlink" title="安装Keepalived"></a>安装Keepalived</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">安装keepalived</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt install keepalived</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo cp /usr/share/doc/keepalived/samples/keepalived.conf.sample  /etc/keepalived/keepalived.conf</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 或手动官网下载</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> https://keepalived.org/download.html</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -zxvf keepalived-2.0.20.tar.gz -C keepalived/</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> keepalived/keepalived-x.x.xx</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./configure --sysconf=/etc --prefix=/usr/<span class="built_in">local</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Keepalived配置文件介绍"><a href="#Keepalived配置文件介绍" class="headerlink" title="Keepalived配置文件介绍"></a>Keepalived配置文件介绍</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"># global全局部分</span><br><span class="line">global_defs &#123;</span><br><span class="line">   # 邮件通知目标, 当keepalived切换时发送email给具体的邮箱地址 </span><br><span class="line">   notification_email &#123;</span><br><span class="line">     ni9ne@outlook.com</span><br><span class="line">   &#125;   </span><br><span class="line">   # 设置发件人信息</span><br><span class="line">   notification_email_from Alexandre.Cassen@firewall.loc</span><br><span class="line">   # 指定SMTP服务地址</span><br><span class="line">   smtp_server 192.168.200.1</span><br><span class="line">   # 指定SMTP服务连接超时时间</span><br><span class="line">   smtp_connect_timeout 30</span><br><span class="line">   # 指定运行keepalived服务器的标识, 可用作邮件主题信息</span><br><span class="line">   router_id keepalived1</span><br><span class="line">   # 如果通告与接收的上一个通告来自相同master, 则不执行检查. 默认不跳过检查</span><br><span class="line">   vrrp_skip_check_adv_addr</span><br><span class="line">   # 严格遵守VRRP协议</span><br><span class="line">   vrrp_strict</span><br><span class="line">   # 配置免费ARP的时间间隔, 默认为0(以秒为单位，支持微秒)  </span><br><span class="line">   vrrp_garp_interval 0</span><br><span class="line">   # 设置主动请求NA之间的默认间隔(以秒为单位，支持微秒)  </span><br><span class="line">   vrrp_gna_interval 0</span><br><span class="line">&#125;</span><br><span class="line"># VRRP部分</span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">	# 设置默认身份: MASTER/BACKUP </span><br><span class="line">	state MASTER</span><br><span class="line">	# 指定网卡名称</span><br><span class="line">    interface eth33</span><br><span class="line">    # 虚拟路由ID, 用于区分运行在同一网络接口和地址上的多个VRRPD实例,0-255</span><br><span class="line">    virtual_router_id 50</span><br><span class="line">    # 优先级高的VRRP备份组上线时，通常会抢占优先级低的VRRP备份组。nopreempt将停止高优先级计算机接管master，并允许低优先级计算机继续担任master</span><br><span class="line">    # nopreempt</span><br><span class="line">    # 选出MASTER，优先级最高的获胜。 priority的取值范围为[1-255]</span><br><span class="line">    priority 100 </span><br><span class="line">    # VRRP的通告时间间隔</span><br><span class="line">    advert_int 1</span><br><span class="line">    # 虚拟服务IP地址</span><br><span class="line">    virtual_ipaddress &#123;</span><br><span class="line">        192.168.253.200</span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br><span class="line">virtual_server 10.10.10.2 1358 &#123;	# LVS设备相关</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="配置Keepalived"><a href="#配置Keepalived" class="headerlink" title="配置Keepalived"></a>配置Keepalived</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># 134 | 138</span><br><span class="line">global_defs &#123;</span><br><span class="line">   notification_email &#123;</span><br><span class="line">     acassen</span><br><span class="line">   &#125;</span><br><span class="line">   notification_email_from Alexandre.Cassen@firewall.loc</span><br><span class="line">   smtp_server 192.168.200.1</span><br><span class="line">   smtp_connect_timeout 30</span><br><span class="line">   router_id keepalived1	# 路径ID唯一,134-1 138-2</span><br><span class="line">&#125;</span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">    state master</span><br><span class="line">    interface ens33	# ip a 查询本机网卡名称</span><br><span class="line">    virtual_router_id 50</span><br><span class="line">    nopreempt</span><br><span class="line">    priority 100	# 设置优先级</span><br><span class="line">    advert_int 1</span><br><span class="line">    virtual_ipaddress &#123;</span><br><span class="line">        192.168.253.200	# 指定VIP</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">virtual_server 10.10.10.2 1358 &#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="启动Keepalived服务"><a href="#启动Keepalived服务" class="headerlink" title="启动Keepalived服务"></a>启动Keepalived服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl start keepalived</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="查看启动结果"><a href="#查看启动结果" class="headerlink" title="查看启动结果"></a>查看启动结果</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ps -ef | grep keepalived	<span class="comment"># 查看进程是否启动</span></span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/cd1be24aa182b5c84836826c107908d3-e036e01.png" alt="image-20220607021413268"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tail -f /var/<span class="built_in">log</span>/syslog	<span class="comment"># 查看日志</span></span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9ee1680b83cbf50602b78363ba9e5ccc-cfaa654.png" alt="image-20220607021630578"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ip addr 	<span class="comment"># 查看VIP是否注册到网卡</span></span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4e2f9a15d4fa1620a70689f2268753ac-c8e3215.png" alt="image-20220607021814980"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.253.200/cluster/index.html	# 访问VIP</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/855d40885069bff5b8979cd7dfd29966-cd24672.png" alt="image-20220607021926118"></p>
+<blockquote>
+<p>当keepalived进程关闭时, 备用节点自动上线, 替代原节点成为master, 若未配置nopreempt, 当原节点上线后, 由于优先级较高, master身份自动漂移到原节点.</p>
+<p>但仅通过keepalived进程存活与否来进行身份漂移无法满足需求, 还需要实时监听Nginx或其他服务是否存活, 来决定是否进行选举, 就需要使用vrrp_script实现</p>
+</blockquote>
+<h4 id="vrrp-script监控Nginx服务"><a href="#vrrp-script监控Nginx服务" class="headerlink" title="vrrp_script监控Nginx服务"></a>vrrp_script监控Nginx服务</h4><h5 id="修改keepalived配置文件"><a href="#修改keepalived配置文件" class="headerlink" title="修改keepalived配置文件"></a>修改keepalived配置文件</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo vi /etc/keepalived/keepalived.conf</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">global_defs&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line">vrrp_script ck_nginx &#123;	# 注意空格</span><br><span class="line">   script &quot;/etc/keepalived/script/ck_nginx.sh&quot;</span><br><span class="line">   interval 3</span><br><span class="line">   weight -20	# 执行脚本后,减权重,避免重复竞争</span><br><span class="line">   user ni9ne</span><br><span class="line">&#125;</span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">    ...</span><br><span class="line">   track_script &#123;	# 注意空格</span><br><span class="line">      ck_nginx</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="编写ck-nginx-sh脚本"><a href="#编写ck-nginx-sh脚本" class="headerlink" title="编写ck_nginx.sh脚本"></a>编写ck_nginx.sh脚本</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim /etc/keepalived/script/ck_nginx.sh</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo chmod 777 /etc/keepalived/script/ck_nginx.sh</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">! /bin/bash</span></span><br><span class="line">num=`ps -C nginx --no-header | wc -l`</span><br><span class="line">if [ $num -eq 0 ];then</span><br><span class="line"><span class="meta">	#</span><span class="bash">sudo systemctl restart nginx</span></span><br><span class="line"><span class="meta">	#</span><span class="bash">sleep 2</span></span><br><span class="line"><span class="meta">	#</span><span class="bash"><span class="keyword">if</span> [ `ps -C nginx --no-header | wc -l` -eq 0 ];<span class="keyword">then</span></span></span><br><span class="line">		sudo killall keepalived</span><br><span class="line"><span class="meta">	#</span><span class="bash"><span class="keyword">fi</span></span></span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<h5 id="重启keepalived服务"><a href="#重启keepalived服务" class="headerlink" title="重启keepalived服务"></a>重启keepalived服务</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl restart keepalived</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="验证脚本"><a href="#验证脚本" class="headerlink" title="验证脚本"></a>验证脚本</h5><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1dd7d806d29f2f8f11bcef4fe2cf1016-62a21a3.png" alt="image-20220607031746823"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2021/06/21/Nginx/Nginx08%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/" title="Nginx服务端集群搭建08">https://ni9ne.github.io/2021/06/21/Nginx/Nginx08服务端集群搭建/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/06/21/Nginx/Nginx09%E4%B8%AD%E7%9A%84Lua%E4%BB%8B%E7%BB%8D/" rel="prev" title="Nginx中的Lua介绍09">
+                  <i class="fa fa-chevron-left"></i> Nginx中的Lua介绍09
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/06/21/Nginx/Nginx07%E7%BC%93%E5%AD%98%E9%9B%86%E6%88%90/" rel="next" title="Nginx缓存集成07">
+                  Nginx缓存集成07 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>

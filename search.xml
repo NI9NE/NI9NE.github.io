@@ -22782,197 +22782,178 @@ composer require ni9ne/excelexport
       </tags>
   </entry>
   <entry>
-    <title>Nginx静态资源压缩02</title>
-    <url>/2020/06/28/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A902/</url>
+    <title>Nginx服务器基础配置00</title>
+    <url>/2021/06/21/Nginx/Nginx00%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/</url>
     <content><![CDATA[
-## Nginx静态资源压缩
+## Nginx服务器基础配置实例
 
-在Nginx的配置文件中可以通过gzip来对静态资源进行压缩
+### 1.准备测试素材文件
 
-```
-ngx_http_gzip_module模块		# nginx自带
-ngx_http_gzip_static_module模块	# 需要安装
-ngx_http_gunzip_module模块		# 需要安装
-```
+![image-20211116191534027](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211116191534027.png)
 
-### Gzip各模块支持配置指令
+### 2.替换编写nginx.conf文件
 
-以下指令都来自于ngx_http_gzip_module模块支持, 该模块nginx内置, 可以直接使用
+```nginx
+user www-data;
 
-```
-模块文档: http://nginx.org/en/docs/http/ngx_http_gzip_module.html
-```
+worker_processes 2;
 
-#### gzip 
+error_log /var/www/nginx_test/log/error.log;
 
-`gzip on|off`  用于开启或关闭gzip功能
+daemon on;
 
-```
-http{
-	gzip on;
+events {
+    accept_mutex on;
+    multi_accept on;
+    worker_connections 1024;
+    use epoll;
+}
+
+http {
+    sendfile on;
+    include mime.types;
+    default_type application/octet-stream;
+    keepalive_timeout 65;
+    log_format server1 '=====> server1 access log format';
+	log_format server2 '=====> server2 access log format';
+
+    include /etc/nginx/conf.d/conf.d/*.conf;
+
 }
 ```
 
-> 可以用于http/server/loaction
+### 3.编写两个服务文件
 
-#### gzip_types
+#### server1.conf 
 
-`gzip_types mime-type ...` 设置需要压缩的文件mime类型
+```nginx
+server {
+    listen 8081;
 
-默认压缩text/html 
+    server_name nginx.conf.test;
 
-```
-http{
-	gzip_types application/javascript;
+    access_log /var/www/nginx_test/server1/logs/access.log server1;
+    
+    location /server1/location1{
+        root /var/www/nginx_test;
+        index index_sr1_location1.html;
+    }
+
+    location /server1/location2{
+        root /var/www/nginx_test;
+        index index_sr1_location2.html;
+    }
+
+    error_page 404 /404.html;
+
+    location = /404.html{
+        root /var/www/nginx_test;
+        index 404.html;
+    }
 }
 ```
 
-> 所选值可以从mime.types文件中查找, 也可以使用* 代表所有类型, 但不推荐
+#### server2.conf
 
-#### gzip_comp_level 
+```nginx
+server {
+    listen 8082;
 
-`gzip_comp_level level` 设置Gzip压缩程度
+    server_name nginx.conf.test;
 
-级别从1到9, 压缩程度上升, 压缩效率降低, 9 代表压缩程度最高, 但效率最低
+    access_log /var/www/nginx_test/server2/logs/access.log server2;
+    
+    location /server2/location1{
+        root /var/www/nginx_test;
+        index index_sr2_location1.html;
+    }
 
-```
-http{
-	gzip_comp_level 6;
+    location /server2/location2{
+        root /var/www/nginx_test;
+        index index_sr2_location2.html;
+    }
+
+    error_page 404 /404.html;
+
+    location /404.html{
+        root /var/www/nginx_test;
+        index 404.html;
+    }
 }
 ```
 
-#### gzip_vary 
+### 4.重新加载启动nginx服务
 
-`gzip_vary on|off ` 设置是否携带gzip响应头
-
-`gzip_vary` 用于设置进行压缩发送是否携带 `Vary:Accept-Encoding` 响应头, 告诉接收方该资源经过了Gzip压缩处理
-
-```
-http{
-	gzip_vary on;
-}
+```shell
+sudo nginx -s reload
 ```
 
-> 可用于http/server/location
+### 5.测试结果
 
-#### gzip_buffers
+![image-20211116192129333](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211116192129333.png)
 
-`gzip_buffers number size` 用于设置压缩的缓冲区数量及大小
 
-该值设定一般和服务器操作系统有关, 一般使用默认值即可
 
-```
-http{
-	gzip_buffers 4 16k;
-}
-```
 
-#### gzip_disable
 
-`gzip_disable regex ..` 用于使用正则针对不同的浏览器禁用Gzip功能
+## Nginx操作优化
 
-regex匹配`Request Headers`中`User-Agent` 数据
+### Nginx配置系统服务
 
-```
-http{
-	gzip_disable "MSIE [1-6]\."; # 排除IE6以下版本
-}
-```
-
-#### gzip_http_version
-
-`gzip_http_version 1.0|1.1`  针对不同的HTTP协议版本, 选择性开启或关闭gzip
-
-该指令用于指定最低HTTP协议版本, 一般用默认值即可
-
-```
-http{
-	gzip_http_version 1.1;
-}
-```
-
-#### gzip_min_length
-
-`gzip_min_length` 指定需要压缩的最小文件长度
-
-默认20, 从头信息中的`Content-Length`中获取
-
-```
-nginx 计量但对: bytes[字节] / kb[千字节] / M[兆]
-如: 1024 / 10k / 10m
+```shell
+sudo vim /usr/lib/systemd/system/nginx.service
 ```
 
 ```
-http{
-	gzip_min_length 20;
-}
-```
-
-#### gzip_proxied
-
-`gzip_proxied off|expired|no-cache|no-store|private|no_last_modified|no-etag|auth|any` 设置是否对服务端返回结果进行Gzip压缩
-
-> 反向代理相关
-
-- off  关闭nginx服务器对后台服务器返回结果的压缩, 忽略其他参数
-- expired  启用压缩, 如果响应头headers头中包含`Expires` 头信息
-- no-cache  启用压缩, 如果响应头headers头中包含`Cache-Control:no-cache`头信息
-- no-store  启用压缩, 如果响应头headers头中包含`Cache-Control:no-store`头信息
-- private  启用压缩, 如果响应头headers头中包含`Cache-Control:private`头信息
-- no-last-modified  启用压缩, 如果响应头headers头中不包含`Last-Modified` 头信息
-- no-etag  启用压缩, 如果响应头headers头中不包含 `ETag` 头信息
-- auth  启用压缩, 如果响应头headers头中包含`Authorization` 头信息
-- any  为所有代理请求无条件启用压缩
-
-### Gzip压缩功能配置
-
-编辑新建nginx_zip.conf文件
-
-```
-gzip on;			# 开启gzip功能
-gzip_types *;		# 压缩文件类型,mime-type
-gzip_comp_level 6;	# gzip 压缩等级
-gzip_min_length 1024;# 需要进行压缩响应页面的最小长度 content-length
-gzip_buffers 4 16k;	# 缓存空间数量及大小
-gzip_http_version 1.1;# 指定压缩响应需要的最低HTTP协议版本
-gzip_vary on;		# 向响应头中添加压缩表示
-gzip_disable "MSIE [1-6]\.";	# 过滤浏览器禁用压缩
-gzip_proxied off;	# nginx作为反向代理压缩服务端返回数据的条件
-```
-
-将配置文件引入nginx.conf
-
-```
-include nginx_zip.conf;
-```
-
-### Gzip和sendfile的冲突解决
-
-Gzip需要应用程序用户态进行操作文件并压缩发送, 但sendfile是直接从内核缓冲区发送到Socket缓冲区的, 会导致功能冲突
-
-可以使用`ngx_http_gzip_static_module` 模块的 `gzip_static` 指令解决问题
-
-![image-20211119012700914](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119012700914.png)
-
-解决方案是在请求资源之前, 就将资源压缩, `jquery.js` 压缩为 `jquery.js.gz`, 在用户请求资源时, 发送压缩后的文件给用户, 由浏览器进行解压缩显示
-
-#### gzip_static
-
-`gzip_static on|off|always;` 
-
-访问与资源同名的`.gz` 文件时, response中以gzip相关的header返回`.gz`文件内容
-
-> 添加上述命令后, 若报错 unknown directiove 'gzip_static', 原因是Nginx默认没有添加对应模块, 需要手动安装 ./configure --with-http_gzip_static_module
-
-```
-http{
-	gzip_static on;
-}
+[Unit]
+Description=nginx web service
+Documentation=http://nginx.org/en/docs/
+After=network.target
+[service]
+Type=forking
+PIDFile=/usr/local/nginx/logs/nginx.pid
+ExecstartPre=/usr/local/nginx/sbin/nginx -t -c /usr/loca1/nginx/conf/nginx.conf
+Execstart=/usr/local/nginx/sbin/nginx
+ExecReload=/usr/local/nginx/sbin/nginx -s reload
+Execstop=/usr/local/nginx/sbin/nginx -s stop
+PrivateTmp=true
+[Install]
+WantedBy=default.target
 ```
 
 ```shell
-gzip /var/www/test/images/jquery.js
+sudo chmod 755 /usr/lib/systemd/system/nginx.service
 ```
+
+使用系统命令执行nginx服务
+
+```shell
+systemctl start nginx  		# 启动
+systemctl stop nginx		# 停止
+systemctl restart nginx		# 重启
+systemctl reload nginx 		# 重载配置
+systemctl status nginx		# 查看状态
+systemctl enable nginx		# 开机启动
+```
+
+> 本机测试用系统安装时已自行配置, 可直接使用systemctl操作nginx
+
+### Nginx命令配置到系统环境
+
+```shell
+sudo vim /etc/profile
+```
+
+```
+最后一行添加
+export PATH=$PATH:/usr/local/nginx/sbin
+```
+
+```shell
+source /etc/profile
+```
+
+> 本机测试用系统安装时已自行配置, 可直接用nginx命令
 
 ]]></content>
       <categories>
@@ -22980,290 +22961,12 @@ gzip /var/www/test/images/jquery.js
       </categories>
       <tags>
         <tag>Nginx</tag>
-        <tag>PHP</tag>
         <tag>后端</tag>
       </tags>
   </entry>
   <entry>
-    <title>Nginx静态资源缓存、跨域、防盗链03</title>
-    <url>/2020/07/05/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E7%BC%93%E5%AD%98%E3%80%81%E8%B7%A8%E5%9F%9F%E3%80%81%E9%98%B2%E7%9B%97%E9%93%BE03/</url>
-    <content><![CDATA[
-## 静态资源缓存处理
-
-> web 缓存: 一个web资源存在于web服务器和客户端之间的副本
-
-### web缓存分类
-
-```
-客户端缓存
-	浏览器缓存 - 浏览器在用户磁盘上的资源缓存
-服务端缓存
-	Nginx/Redis/Memcache等
-```
-
-###  浏览器缓存执行流程
-
-HTTP协议中与页面缓存相关的字段:
-
-| headers       | 说明                                |
-| ------------- | ----------------------------------- |
-| Expires       | 缓存过期的日期时间                  |
-| Cache-Control | 设置缓存相关配置信息                |
-| Last-Modified | 请求资源最后修改时间                |
-| ETag          | 请求实体标签的当前值, 如文件的MD5值 |
-
-![image-20211120005659396](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120005659396.png)
-
-```
-强缓存: 直接从浏览器端使用缓存, 不与服务端交互
-协商缓存: 发现本地缓存过期后, 发送请求与服务端协商, 服务端判定资源未发生变化, 返回304, 仍使用浏览器缓存
-```
-
-### Nginx浏览器缓存指令
-
-Nginx实现对应缓存设置, 需要如下指令
-
-#### expires
-
-用于控制页面资源过期时间, 可以通过控制HTTP响应头中的`Expires` 和 `Cache-Control` 实现
-
-##### 指令格式
-
-`expires [modified] time;  ||  expires epoch|max|off;`
-
-```
-time: 可以为任意整数指定过期时间, 单位为秒. 
-	如果是负数, Cache-Control值设定为no-cache
-	如果为正数或0, 则Cache-Control被设定为max-age=time
-epoch: 指定Expires值为'1 January,1970,00:00:00 GMT', 即1970-01-01 00:00:00,
-	Cache-Control值为no-cache
-max: 指定Expires值为'31December,2037,23:59:59 GMT', 即2037-12-31 23:59:59
-	Cache-Control值为315360000 (10年)
-off: 不缓存
-```
-
-> 注: HTTP响应头中, Expires和Cache-Control共同控制缓存过期配置. 
->
-> 其中, Expires为1.0版本协议, 使用GMT时间对照浏览器与服务器资源过期时间, 在时间配置不同步时会出现问题.
->
-> 所以在1.1版本中, 使用Cache-Control:max-age=time, 以相对时间对照过期时间, 实现资源缓存的配置
-
-##### 指令配置
-
-```nginx
-location ~ .*\.(html|js|css|png)${
-    expires 1000;
-}
-```
-
-![image-20211120012032536](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120012032536.png)
-
-#### add_header
-
-用于添加HTTP响应头信息, 值
-
-##### 指令语法
-
-`add_header name value [always];`
-
-```
-其中缓存配置主要修改Cache-Control值, 值包括:
-must-revalidate		可缓存但必须向服务器进行确认协商
-no-cache			指示请求或响应消息不能缓存,不是说可以设置不缓存,而是需要和服务器确认
-no-store			不缓存请求或响应的任何内容
-no-transform		代理不可更改媒体类型
-public				可向任意方提供响应缓存
-private				可向特定用户提供响应缓存
-proxy-revalidate	要求中间缓存服务器对缓存的响应有效性再次确认
-max-age=<seconds>	最大响应缓存Age时间
-s-maxage=<seconds>	公共缓存服务器响应的最大Age值
-```
-
-##### 指令配置
-
-```nginx
-location ~ .*\.(html|js|css|png)${
-    add_header Cache-Control no-store;
-}
-```
-
-## Nginx跨域问题解决
-
-### 浏览器同源策略
-
-浏览器的一种约定策略, 将协议、域名(IP)、端口相同的请求称为同源请求. 
-
-### 跨域问题
-
-即存在两台服务器A, B. 如果从A的页面发送异步请求到B获取数据, 如果服务器A和B不满足同源策略, 就会出现跨域问题
-
-### 跨域演示
-
-新建nginx配置server
-
-```nginx
-server {
-    listen 8081;
-    server_name test.project.com;
-    location / {
-        root /var/www/test;
-        index index.html;
-    }
-}
-server {
-    listen 8082;
-    server_name localhost;
-    location / {
-        root /var/www/test/another;
-        index index.html index.php;
-    }
-}
-```
-
-新建/var/www/test/index.html文件
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<title>跨域演示</title>
-	<script src="jquery.js"></script>
-</head>
-<body>
-	<input type="button" name="bt" value="获取跨域数据" id="btn">
-</body>
-<script type="text/javascript">
-	$(function(){
-		$("#btn").click(function(){
-			$.get('http://192.168.253.134:8082/getUser', function(data){
-				alert(JSON.stringify(data));
-			})
-		});
-	});
-</script>
-</html>
-```
-
-请求结果如下:
-
-![image-20211120023920588](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120023920588.png)
-
-### 跨域解决方案
-
-使用Nginx指令add_header 添加响应头信息
-
-```
-需要添加两个信息:
-Access-Control-Allow-Origin		# 允许访问域名, 可配置多个,逗号分隔, 或 * 代表所有 
-Access-Control-Allow-Methods	# 允许访问方式, 可配置多个,逗号分隔
-```
-
-如修改上述案例的nginx配置如下
-
-```nginx
-server {
-    listen 8081;
-    server_name test.project.com;
-    location / {
-        root /var/www/test;
-        index index.html;
-    }
-}
-server {
-    listen 8082;
-    server_name localhost;
-    location / {
-        add_header Access-Control-Allow-Origin http://test.project.com:8081;
-        add_header Access-Control-Allow-Methods *;
-        root /var/www/test/another;
-        index index.html index.php;
-    }
-}
-```
-
-重新请求结果如下:
-
-![image-20211120024917471](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120024917471.png)
-
-## 静态资源防盗链
-
-**资源盗链**: 将不在自己服务器上的静态资源通过技术手段, 绕过限制放置到自己的页面上展示给用户, 依次盗取大网站的空间和流量
-
-如下所示代码:
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<title>盗链演示</title>
-</head>
-<body>
-	<img src="https://m.360buyimg.com/babel/jfs/t1/169821/25/23076/279367/6191c359E738f3e96/64e56f4355e3cd20.gif">
-</body>
-</html>
-```
-
-### 实现原理
-
-使用HTTP请求头中的`Referer` , 获取来源网站地址是否为信任地址, 若是则放行访问, 若不是则返回403(拒绝访问)状态码
-
-使用Nginx指令`valid_referers` 实现匹配
-
-### 指令格式
-
-`valid_referers none|blocked|server_names|string ...`
-
-```
-指令valid_referers会通过匹配Referer和配置后面的内容, 将结果赋给变量$invalid_referer, 若匹配成功, 该值等于0, 匹配失败, 该值等于1, 匹配时不区分大小写
-```
-
-```
-none: 如果Header中的Referer为空, 允许访问
-blocker: Header中的Referer不为空, 但该值被防火墙或代理伪装过, 如不带http:// https://等协议头, 允许访问
-server_names: 具体的域名或IP
-string: 支持正则表达式和*的统配符表达式如: *.example.com  ~.*\.google\..*
-```
-
-### Nginx配置实例
-
-```nginx
-location ~ ^.*\.(png|jpg|gif)$ {	# 针对文件类型防盗链
-    valid_referers none blocked www.baidu.com;
-    if ($invalid_referer) {
-        return 403;
-    }
-}
-
-location /images {	# 针对目录防盗链
-    valid_referers none blocked www.baidu.com;
-    if ($invalid_referer) {
-        return 403;
-    }
-    root /var/www/test;
-}
-```
-
-### 效果展示 
-
-![image-20211120042313902](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120042313902.png)
-
-### 通过模块精细化设置
-
-需要使用Nginx模块 `ngx_http_accesskey_module` ]]></content>
-      <categories>
-        <category>学习笔记</category>
-      </categories>
-      <tags>
-        <tag>Nginx</tag>
-        <tag>PHP</tag>
-        <tag>后端</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Nginx静态资源部署优化01</title>
-    <url>/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/</url>
+    <title>Nginx静态资源部署优化_部署01</title>
+    <url>/2021/06/21/Nginx/Nginx01%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/</url>
     <content><![CDATA[
 ## Nginx静态资源部署
 
@@ -23624,13 +23327,490 @@ tcp_nopush和tcp_nodelay在linux 2.5.9之后可以兼容, 两者都开启可以�
       </categories>
       <tags>
         <tag>Nginx</tag>
-        <tag>PHP</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx静态资源部署优化_压缩02</title>
+    <url>/2021/06/21/Nginx/Nginx02%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A9/</url>
+    <content><![CDATA[
+## Nginx静态资源压缩
+
+在Nginx的配置文件中可以通过gzip来对静态资源进行压缩
+
+```
+ngx_http_gzip_module模块		# nginx自带
+ngx_http_gzip_static_module模块	# 需要安装
+ngx_http_gunzip_module模块		# 需要安装
+```
+
+### Gzip各模块支持配置指令
+
+以下指令都来自于ngx_http_gzip_module模块支持, 该模块nginx内置, 可以直接使用
+
+```
+模块文档: http://nginx.org/en/docs/http/ngx_http_gzip_module.html
+```
+
+#### gzip 
+
+`gzip on|off`  用于开启或关闭gzip功能
+
+```
+http{
+	gzip on;
+}
+```
+
+> 可以用于http/server/loaction
+
+#### gzip_types
+
+`gzip_types mime-type ...` 设置需要压缩的文件mime类型
+
+默认压缩text/html 
+
+```
+http{
+	gzip_types application/javascript;
+}
+```
+
+> 所选值可以从mime.types文件中查找, 也可以使用* 代表所有类型, 但不推荐
+
+#### gzip_comp_level 
+
+`gzip_comp_level level` 设置Gzip压缩程度
+
+级别从1到9, 压缩程度上升, 压缩效率降低, 9 代表压缩程度最高, 但效率最低
+
+```
+http{
+	gzip_comp_level 6;
+}
+```
+
+#### gzip_vary 
+
+`gzip_vary on|off ` 设置是否携带gzip响应头
+
+`gzip_vary` 用于设置进行压缩发送是否携带 `Vary:Accept-Encoding` 响应头, 告诉接收方该资源经过了Gzip压缩处理
+
+```
+http{
+	gzip_vary on;
+}
+```
+
+> 可用于http/server/location
+
+#### gzip_buffers
+
+`gzip_buffers number size` 用于设置压缩的缓冲区数量及大小
+
+该值设定一般和服务器操作系统有关, 一般使用默认值即可
+
+```
+http{
+	gzip_buffers 4 16k;
+}
+```
+
+#### gzip_disable
+
+`gzip_disable regex ..` 用于使用正则针对不同的浏览器禁用Gzip功能
+
+regex匹配`Request Headers`中`User-Agent` 数据
+
+```
+http{
+	gzip_disable "MSIE [1-6]\."; # 排除IE6以下版本
+}
+```
+
+#### gzip_http_version
+
+`gzip_http_version 1.0|1.1`  针对不同的HTTP协议版本, 选择性开启或关闭gzip
+
+该指令用于指定最低HTTP协议版本, 一般用默认值即可
+
+```
+http{
+	gzip_http_version 1.1;
+}
+```
+
+#### gzip_min_length
+
+`gzip_min_length` 指定需要压缩的最小文件长度
+
+默认20, 从头信息中的`Content-Length`中获取
+
+```
+nginx 计量但对: bytes[字节] / kb[千字节] / M[兆]
+如: 1024 / 10k / 10m
+```
+
+```
+http{
+	gzip_min_length 20;
+}
+```
+
+#### gzip_proxied
+
+`gzip_proxied off|expired|no-cache|no-store|private|no_last_modified|no-etag|auth|any` 设置是否对服务端返回结果进行Gzip压缩
+
+> 反向代理相关
+
+- off  关闭nginx服务器对后台服务器返回结果的压缩, 忽略其他参数
+- expired  启用压缩, 如果响应头headers头中包含`Expires` 头信息
+- no-cache  启用压缩, 如果响应头headers头中包含`Cache-Control:no-cache`头信息
+- no-store  启用压缩, 如果响应头headers头中包含`Cache-Control:no-store`头信息
+- private  启用压缩, 如果响应头headers头中包含`Cache-Control:private`头信息
+- no-last-modified  启用压缩, 如果响应头headers头中不包含`Last-Modified` 头信息
+- no-etag  启用压缩, 如果响应头headers头中不包含 `ETag` 头信息
+- auth  启用压缩, 如果响应头headers头中包含`Authorization` 头信息
+- any  为所有代理请求无条件启用压缩
+
+### Gzip压缩功能配置
+
+编辑新建nginx_zip.conf文件
+
+```
+gzip on;			# 开启gzip功能
+gzip_types *;		# 压缩文件类型,mime-type
+gzip_comp_level 6;	# gzip 压缩等级
+gzip_min_length 1024;# 需要进行压缩响应页面的最小长度 content-length
+gzip_buffers 4 16k;	# 缓存空间数量及大小
+gzip_http_version 1.1;# 指定压缩响应需要的最低HTTP协议版本
+gzip_vary on;		# 向响应头中添加压缩表示
+gzip_disable "MSIE [1-6]\.";	# 过滤浏览器禁用压缩
+gzip_proxied off;	# nginx作为反向代理压缩服务端返回数据的条件
+```
+
+将配置文件引入nginx.conf
+
+```
+include nginx_zip.conf;
+```
+
+### Gzip和sendfile的冲突解决
+
+Gzip需要应用程序用户态进行操作文件并压缩发送, 但sendfile是直接从内核缓冲区发送到Socket缓冲区的, 会导致功能冲突
+
+可以使用`ngx_http_gzip_static_module` 模块的 `gzip_static` 指令解决问题
+
+![image-20211119012700914](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211119012700914.png)
+
+解决方案是在请求资源之前, 就将资源压缩, `jquery.js` 压缩为 `jquery.js.gz`, 在用户请求资源时, 发送压缩后的文件给用户, 由浏览器进行解压缩显示
+
+#### gzip_static
+
+`gzip_static on|off|always;` 
+
+访问与资源同名的`.gz` 文件时, response中以gzip相关的header返回`.gz`文件内容
+
+> 添加上述命令后, 若报错 unknown directiove 'gzip_static', 原因是Nginx默认没有添加对应模块, 需要手动安装 ./configure --with-http_gzip_static_module
+
+```
+http{
+	gzip_static on;
+}
+```
+
+```shell
+gzip /var/www/test/images/jquery.js
+```
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx静态资源部署优化_缓存、跨域、防盗链03</title>
+    <url>/2021/06/21/Nginx/Nginx03%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E7%BC%93%E5%AD%98%E3%80%81%E8%B7%A8%E5%9F%9F%E3%80%81%E9%98%B2%E7%9B%97%E9%93%BE/</url>
+    <content><![CDATA[
+## 静态资源缓存处理
+
+> web 缓存: 一个web资源存在于web服务器和客户端之间的副本
+
+### web缓存分类
+
+```
+客户端缓存
+	浏览器缓存 - 浏览器在用户磁盘上的资源缓存
+服务端缓存
+	Nginx/Redis/Memcache等
+```
+
+###  浏览器缓存执行流程
+
+HTTP协议中与页面缓存相关的字段:
+
+| headers       | 说明                                |
+| ------------- | ----------------------------------- |
+| Expires       | 缓存过期的日期时间                  |
+| Cache-Control | 设置缓存相关配置信息                |
+| Last-Modified | 请求资源最后修改时间                |
+| ETag          | 请求实体标签的当前值, 如文件的MD5值 |
+
+![image-20211120005659396](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120005659396.png)
+
+```
+强缓存: 直接从浏览器端使用缓存, 不与服务端交互
+协商缓存: 发现本地缓存过期后, 发送请求与服务端协商, 服务端判定资源未发生变化, 返回304, 仍使用浏览器缓存
+```
+
+### Nginx浏览器缓存指令
+
+Nginx实现对应缓存设置, 需要如下指令
+
+#### expires
+
+用于控制页面资源过期时间, 可以通过控制HTTP响应头中的`Expires` 和 `Cache-Control` 实现
+
+##### 指令格式
+
+`expires [modified] time;  ||  expires epoch|max|off;`
+
+```
+time: 可以为任意整数指定过期时间, 单位为秒. 
+	如果是负数, Cache-Control值设定为no-cache
+	如果为正数或0, 则Cache-Control被设定为max-age=time
+epoch: 指定Expires值为'1 January,1970,00:00:00 GMT', 即1970-01-01 00:00:00,
+	Cache-Control值为no-cache
+max: 指定Expires值为'31December,2037,23:59:59 GMT', 即2037-12-31 23:59:59
+	Cache-Control值为315360000 (10年)
+off: 不缓存
+```
+
+> 注: HTTP响应头中, Expires和Cache-Control共同控制缓存过期配置. 
+>
+> 其中, Expires为1.0版本协议, 使用GMT时间对照浏览器与服务器资源过期时间, 在时间配置不同步时会出现问题.
+>
+> 所以在1.1版本中, 使用Cache-Control:max-age=time, 以相对时间对照过期时间, 实现资源缓存的配置
+
+##### 指令配置
+
+```nginx
+location ~ .*\.(html|js|css|png)${
+    expires 1000;
+}
+```
+
+![image-20211120012032536](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120012032536.png)
+
+#### add_header
+
+用于添加HTTP响应头信息, 值
+
+##### 指令语法
+
+`add_header name value [always];`
+
+```
+其中缓存配置主要修改Cache-Control值, 值包括:
+must-revalidate		可缓存但必须向服务器进行确认协商
+no-cache			指示请求或响应消息不能缓存,不是说可以设置不缓存,而是需要和服务器确认
+no-store			不缓存请求或响应的任何内容
+no-transform		代理不可更改媒体类型
+public				可向任意方提供响应缓存
+private				可向特定用户提供响应缓存
+proxy-revalidate	要求中间缓存服务器对缓存的响应有效性再次确认
+max-age=<seconds>	最大响应缓存Age时间
+s-maxage=<seconds>	公共缓存服务器响应的最大Age值
+```
+
+##### 指令配置
+
+```nginx
+location ~ .*\.(html|js|css|png)${
+    add_header Cache-Control no-store;
+}
+```
+
+## Nginx跨域问题解决
+
+### 浏览器同源策略
+
+浏览器的一种约定策略, 将协议、域名(IP)、端口相同的请求称为同源请求. 
+
+### 跨域问题
+
+即存在两台服务器A, B. 如果从A的页面发送异步请求到B获取数据, 如果服务器A和B不满足同源策略, 就会出现跨域问题
+
+### 跨域演示
+
+新建nginx配置server
+
+```nginx
+server {
+    listen 8081;
+    server_name test.project.com;
+    location / {
+        root /var/www/test;
+        index index.html;
+    }
+}
+server {
+    listen 8082;
+    server_name localhost;
+    location / {
+        root /var/www/test/another;
+        index index.html index.php;
+    }
+}
+```
+
+新建/var/www/test/index.html文件
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>跨域演示</title>
+	<script src="jquery.js"></script>
+</head>
+<body>
+	<input type="button" name="bt" value="获取跨域数据" id="btn">
+</body>
+<script type="text/javascript">
+	$(function(){
+		$("#btn").click(function(){
+			$.get('http://192.168.253.134:8082/getUser', function(data){
+				alert(JSON.stringify(data));
+			})
+		});
+	});
+</script>
+</html>
+```
+
+请求结果如下:
+
+![image-20211120023920588](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120023920588.png)
+
+### 跨域解决方案
+
+使用Nginx指令add_header 添加响应头信息
+
+```
+需要添加两个信息:
+Access-Control-Allow-Origin		# 允许访问域名, 可配置多个,逗号分隔, 或 * 代表所有 
+Access-Control-Allow-Methods	# 允许访问方式, 可配置多个,逗号分隔
+```
+
+如修改上述案例的nginx配置如下
+
+```nginx
+server {
+    listen 8081;
+    server_name test.project.com;
+    location / {
+        root /var/www/test;
+        index index.html;
+    }
+}
+server {
+    listen 8082;
+    server_name localhost;
+    location / {
+        add_header Access-Control-Allow-Origin http://test.project.com:8081;
+        add_header Access-Control-Allow-Methods *;
+        root /var/www/test/another;
+        index index.html index.php;
+    }
+}
+```
+
+重新请求结果如下:
+
+![image-20211120024917471](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120024917471.png)
+
+## 静态资源防盗链
+
+**资源盗链**: 将不在自己服务器上的静态资源通过技术手段, 绕过限制放置到自己的页面上展示给用户, 依次盗取大网站的空间和流量
+
+如下所示代码:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>盗链演示</title>
+</head>
+<body>
+	<img src="https://m.360buyimg.com/babel/jfs/t1/169821/25/23076/279367/6191c359E738f3e96/64e56f4355e3cd20.gif">
+</body>
+</html>
+```
+
+### 实现原理
+
+使用HTTP请求头中的`Referer` , 获取来源网站地址是否为信任地址, 若是则放行访问, 若不是则返回403(拒绝访问)状态码
+
+使用Nginx指令`valid_referers` 实现匹配
+
+### 指令格式
+
+`valid_referers none|blocked|server_names|string ...`
+
+```
+指令valid_referers会通过匹配Referer和配置后面的内容, 将结果赋给变量$invalid_referer, 若匹配成功, 该值等于0, 匹配失败, 该值等于1, 匹配时不区分大小写
+```
+
+```
+none: 如果Header中的Referer为空, 允许访问
+blocker: Header中的Referer不为空, 但该值被防火墙或代理伪装过, 如不带http:// https://等协议头, 允许访问
+server_names: 具体的域名或IP
+string: 支持正则表达式和*的统配符表达式如: *.example.com  ~.*\.google\..*
+```
+
+### Nginx配置实例
+
+```nginx
+location ~ ^.*\.(png|jpg|gif)$ {	# 针对文件类型防盗链
+    valid_referers none blocked www.baidu.com;
+    if ($invalid_referer) {
+        return 403;
+    }
+}
+
+location /images {	# 针对目录防盗链
+    valid_referers none blocked www.baidu.com;
+    if ($invalid_referer) {
+        return 403;
+    }
+    root /var/www/test;
+}
+```
+
+### 效果展示 
+
+![image-20211120042313902](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120042313902.png)
+
+### 通过模块精细化设置
+
+需要使用Nginx模块 `ngx_http_accesskey_module` ]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
         <tag>后端</tag>
       </tags>
   </entry>
   <entry>
     <title>Nginx配置指令Rewrite04</title>
-    <url>/2020/07/15/Nginx/Nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite04/</url>
+    <url>/2021/06/21/Nginx/Nginx04%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite/</url>
     <content><![CDATA[
 # Nginx配置指令Rewrite
 
@@ -24078,7 +24258,2756 @@ location /images{
       </categories>
       <tags>
         <tag>Nginx</tag>
-        <tag>PHP</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx反向代理05</title>
+    <url>/2021/06/21/Nginx/Nginx05%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/</url>
+    <content><![CDATA[
+## Nginx反向代理
+
+### 概述
+
+正向代理的代理对象是客户端, 而反向代理的代理对象是服务端
+
+![image-20211215160706151](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9e026fcf5b2b4ea8b4084772e48d07c6-1a51656.png)
+
+### 正向代理实战
+
+![image-20211215181140687](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a9f5c90926eef4bdbc3dba6a259dd0a7-3e62cb1.png)
+
+#### 配置134服务器
+
+##### nginx服务
+
+```nginx
+http {
+    include mime.types;
+    default_type application/octet-stream;
+    keepalive_timeout 65;
+	access_log /var/log/nginx/access.log;
+	error_log /var/log/nginx/error.log;
+    log_format proxy 'client send request from $remote_addr to $host';
+    server{
+        root /var/www/test;
+        listen 80;
+        default_type text/plain;
+        access_log /var/log/nginx/access.log proxy;
+    }
+    include /etc/nginx/sites-enabled/*;
+}
+```
+
+##### 访问页面结果
+
+![image-20211215181811763](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/12d88879a995b41864d927e53077bdfd-a0e6e16.png)
+
+##### 监控访问日志
+
+![image-20211215181916864](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/29ff51219e6b274e9edbd04ed5803113-741d8c5.png)
+
+#### 配置135代理服务器
+
+##### nginx服务
+
+```nginx
+    server{
+        listen 82;
+        location /{
+            # resolver 8.8.8.8; # 用于设置解析proxy_pass中域名
+            proxy_pass http://$host$request_uri;
+        }
+    }
+```
+
+##### 客户端设置代理
+
+![1200628e43314ad0d024781-5faa8fe](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e56225e7e1200628e43314ad0d024781-5faa8fe.png)
+
+##### 监控访问日志
+
+![image-20211215182241957](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9111c7b40b466f112f83c9517581f792-de930ed.png)
+
+### 反向代理配置语法
+
+Nginx反向代理由nginx自带模块ngx_http_proxy_module进行解析, 常见指令包括
+
+```
+proxy_pass
+proxy_set_header
+proxy_redirect
+```
+
+```
+文档: http://nginx.org/en/docs/http/ngx_http_proxy_module.html
+```
+
+#### proxy_pass
+
+用于设置被代理服务器地址, 可以为主机名称、IP+端口号
+
+语法: `proxy_pass URL;`
+
+位置: location块
+
+>  URL为要设置的被代理的服务器地址, 包含协议(`http://`, `https://`)、主机名称或IP+端口
+
+```
+proxy_pass http://www.baidu.com;
+proxy_pass http://192.168.253.134/;
+```
+
+##### 是否需要加/
+
+```nginx
+server{
+    listen 80;
+    server_name localhost;
+    location /{
+        # proxy_pass http://192.168.253.134;
+        proxy_pass http://192.168.253.134/;
+    }
+}
+# 客户端访问 http://localhost/index.html 时, 显示访问结果一样
+```
+
+```nginx
+server{
+    listen 80;
+    server_name localhost;
+    location /server{
+        # proxy_pass http://192.168.253.134;
+        proxy_pass http://192.168.253.134/;
+    }
+}
+# 客户端访问 http://localhost/server/index.html 时
+# 第一个配置会访问 http://localhost/server/index.html
+# 第二个配置会访问 http://localhost/index.html
+```
+
+> 配置proxy_pass时，当在后面的url加上了/，相当于是绝对根路径，则nginx不会把location中匹配的路径部分代理走;如果没有/，则会把匹配的路径部分也给代理走
+
+#### proxy_set_header
+
+用于更改Nginx代理服务器收到的客户端的请求头信息,并将新的请求头信息发送给被代理服务器
+
+语法: `proxy_set_header field value;`
+
+默认值: `proxy_set_header Host $proxy_host;  proxy_set_header Connection close;`
+
+位置: http server location 块
+
+##### 案例:获取客户端IP
+
+> 想要获取客户端的真实IP而不是代理服务器IP
+
+代理服务器配置(192.168.253.135)
+
+```nginx
+    server{
+        listen 80;
+        location /{
+            # resolver 8.8.8.8; # 用于设置解析proxy_pass中域名
+            proxy_pass http://192.168.253.134/;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
+```
+
+被代理服务器配置(192.168.253.134)
+
+```nginx
+    server{
+        root /var/www/test;
+        listen 80;
+        default_type text/plain;
+        access_log /var/log/nginx/access.log proxy;
+        location /{
+            return 200 "$http_host==>$http_x_real_ip==>$http_x_forwarded_for";
+        }
+    }
+```
+
+访问代理服务器 `http://192.168.253.135/`
+
+![image-20211215191626909](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/acb42374e4cc50cc8561de13929e150a-b132ded.png)
+
+#### proxy_redirect
+
+用于重置头信息中的 Location 和 Refresh 信息
+
+语法: `proxy_redirect redirect replacement; | proxy_redirect default; | proxy_redirect  off;  ` 
+
+默认值: `default`
+
+位置: http server location 块
+
+设置被代理服务器(192.168.253.134)
+
+```nginx
+    server{
+        root /var/www/test;
+        listen 8081;
+        if (!-f $request_filename){
+            return 302 http://192.168.253.134;
+        }
+    }
+    server{
+        root /var/www/test;
+        listen 80;
+    }
+```
+
+设置代理服务器(192.168.253.135)
+
+```nginx
+    server{
+        listen 8081;
+        location /{
+            proxy_pass http://192.168.253.134:8081/;
+           	proxy_redirect http://192.168.253.134/ http://192.168.253.135/;
+        }
+    }
+    server{
+        listen 80;
+        location /{
+            proxy_pass http://192.168.253.134/;
+        }
+    }
+```
+
+> 从而避免暴露被代理服务器
+
+### 反向代理实战
+
+![image-20211215212251372](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c89567916c57a4242641de48cfecc683-b15bfa1.png)
+
+#### 配置代理服务器(134)
+
+```nginx
+    server{
+        listen 80;
+        server_name localhost;
+        location /server1{
+            proxy_pass http://192.168.253.135/;
+        }
+        location /server2{
+            proxy_pass http://192.168.253.136/;
+        }
+        location /server3{
+            proxy_pass http://192.168.253.137/;
+        }
+    }
+```
+
+#### 配置被代理服务器(135 136 137)
+
+```nginx
+    server{
+        listen 80;
+        server_name localhost;
+        location /{
+            default_type text/plain;
+            return 200 '192.168.253.135';
+        	# return 200 '192.168.253.136';
+        	# return 200 '192.168.253.137';
+        }
+    }
+```
+
+#### 访问结果如下
+
+![image-20211215213813825](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e0c09d474fcf786c4eb8e795ee43150a-42e85d2.png)
+
+### 反向代理系统优化
+
+利用缓冲区Buffer和缓存Cache提升IO吞吐效率
+
+```
+缓冲主要用于解决不同设备间数据传输速度不一致, 导致性能低下的问题, 缓冲中的数据完成操作后删除
+缓存主要用于备份, 当客户端再次获取相同数据时, 可以从代理服务器上获取, 满足特定条件后删除
+```
+
+#### Proxy Buffer指令
+
+- proxy_buffering: 用于开启或关闭代理服务缓冲区
+
+  语法: `proxy_buffering on|off;` 
+
+  默认值: `on` 
+
+- proxy_buffers: 用于指定单个连接从代理服务器读取响应的缓冲区个数和大小
+
+  语法: `proxy_buffers number size;` 
+
+  默认值: `8 4k` (与平台有关) 
+
+- proxy_buffer_size: 用于设置从被代理服务器获取的第一部分响应数据大小
+
+  语法: `proxy_buffer_size size;`
+
+  默认值: `4k|8K` (与平台有关)
+
+  > 保持与proxy_buffers中size相同即可
+
+- proxy_busy_buffers_size: 用于限制同时处于BUSY状态的缓冲区总大小
+
+  语法: `proxy_busy_buffers_size size;`
+
+  默认值: `8k|16k` 
+
+- proxy_temp_path : 当缓冲区满后, 仍未被nginx服务器完全接受, 响应数据就会被临时存放在磁盘上
+
+  语法: `proxy_temp_path path;`
+
+   默认值: `proxy_temp` 
+
+  > path 最大目录深度为3层
+
+- proxy_temp_file_write_size: 用于设置磁盘上缓冲文件大小
+
+  语法: `proxy_temp_file_write_size size;`
+
+  默认值: `8k|16k` 
+
+#### 通用配置
+
+```nginx
+proxy_buffering on;
+proxy_buffer_size 4 32k;
+proxy_busy_buffers_size 64k;
+proxy_temp_file_write_size 64k;
+```
+
+### 使用OpenSSL生成证书文件
+
+```
+mkdri /root/cert
+cd /root/cert
+openssl genrsa -des3 -out server.key 1024
+# 设定密码
+openssl req -new -key server.key -out server.csr
+# 输入密码, 验证信息
+cp server.key server.key.org
+openssl rsa -in server.key.org -out server.key
+# 验证密码
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+```
+
+生成文件: server.key | server.crt
+
+### 开启SSL实例
+
+详细官方文档: `https://nginx.org/en/docs/http/ngx_http_ssl_module.html` 
+
+```nginx
+server{
+    # ssl on;
+    listen 443 ssl;
+    server_name localhost;
+    
+    ssl_certificate server.crt;	# 指定证书文件路径
+    ssl_certificate_key server.key;	# 指定证书key文件路径
+    
+    ssl_session_cache shared:SSL:1m;	# 配置用于SSL会话缓存
+    # off-禁用, 客户端不得重复使用会话
+    # none-禁用, 客户端可以重复使用, 但并没有在缓存中存储会话参数
+    # builtin-内置OpenSSL缓存,仅在一个工作进程中使用
+    # shared-所有工作进程间共享缓存, 相关信息由name和size指定
+    ssl_session_timeout 5m;	# 开启会话后,客户端能够反复使用存储会话时间
+    
+    ssl_ciphers HIGH:!aNULL:!MD5;	# 允许密码格式,可以用openssl ciphers查看支持格式
+    ssl_prefer_server_ciphers on;	# 指定是否服务器密码优先于客户端密码
+    
+    location /{
+        root html;
+        index index.html index.htm;
+    }
+}
+```
+
+#### 自动转换为https协议
+
+```
+location /{
+	...
+	rewrite ^(.*) https://[server_name]$1;
+}
+
+或
+
+server {
+    if ($host = [server_name]) {
+        return 301 https://$host$request_uri;
+    }
+}
+```
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx负载均衡06</title>
+    <url>/2021/06/21/Nginx/Nginx06%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</url>
+    <content><![CDATA[
+## 负载均衡
+
+将用户请求根据对应的算法, 分发到集群中的一台服务器上进行处理
+
+### 作用
+
+- 提升并发处理能力
+
+- 提高单点故障宕机容错能力, 实现高可用
+
+- 通过添加或减少服务器数量, 增强可扩展性
+
+- 在负载均衡器上进行过滤, 提高系统安全性
+
+### 常用实现方式
+
+#### 用户手动选择
+
+比较原始的方式, 即提供不同线路, 由用户自己选择访问服务器
+
+#### DNS轮询
+
+由域名注册商解析同一域名到多主机IP, 随机访问不同IP, 也可以实现简单的负载均衡
+
+但存在可靠性低(DNS缓存), 不均衡的问题
+
+#### 四/七层负载均衡
+
+开放式系统互联模型 - OSI(open system interconnection)
+
+![image-20211217232125273](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b3a8204c69af08b5271c14168c42e524-0843c75.png)
+
+##### 四层负载均衡(传输层)
+
+基于IP+Port实现, 包括硬件和软件实现方式:
+
+- 硬件: F5 BIG-IP 、Radware等
+- 软件: LVS、Nginx、Hayproxy等
+
+##### 七层负载均衡(应用层)
+
+基于虚拟的URL或主机IP实现
+
+- 软件: Nginx、Hayproxy等
+
+>  四层负载均衡数据是在底层就进行分发, 而七层负载均衡则是在最顶端分发, 所以四层负载均衡效率更高
+>
+> 四层负载均衡不识别域名, 而七层负载均衡识别域名
+>
+> 一般实际环境使用四层负载(LVS) + 七层负载均衡(Nginx)
+
+### Nginx七层负载均衡
+
+需要使用proxy_pass代理模块, 在反向代理的基础上将用户请求根据指定算法分发到[upstream虚拟服务池]
+
+#### 指令
+
+##### upstram指令
+
+用于定义一组服务器, 可以是不同端口, 也可以是监听TCP和Unix socket的服务器, 权重不指定, 默认为1
+
+```
+语法:
+	upstream name{...}
+位置: 
+	http块
+```
+
+#####  server指令
+
+用于指定后端服务器的名称及参数, 可以使用域名/IP/端口或Unix socket
+
+```
+语法:
+	server name[parameters]
+位置: 
+	upstream
+```
+
+#### 实现流程
+
+![image-20220603230545450](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1c25ebb2b08f3346e7b1c79fc0863c12-3f2ab7f.png)
+
+```nginx
+# 配置负载均衡服务器 192.168.253.134
+http {
+    ...
+	upstream serverpool{
+		server 192.168.253.135;
+		server 192.168.253.136;
+		server 192.168.253.137;
+	}
+    server{
+        listen 80;
+        server_name test.project.com;
+        location /{
+            proxy_pass http://serverpool;
+        }
+    }
+}
+
+# 配置服务端服务器 192.168.253.135 / 192.168.253.136 / 192.168.253.137
+http {
+    ...
+    server{
+        listen 80;
+        server_name localhost;
+        location /{
+            default_type text/plain;
+            return 200 '<h1>192.168.253.137</h1>';
+        }
+    }
+}
+```
+
+#### 实现结果
+
+![image-20211218190642925](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/0b9c5ff60cf3ea29e96566ed58d7f8e1-d6f6303.png)
+
+#### 负载均衡状态
+
+| 状态         | 概述                                |
+| ------------ | ----------------------------------- |
+| down         | 当前server不参与服务                |
+| backup       | 预留备份服务器                      |
+| max_fails    | 允许请求失败次数, 默认1             |
+| fail_timeout | 请求失败后, 服务暂停时间, 默认10s   |
+| max_conns    | 限制最大的接收连接数, 默认0, 不限制 |
+
+```nginx 
+upstream serverpool{
+    server 192.168.253.135 down;
+    server 192.168.253.136 backup;
+    server 192.168.253.137 max_fails=3 fail_timeout=15;
+}
+```
+
+> 使用配置之后, 由于浏览器缓存问题, 可能出现仍然访问到135服务器的状况, 可以用curl请求验证配置生效
+
+![image-20220604005521986](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ecd73e9165a916a644f6aaf315f7e164-5ef3311.png)
+
+#### 负载均衡策略
+
+Nginx的upstream支持六种分配算法, 分别是:
+
+| 算法       | 概述               |
+| ---------- | ------------------ |
+| 轮询       | 默认方式, 无需配置 |
+| weight     | 依权重点数分配     |
+| ip_hash    | 依据IP分配         |
+| least_conn | 最少连接分配       |
+| url_hash   | 依据URL分配        |
+| fair       | 依响应时间分配     |
+
+##### 轮询策略
+
+不做任何配置,  默认就是使用轮询策略
+
+##### weight加权
+
+也叫加权轮询, 使用`weight=number`设置server服务器的权重, 权重越大, 分配到的概率就越大, 主要是为了针对工作环境中不同配置的服务器配置
+
+```nginx
+upstream serverpool{
+    server 192.168.253.135 weight=10;
+    server 192.168.253.136 weight=5;
+    server 192.168.253.137 weight=5;
+}
+```
+
+##### ip_hash策略
+
+通过请求客户端的IP,所计算出的哈希值定位到同一后端服务器上, 之后该客户端的请求均访问同一服务器, 可以解决用户session共享问题, 但无法保证后端服务器的负载均衡, 且设置后权重等配置将失效
+
+```nginx
+upstream serverpool{
+    ip_hash;
+    server 192.168.253.135;
+    server 192.168.253.136;
+    server 192.168.253.137;
+}
+```
+
+##### least_conn策略
+
+将请求转发给连接数较少的后端服务器上, 可以避免某些占用时间长的请求, 连续分发到同一服务器上, 达到更好的负载均衡效果
+
+```nginx
+upstream serverpool{
+    least_conn;
+    server 192.168.253.135;
+    server 192.168.253.136;
+    server 192.168.253.137;
+}
+```
+
+##### url_hash策略
+
+通过用户访问URL的哈希计算结果来分配请求访问目标, 使每一个URL定向到同一个后端服务器, 使其提高**缓存命中率**, 避免不必要的资源下载
+
+```nginx
+upstream serverpool{
+    hash $request_uri;
+    server 192.168.253.135;
+    server 192.168.253.136;
+    server 192.168.253.137;
+}
+```
+
+##### fair策略
+
+依据客户端请求页面大小、加载时间长短智能分发. 但不是nginx内建均衡算法, 需要引入第三方模块
+
+```nginx
+upstream serverpool{
+    fair;
+    server 192.168.253.135;
+    server 192.168.253.136;
+    server 192.168.253.137;
+}
+```
+
+**添加nginx-upstream-fair模块** 
+
+```shell
+# https://github.com/gnosek/nginx-upstream-fair 下载fair压缩包
+$ wget https://nginx.org/download/nginx-1.14.0.tar.gz # 对照本机版本下载nginx包
+$ unzip nginx-upstream-fair
+$ tar -zxvf nginx-1.14.0.tar.gz
+
+$ cd nginx-1.14.0
+$ vi src/http/ngx_http_upstream.h	# 打开文件
+	/ngx_http_upstream_srv_conf_s	# 找到关键字
+	131     in_port_t                        default_port;	# 131行添加内容
+$ sudo apt install build-essential libpcre3 libpcre3-dev openssl libssl-dev zlib1g-dev libxslt1-dev libgd-dev libgroip-dev	# 安装编译依赖
+$ pwd ../nginx-upstream-fair	# 记录下module路径
+$ nginx -V	# 复制nginx模块配置
+$ ./configure [nginx原有配置] --add-module=[fair-module路径]
+$ make
+$ sudo mv /usr/sbin/nginx /usr/sbin/nginx_old	# 备份
+$ sudo cp objs/nginx /usr/sbin/nginx	# 替换nginx
+# $ sudo service nginx restart # 重启nginx
+$ make upgrade	# 更新nginx
+```
+
+#### 实际案例
+
+##### 特定资源负载均衡
+
+```nginx
+# 配置负载均衡服务器 192.168.253.134
+http {
+    ...
+	upstream video_pool{
+		server 192.168.253.135;
+		server 192.168.253.136;
+	}
+    upstream file_pool{
+		server 192.168.253.137;
+        server 192.168.253.138;
+	}
+    server{
+        listen 80;
+        server_name localhost;
+        location /video{
+            proxy_pass http://video_pool;
+        }
+        location /file{
+            proxy_pass http://file_pool;
+        }
+    }
+}
+```
+
+![image-20220604175807846](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f5436bfc830fadb21cba25c7278086f5-574c4b4.png)
+
+![image-20220604175831716](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/82f3d7cea21921bb0c79158d220cf825-0dfe729.png)
+
+##### 对不同域名实现负载均衡
+
+修改客户端本地hosts文件(`C:\Windows\System32\drivers\etc\hosts`), 添加内容
+
+```
+192.168.253.134 local1.project.com
+192.168.253.134 local2.project.com
+```
+
+修改服务器nginx配置文件
+
+```nginx
+    upstream local1{
+        server 192.168.253.135;
+        server 192.168.253.136;
+    }
+    upstream local2{
+        server 192.168.253.137;
+        server 192.168.253.138;
+    }
+
+    server{
+        listen 80;
+        server_name local1.project.com;
+        location /{
+            proxy_pass http://local1;
+        }
+    }
+    server{
+        listen 80;
+        server_name local2.project.com;
+        location /{
+            proxy_pass http://local2;
+        }
+    }
+```
+
+![image-20220604181016412](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/50478c23602aee661096590bb76de5bc-534982e.png)
+
+![image-20220604181034312](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ca8206c7694353c655eccfbe1c4e83f4-cd4d378.png)
+
+##### 带URL重写的负载均衡
+
+重写请求中以file开头的路由, 到new路由中
+
+```nginx
+    upstream rewrite_pool{
+        server 192.168.253.135 weight=2;
+        server 192.168.253.136 weight=1;
+        server 192.168.253.137 weight=1;
+    }
+    server{
+        listen 80;
+        server_name localhost;
+        location /file/{
+            rewrite ^(/file/.*/) /new/$1 last;
+        }
+        location /new{
+            proxy_pass http://rewrite_pool;
+        }
+    }
+```
+
+### Nginx 四层负载均衡
+
+Nginx 的四层协议转发、代理、负载均衡, 是通过stream模块实现的. 允许配置一组TCP/UDP等协议的监听, 然后通过proxy_pass转发请求, 通过upstream添加多个后端服务, 实现负载均衡
+
+#### 添加stream模块支持
+
+```shell
+$ sudo mv /usr/sbin/nginx /usr/sbin/nginx_old	# 备份
+$ nginx -V	# 复制nginx模块配置
+$ ./configure [nginx原有配置] --with-stream # 添加stream模块
+$ make
+$ sudo cp objs/nginx /usr/sbin/nginx	# 替换nginx
+$ sudo service nginx restart # 重启nginx
+```
+
+![image-20220604185419081](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/45183d660d0486a559cf6700e999aa0a-cc05ea0.png)
+
+#### stream模块指令
+
+##### stream指令
+
+提供在其中指定流服务器的配置文件上下文, 和http块同级
+
+```
+语法:
+	stream{...}
+位置:
+	main
+```
+
+##### upstream指令
+
+与upstream模块中类似, 但位置处于stream块内部
+
+#### 实际案例
+
+访问负载均衡分发服务器的8088端口时, 将请求分发到两台服务器的redis服务中
+
+```nginx
+# 设置192.168.253.134服务器的nginx配置
+stream{
+    upstream redis_backend{
+        server 192.168.253.135:6379;
+        server 192.168.253.136:6379;
+    }
+    server{
+        listen 8088;
+        proxy_pass redis_backend;
+    }
+}
+
+```
+
+结果:
+
+![image-20220605002708958](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/54515b4b5d3b2ddd5f4242bc09aa3392-f64c6d3.png)
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx缓存集成07</title>
+    <url>/2021/06/21/Nginx/Nginx07%E7%BC%93%E5%AD%98%E9%9B%86%E6%88%90/</url>
+    <content><![CDATA[
+## Nginx缓存集成
+
+### 缓存概述
+
+客户端的所有请求直接请求服务端, 会影响服务端的性能. 如: 接收过多请求, 压力增大, 某些操作比较耗时, 影响响应速度. 所以引入缓存机制可以大大减轻服务器压力.
+
+用户请求资源数据时, 先从缓存中查看, 若缓存中存在则直接返回给客户, 若不存在, 才请求服务器资源获取, 在返回用户的同时将其放入缓存, 下次就可以直接从缓存中获取
+
+#### 缓存使用场景:
+
+| 场景             | 作用                     |
+| ---------------- | ------------------------ |
+| 操作系统磁盘缓存 | 减少磁盘机械操作         |
+| 数据库缓存       | 减少文件系统IO操作       |
+| 应用程序缓存     | 减少对数据库的查询       |
+| Web服务器缓存    | 减少对应用服务器请求次数 |
+| 浏览器缓存       | 减少后台交互次数         |
+
+#### 缓存优点:
+
+减少数据传输, 节省网络带宽流量, 加快响应速度, 提升用户体验
+
+减轻服务器压力
+
+提供服务端高可用性
+
+#### 缓存缺点:
+
+数据的即时性和一致性可能有延迟
+
+增加成本
+
+### Nginx的web缓存服务
+
+基于proxy store实现, 将URL及相关组合当做key, 在使用MD5算法对key进行哈希, 的到硬盘对应的哈希目录路径, 从而将缓存内容保存在该目录中. Nginx支持对指定URL或者状态码设置过期时间, 也可以使用purge命令手动清除指定URL缓存
+
+![image-20220605014002839](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2f2c3c8c4bc9e883b630047f955b54b1-78f1e1d.png)
+
+#### Nginx缓存设置指令
+
+Nginx的web缓存服务主要是使用ngx_http_proxy_module完成,常用指令如下:
+
+```
+文档: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
+```
+
+##### proxy_cache_path指令
+
+用于设置缓存文件的存储路径
+
+```
+语法:
+	proxy_cache_path path [levels=number]  keys_zone=zone_name:zone_size [inactive=time] [max_size=size]
+位置:
+	http块
+```
+
+```
+- path 为缓存路径地址, 如: /usr/local/proxy_cache
+
+- levels 指定缓存空间子目录等级, 最多设置三层, 每层取值为1或2. 如:
+	levels=1:2	代表缓存空间有两层, 第一层是一个字符, 第二层是两个字符 
+	设置key=ni9ne, 通过MD5编码后为:f5d6316dd7ab283c02f90cd236dce1cc
+	levels=1:2	最终存储路径为: /usr/local/proxy_path/c/1c
+	levels=2:1:2最终存储路径为: /usr/local/proxy_path/cc/1/ce
+
+- key_zone 指定该缓存区名称和大小. 如:
+	key_zone=ni9ne:200m	代表缓存区的名称为ni9ne,大小为200m
+
+- inactive 指定缓存数据多久时间未访问才会删除.如:
+	inactive=1d	代表数据仅缓存1天, 1天内没有访问就会删除
+
+- max_size 设置最大缓存空间, 若空间已满, 默认覆盖缓存时间最长的资源
+	max-size=20g
+```
+
+配置实例:
+
+```nginx
+http{
+    ...
+    proxy_cache_path /usr/local/proxy_cache levels=2:2 keys_zone=ni9ne:200m inactive=1d max_size=20g
+    ...
+}
+```
+
+##### proxy_cache指令
+
+用于开启或关闭指定缓存配置
+
+```
+语法:
+	proxy_cache zone_name [off];
+默认值:
+	proxy_cache off;
+位置:
+	http server location块
+```
+
+```
+- zone_name 指定用于缓存区的名称
+```
+
+##### proxy_cache_key指令
+
+用于指定web缓存的key值, Nginx会依据key值MD5哈希存储缓存
+
+```
+语法:
+	proxy_cache_key key;
+默认值: 
+	proxy_cache_key $scheme$proxy_host$request_uri;
+位置:
+	http server location块
+```
+
+##### proxy_cache_valid指令
+
+用于对不同返回状态码的URL设置不同的缓存时间
+
+```
+语法:
+	proxy_cache_valid [code] time;
+位置:
+	http server location块
+```
+
+```
+如:
+proxy_cache_valid 200 302 10m;
+proxy_cache_valid 404 1m;
+# 设置200和302响应的URL缓存10分钟, 响应404的URL缓存1分钟
+proxy_cache_valid any 1m;
+# 对所有响应状态码的URL都设置1分钟缓存
+```
+
+##### proxy_cache_min_uses指令
+
+用于设置资源被访问多少次后备缓存
+
+```
+语法:
+	proxy_cache_min_uses;
+默认值:
+	proxy_cache_min_uses 1;
+位置:
+	http server location块
+```
+
+##### proxy_cache_methods指令
+
+用于设置缓存哪些方法的请求
+
+```
+语法:
+	proxy_cache_methods GET|HEAD|POST;
+默认值:
+	proxy_cache_methods GET HEAD;
+位置: 
+	http server location块
+```
+
+#### Nginx缓存设置案例
+
+客户端请求134服务器, 获取jquery.js文件, 但文件存在于135服务器中, 服务器134在获取135资源后, 将其缓存, 后续请求资源将从缓存中获取
+
+##### 环境准备
+
+```nginx
+# 135服务器配置jquery.js路径
+    server{
+        listen 80;
+        server_name localhost;
+        location /js{
+            root /var/www/project/;
+            index index.html;
+        }
+    }
+# 配置完成后测试是否可以访问路径: http://192.168.253.135/js/jquery.js
+
+# 134配置代理转发
+	server {
+        listen       80;
+        server_name  localhost;
+        location /js {
+            proxy_pass http://192.168.253.135/js/;
+        }
+	}
+# 配置完成后测试是否可以获取文件 http://192.168.253.134/js/jquery.js
+```
+
+##### 添加缓存配置
+
+```nginx
+# 修改134服务器配置为:
+http{
+    ...
+    proxy_cache_path /usr/local/proxy_cache levels=2:2 keys_zone=ni9ne:200m inactive=30s max_size=20g
+    ...
+	server {
+        listen       80;
+        server_name  localhost;
+        location /js {
+            proxy_cache ni9ne;
+            proxy_cache_key $scheme$proxy_host$request_uri;
+            proxy_cache_valid 200 20s;	
+            proxy_cache_valid 404 30s;	# 访问404状态保存30秒
+            proxy_cache_valid any 1m;
+            proxy_cache_min_uses 5; 	# 最少使用5次后才缓存
+        	# 添加header,验证缓存命中状态 HIT/MISS
+            add_header Nginx-Cache-Status "$upstream_cache_status";
+            proxy_pass http://192.168.253.135/js/;
+        }
+    }
+}
+```
+
+##### 验证缓存结果
+
+![image-20220605202848657](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/50ea7e6f265435f33ccd8cba5155fc14-1bacbdf.png)
+
+![image-20220605203305150](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a60125c18078aa4c9da2d187ff185484-5c4cef1.png)
+
+#### Nginx缓存清除
+
+##### 方式一: 删除对应缓存目录
+
+```shell
+$ sudo rm -rf /usr/local/proxy_pass/...
+```
+
+##### 方式二: 第三方扩展模块
+
+使用`ngx_cache_purge`模块清除缓存, 需要安装模块
+
+```
+模块: https://github.com/FRiCKLE/ngx_cache_purge
+```
+
+```nginx
+# 配置清除路由
+http {
+    proxy_cache_path /usr/local/proxy_cache levels=2:2 keys_zone=ni9ne:200m inactive=30s max_size=2g;
+    server {
+        location /js {
+            proxy_cache ni9ne;
+            proxy_cache_key $scheme$host$request_uri;
+            proxy_cache_valid any 1m; 
+            add_header Nginx-Cache-Status "$upstream_cache_status";
+            add_header Nginx-Cache-Key "$scheme$host$request_uri";
+            proxy_pass http://192.168.253.135/js/;
+        }
+        location ~ /purge(/.*) {
+            proxy_cache_purge ni9ne $scheme$host$1;	# 无法获取$proxy_host
+        }
+    }
+}
+```
+
+访问清除页面结果
+
+![image-20220606010637248](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a85383c41eaeee2620e25f6173b2e843-cb76d65.png)
+
+#### Nginx设置资源不缓存
+
+对不需要缓存的数据进行指定, 使用以下指令可以实现
+
+##### proxy_no_cache指令
+
+定义不缓存数据的条件
+
+```
+语法:
+	proxy_no_cache string ...;
+位置: 
+	http server location块
+```
+
+```nginx
+# 配置实例
+proxy_no_cache $cookie_nocache $arg_nocache $arg_comment;
+```
+
+##### proxy_cache_bypass指令
+
+设置不从缓存中获取数据的条件
+
+```
+语法: 
+	proxy_cache_bypass string ...;
+位置:
+	http server location块
+```
+
+```nginx
+# 配置实例
+proxy_cache_bypass $cookie_nocache $arg_nocache $arg_comment;
+```
+
+> 上述两个指令均支持多个条件, 且可以同时使用, 条件中只要至少有一个不为空且不等于'0', 则条件满足成立, 不缓存或不获取缓存数据
+
+##### 涉及内置变量介绍
+
+```
+- $cookie_nocache
+	当前请求的cookie中键为nocache对应的值
+	测试可使用 add_header Set-Cookie 'nocache=1'
+- $arg_nocache/$arg_comment
+	当前请求的参数中属性名为nocache和comment对应的属性值
+```
+
+##### 案例实现
+
+```nginx
+http {
+	server {
+        location /js {
+            if ($request_uri ~ /.*\.js$){
+                set $my_cache_sign 1;
+            }
+            proxy_cache ni9ne;
+            proxy_pass http://192.168.253.135/js/;
+            # proxy_no_cache $cookie_nocache $arg_nocache $arg_comment $my_cache_sign;
+            proxy_cache_bypass $cookie_nocache $arg_nocache $arg_comment $my_cache_sign;
+        }
+    }
+}
+```
+
+![image-20220606014448985](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f0f39cb50e89291ba583b9bad8b74866-1bfd046.png)
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx服务端集群搭建08</title>
+    <url>/2021/06/21/Nginx/Nginx08%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[
+## Nginx服务端集群搭建
+
+### 准备环境搭建
+
+构建可访问路径:
+
+192.168.253.135/cluster/getAddress 
+
+![image-20220606205305319](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/12192f412dac2fbd1b864292a9e6edbe-7ec1046.png)
+
+192.168.253.135/cluster/index.html
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>后端服务器</title>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+</head>
+<body>
+	<img src="./img/ni9ne.png">
+	<h1>后端服务器: <span id="msg"></span></h1>
+</body>
+<script>
+	$(function(){
+		$.get('cluster/getAddress', function(data){
+			$('#msg').html(data);
+		});
+	});
+</script>
+</html>
+```
+
+由134服务器代理路径, 访问`192.168.253.135/demo/index.html`转发到135
+
+![image-20220606205335429](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/918afd8edea919c2a05c8d6b29d40dff-4456f0a.png)
+
+> 实现动静分离, 搭建服务集群
+
+### Nginx实现动静分离
+
+#### 动静分离
+
+**动态资源**指的是后台应用程序的业务处理结果, 
+
+**静态资源**则是html,js,css,image等资源
+
+分离处理可以降低动静资源的耦合度, 提高可用性, 同时, 静态资源也可以部署CDN
+
+#### 实现方式
+
+1.将静态资源移动到代理服务器本地硬盘
+
+![image-20220606205415848](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c12e2239ea060640adb2b087caddda0e-1fb3d17.png)
+
+2.修改代理服务器nginx配置文件
+
+```nginx
+http {
+	upstream webservice{
+        server 192.168.253.135;
+    }
+    server {
+		# 动态资源配置
+        location /cluster {
+            proxy_pass http://webservice;
+        }
+        # 静态资源配置
+        location ~/.*\.(png|jpg|gif|js){
+            root /var/www/static;
+        }
+	}
+}
+```
+
+#### 效果
+
+此时, 当动态资源服务宕机时, 静态资源还可以正常显示
+
+![image-20220606205700820](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c3d219941f1aa3e873b69c9c7febc615-a33074b.png)
+
+### Nginx实现集群搭建
+
+#### 配置代理服务器134
+
+```nginx
+http {
+	upstream webservice{
+		server 192.168.253.135;
+        server 192.168.253.136;
+        server 192.168.253.137;
+    }
+    server {
+		# 动态资源配置
+        location /cluster {
+            proxy_pass http://webservice;
+        }
+        # 静态资源配置
+        location ~/.*\.(png|jpg|gif|js){
+            root /var/www/static;
+        }
+	}
+}
+```
+
+![image-20220606214400402](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/02ae83f1e2277edd0ff27e9bce7cf2de-9da4f7d.png)
+
+### Nginx高可用解决方案
+
+动态资源集群中, 当某一服务器服务中断时, 可以切换到其余服务器获取动态数据, 当如果代理服务器宕机, 则需要通过其他手段解决问题
+
+#### Keepalived
+
+使用Keepalived解决可用性问题, Keepalived使用C语言编写, 通过**虚拟路由冗余协议**VRRP(Virtual Route Redundancy Protocol)实现功能
+
+##### VRRP协议简介
+
+类似于Redis中的哨兵机制, 对外提供一个接口提供服务, 内部由多台设备动态选举一个master, 其余为backup, 当master心跳中断时, 其余backup竞争提升为master, 对外提供服务. 
+
+其中主要包含选择协议(竞争master)与路由容错协议(master心跳监测_backup竞争)
+
+#### 环境搭建
+
+| VIP             | IP              | 主机名      | 主/从  |
+| --------------- | --------------- | ----------- | ------ |
+|                 | 192.168.253.134 | keepalived1 | master |
+| 192.168.253.200 |                 |             |        |
+|                 | 192.168.253.138 | keepalived2 | backup |
+
+#### 安装Keepalived
+
+```shell
+#安装keepalived
+$ sudo apt install keepalived
+$ sudo cp /usr/share/doc/keepalived/samples/keepalived.conf.sample  /etc/keepalived/keepalived.conf
+
+# 或手动官网下载
+# https://keepalived.org/download.html
+$ tar -zxvf keepalived-2.0.20.tar.gz -C keepalived/
+$ cd keepalived/keepalived-x.x.xx
+$ ./configure --sysconf=/etc --prefix=/usr/local
+$ make && make install
+```
+
+####  Keepalived配置文件介绍
+
+```
+# global全局部分
+global_defs {
+   # 邮件通知目标, 当keepalived切换时发送email给具体的邮箱地址 
+   notification_email {
+     ni9ne@outlook.com
+   }   
+   # 设置发件人信息
+   notification_email_from Alexandre.Cassen@firewall.loc
+   # 指定SMTP服务地址
+   smtp_server 192.168.200.1
+   # 指定SMTP服务连接超时时间
+   smtp_connect_timeout 30
+   # 指定运行keepalived服务器的标识, 可用作邮件主题信息
+   router_id keepalived1
+   # 如果通告与接收的上一个通告来自相同master, 则不执行检查. 默认不跳过检查
+   vrrp_skip_check_adv_addr
+   # 严格遵守VRRP协议
+   vrrp_strict
+   # 配置免费ARP的时间间隔, 默认为0(以秒为单位，支持微秒)  
+   vrrp_garp_interval 0
+   # 设置主动请求NA之间的默认间隔(以秒为单位，支持微秒)  
+   vrrp_gna_interval 0
+}
+# VRRP部分
+vrrp_instance VI_1 {
+	# 设置默认身份: MASTER/BACKUP 
+	state MASTER
+	# 指定网卡名称
+    interface eth33
+    # 虚拟路由ID, 用于区分运行在同一网络接口和地址上的多个VRRPD实例,0-255
+    virtual_router_id 50
+    # 优先级高的VRRP备份组上线时，通常会抢占优先级低的VRRP备份组。nopreempt将停止高优先级计算机接管master，并允许低优先级计算机继续担任master
+    # nopreempt
+    # 选出MASTER，优先级最高的获胜。 priority的取值范围为[1-255]
+    priority 100 
+    # VRRP的通告时间间隔
+    advert_int 1
+    # 虚拟服务IP地址
+    virtual_ipaddress {
+        192.168.253.200
+    }   
+}
+virtual_server 10.10.10.2 1358 {	# LVS设备相关
+    ...
+}
+```
+
+#### 配置Keepalived
+
+```
+# 134 | 138
+global_defs {
+   notification_email {
+     acassen
+   }
+   notification_email_from Alexandre.Cassen@firewall.loc
+   smtp_server 192.168.200.1
+   smtp_connect_timeout 30
+   router_id keepalived1	# 路径ID唯一,134-1 138-2
+}
+vrrp_instance VI_1 {
+    state master
+    interface ens33	# ip a 查询本机网卡名称
+    virtual_router_id 50
+    nopreempt
+    priority 100	# 设置优先级
+    advert_int 1
+    virtual_ipaddress {
+        192.168.253.200	# 指定VIP
+    }
+}
+virtual_server 10.10.10.2 1358 {
+	...
+}
+```
+
+#### 启动Keepalived服务
+
+```shell
+$ sudo systemctl start keepalived
+```
+
+#### 查看启动结果
+
+```shell
+$ ps -ef | grep keepalived	# 查看进程是否启动
+```
+
+![image-20220607021413268](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/cd1be24aa182b5c84836826c107908d3-e036e01.png)
+
+```shell
+$ tail -f /var/log/syslog	# 查看日志
+```
+
+![image-20220607021630578](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9ee1680b83cbf50602b78363ba9e5ccc-cfaa654.png)
+
+```shell
+$ ip addr 	# 查看VIP是否注册到网卡
+```
+
+![image-20220607021814980](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4e2f9a15d4fa1620a70689f2268753ac-c8e3215.png)
+
+```
+http://192.168.253.200/cluster/index.html	# 访问VIP
+```
+
+![image-20220607021926118](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/855d40885069bff5b8979cd7dfd29966-cd24672.png)
+
+> 当keepalived进程关闭时, 备用节点自动上线, 替代原节点成为master, 若未配置nopreempt, 当原节点上线后, 由于优先级较高, master身份自动漂移到原节点.
+>
+> 但仅通过keepalived进程存活与否来进行身份漂移无法满足需求, 还需要实时监听Nginx或其他服务是否存活, 来决定是否进行选举, 就需要使用vrrp_script实现
+
+#### vrrp_script监控Nginx服务
+
+##### 修改keepalived配置文件
+
+```shell
+$ sudo vi /etc/keepalived/keepalived.conf
+```
+
+```
+global_defs{
+	...
+}
+vrrp_script ck_nginx {	# 注意空格
+   script "/etc/keepalived/script/ck_nginx.sh"
+   interval 3
+   weight -20	# 执行脚本后,减权重,避免重复竞争
+   user ni9ne
+}
+vrrp_instance VI_1 {
+    ...
+   track_script {	# 注意空格
+      ck_nginx
+   }
+}
+```
+
+##### 编写ck_nginx.sh脚本
+
+```shell
+$ vim /etc/keepalived/script/ck_nginx.sh
+$ sudo chmod 777 /etc/keepalived/script/ck_nginx.sh
+```
+
+```shell
+#! /bin/bash
+num=`ps -C nginx --no-header | wc -l`
+if [ $num -eq 0 ];then
+	#sudo systemctl restart nginx
+	#sleep 2
+	#if [ `ps -C nginx --no-header | wc -l` -eq 0 ];then
+		sudo killall keepalived
+	#fi
+fi
+```
+
+##### 重启keepalived服务
+
+```shell
+$ sudo systemctl restart keepalived
+```
+
+##### 验证脚本
+
+![image-20220607031746823](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1dd7d806d29f2f8f11bcef4fe2cf1016-62a21a3.png)]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx中的Lua介绍09</title>
+    <url>/2021/06/21/Nginx/Nginx09%E4%B8%AD%E7%9A%84Lua%E4%BB%8B%E7%BB%8D/</url>
+    <content><![CDATA[
+# Nginx中的Lua操作简介
+
+## Lua
+
+轻量小巧的脚本语言, 可以嵌入到其他应用程序中, 提供灵活的扩展定制功能
+
+可用于游戏开发、独立应用脚本、文本应用脚本、扩展和数据库插件、系统安全上
+
+### 安装lua
+
+```shell
+$ wget https://www.lua.org/ftp/lua-5.4.1.tar.gz
+$ tar -zxvf lua-5.4.1.tar.gz
+$ cd lua-5.4.1
+$ make linux test 	# 测试编译环境
+$ sudo make install
+$ lua -v
+```
+
+![image-20220607184810900](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b85f7df8bda089f12cac87d15a2d1a75-d943b5a.png)
+
+### Lua语法
+
+#### 命令行运行与脚本式运行
+
+![image-20220607185129757](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a62459d046f5d7d451fa3b60fb151312-0a8bfc1.png)
+
+![image-20220607185813716](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/81c6cfbe61888620f3e4bad9c5cce9a7-bd9f0cc.png)
+
+```
+#! /usr/local/bin/lua
+print('hello,lua!!!')
+```
+
+#### 注释
+
+**单行注释 ** 
+
+```lua
+-- print('hello,lua!!!')
+```
+
+**多行注释** 
+
+```lua
+--[[
+    print('hello,lua!!!')
+    print('hello,lua!!!')
+    print('hello,lua!!!')
+--]]
+```
+
+**取消多行注释** 
+
+第一个注释符前加一个 `-` 
+
+```lua
+---[[	
+    print('hello,lua!!!')
+    print('hello,lua!!!')
+    print('hello,lua!!!')
+--]]
+```
+
+#### 标识符
+
+变量名可以使用字母数字下划线, 由于lua保留字使用下划线加大写字母, 如`_VERSION` , 应避免冲突
+
+#### 关键字
+
+| and      | break | do    | else   |
+| -------- | ----- | ----- | ------ |
+| elseif   | end   | false | for    |
+| function | if    | in    | local  |
+| nil      | not   | or    | repeat |
+| return   | then  | true  | until  |
+| while    | goto  |       |        |
+
+#### 运算符
+
+| 算术运算符 | 关系运算符    | 逻辑运算符         | 其他运算符                              |
+| ---------- | ------------- | ------------------ | --------------------------------------- |
+| `+` 加法   | `==` 等于     | `and` 逻辑与  `&&` | `..`  字符串连接                        |
+| `-` 减法   | `~=` 不等于   | `or`   逻辑或 `||` | `#` 一元运算符,<br />返回字符串或表长度 |
+| `*` 乘法   | `>` 大于      | `not` 逻辑非  `!`  |                                         |
+| `/` 除法   | `<` 小于      |                    |                                         |
+| `%` 取余   | `>=` 大于等于 |                    |                                         |
+| `^` 乘幂   | `<=` 小于等于 |                    |                                         |
+| `-` 负号   |               |                    |                                         |
+
+#### 全局/局部变量
+
+不声明则为全局变量, 若未提前赋值, 默认为`nil`, 声明局部变量, 需要使用`local`关键字
+
+![image-20220607200001074](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f1997b80b95be9cb568f0e7f35ee3182-922fd47.png)
+
+#### 数据类型
+
+| 数据类型 | 名称              | 简介                                                         |
+| -------- | ----------------- | ------------------------------------------------------------ |
+| nil      | 空, 无效值        | 可用于移除变量,只需要将该变量名赋值为nil                     |
+| boolean  | 布尔 , true/false | 可用于条件判断, false/nil为假, 其余均为真                    |
+| number   | 数值              | 只包含两种:整型(integer)和双精度浮点型(float)                |
+| string   | 字符串            | 可用单双引号定义, 也可以使用`[[ 多行文字 ]]`                 |
+| function | 函数              | 使用`function`关键字定义, 以`end`结尾                        |
+| table    | 表                | 本质为一种辅助数组, 表示数组,集合,记录等<br />可以使用用`{}`定义, 默认索引从1开始 |
+| thread   | 线程              | 用于执行协同程序                                             |
+| userdata | 用户数据          | 用于表示由应用程序或C/C++语言库锁创建的类型                  |
+
+> 可以使用type()函数判断给定变量数据类型
+
+![image-20220607200553018](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c57d6bd2540774f5f66ea5bc77a5bbc4-cfd664b.png)
+
+##### function定义及使用
+
+参数可以缺省, 默认为nil, 也可以多传, 多余参数被舍弃
+
+![image-20220607202218668](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1522de9464134ab57d26ff60cbd0e081-10b030a.png)
+
+也可以使用可变参数`...`定义传参
+
+![image-20220607202850654](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/25cc5efac8a844a4b40c6138df3b7250-fcd42f2.png)
+
+#### 控制结构-条件判断
+
+lua中的条件判断通过`if then elseif then else end` 完成
+
+```lua
+-- 语法
+if 条件1 then
+    动作1
+elseif 条件2 then
+    动作2
+else
+    动作3
+end
+```
+
+![image-20220607204807108](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6b1ee1817008af73272465219112aae8-d04ded2.png)
+
+#### 控制结构-循环语句
+
+**whil循环**
+
+```lua
+-- 语法
+while 条件 do
+    循环体
+end
+```
+
+```lua
+function rangePrint(n)
+    local i=1
+    while i<=n do
+        print(i)
+        i=i+1
+    end
+end
+```
+
+![image-20220608021530059](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/80771f661b155cb827bd4990297ffd4b-31c7ec4.png)
+
+**repeat循环**
+
+```lua
+-- 语法
+repeat
+    循环体
+until 条件
+```
+
+```lua
+function rangeRepeat(n)
+    local i=n
+    repeat
+        print(i)
+        i=i-1
+    until i<1
+end
+```
+
+![image-20220608021835989](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/fd2862982c1a18f2cb2699772eb8c6d2-8c9cb60.png)
+
+**for循环**
+
+for循环支持数值型循环和泛型循环
+
+- 数值型for循环
+
+  ```lua
+  -- 语法
+  for i=start,end,step do
+  	循环体
+  end
+  ```
+
+  i 代表当前循环数值, start代表开始数值, end代表结束数值, step代表步长
+
+  ```lua
+  function rangeStep()
+      for i=10,50,10 do
+          print(i)
+      end
+  end
+  ```
+
+  ![image-20220608022903146](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/32be20ee2f8b3540ea9ccb456ce11493-1b7f129.png)
+
+- 泛型for循环
+
+  ```lua
+  -- 语法
+  for i,v in ipairs(x) do    
+      循环体
+  end
+  -- 或
+  for i,v in pairs(x) do
+      循环体
+  end
+  ```
+
+  **ipairs不会循环非数值型元素, pairs会全部循环** 
+
+  ```lua
+  function showArr(x)
+      for i,v in ipairs(x) do
+          print(i,v)
+      end
+  end
+  ```
+
+  ![image-20220608023932770](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8b0af629201f6bb02e339d68cb270417-028ef3d.png)
+
+  ![image-20220608024109753](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/19b47428652c7000410aa7927f328fcb-ea71c1e.png)
+
+  
+
+## ngx_lua模块
+
+### OpenResty文档
+
+```
+https://www.nginx.com/resources/wiki/modules/lua/
+https://github.com/openresty/lua-nginx-module
+```
+
+ngx_lua模块通过将lua解释器集成进Nginx, 可以采用lua脚本实现业务逻辑, 在保证高并发服务能力的同时极大的降低了实现成本
+
+### 环境搭建
+
+#### 方式一: lua-nginx-module
+
+1.安装LuaJIT
+
+```shell
+$ wget https://luajit.org/download/LuaJIT-2.0.5.tar.gz
+$ tar -zxvf LuaJIT-2.0.5.tar.gz
+$ cd LuaJIT-2.0.5
+$ sudo apt install build-essential	# 安装编译环境
+$ make && sudo make install
+$ luajit -v
+```
+
+2.安装lua-nginx-module
+
+```shell
+$ wget https://github.com/openresty/lua-nginx-module/archive/v0.10.16rc4.tar.gz
+$ tar -zxvf v0.10.16rc4.tar.gz
+$ mv lua-nginx-module-0.10.16rc4 lua-nginx-module
+$ export LUAJIT_LIB=/usr/local/lib
+$ export LUAJIT_INC=/usr/loacl/include/luajit-2.0
+$ cd lua-nginx-module
+$ nginx -V	# 复制结果
+$ cd (nginx包路径)
+$ ./configure [原有配置] --add-module=[lua-nginx-module路径]
+$ sudo apt install build-essential libpcre3 libpcre3-dev openssl libssl-dev zlib1g-dev libxslt1-dev libgd-dev libgeoip-dev	# 安装编译依赖
+$ make
+$ sudo mv /usr/sbin/nginx /usr/sbin/nginx.old
+$ sudo mv objs/nginx /usr/sbin/nginx
+$ sudo ln -s /usr/local/lib/libluajit-5.1.so.2 /lib64/libluajit-5.1.so.2 # 报错处理
+$ sudo vi /etc/nginx/nginx.conf
+	# 报错处理 http块添加 lua_load_resty_core off;
+$ sudo systemctl start nginx
+```
+
+3.配置lua路由,查看结果
+
+```
+location /lua{
+	default_type 'text/html';
+	content_by_lua 'ngx.say("<h1>hello,lua</h1>")';
+}
+```
+
+![image-20220608040828296](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6c4e81f18c987583441251a94e60b66d-730ffad.png)
+
+#### 方式二: OpenResty
+
+```
+官网: https://openresty.org/cn/
+```
+
+openresty是一个基于Nginx和Lua的高性能Web平台, 内部集成了Nginx和Lua. 用于方便的搭建处理超高并发, 扩展性极强的动态Web应用服务
+
+```shell
+$ wget https://openresty.org/download/openresty-1.15.8.2.tar.gz
+$ tar -zxvf openresty-1.15.8.2.tar.gz
+$ cd openresty-1.15.8.2/
+$ ./configure
+$ make && sudo make install
+$ sudo /usr/local/openresty/nginx/sbin/nginx
+```
+
+配置lua路由,查看结果
+
+```nginx
+# vim /usr/local/openresty/nginx/conf/nginx.conf
+location /lua{
+	default_type 'text/html';
+	content_by_lua 'ngx.say("<h1>hello,lua</h1>")';
+}
+```
+
+![image-20220608180950753](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d0112277b31c82da8bdd43a9426a19fd-bb04370.png)
+
+### 指令解析
+
+![image-20220608181255049](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/376ca1e69f85b2f1dfb9e5b5d75a6d3c-f07ea8d.png)
+
+图中 `*` 作用为:
+
+```
+* : 无, 即 xxx_by_lua, 则后面应该跟的是lua指令
+* :_file, 即 xxx_by_lua_file, 则后面跟的是lua文件
+* :_block, 即 xxx_by_lua_block, 在0.9.17版后替代 xxx_by_lua_file
+```
+
+#### 初始化阶段指令
+
+**init_by_lua***
+
+> 该指令在每次Nginx重启时执行, 可以完成一些耗时模块的加载, 或初始化全局配置
+
+**init_worker_by_lua***
+
+> 用于启动一些定时任务, 如心跳监测、定时拉取服务器配置等
+
+#### 重写/访问阶段指令
+
+**set_by_lua***
+
+> 用于变量赋值, 该指令每次只能返回一个值, 并赋给指定变量名
+
+**rewrite_by_lua***
+
+> 用于执行内部URL重写或外部重定向, 如伪静态化URL重写, 本阶段在rewrite处理阶段最后默认执行
+
+**access_by_lua***
+
+> 用于访问控制. 如仅允许内网IP访问
+
+**ssl_certificate_by_lua***
+
+> 作用在Nginx和下游服务器开始一个SSL握手操作时, 将允许执行本配置项lua代码
+
+#### 内容处理阶段指令
+
+**content_by_lua***
+
+> 该指令是应用最多的指令, 大部分任务均在本阶段完成, 其他阶段主要是为本阶段准备数据
+
+**header_filter_by_lua***
+
+> 用于设置应答消息的头信息
+
+**body_filter_by_lua***
+
+> 用于对响应数据进行过滤、截断、替换操作
+
+**balancer_by_lua***
+
+> 主要用于实现上游服务器的负载均衡算法
+
+#### 日志阶段指令
+
+**log_by_lua***
+
+> 用于在log请求处理阶段, 用Lua代码处理日志, 但并不替换原有log处理
+
+### 操作案例
+
+```
+参考文档: 
+https://github.com/openresty/lua-nginx-module#nginx-api-for-lua
+```
+
+```
+需求:
+访问路径http://192.168.253.138?name=tim&gender=1
+Nginx接收请求后, 根据gender传值, 若等于1,显示tim先生, 若等于0, 显示tim女士, 若即不是0也不是1, 返回tim
+```
+
+```nginx
+# 配置/usr/local/openresty/nginx/conf/nginx.conf文件路由
+		location /getGender{
+            charset utf8;
+            default_type 'text/html';
+            set_by_lua $value "
+            	-- 获取请求参数
+                local params = ngx.req.get_uri_args()
+                local name = params['name']
+                local gender = params['gender']
+                -- 判断组装返回值
+                if gender == '1' then
+                    gender_str = '先生'
+                elseif gender == '0' then
+                    gender_str = '女士'
+                else 
+                    gender_str = ''
+                end
+                str_total = name .. gender_str
+                -- 返回结果
+                return str_total
+            ";
+            return 200 $value;
+        }
+```
+
+```shell
+# 重启nginx
+$ sudo /usr/local/openresty/nginx/sbin/nginx -s reload
+```
+
+![image-20220608190959254](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f9433cfde6f42edc5f480245abda37b5-dbaf6a3.png)
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx中的Lua使用10</title>
+    <url>/2021/06/21/Nginx/Nginx10%E4%B8%AD%E7%9A%84Lua%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[
+# Nging中的Lua使用
+
+## ngx_lua操作redis
+
+```
+Nginx 支持三种方法访问Redis
+- HttpRedis模块
+	指令少, 功能单一, 适合简单缓存
+- HttpRedis2Module
+	比较灵活, 功能强大
+- lua-resty-redis库
+	OpenResty提供的操作Redis的接口库, 适合复杂业务逻辑
+```
+
+### 查询基本使用API
+
+OpenResty官方文档
+
+```
+https://github.com/openresty/lua-resty-redis
+```
+
+> 在lua-resty-redis中, 所有Redis命令都有自己的方法, 名称与Redis命令相同, 只是全部小写
+
+### 修改RestyNginx配置文件
+
+```nginx
+# sudo vi /usr/local/openresty/nginx/conf/nginx.conf
+		location /showRedis{
+            default_type 'text/html';
+            content_by_lua_block{
+                -- 引入Redis接口模块
+                local redis = require "resty.redis"
+                -- 创建Redis对象
+                local redisObj = redis:new()
+                -- 设置超时时间
+                redisObj:set_timeout(1000)
+                local ok,err = redisObj:connect("192.168.253.135",6379)
+                if not ok then
+                    ngx.say('failed to connection with redis',err)
+                    return
+                else
+                    ngx.say('connect to Redis success','<br>')
+                end
+                -- 向Redis存入数据
+                local ok,err = redisObj:set('username','ni9ne')
+                if ok then
+                    ngx.say('set value username_ni9ne:', ok,'<br>')
+                else
+                    ngx.say('failed to set value',err)
+                    return
+                end
+                -- 从Redis中获取数据
+                local res,err = redisObj:get('username')
+                ngx.say('<h1>',res,'<h1>')
+                -- 关闭Redis连接
+                redisObj:close()
+            }
+        }
+```
+
+### 验证配置路由结果
+
+![image-20220609012350518](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/93fd3c7bd253c60a886c0e78c31cd214-949d4d8.png)
+
+![image-20220609012412032](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8d5070a50c55ee8993b28ff1e3c535a3-80b026e.png)
+
+## ngx_lua操作MySql
+
+```
+在ngx_lua中, MySql有两种访问方式:
+- 使用OpenResty自带的ngx_lua模块和lua-resty-mysql模块
+- 安装drizzle_nginx_module(HttpDrizzleModule)模块
+	文档路径为: https://github.com/openresty/drizzle-nginx-module
+```
+
+> 已安装OpenResty, 使用lua-resty-mysql
+
+### 查询基本使用API
+
+OpenResty官方文档
+
+```
+https://github.com/openresty/lua-resty-mysql
+```
+
+### 单条数据查询
+
+**修改Nginx配置文件**
+
+```nginx
+# sudo vi /usr/local/openresty/nginx/conf/nginx.conf
+		location /mysqlQuery{
+            default_type 'text/html';
+            content_by_lua_block{
+        		-- 引入resty.msyql模块
+                local mysql = require 'resty.mysql'
+            	-- 创建连接对象
+                local db = mysql:new()
+            	-- 建立连接
+                local ok,err = db:connect{
+                    host="192.168.253.134",
+                    port=3306,
+                    user="root",
+                    password="xxxxxx",
+                    database="nginx_db"
+                }
+        		-- 验证是否连接成功
+                if not ok then
+                    ngx.say('failed connected to mysql',err)
+                    return
+                else
+                    ngx.say('mysql connected success'..'<br/>')
+                end
+            	-- 设置超时时间
+                db:set_timeout(1000)
+            	-- 发送SQL语句
+                db:send_query('select * from users where id=2')
+            	-- 接收返回结果
+                local res,err,errcode,sqlstate = db:read_result()
+            	-- 输出信息到页面
+                if not err then
+                    ngx.say('res[1].username:',res[1].username)
+                    ngx.say('<br/>')
+                end
+                ngx.say('err:',err)
+                ngx.say('<br/>')
+                ngx.say('errcode:',errcode)
+                ngx.say('<br/>')
+                ngx.say('sqlstate:',sqlstate)
+            	-- 关闭连接
+                db:close()
+            }
+        }
+```
+
+**验证配置路由结果**
+
+![image-20220609020926699](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/86388f1fca6fde11dade06df7e1aa189-1b65852.png)
+
+SQL错误信息如下所示:
+
+![image-20220609021614599](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1093039c88fc483b63732db7be246f53-c5e9cf6.png)
+
+### 多条数据查询
+
+**修改Nginx配置文件**
+
+```nginx
+# sudo vi /usr/local/openresty/nginx/conf/nginx.conf
+        location /mysqlQuery{
+            default_type 'text/html';
+            content_by_lua_block{
+                local mysql = require 'resty.mysql'
+                local db = mysql:new()
+                local ok,err = db:connect{
+                    host="192.168.253.134",
+                    port=3306,
+                    user="root",
+                    password="xxxxxx",
+                    database="nginx_db"
+                }
+                if not ok then
+                    ngx.say('failed connected to mysql',err)
+                    return
+                else
+                    ngx.say('mysql connected success'..'<br/>')
+                end
+                db:set_timeout(1000)
+                db:send_query('select * from users')
+                local res,err,errcode,sqlstate = db:read_result()
+                if not err then
+                    --[[
+                    ngx.say('res[1].username:',res[1].username)
+                    ngx.say('<br/>')
+                    --]]
+            		# for循环解析多条数据
+                    for i,v in pairs(res) do
+                        ngx.say('username:'..v.username,'|','salary:'..v.salary)
+                        ngx.say('<br/>')
+                    end
+                end
+                ngx.say('err:',err)
+                ngx.say('<br/>')
+                ngx.say('errcode:',errcode)
+                ngx.say('<br/>')
+                ngx.say('sqlstate:',sqlstate)
+                db:close()
+            }
+        }
+```
+
+**验证配置路由结果**
+
+![image-20220609023333612](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d3fc6fc2d3c8bce7f4ad08c4106ab70a-d76d129.png)
+
+### 使用CJson编码数据table
+
+**修改Nginx配置文件**
+
+```nginx
+# sudo vi /usr/local/openresty/nginx/conf/nginx.conf
+        location /mysqlQuery{
+            default_type 'text/html';
+            content_by_lua_block{
+                local mysql = require 'resty.mysql'
+            	# 引入cjson模块, 也可以在http块中初始化
+            	# init_by_lua_block{ cjson=require 'cjson' }
+                local cjson = require 'cjson'
+                local db = mysql:new()
+                local ok,err = db:connect{
+                    host="192.168.253.134",
+                    port=3306,
+                    user="root",
+                    password="xxxxxx",
+                    database="nginx_db"
+                }
+                if not ok then
+                    ngx.say('failed connected to mysql',err)
+                    return
+                else
+                    ngx.say('mysql connected success'..'<br/>')
+                end
+                db:set_timeout(1000)
+                db:send_query('select * from users')
+                local res,err,errcode,sqlstate = db:read_result()
+                if not err then
+                    --[[
+                    for i,v in pairs(res) do
+                        ngx.say('username:'..v.username,'|','salary:'..v.salary)
+                        ngx.say('<br/>')
+                    end
+                    --]]
+                    local res_json = cjson.encode(res)
+                    ngx.say('res_json: ',res_json)
+                    ngx.say('<br/>')
+                end
+                ngx.say('err:',err)
+                ngx.say('<br/>')
+                ngx.say('errcode:',errcode)
+                ngx.say('<br/>')
+                ngx.say('sqlstate:',sqlstate)
+                db:close()
+            }
+        }
+```
+
+**验证配置路由结果**
+
+![image-20220609023722667](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e6d8125c772e8eaf0cdfbb5b757f6c41-efbd963.png)
+
+### 使用query()执行查询/读取
+
+使用`query()`可以替代`send_query()`+`read_result()` 
+
+**修改Nginx配置文件**
+
+```nginx
+# sudo vi /usr/local/openresty/nginx/conf/nginx.conf
+        location /mysqlQuery{
+            default_type 'text/html';
+            content_by_lua_block{
+                local mysql = require 'resty.mysql'
+                local cjson = require 'cjson'
+                local db = mysql:new()
+                local ok,err = db:connect{
+                    host="192.168.253.134",
+                    port=3306,
+                    user="root",
+                    password="xxxxxx",
+                    database="nginx_db"
+                }
+                if not ok then
+                    ngx.say('failed connected to mysql',err)
+                    return
+                else
+                    ngx.say('mysql connected success'..'<br/>')
+                end
+                db:set_timeout(1000)
+                local sql = 'select * from users'
+            	# 使用query()
+                local res,err,errcode,sqlstate = db:query(sql)
+                if res then
+                    local res_json = cjson.encode(res)
+                    ngx.say('res_json: ',res_json)
+                    ngx.say('<br/>')
+                end
+                ngx.say('err:',err)
+                ngx.say('<br/>')
+                ngx.say('errcode:',errcode)
+                ngx.say('<br/>')
+                ngx.say('sqlstate:',sqlstate)
+                db:close()
+            }
+        }
+```
+
+### 增删改操作
+
+> 增删改操作只需要将对于SQL放入query()中即可, 仅返回数据不同
+
+**修改Nginx配置文件**
+
+```nginx
+# sudo vi /usr/local/openresty/nginx/conf/nginx.conf
+        location /mysqlQuery{
+            default_type 'text/html';
+            content_by_lua_block{
+                local mysql = require 'resty.mysql'
+                local cjson = require 'cjson'
+                local db = mysql:new()
+                local ok,err = db:connect{
+                    host="192.168.253.134",
+                    port=3306,
+                    user="root",
+                    password="xxxxxx",
+                    database="nginx_db"
+                }
+                if not ok then
+                    ngx.say('failed connected to mysql',err)
+                    return
+                else
+                    ngx.say('mysql connected success'..'<br/>')
+                end
+                db:set_timeout(1000)
+                -- local sql = "insert into users (username,birthday,salary) values ('aris','1998-12-07',22356)"
+                -- local sql = "update users set salary=100 where id=1"
+                local sql = "delete from users where username = 'aris'"
+            	# 使用query()
+                local res,err,errcode,sqlstate = db:query(sql)
+                if res then
+                    local res_json = cjson.encode(res)
+                    ngx.say('res_json: ',res_json)
+                    ngx.say('<br/>')
+                end
+                ngx.say('err:',err)
+                ngx.say('<br/>')
+                ngx.say('errcode:',errcode)
+                ngx.say('<br/>')
+                ngx.say('sqlstate:',sqlstate)
+                db:close()
+            }
+        }
+```
+
+**验证结果**
+
+```mysql
+-- 新增
+insert into users (username,birthday,salary) values ('aris','1998-12-07',22356)
+```
+
+![image-20220609033006008](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/05d3ebca7f8d8871d616fc3fbf809dc5-13b419c.png)
+
+
+
+```mysql
+-- 修改
+update users set salary=100 where id=1
+```
+
+![image-20220609033232697](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e84f6c3dfb1904c19d695872bc627cc8-fac20ff.png)
+
+
+
+```mysql
+-- 删除
+delete from users where username = 'aris'
+```
+
+![image-20220609033404049](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d98df28605aea32d6ff92beb8230ffd5-381e133.png)
+
+## ngx_lua缓存预热
+
+### 需求
+
+使用ngx_lua做缓存预热. 访问路径`http://192.168.253.138/cacheWarm?username=Tom`, 不带参数时, 将所有数据缓存进Redis, 带参数时, 仅更新一条
+
+### 修改配置
+
+```shell
+$ sudo mkdie /usr/local/openresty/nginx/lua_script
+$ sudo vim /usr/local/openresty/nginx/lua_script/lua_init_script.lua
+$ sudo vim /usr/local/openresty/nginx/lua_script/lua_cache_warm_script.lua 
+$ sudo vim /usr/local/openresty/nginx/conf/nginx.conf
+```
+
+```nginx
+# 修改Nginx配置文件
+# sudo vim /usr/local/openresty/nginx/conf/nginx.conf
+http {
+	...
+    init_by_lua_file /usr/local/openresty/nginx/lua_script/init_script.lua;
+	...
+   	server {
+		...
+        location /cacheWarm{
+            default_type 'text/html';
+            content_by_lua_file /usr/local/openresty/nginx/lua_script/lua_cache_warm_script.lua;
+        }
+    }
+}
+```
+
+```lua
+-- 创建初始化脚本
+-- sudo vim /usr/local/openresty/nginx/lua_script/lua_init_script.lua
+redis = require 'resty.redis'
+mysql = require 'resty.mysql'
+cjson = require 'cjson'
+```
+
+```lua
+-- 创建业务逻辑脚本
+-- sudo vim /usr/local/openresty/nginx/lua_script/lua_cache_warm_script.lua 
+-- 获取get参数username
+local param = ngx.req.get_uri_args()['username'];
+
+-- 连接数据库
+local db = mysql:new()
+local ok,err = db:connect{
+	host="192.168.253.134",
+	port=3306,
+	user="root",
+	password="xxxxxx",
+	database="nginx_db"
+}
+if not ok then
+	ngx.say("failed connect to mysql: ",err)
+	return
+end
+db:set_timeout(1000)
+
+-- 依据get参数构建SQL
+local sql = ""
+if param then
+	sql = "select * from users where username = ".."'"..param.."'"
+else
+	sql = "select * from users"
+end
+
+--执行SQL,获取数据
+local res,err,errcode,sqlstate = db:query(sql)
+if not res then
+	ngx.say("failed query in mysql: ",err)
+	return
+end
+
+-- 连接Redis
+local redisObj = redis:new()
+local ok,err = redisObj:connect("192.168.253.135",6379)
+if not ok then
+	ngx.say("failed connect to redis: ",err)
+	return
+end
+redisObj:set_timeout(1000)
+
+-- 循环MySQL数据存入Redis
+local count=0
+for i,v in ipairs(res) do
+	local redis_key = "user_"..v.username
+	local res_json = cjson.encode(v)
+	local ok,err = redisObj:set(redis_key,res_json)
+	if not ok then
+		ngx.say("failed set redis value: "..redis_key..'-'..res_json,err)
+	else
+		ngx.say("success set redis value: "..redis_key..'-'..res_json)
+	end
+	ngx.say("<br/>")
+	count = count + 1
+end
+ngx.say("warm cache success, total count "..count)
+
+-- 关闭连接
+db:close()
+redisObj:close()
+```
+
+### 访问结果
+
+```
+访问 http://192.168.253.138/cacheWarm
+```
+
+![image-20220609041921037](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c4fad63b98a525646e58ba1fbf915d3f-3d85e66.png)
+
+
+
+```
+访问http://192.168.253.138/cacheWarm?username=Tom
+```
+
+![image-20220609041936691](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3c10337f6602ad6bd077ddf415df731f-7714d96.png)
+
+
+
+**查看Redis缓存结果**
+
+![image-20220609043004337](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f997b146e9e9c74db24c13cbdc8d73b7-97ffa41.png)]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Ngnix制作下载站11</title>
+    <url>/2021/06/21/Nginx/Nginx11%E5%88%B6%E4%BD%9C%E4%B8%8B%E8%BD%BD%E7%AB%99+%E7%94%A8%E6%88%B7%E8%AE%A4%E8%AF%81/</url>
+    <content><![CDATA[
+## Ngnix制作下载站
+
+类似于如下效果:
+
+访问:  `https://nginx.org/download/`
+
+![image-20220607155607509](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/99329265b5f622d51dba950071731e3f-d73496c.png)
+
+nginx使用模块ngx_http_autoindex_module实现, 该模块处理以斜杆`/`结尾的请求, 并生成目录列表
+
+该模块自动加载, 但默认关闭, 需要使用指令开启配置
+
+### 指令解析
+
+#### autoindex指令
+
+启用或禁用目录列表输出
+
+```
+语法: 
+	autoindex on|off
+默认值:
+	off
+位置:
+	http server location块
+```
+
+#### autoindex_format指令
+
+设置目录列表的格式
+
+```
+语法:
+	autoindex_format html|xml|json|jsonp
+默认值:
+	html
+位置:
+	http serve location
+```
+
+#### autoindex_exact_size指令
+
+对应`autoindex_format`的HTML格式. 指定是否在目录列表中展示文件详细大小. 默认on, 显示文件确切大小, 单位为bytes. off时, 显示大概大小, 单位KB/MB/GB
+
+```
+语法:
+	autoindex_exact_size on|off
+默认值:
+	autoindex_exact_size on
+位置:
+	http server location块
+```
+
+#### autoindex_localtime指令
+
+对应`autoindex_format`的HTML格式. 是否在目录列表上显示时间. 默认为off, 显示的文件时间为UTC时间. on时, 显示文件的本地时区时间
+
+```
+语法:
+	autoindex_localtime on|off
+默认值:
+	autoindex_localtime off
+位置:
+	http server location块
+```
+
+### 配置nginx.conf文件
+
+```
+http{
+	...
+	server{
+		...
+		# 下载站点配置
+        location /download{
+            root /var/www/nginx-module;
+            autoindex on;
+            autoindex_exact_size on;
+            autoindex_format html;
+            autoindex_localtime on;
+        }
+	}
+}
+```
+
+### 效果展示
+
+![image-20220607170033885](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e7e74d4af69436a7b8f4ecbf9bb7f9ad-519da34.png)
+
+## 资源下载用户认证
+
+Nginx通过ngx_http_auth_basic_module模块实现用户认证, 允许通过使用HTTP基本身份验证协议验证用户名和密码来限制对资源的访问, Nginx默认安装了该模块
+
+### 模块指令
+
+#### auth_basic指令
+
+使用HTTP基本认证协议开启/关闭用户名密码验证
+
+```
+语法:
+	auth_basic string|off
+默认值:
+	autoindex_exact_size off
+位置:
+	http server location limit_except块
+```
+
+> 开启后, 指定字符串会以头信息字段的方式返回到客户端, 给用户提示信息, 但不同浏览器展示方式不同
+
+#### auth_basic_user_file指令
+
+指定用户名密码验证文件(一般使用`htpasswd`生成)
+
+```
+语法:
+	auth_basic_user_file file
+位置:
+	http server location limit_except块
+```
+
+> 指定文件路径, 该文件中包含用户名和密码, 密码需要加密, 可以采用`htpasswd`自动生成
+
+### 认证功能实现
+
+#### 修改nginx.conf文件
+
+```nginx
+http{
+	...
+	server{
+		...
+		# 下载站点配置
+        location /download{
+            root /var/www/nginx-module;
+            autoindex on;
+            autoindex_exact_size on;
+            autoindex_format html;
+            autoindex_localtime on;
+            auth_basic 'please varify yourself';
+            auth_basic_user_file /etc/nginx/htpasswd;
+        }
+	}
+}
+```
+
+#### 安装htpasswd工具
+
+```shell
+sudo apt install httpd-tools
+```
+
+#### htpasswd指令
+
+```shell
+$ htpasswd -c /etc/nginx/htpasswd user_name	# 创建一个新密码文件
+```
+
+![image-20220607175919503](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4ad350624ec1d63f27a3661e06b12e6a-4736182.png)
+
+```shell
+$ htpasswd -b /etc/nginx/htpasswd user_name password # 添加新用户
+```
+
+![image-20220607180155361](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c9d2bb8066e4b37ff708f1484852b664-672b81f.png)
+
+```shell
+$ htpasswd -D /etc/nginx/htpasswd ni8ne # 删除用户
+```
+
+![image-20220607180246736](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6182c4038933360b353e511e44cfba91-d839289.png)
+
+```shell
+$ htpasswd -v /etc/nginx/htpasswd ni9ne	# 验证用户密码
+```
+
+![image-20220607180413193](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/79b398d4d9dd3aaa160244132c39ffe7-4bc70bb.png)
+
+#### 访问资源下载站点
+
+```
+http://192.168.253.134/download/
+```
+
+![image-20220607180755952](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d3fe43017634e0ba52748645fc96c55b-b92bac2.png)]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx中添加模块</title>
+    <url>/2021/06/22/Nginx/Nginx%E6%B7%BB%E5%8A%A0%E6%A8%A1%E5%9D%97upstream-fail/</url>
+    <content><![CDATA[
+## Nginx添加模块upstream-fail
+
+```shell
+# https://github.com/gnosek/nginx-upstream-fair 下载fair压缩包
+$ wget https://nginx.org/download/nginx-1.14.0.tar.gz # 对照本机版本下载nginx包
+$ unzip nginx-upstream-fair
+$ tar -zxvf nginx-1.14.0.tar.gz
+
+$ cd nginx-1.14.0
+$ vi src/http/ngx_http_upstream.h	# 打开文件
+	/ngx_http_upstream_srv_conf_s	# 找到关键字
+	131     in_port_t                        default_port;	# 131行添加内容
+$ sudo apt install build-essential libpcre3 libpcre3-dev openssl libssl-dev zlib1g-dev libxslt1-dev libgd-dev libgeoip-dev	# 安装编译依赖
+$ pwd ../nginx-upstream-fair	# 记录下module路径
+$ nginx -V	# 复制nginx模块配置
+$ ./configure [nginx原有配置] --add-module=[fair-module路径]
+$ make
+$ sudo mv /usr/sbin/nginx /usr/sbin/nginx_old	# 备份
+$ sudo cp objs/nginx /usr/sbin/nginx	# 替换nginx
+# $ sudo service nginx restart # 重启nginx
+$ make upgrade	# 更新nginx
+```
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx证书生成及使用</title>
+    <url>/2021/06/22/Nginx/Nginx%E8%AF%81%E4%B9%A6%E7%94%9F%E6%88%90%E5%8F%8A%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[
+## 证书来源
+
+### 1.通过阿里云/腾讯云等第三方服务商购买
+
+免费版, 一般限制一年的有效期
+
+### 2.使用OpenSSL生成证书文件
+
+```
+mkdri /root/cert
+cd /root/cert
+openssl genrsa -des3 -out server.key 1024
+# 设定密码
+openssl req -new -key server.key -out server.csr
+# 输入密码, 验证信息
+cp server.key server.key.org
+openssl rsa -in server.key.org -out server.key
+# 验证密码
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+```
+
+生成文件: server.key | server.crt
+
+## 开启SSL实例
+
+详细官方文档: `https://nginx.org/en/docs/http/ngx_http_ssl_module.html` 
+
+```nginx
+server{
+    # ssl on;
+    listen 443 ssl;
+    server_name localhost;
+    
+    ssl_certificate server.crt;	# 指定证书文件路径
+    ssl_certificate_key server.key;	# 指定证书key文件路径
+    
+    ssl_session_cache shared:SSL:1m;	# 配置用于SSL会话缓存
+    # off-禁用, 客户端不得重复使用会话
+    # none-禁用, 客户端可以重复使用, 但并没有在缓存中存储会话参数
+    # builtin-内置OpenSSL缓存,仅在一个工作进程中使用
+    # shared-所有工作进程间共享缓存, 相关信息由name和size指定
+    ssl_session_timeout 5m;	# 开启会话后,客户端能够反复使用存储会话时间
+    
+    ssl_ciphers HIGH:!aNULL:!MD5;	# 允许密码格式,可以用openssl ciphers查看支持格式
+    ssl_prefer_server_ciphers on;	# 指定是否服务器密码优先于客户端密码
+    
+    location /{
+        root html;
+        index index.html index.htm;
+    }
+}
+```
+
+## 自动转换为https协议
+
+```
+location /{
+	...
+	rewrite ^(.*) https://[server_name]$1;
+}
+
+或
+
+server {
+    if ($host = [server_name]) {
+        return 301 https://$host$request_uri;
+    }
+}
+```
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
         <tag>后端</tag>
       </tags>
   </entry>

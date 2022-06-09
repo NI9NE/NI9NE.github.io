@@ -88,7 +88,7 @@
         <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
         <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li>
         <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
-        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">70</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">80</span></a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -159,7 +159,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-count">80</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -222,7 +222,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/07/15/Nginx/Nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite04/">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/05/07/Bat%E8%84%9A%E6%9C%AC%E7%BC%96%E5%86%99%E7%94%A8%E4%BE%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
@@ -235,7 +235,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/07/15/Nginx/Nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite04/" class="post-title-link" itemprop="url">Nginx配置指令Rewrite04</a>
+          <a href="/2021/05/07/Bat%E8%84%9A%E6%9C%AC%E7%BC%96%E5%86%99%E7%94%A8%E4%BE%8B/" class="post-title-link" itemprop="url">Bat脚本编写用例</a>
         </h2>
 
         <div class="post-meta-container">
@@ -246,7 +246,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2020-07-15 22:09:24" itemprop="dateCreated datePublished" datetime="2020-07-15T22:09:24+08:00">2020-07-15</time>
+      <time title="创建时间：2021-05-07 18:23:12" itemprop="dateCreated datePublished" datetime="2021-05-07T18:23:12+08:00">2021-05-07</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -254,7 +254,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+          <a href="/categories/%E5%AE%9E%E9%99%85%E6%BC%94%E7%BB%83/" itemprop="url" rel="index"><span itemprop="name">实际演练</span></a>
         </span>
     </span>
 
@@ -268,10 +268,11 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Nginx配置指令Rewrite"><a href="#Nginx配置指令Rewrite" class="headerlink" title="Nginx配置指令Rewrite"></a>Nginx配置指令Rewrite</h1><h2 id="Rewrite功能配置"><a href="#Rewrite功能配置" class="headerlink" title="Rewrite功能配置"></a>Rewrite功能配置</h2><p>Rewrite功能是Nginx服务器提供的一个重要基本功能, 主要用于实现URL的重写. 其具体实现需要依赖PCRE的支持, Nginx通过 <code>ngx_http_rewrite_module</code> 模块解析处理Rewrite功能相关配置</p>
+          <h2 id="一次Bat脚本的尝试"><a href="#一次Bat脚本的尝试" class="headerlink" title="一次Bat脚本的尝试"></a>一次Bat脚本的尝试</h2><p>记录一次Bat脚本的编写使用,</p>
+<p>本意是在Windows服务器上用Git实现文件的备份和实时拉取, 但由于仓库的大小限制失败, 改为其他方式实现, 以下为具体bat脚本代码</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2020/07/15/Nginx/Nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite04/#more" rel="contents">
+              <a class="btn" href="/2021/05/07/Bat%E8%84%9A%E6%9C%AC%E7%BC%96%E5%86%99%E7%94%A8%E4%BE%8B/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -302,7 +303,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/07/05/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E7%BC%93%E5%AD%98%E3%80%81%E8%B7%A8%E5%9F%9F%E3%80%81%E9%98%B2%E7%9B%97%E9%93%BE03/">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
@@ -315,7 +316,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/07/05/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E7%BC%93%E5%AD%98%E3%80%81%E8%B7%A8%E5%9F%9F%E3%80%81%E9%98%B2%E7%9B%97%E9%93%BE03/" class="post-title-link" itemprop="url">Nginx静态资源缓存、跨域、防盗链03</a>
+          <a href="/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/" class="post-title-link" itemprop="url">从零配置一台服务器</a>
         </h2>
 
         <div class="post-meta-container">
@@ -326,7 +327,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2020-07-05 18:33:58" itemprop="dateCreated datePublished" datetime="2020-07-05T18:33:58+08:00">2020-07-05</time>
+      <time title="创建时间：2021-03-22 13:13:32" itemprop="dateCreated datePublished" datetime="2021-03-22T13:13:32+08:00">2021-03-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -334,7 +335,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+          <a href="/categories/%E5%AE%9E%E9%99%85%E6%BC%94%E7%BB%83/" itemprop="url" rel="index"><span itemprop="name">实际演练</span></a>
         </span>
     </span>
 
@@ -348,13 +349,13 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="静态资源缓存处理"><a href="#静态资源缓存处理" class="headerlink" title="静态资源缓存处理"></a>静态资源缓存处理</h2><blockquote>
-<p>web 缓存: 一个web资源存在于web服务器和客户端之间的副本</p>
+          <h1 id="从零配置一台服务器"><a href="#从零配置一台服务器" class="headerlink" title="从零配置一台服务器"></a>从零配置一台服务器</h1><blockquote>
+<p>ubuntu server 18.04</p>
 </blockquote>
-<h3 id="web缓存分类"><a href="#web缓存分类" class="headerlink" title="web缓存分类"></a>web缓存分类</h3>
+<h2 id="基础服务器镜像安装"><a href="#基础服务器镜像安装" class="headerlink" title="基础服务器镜像安装"></a>基础服务器镜像安装</h2>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2020/07/05/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E7%BC%93%E5%AD%98%E3%80%81%E8%B7%A8%E5%9F%9F%E3%80%81%E9%98%B2%E7%9B%97%E9%93%BE03/#more" rel="contents">
+              <a class="btn" href="/2021/03/22/%E7%A9%BA%E7%99%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -385,7 +386,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/06/28/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A902/">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/03/15/Docker%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
@@ -398,7 +399,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/06/28/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A902/" class="post-title-link" itemprop="url">Nginx静态资源压缩02</a>
+          <a href="/2021/03/15/Docker%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85/" class="post-title-link" itemprop="url">Docker手动安装</a>
         </h2>
 
         <div class="post-meta-container">
@@ -409,7 +410,332 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2020-06-28 09:42:07" itemprop="dateCreated datePublished" datetime="2020-06-28T09:42:07+08:00">2020-06-28</time>
+      <time title="创建时间：2021-03-15 17:13:58" itemprop="dateCreated datePublished" datetime="2021-03-15T17:13:58+08:00">2021-03-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">环境配置</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="Docker手动安装"><a href="#Docker手动安装" class="headerlink" title="Docker手动安装"></a>Docker手动安装</h2><p>安装环境: ubuntu</p>
+<p>官方脚本</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/15/Docker%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/01/15/Libreoffice%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/01/15/Libreoffice%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97/" class="post-title-link" itemprop="url">Libreoffice升级指南</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-01-15 19:22:56" itemprop="dateCreated datePublished" datetime="2021-01-15T19:22:56+08:00">2021-01-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">环境配置</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>由于低版本libreoffice转化PDF时, 会存在样式错误, 需要提高到6.4以上才能避免</p>
+<p>如果服务器已有libreoffice, 可通过命令查看版本<code>soffice --version</code> 或 <code>libreoffice --version</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">升级命令: </span><br><span class="line"> sudo add-apt-repository ppa:libreoffice/ppa</span><br><span class="line"> sudo apt update</span><br><span class="line"> sudo apt-get install -y libreoffice</span><br><span class="line"> 该命令为完整安装升级, 大约占用250M空间, 可酌情使用(推荐)</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/15/Libreoffice%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/" class="post-title-link" itemprop="url">Navicat通过ssh-秘钥方式登录</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-01-15 19:22:56" itemprop="dateCreated datePublished" datetime="2021-01-15T19:22:56+08:00">2021-01-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">环境配置</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-准备私钥文件"><a href="#1-准备私钥文件" class="headerlink" title="1.准备私钥文件:"></a>1.准备私钥文件:</h3><p> <code>id_rsa_2048.pub</code></p>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767009388.png" alt="1596767009388"></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/" class="post-title-link" itemprop="url">雪花算法实现</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-12 19:54:34" itemprop="dateCreated datePublished" datetime="2020-12-12T19:54:34+08:00">2020-12-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AE%9E%E9%99%85%E6%BC%94%E7%BB%83/" itemprop="url" rel="index"><span itemprop="name">实际演练</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="雪花算法实现"><a href="#雪花算法实现" class="headerlink" title="雪花算法实现"></a>雪花算法实现</h1><p>在laravel中实现雪花算法</p>
+<hr>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/12/03/Shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/12/03/Shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">Shell脚本编程</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-03 19:13:52" itemprop="dateCreated datePublished" datetime="2020-12-03T19:13:52+08:00">2020-12-03</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -431,11 +757,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="Nginx静态资源压缩"><a href="#Nginx静态资源压缩" class="headerlink" title="Nginx静态资源压缩"></a>Nginx静态资源压缩</h2><p>在Nginx的配置文件中可以通过gzip来对静态资源进行压缩</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ngx_http_gzip_module模块		# nginx自带</span><br><span class="line">ngx_http_gzip_static_module模块	# 需要安装</span><br><span class="line">ngx_http_gunzip_module模块		# 需要安装</span><br></pre></td></tr></table></figure>
+          <h3 id="脚本运行环境"><a href="#脚本运行环境" class="headerlink" title="脚本运行环境"></a>脚本运行环境</h3><h4 id="1-脚本权限"><a href="#1-脚本权限" class="headerlink" title="1.脚本权限"></a>1.脚本权限</h4><p>需要当前用户有执行权限, 可以使用如下命令给当前目录下的<code>test.sh</code>添加权限</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2020/06/28/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A902/#more" rel="contents">
+              <a class="btn" href="/2020/12/03/Shell%E8%84%9A%E6%9C%AC%E7%BC%96%E7%A8%8B/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -466,7 +791,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
@@ -479,7 +804,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/" class="post-title-link" itemprop="url">Nginx静态资源部署优化01</a>
+          <a href="/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/" class="post-title-link" itemprop="url">IoT物联网接入</a>
         </h2>
 
         <div class="post-meta-container">
@@ -490,7 +815,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2020-06-21 20:53:43" itemprop="dateCreated datePublished" datetime="2020-06-21T20:53:43+08:00">2020-06-21</time>
+      <time title="创建时间：2020-11-27 19:13:52" itemprop="dateCreated datePublished" datetime="2020-11-27T19:13:52+08:00">2020-11-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -512,10 +837,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="Nginx静态资源部署"><a href="#Nginx静态资源部署" class="headerlink" title="Nginx静态资源部署"></a>Nginx静态资源部署</h2><h3 id="1-nginx静态资源配置指令"><a href="#1-nginx静态资源配置指令" class="headerlink" title="1.nginx静态资源配置指令"></a>1.nginx静态资源配置指令</h3><h4 id="listen-用于配置监听端口"><a href="#listen-用于配置监听端口" class="headerlink" title="listen 用于配置监听端口"></a>listen 用于配置监听端口</h4>
+          <h2 id="阿里云平台功能页面"><a href="#阿里云平台功能页面" class="headerlink" title="阿里云平台功能页面"></a>阿里云平台功能页面</h2><h3 id="1-设备生命周期"><a href="#1-设备生命周期" class="headerlink" title="1.设备生命周期"></a>1.设备生命周期</h3><p>设备注册、功能定义、数据解析、在线调试、远程配置、固件升级、远程维护、实时监控、分组管理、设备删除</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2020/06/21/Nginx/Nginx%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE01/#more" rel="contents">
+              <a class="btn" href="/2020/11/27/IoT%E7%89%A9%E8%81%94%E7%BD%91%E6%8E%A5%E5%85%A5/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -546,7 +871,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/05/22/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BA%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C/">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
@@ -559,7 +884,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/05/22/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BA%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C/" class="post-title-link" itemprop="url">导入导出系统使用手册</a>
+          <a href="/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/" class="post-title-link" itemprop="url">码云 fork+pr操作教程</a>
         </h2>
 
         <div class="post-meta-container">
@@ -570,330 +895,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2020-05-22 14:22:28" itemprop="dateCreated datePublished" datetime="2020-05-22T14:22:28+08:00">2020-05-22</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/" itemprop="url" rel="index"><span itemprop="name">开发手册</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>导入系统是作为项目初始化或批量数据生成的一种方式, 将符合格式的数据批量导入项目数据库, 通常只有管理员才可以操作, 入口如下:</p>
-<p><img src="/images/imgs/%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BA%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C/1592370680273.png" alt="1592370680273"></p>
-<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项:"></a>注意事项:</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/05/22/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BA%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/02/17/UML%E7%B1%BB%E5%9B%BE%E7%BB%98%E5%88%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
-      <meta itemprop="name" content="NI9NE">
-      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="NI9NE's Zone">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/02/17/UML%E7%B1%BB%E5%9B%BE%E7%BB%98%E5%88%B6/" class="post-title-link" itemprop="url">UML类图详解</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-02-17 08:33:12" itemprop="dateCreated datePublished" datetime="2020-02-17T08:33:12+08:00">2020-02-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="UML类图"><a href="#UML类图" class="headerlink" title="UML类图"></a>UML类图</h2><h3 id="类图的基本元素"><a href="#类图的基本元素" class="headerlink" title="类图的基本元素"></a>类图的基本元素</h3><p><img src="/images/imgs/image-20211110002022081.png" alt="image-20211110002022081"></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/02/17/UML%E7%B1%BB%E5%9B%BE%E7%BB%98%E5%88%B6/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/01/19/Supervisor%E7%BA%BF%E4%B8%8A%E8%BF%9B%E7%A8%8B%E7%9B%91%E6%8A%A4%E5%B7%A5%E5%85%B7%E9%85%8D%E7%BD%AE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
-      <meta itemprop="name" content="NI9NE">
-      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="NI9NE's Zone">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/01/19/Supervisor%E7%BA%BF%E4%B8%8A%E8%BF%9B%E7%A8%8B%E7%9B%91%E6%8A%A4%E5%B7%A5%E5%85%B7%E9%85%8D%E7%BD%AE/" class="post-title-link" itemprop="url">Supervisor线上进程监护工具配置</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-01-19 18:23:32" itemprop="dateCreated datePublished" datetime="2020-01-19T18:23:32+08:00">2020-01-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="Supervisor-使用总结"><a href="#Supervisor-使用总结" class="headerlink" title="Supervisor 使用总结"></a>Supervisor 使用总结</h1><p><strong>Supervisor 是一个进程监护工具，在 Laravel 中，我们用来监护消息队列、Horizon 进程，以便在其意外退出时自动重启。</strong></p>
-<p>Ubuntu 环境下，运行：<code>apt-get install -y supervisor</code>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/01/19/Supervisor%E7%BA%BF%E4%B8%8A%E8%BF%9B%E7%A8%8B%E7%9B%91%E6%8A%A4%E5%B7%A5%E5%85%B7%E9%85%8D%E7%BD%AE/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/01/07/PHP%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
-      <meta itemprop="name" content="NI9NE">
-      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="NI9NE's Zone">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/01/07/PHP%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="post-title-link" itemprop="url">PHP设计模式详解</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-01-07 18:33:12" itemprop="dateCreated datePublished" datetime="2020-01-07T18:33:12+08:00">2020-01-07</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>可以被反复使用,容易被他人理解的,可靠地代码设计的最佳实践</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/01/07/PHP%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2019/01/12/LINUX%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C(PHP%E7%89%88)/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
-      <meta itemprop="name" content="NI9NE">
-      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="NI9NE's Zone">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2019/01/12/LINUX%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C(PHP%E7%89%88)/" class="post-title-link" itemprop="url">LINUX基础操作(PHP版)</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-01-12 18:33:20" itemprop="dateCreated datePublished" datetime="2019-01-12T18:33:20+08:00">2019-01-12</time>
+      <time title="创建时间：2020-10-25 22:12:28" itemprop="dateCreated datePublished" datetime="2020-10-25T22:12:28+08:00">2020-10-25</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -915,13 +917,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="ssh-Secure-Shell"><a href="#ssh-Secure-Shell" class="headerlink" title="ssh - Secure Shell"></a>ssh - Secure Shell</h2><blockquote>
-<p>安全外壳协议(安全的远程连接)</p>
-</blockquote>
-<h3 id="1-服务器端配置安装"><a href="#1-服务器端配置安装" class="headerlink" title="1.服务器端配置安装:"></a>1.服务器端配置安装:</h3>
+          <h1 id="pull-request-操作"><a href="#pull-request-操作" class="headerlink" title="pull request 操作"></a>pull request 操作</h1><h2 id="一-单账号Fork-PR操作"><a href="#一-单账号Fork-PR操作" class="headerlink" title="一.单账号Fork_PR操作"></a>一.单账号Fork_PR操作</h2><h3 id="1-准备账号"><a href="#1-准备账号" class="headerlink" title="1.准备账号:"></a>1.准备账号:</h3>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2019/01/12/LINUX%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C(PHP%E7%89%88)/#more" rel="contents">
+              <a class="btn" href="/2020/10/25/Gitee%20%E7%A0%81%E4%BA%91fork+pr%E6%93%8D%E4%BD%9C%E6%95%99%E7%A8%8B/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -952,7 +951,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2018/11/12/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-Laravel/">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/10/23/Gitee%20PR%E6%8F%90%E4%BA%A4%E5%85%B3%E8%81%94%E4%BB%BB%E5%8A%A1+Hook%E6%8F%90%E9%86%92/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
@@ -965,7 +964,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/11/12/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-Laravel/" class="post-title-link" itemprop="url">框架开发-Laravel</a>
+          <a href="/2020/10/23/Gitee%20PR%E6%8F%90%E4%BA%A4%E5%85%B3%E8%81%94%E4%BB%BB%E5%8A%A1+Hook%E6%8F%90%E9%86%92/" class="post-title-link" itemprop="url">码云 PR提交关联任务+Hook提醒</a>
         </h2>
 
         <div class="post-meta-container">
@@ -976,7 +975,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2018-11-12 23:40:11" itemprop="dateCreated datePublished" datetime="2018-11-12T23:40:11+08:00">2018-11-12</time>
+      <time title="创建时间：2020-10-23 23:22:16" itemprop="dateCreated datePublished" datetime="2020-10-23T23:22:16+08:00">2020-10-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -984,7 +983,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
         </span>
     </span>
 
@@ -998,20 +997,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="0-准备姿势-安装部署"><a href="#0-准备姿势-安装部署" class="headerlink" title="0. 准备姿势 (安装部署)"></a>0. 准备姿势 (安装部署)</h2><ol>
-<li><p>composer(依赖管理工具) 安装/使用<br>1.1. composer下载</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">`https://getcomposer.org`     [composer官网]</span><br></pre></td></tr></table></figure>
-
-<p>1.2. 环境检查<br>1.3. 安装<br>1.4. 源地址问题</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">`https://developer.aliyun.com/composer` [Composer 阿里镜像]</span><br></pre></td></tr></table></figure>
-
-<p>1.5. 使用composer</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS. 下载量最高的 100 个 Laravel 扩展包推荐</span><br><span class="line">https://github.com/summerblue/laravel-package-top-100</span><br></pre></td></tr></table></figure></li>
-</ol>
-<hr>
+          <h2 id="WebHook实现"><a href="#WebHook实现" class="headerlink" title="WebHook实现"></a>WebHook实现</h2><h3 id="企业微信端设置"><a href="#企业微信端设置" class="headerlink" title="企业微信端设置:"></a>企业微信端设置:</h3><h4 id="1-创建企业微信群聊"><a href="#1-创建企业微信群聊" class="headerlink" title="1.创建企业微信群聊"></a>1.创建企业微信群聊</h4>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2018/11/12/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-Laravel/#more" rel="contents">
+              <a class="btn" href="/2020/10/23/Gitee%20PR%E6%8F%90%E4%BA%A4%E5%85%B3%E8%81%94%E4%BB%BB%E5%8A%A1+Hook%E6%8F%90%E9%86%92/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1035,7 +1024,7 @@
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>
@@ -1047,7 +1036,7 @@
 
 <div class="copyright">
   &copy; 2017 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

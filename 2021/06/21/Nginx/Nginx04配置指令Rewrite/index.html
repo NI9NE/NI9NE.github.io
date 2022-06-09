@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Nginx配置指令RewriteRewrite功能配置Rewrite功能是Nginx服务器提供的一个重要基本功能, 主要用于实现URL的重写. 其具体实现需要依赖PCRE的支持, Nginx通过 ngx_http_rewrite_module 模块解析处理Rewrite功能相关配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx配置指令Rewrite04">
+<meta property="og:url" content="https://ni9ne.github.io/2021/06/21/Nginx/Nginx04%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="Nginx配置指令RewriteRewrite功能配置Rewrite功能是Nginx服务器提供的一个重要基本功能, 主要用于实现URL的重写. 其具体实现需要依赖PCRE的支持, Nginx通过 ngx_http_rewrite_module 模块解析处理Rewrite功能相关配置">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120064013787.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120074841710.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120074744772.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120075013711.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120122634521.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120123838920.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120123933761.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120124019223.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120125424948.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120125634725.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120131411135.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120134903700.png">
+<meta property="article:published_time" content="2021-06-21T12:53:43.000Z">
+<meta property="article:modified_time" content="2022-06-09T09:43:56.687Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="Nginx">
+<meta property="article:tag" content="后端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120064013787.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2021/06/21/Nginx/Nginx04%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/06/21/Nginx/Nginx04%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite/","path":"2021/06/21/Nginx/Nginx04配置指令Rewrite/","title":"Nginx配置指令Rewrite04"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Nginx配置指令Rewrite04 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">50</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">80</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Nginx%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite"><span class="nav-number">1.</span> <span class="nav-text">Nginx配置指令Rewrite</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Rewrite%E5%8A%9F%E8%83%BD%E9%85%8D%E7%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text">Rewrite功能配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Rewrite%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.1.</span> <span class="nav-text">Rewrite相关命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#set"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">set</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.1.1.1.1.</span> <span class="nav-text">指令格式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Nginx%E5%B8%B8%E7%94%A8%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.1.1.2.</span> <span class="nav-text">Nginx常用全局变量</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#if"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">if</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%A0%BC%E5%BC%8F-1"><span class="nav-number">1.1.1.2.1.</span> <span class="nav-text">指令格式</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#break"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">break</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%A0%BC%E5%BC%8F-2"><span class="nav-number">1.1.1.3.1.</span> <span class="nav-text">指令格式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%A1%88%E4%BE%8B"><span class="nav-number">1.1.1.3.2.</span> <span class="nav-text">使用案例</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#return"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">return</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%A0%BC%E5%BC%8F-3"><span class="nav-number">1.1.1.4.1.</span> <span class="nav-text">指令格式</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#rewrite"><span class="nav-number">1.1.1.5.</span> <span class="nav-text">rewrite</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%A0%BC%E5%BC%8F-4"><span class="nav-number">1.1.1.5.1.</span> <span class="nav-text">指令格式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%A1%88%E4%BE%8B-1"><span class="nav-number">1.1.1.5.2.</span> <span class="nav-text">使用案例</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#rewrite-log"><span class="nav-number">1.1.1.6.</span> <span class="nav-text">rewrite_log</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%AF%AD%E6%B3%95"><span class="nav-number">1.1.1.6.1.</span> <span class="nav-text">指令语法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rewrite%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.1.2.</span> <span class="nav-text">Rewrite应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%9F%E5%90%8D%E8%B7%B3%E8%BD%AC"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">域名跳转</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%8B%AC%E7%AB%8B%E5%9F%9F%E5%90%8D"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">独立域名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%9F%E5%90%8D%E9%95%9C%E5%83%8F"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">域名镜像</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E8%87%AA%E5%8A%A8%E6%B7%BB%E5%8A%A0%E2%80%9D-%E2%80%9C"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">目录自动添加”&#x2F;“</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E7%9B%AE%E5%BD%95"><span class="nav-number">1.1.2.5.</span> <span class="nav-text">合并目录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%98%B2%E7%9B%97%E9%93%BE"><span class="nav-number">1.1.2.6.</span> <span class="nav-text">防盗链</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/06/21/Nginx/Nginx04%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nginx配置指令Rewrite04
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-21 20:53:43" itemprop="dateCreated datePublished" datetime="2021-06-21T20:53:43+08:00">2021-06-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Nginx配置指令Rewrite"><a href="#Nginx配置指令Rewrite" class="headerlink" title="Nginx配置指令Rewrite"></a>Nginx配置指令Rewrite</h1><h2 id="Rewrite功能配置"><a href="#Rewrite功能配置" class="headerlink" title="Rewrite功能配置"></a>Rewrite功能配置</h2><p>Rewrite功能是Nginx服务器提供的一个重要基本功能, 主要用于实现URL的重写. 其具体实现需要依赖PCRE的支持, Nginx通过 <code>ngx_http_rewrite_module</code> 模块解析处理Rewrite功能相关配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">文档: http://nginx.org/en/docs/http/ngx_http_rewrite_module.html</span><br></pre></td></tr></table></figure>
+
+<h3 id="Rewrite相关命令"><a href="#Rewrite相关命令" class="headerlink" title="Rewrite相关命令"></a>Rewrite相关命令</h3><h4 id="set"><a href="#set" class="headerlink" title="set"></a>set</h4><blockquote>
+<p>用于设置一个Nginx变量, 可用于 server/location/if 块中</p>
+</blockquote>
+<h5 id="指令格式"><a href="#指令格式" class="headerlink" title="指令格式"></a>指令格式</h5><p><code>set $variable value</code></p>
+<p>variables: 变量的名称. 该变量名要用 <code>$</code> 作为变量开头, 且不能与nginx全局变量同名</p>
+<p>value: 变量的值.</p>
+<h5 id="Nginx常用全局变量"><a href="#Nginx常用全局变量" class="headerlink" title="Nginx常用全局变量"></a>Nginx常用全局变量</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">请求: http://192.168.200.133/server?arg1=value1&amp;arg2=value2</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$args</td>
+<td>请求URL中参数, 功能与 <code>$query_string</code> 一样<br />“<code>arg1=value1&amp;arg2=value2</code>“</td>
+</tr>
+<tr>
+<td>$http_user_agent</td>
+<td>用户访问客户端或代理的信息, 同<code>Request Headers-&gt;User-Agent</code></td>
+</tr>
+<tr>
+<td>$host</td>
+<td>服务器的<code>server_name</code> 值<br />“<code>192.168.200.133</code>“</td>
+</tr>
+<tr>
+<td>$document_uri</td>
+<td>当前访问地址的URI, 功能与 <code>$uri</code> 一样<br />“<code>/server</code>“</td>
+</tr>
+<tr>
+<td>$content_length</td>
+<td>请求头中的 <code>Content-Length</code> 值</td>
+</tr>
+<tr>
+<td>$content_type</td>
+<td>请求头中的 <code>Content-Type</code> 值</td>
+</tr>
+<tr>
+<td>$http_cookie</td>
+<td>客户端的cookie信息</td>
+</tr>
+<tr>
+<td>$limit_rate</td>
+<td>Nginx服务器对网络连接速率的限制, 默认为0, 不限制</td>
+</tr>
+<tr>
+<td>$remote_addr</td>
+<td>客户端的IP地址</td>
+</tr>
+<tr>
+<td>$remote_port</td>
+<td>客户端与服务端连接的端口号</td>
+</tr>
+<tr>
+<td>$remote_user</td>
+<td>客户端的用户名, 需要认证模块</td>
+</tr>
+<tr>
+<td>$scheme</td>
+<td>访问协议</td>
+</tr>
+<tr>
+<td>$server_addr</td>
+<td>服务端的地址</td>
+</tr>
+<tr>
+<td>$server_name</td>
+<td>服务端的名称</td>
+</tr>
+<tr>
+<td>$server_port</td>
+<td>服务端的端口</td>
+</tr>
+<tr>
+<td>$server_protocol</td>
+<td>客户端请求协议版本</td>
+</tr>
+<tr>
+<td>$request_body_file</td>
+<td>发给服务器的本地资源名称</td>
+</tr>
+<tr>
+<td>$request_method</td>
+<td>客户端的请求方式</td>
+</tr>
+<tr>
+<td>$request_filename</td>
+<td>当前请求资源文件的路径名</td>
+</tr>
+<tr>
+<td>$request_uri</td>
+<td>当前请求的URI, 且携带请求参数<br />“<code>/server?arg1=value1&amp;arg2=value2</code>“</td>
+</tr>
+</tbody></table>
+<h4 id="if"><a href="#if" class="headerlink" title="if"></a>if</h4><blockquote>
+<p>用于支持条件判断, 根据不同记过选择不同Nginx配置, 可用于server/location 块中</p>
+</blockquote>
+<h5 id="指令格式-1"><a href="#指令格式-1" class="headerlink" title="指令格式"></a>指令格式</h5><p><code>if (condition)&#123;...&#125;</code>        </p>
+<p>注意: if后必须带一个空格</p>
+<p>condition: 判定条件, 支持一下写法:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1.变量名. 如果变量对应值为空字符串或0, if判断都为false, 其余情况均为true</span><br><span class="line">	if ($param)&#123;&#125;</span><br><span class="line">2.使用 = 和 != 比较变量和字符串, 满足为true, 不满足为false(字符串不需要引号)</span><br><span class="line">	if ($request_method = POST)&#123;return 405;&#125;</span><br><span class="line">3.使用正则表达式匹配, 匹配成功为true,匹配失败为false, 以 ~ | ~* | !~ | !~* 开头</span><br><span class="line">	if ($http_user_agent ~ Safari)&#123;return 200 Chrome;&#125;</span><br><span class="line">4.使用 -f | !-f 判断请求静态文件是否存在</span><br><span class="line">	if (!-f $request_filename)&#123;return 200 &quot;file $request_filename not found&quot;;&#125;</span><br><span class="line">5.使用 -d | !-d 判断请求目录是否存在</span><br><span class="line">6.使用 -e | !-e 判断请求的文件或目录是否可用</span><br><span class="line">7.使用 -x | !-x 判断请求的文件是否可执行</span><br></pre></td></tr></table></figure>
+
+<h4 id="break"><a href="#break" class="headerlink" title="break"></a>break</h4><blockquote>
+<p>1.用于中断当前作用域的其他nginx配置. 在同一作用域中, break之后的配置不再执行生效</p>
+<p>2.终止当前匹配并将当前URI在本location中进行301重定向访问</p>
+</blockquote>
+<h5 id="指令格式-2"><a href="#指令格式-2" class="headerlink" title="指令格式"></a>指令格式</h5><p><code>break;</code></p>
+<h5 id="使用案例"><a href="#使用案例" class="headerlink" title="使用案例"></a>使用案例</h5><p>访问: <code>http://test.project.com:8081/testbreak</code></p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> /testbreak&#123;</span><br><span class="line">    <span class="attribute">root</span> /var/www/test;</span><br><span class="line">    <span class="attribute">index</span> <span class="literal">break</span>.html;</span><br><span class="line">    <span class="attribute">default_type</span> text/plain;</span><br><span class="line">    <span class="attribute">set</span> $username number1;</span><br><span class="line">    <span class="attribute">if</span> ($username)&#123;</span><br><span class="line">        <span class="attribute">set</span> $username number2;</span><br><span class="line">        break;	</span><br><span class="line">        <span class="comment"># 终止匹配并跳转至路由 http://test.project.com:8081/testbreak/break.html</span></span><br><span class="line">        <span class="attribute">set</span> $username number3;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attribute">add_header</span> username $username;</span><br><span class="line">    <span class="attribute">return</span> <span class="number">200</span> $username;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">同时创建目录 /var/www/test/testbreak, 创建文件 /var/www/test/testbreak/break.html </span><br></pre></td></tr></table></figure>
+
+<p>显示结果如下, break不仅中断了本作用域的 <code>set $username number3;</code> 配置, 而且301永久重定向到了本location下的root+index配置页面</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120064013787.png" alt="image-20211120064013787"></p>
+<h4 id="return"><a href="#return" class="headerlink" title="return"></a>return</h4><blockquote>
+<p>用于完成对请求的处理, 直接向客户端返回. 在return后的所有Nginx配置都无效</p>
+</blockquote>
+<h5 id="指令格式-3"><a href="#指令格式-3" class="headerlink" title="指令格式"></a>指令格式</h5><p><code>return code [text];  || return code URL; || return URL;</code></p>
+<p>code: 返回客户端的HTTP状态, 0-999</p>
+<p>text: 返回客户端的响应体内容, 支持变量使用</p>
+<p>URL: 返回给客户端的URL地址 (302跳转)</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> /testreturn&#123;</span><br><span class="line">	<span class="comment"># return 200 success;</span></span><br><span class="line">    <span class="comment"># return https://www.baidu.com;</span></span><br><span class="line">    <span class="attribute">return</span> <span class="number">302</span> https://www.baidu.com;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="rewrite"><a href="#rewrite" class="headerlink" title="rewrite"></a>rewrite</h4><blockquote>
+<p>通过正则表达式改变URI. 可以同时存在多个指令, Nginx按照顺序依次执行匹配</p>
+</blockquote>
+<h5 id="指令格式-4"><a href="#指令格式-4" class="headerlink" title="指令格式"></a>指令格式</h5><p><code>rewrite regex replacement [flag]</code> </p>
+<p>regex: 用来匹配URI的正则表达式</p>
+<p>replacement: 匹配成功后, 用于替换URI内容的字符串. 若该配置以 <code>http://</code> 或 <code>https://</code> 开头, 则不会继续执行其他rewrite, 直接返回重写后的URI给客户端</p>
+<p>flag: 用于设置rewrite对URI的处理行为, 有如下值:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">last - 终止继续在本location块中处理接收到的URI, 并将此处重写的URI作为一个新的URI, 使用各location块进行处理. 该标识将重写后的URI重新载server块中执行, 为重写后的URI提供了在其他location块中执行的机会, 不会修改当前浏览器的URL</span><br><span class="line"></span><br><span class="line">break - 将此处重写的URI作为一个新的URI, 在本location块中继续处理. 该标识将重写后的地址在当前location中执行(root+index), 不会将新的URI转向其他location块, 不会修改当前浏览器的URL</span><br><span class="line"></span><br><span class="line">redirect - 将重写后的URI返回给客户端, 状态码为302, 指明是临时重定向, 主要用于replacement不是以http:// 或 https:// 开头的情况. 会修改当前浏览器的URL</span><br><span class="line"></span><br><span class="line">permanent - 将重写后的URI返回给客户端, 状态码为301, 指明是永久重定向, 主要用于replacement不是以http:// 或 https:// 开头的情况. 会修改当前浏览器的URL</span><br></pre></td></tr></table></figure>
+
+<h5 id="使用案例-1"><a href="#使用案例-1" class="headerlink" title="使用案例"></a>使用案例</h5><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> /rewrite&#123;</span><br><span class="line">    <span class="comment"># rewrite ^/rewrite/url\w*$ https://www.baidu.com;</span></span><br><span class="line">    <span class="attribute">rewrite</span><span class="regexp"> ^/rewrite/(test)\w*$</span> /<span class="variable">$1</span>;</span><br><span class="line">    <span class="attribute">rewrite</span><span class="regexp"> ^/rewrite/(demo)\w*$</span> /<span class="variable">$1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span> /test&#123;</span><br><span class="line">    <span class="attribute">default_type</span> text/plain;</span><br><span class="line">    <span class="attribute">return</span> <span class="number">200</span> success_test;</span><br><span class="line">&#125;</span><br><span class="line"><span class="attribute">location</span> /demo&#123;</span><br><span class="line">    <span class="attribute">default_type</span> text/plain;</span><br><span class="line">    <span class="attribute">return</span> <span class="number">200</span> success_demo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问 <code>http://test.project.com:8081/rewrite/urlxxx</code></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120074841710.png" alt="image-20211120074841710"></p>
+<p>访问 <code>http://test.project.com:8081/rewrite/testxxx</code></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120074744772.png" alt="image-20211120074744772"></p>
+<h4 id="rewrite-log"><a href="#rewrite-log" class="headerlink" title="rewrite_log"></a>rewrite_log</h4><blockquote>
+<p>开启URL重写日志的输出功能, 可用于http/server/location/if</p>
+</blockquote>
+<h5 id="指令语法"><a href="#指令语法" class="headerlink" title="指令语法"></a>指令语法</h5><p><code>rewrite_log on|off;</code></p>
+<p>开启后,URL重写日志将会以notice级别输出到error_log中</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">rewrite_log</span> <span class="literal">on</span>;</span><br><span class="line"><span class="attribute">error_log</span> /var/log/nginx/error.log <span class="literal">notice</span>;  <span class="comment"># 需要设置默认日志级别</span></span><br></pre></td></tr></table></figure>
+
+<p>日志数据如下:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120075013711.png" alt="image-20211120075013711"></p>
+<h3 id="Rewrite应用场景"><a href="#Rewrite应用场景" class="headerlink" title="Rewrite应用场景"></a>Rewrite应用场景</h3><h4 id="域名跳转"><a href="#域名跳转" class="headerlink" title="域名跳转"></a>域名跳转</h4><p>访问京东商城, 可以使用<code>www.jd.com</code> , 也可以使用<code>www.360buy.com</code> , 除了单server块指定多<code>server_name</code>外, 还可以利用Rewrite实现该效果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">准备三个域名</span><br><span class="line">192.168.253.134 test.project.com</span><br><span class="line">192.168.253.134 test1.project.com</span><br><span class="line">192.168.253.134 test2.project.com</span><br></pre></td></tr></table></figure>
+
+<p>编写nginx配置文件</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> test.project.com;</span><br><span class="line">    <span class="attribute">location</span> /&#123;</span><br><span class="line">        <span class="attribute">default_type</span> text/plain;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">200</span> <span class="string">&#x27;test.project.com page&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> test1.project.com test2.project.com;</span><br><span class="line">    <span class="comment"># rewrite ^/ http://test.project.com;	# 无法携带URI</span></span><br><span class="line">    <span class="attribute">rewrite</span><span class="regexp"> ^(.*)</span> http://test.project.com<span class="variable">$1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问域名 <code>http://test1.project.com/getUser/id?test=111</code></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120122634521.png"></p>
+<h4 id="独立域名"><a href="#独立域名" class="headerlink" title="独立域名"></a>独立域名</h4><p>一个完整项目包含多个模块, 如何为每个模块设置独立域名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">需求为:</span><br><span class="line">http://test1.project.com 访问搜索模块 /search</span><br><span class="line">http://test2.project.com 访问详情模块 /detail</span><br><span class="line">http://test3.project.com 访问列表模块 /list</span><br></pre></td></tr></table></figure>
+
+<p>编写nginx配置文件</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> test.project.com;</span><br><span class="line">    <span class="attribute">default_type</span> text/plain;</span><br><span class="line">    <span class="attribute">location</span> /&#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">200</span> <span class="string">&#x27;test.project.com index page&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attribute">location</span> /search&#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">200</span> <span class="string">&#x27;test.project.com search page&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attribute">location</span> /detail&#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">200</span> <span class="string">&#x27;test.project.com detail page&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attribute">location</span> /list&#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">200</span> <span class="string">&#x27;test.project.com list page&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> test1.project.com;</span><br><span class="line">    <span class="attribute">rewrite</span><span class="regexp"> ^(.*)</span> http://test.project.com/search<span class="variable">$1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> test2.project.com;</span><br><span class="line">    <span class="attribute">rewrite</span><span class="regexp"> ^(.*)</span> http://test.project.com/detail<span class="variable">$1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> test3.project.com;</span><br><span class="line">    <span class="attribute">rewrite</span><span class="regexp"> ^(.*)</span> http://test.project.com/list<span class="variable">$1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问效果如下</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120123838920.png" alt="image-20211120123838920"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120123933761.png" alt="image-20211120123933761"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120124019223.png" alt="image-20211120124019223"></p>
+<h4 id="域名镜像"><a href="#域名镜像" class="headerlink" title="域名镜像"></a>域名镜像</h4><p>域名跳转部分中, 我们将<code>test1.project.com</code>和<code>test2.project.com</code> 均跳转到<code>test.project.com</code>, 即两个备份域名跳转到主域名, 如果不想把整个网站都做镜像, 仅为其中一个子目录下的资源做镜像, 可以在location块中配置Rewrite实现</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> test.project.com;</span><br><span class="line">    <span class="attribute">default_type</span> text/plain;</span><br><span class="line">    <span class="attribute">location</span> /&#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">200</span> <span class="string">&#x27;test.project.com index page&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attribute">location</span> /user&#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">200</span> <span class="string">&#x27;test.project.com user module page&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">default_type</span> text/plain;</span><br><span class="line">    <span class="attribute">server_name</span> test1.project.com test2.project.com;</span><br><span class="line">    <span class="attribute">location</span> /user&#123;</span><br><span class="line">        <span class="attribute">rewrite</span><span class="regexp"> ^(/user.*)$</span> http://test.project.com<span class="variable">$1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attribute">location</span> /goods&#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">200</span> <span class="string">&#x27;goods page&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>访问效果如下:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120125424948.png" alt="image-20211120125424948"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120125634725.png" alt="image-20211120125634725"></p>
+<h4 id="目录自动添加”-“"><a href="#目录自动添加”-“" class="headerlink" title="目录自动添加”/“"></a>目录自动添加”/“</h4><p>创建nginx配置如下</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">root</span> /var/www/test;</span><br><span class="line"><span class="attribute">index</span> index.html;</span><br><span class="line"><span class="comment"># server_name_in_redirect on;</span></span><br><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">8088</span>;</span><br><span class="line">    <span class="attribute">server_name</span> localhost;</span><br><span class="line">    <span class="attribute">default_type</span> text/plain;</span><br><span class="line">    <span class="attribute">location</span> /goods&#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>访问网址 <code>http://test.project.com/goods</code>, 显示如下:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120131411135.png" alt="image-20211120131411135"></p>
+<p>可见可以访问, 但实际上是nginx做了301转发, 实际是去找<code>root+index</code> 文件展示出来</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nginx配置中的server_name_in_redirect, 在Nginx 0.8.48版本之前, 默认为on, 之后为off</span><br><span class="line"></span><br><span class="line">当server_name_in_redirect等于on时,访问使用server_name替换请求host, 即访问的是</span><br><span class="line">	http://192.168.253.134:8088/goods -&gt; http://localhost:8088/goods/</span><br><span class="line">当server_name_in_redirect等于off时, 正常转发, 只在后面加了 / 符号</span><br></pre></td></tr></table></figure>
+
+<p>可以通过Rewrite在URI后面手动加<code>/</code>解决问题</p>
+<p>修改nginx配置为:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">root</span> /var/www/test;</span><br><span class="line"><span class="attribute">index</span> index.html;</span><br><span class="line"><span class="attribute">server_name_in_redirect</span> <span class="literal">on</span>;</span><br><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">8088</span>;</span><br><span class="line">    <span class="attribute">server_name</span> localhost;</span><br><span class="line">    <span class="attribute">default_type</span> text/plain;</span><br><span class="line">    <span class="attribute">location</span> /goods&#123;</span><br><span class="line">        <span class="attribute">if</span> (-d $request_filename)&#123;</span><br><span class="line">            <span class="attribute">rewrite</span><span class="regexp"> ^/(.*)([^/])$</span> http://$host:$server_port/<span class="variable">$1</span><span class="variable">$2</span>/ <span class="literal">permanent</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>即可正常访问</p>
+<h4 id="合并目录"><a href="#合并目录" class="headerlink" title="合并目录"></a>合并目录</h4><p>SEO要求包含URL的目录层级不要超过三层, 可以使用Rewrite简化输入目录层级</p>
+<p>如: 需要访问服务器中的URI<code>/server/11/22/33/44/55.html</code>, 则完整URL应该是<code>http://test.project.com/server/11/22/33/44/55.html</code>, 在Rewrite后可以访问<code>http://test.project.com/server-11-22-33-44/55.html</code> 达成同样效果</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server&#123;</span><br><span class="line">    <span class="attribute">root</span> /var/www/test;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> test.project.com;</span><br><span class="line">    <span class="attribute">default_type</span> text/plain;</span><br><span class="line">    <span class="attribute">location</span> /server&#123;</span><br><span class="line">        <span class="attribute">rewrite</span><span class="regexp"> ^/server-([0-9]+)-([0-9]+)-([0-9]+)-([0-9]+)/(.*)$</span> /server/<span class="variable">$1</span>/<span class="variable">$2</span>/<span class="variable">$3</span>/<span class="variable">$4</span>/<span class="variable">$5</span> <span class="literal">last</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问效果如下</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211120134903700.png" alt="image-20211120134903700"></p>
+<h4 id="防盗链"><a href="#防盗链" class="headerlink" title="防盗链"></a>防盗链</h4><p>当访问来源非授权时, 可以通过Rewrite到一张自定义图片资源上</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> /images&#123;</span><br><span class="line">    <span class="attribute">valid_referers</span> <span class="literal">none</span> <span class="literal">blocked</span> www.baidu.com;</span><br><span class="line">    <span class="attribute">if</span> (invalid_referer)&#123;</span><br><span class="line">        <span class="attribute">rewrite</span><span class="regexp"> ^/</span> /images/forbidden.png <span class="literal">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2021/06/21/Nginx/Nginx04%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4Rewrite/" title="Nginx配置指令Rewrite04">https://ni9ne.github.io/2021/06/21/Nginx/Nginx04配置指令Rewrite/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/06/21/Nginx/Nginx05%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/" rel="prev" title="Nginx反向代理05">
+                  <i class="fa fa-chevron-left"></i> Nginx反向代理05
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/06/21/Nginx/Nginx03%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E7%BC%93%E5%AD%98%E3%80%81%E8%B7%A8%E5%9F%9F%E3%80%81%E9%98%B2%E7%9B%97%E9%93%BE/" rel="next" title="Nginx静态资源部署优化_缓存、跨域、防盗链03">
+                  Nginx静态资源部署优化_缓存、跨域、防盗链03 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>
