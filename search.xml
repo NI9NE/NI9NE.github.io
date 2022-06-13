@@ -22379,7 +22379,7 @@ sudo supervisorctl stop all 停止所有进程
             ],
             "api": [
                 {
-                    "target": "https://eqbsdemo.quanzhuyun.com/api/v1.Api.Approve",
+                    "target": "https://xxxxxx/api/v1.Api.Approve",
                     "post": {
                         "Func": "Core",
                         "Token": "88888888",
@@ -22398,7 +22398,7 @@ sudo supervisorctl stop all 停止所有进程
             "sql": [],
             "api": [
                 {
-                    "target": "https://testapi.quanzhuejia.com/api/push",
+                    "target": "https://xxxxxx/api/push",
                     "post": {
                         "Package": {
                             "Version": "V1",
@@ -22409,10 +22409,10 @@ sudo supervisorctl stop all 停止所有进程
                                     "MAIL_HOST": "smtphz.qiye.163.com",
                                     "MAIL_PORT": "994",
                                     "MAIL_ENCRYPTION": "ssl",
-                                    "MAIL_FROM_ADDRESS": "e-home@trendzone.com.cn",
+                                    "MAIL_FROM_ADDRESS": "xxxxxx",
                                     "MAIL_FROM_NAME": "全筑e家",
-                                    "MAIL_USERNAME": "e-home@trendzone.com.cn",
-                                    "MAIL_PASSWORD": "Trendzone2019"
+                                    "MAIL_USERNAME": "xxxxxx",
+                                    "MAIL_PASSWORD": "xxxxxx"
                                 },
                                 "from": "全筑e家",
                                 "to": "[EMAIL]",
