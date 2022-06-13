@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="bash命令常用功能字符处理12345678910111213# 批量前缀指定ni9ne@ni9nes:~$ echo naxx&amp;#123;111,123,1112&amp;#125;naxx111 naxx123 naxx1112# 连续补全后缀ni9ne@ni9nes:~$ echo naxx&amp;#123;1..10&amp;#125;naxx1 naxx2 naxx3 naxx4 naxx5 naxx6 na">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LINUXLINUX操作(grep_seed_awk)">
+<meta property="og:url" content="https://ni9ne.github.io/2022/01/12/Linux/LINUX%E6%93%8D%E4%BD%9C(grep_seed_awk)/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="bash命令常用功能字符处理12345678910111213# 批量前缀指定ni9ne@ni9nes:~$ echo naxx&amp;#123;111,123,1112&amp;#125;naxx111 naxx123 naxx1112# 连续补全后缀ni9ne@ni9nes:~$ echo naxx&amp;#123;1..10&amp;#125;naxx1 naxx2 naxx3 naxx4 naxx5 naxx6 na">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4f202efa4f14dbf2a5503531cbd2769a-f219d25.png">
+<meta property="article:published_time" content="2022-01-12T10:33:10.000Z">
+<meta property="article:modified_time" content="2022-06-09T10:15:59.363Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4f202efa4f14dbf2a5503531cbd2769a-f219d25.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2022/01/12/Linux/LINUX%E6%93%8D%E4%BD%9C(grep_seed_awk)/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2022/01/12/Linux/LINUX%E6%93%8D%E4%BD%9C(grep_seed_awk)/","path":"2022/01/12/Linux/LINUX操作(grep_seed_awk)/","title":"LINUXLINUX操作(grep_seed_awk)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LINUXLINUX操作(grep_seed_awk) | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">51</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">88</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#bash%E5%91%BD%E4%BB%A4%E5%B8%B8%E7%94%A8%E5%8A%9F%E8%83%BD"><span class="nav-number">1.</span> <span class="nav-text">bash命令常用功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E5%A4%84%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">字符处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="nav-number">1.2.</span> <span class="nav-text">命令行快捷键</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">正则表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux%E5%B7%A5%E5%85%B7"><span class="nav-number">3.</span> <span class="nav-text">linux工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#grep"><span class="nav-number">3.1.</span> <span class="nav-text">grep</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sed"><span class="nav-number">3.2.</span> <span class="nav-text">sed</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B"><span class="nav-number">3.2.1.</span> <span class="nav-text">案例</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#awk"><span class="nav-number">3.3.</span> <span class="nav-text">awk</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B-1"><span class="nav-number">3.3.1.</span> <span class="nav-text">案例</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">88</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2022/01/12/Linux/LINUX%E6%93%8D%E4%BD%9C(grep_seed_awk)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LINUXLINUX操作(grep_seed_awk)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-01-12 18:33:10" itemprop="dateCreated datePublished" datetime="2022-01-12T18:33:10+08:00">2022-01-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="bash命令常用功能"><a href="#bash命令常用功能" class="headerlink" title="bash命令常用功能"></a>bash命令常用功能</h3><h4 id="字符处理"><a href="#字符处理" class="headerlink" title="字符处理"></a>字符处理</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 批量前缀指定</span></span><br><span class="line">ni9ne@ni9nes:~$ echo naxx&#123;111,123,1112&#125;</span><br><span class="line">naxx111 naxx123 naxx1112</span><br><span class="line"><span class="meta">#</span><span class="bash"> 连续补全后缀</span></span><br><span class="line">ni9ne@ni9nes:~$ echo naxx&#123;1..10&#125;</span><br><span class="line">naxx1 naxx2 naxx3 naxx4 naxx5 naxx6 naxx7 naxx8 naxx9 naxx10</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定步长补全后缀</span></span><br><span class="line">ni9ne@ni9nes:~$ echo naxx&#123;1..10..2&#125;</span><br><span class="line">naxx1 naxx3 naxx5 naxx7 naxx9</span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定格式补全后缀</span></span><br><span class="line">ni9ne@ni9nes:~$ echo naxx&#123;001..10..2&#125;</span><br><span class="line">naxx001 naxx003 naxx005 naxx007 naxx009</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="命令行快捷键"><a href="#命令行快捷键" class="headerlink" title="命令行快捷键"></a>命令行快捷键</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Ctrl + a  移动光标到命令首字符</span><br><span class="line">Ctrl + e 移动光标到命令末尾字符</span><br><span class="line">Ctrl + u 删除光标之前的字符</span><br><span class="line">Ctrl + k 删除光标之后的字符</span><br><span class="line">Ctrl + l 清屏,相当于命令clear</span><br></pre></td></tr></table></figure>
+
+<h3 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h3><p>regular expression - REGEXP</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">基本正则表达式 BRE  Basic Regular Expression</span><br><span class="line"> - 包括字符: </span><br><span class="line"> 	^ - 匹配以指定字符开头, 如 &quot;^nax&quot; 表示匹配以&#x27;nax&#x27;开头的行</span><br><span class="line"> 	$ - 匹配以指定字符结尾, 如 &quot;axx$&quot; 表示匹配以&#x27;axx&#x27;结尾的行</span><br><span class="line"> 	. - 匹配任意一个字符</span><br><span class="line"> 	[] - 匹配中括号内任意一个字符, 如 &quot;[abc]&quot; 表示匹配a或b或c</span><br><span class="line"> 	* - 匹配前一个字符出现任意次,0次或多次</span><br><span class="line"> 	[^abc] - 匹配除了^后出现的任意字符, ^在中括号内代表取反</span><br><span class="line">扩展正则表达式 ERE  Extended Regular Expression</span><br><span class="line">扩展正则需要用grep -E 搭配才能使用</span><br><span class="line"> - 包括字符:</span><br><span class="line"> 	() - 分组过滤,将括号内的字符当做一个整体,如&quot;g(oo|la)d&quot;代表good或glad</span><br><span class="line"> 		后可以使用\n 引用第n个括号内内容</span><br><span class="line">    &#123;&#125; - 匹配前一个字符指定次数</span><br><span class="line">    	&#123;n,m&#125; - 最少n次,最大m次</span><br><span class="line">    	&#123;n,&#125;  - 最少n次</span><br><span class="line">    	&#123;,m&#125;  - 最多m次</span><br><span class="line">    	&#123;n&#125;   - 正好n次</span><br><span class="line">    ? - 匹配前一个字符0次或一次</span><br><span class="line">    + - 匹配前一个字符一次或多次</span><br><span class="line">    | 或者,同时过滤多个字符串</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>主要用于处理大量字符串, 过滤替换处理</p>
+</blockquote>
+<h3 id="linux工具"><a href="#linux工具" class="headerlink" title="linux工具"></a>linux工具</h3><p>grep - 文本过滤工具</p>
+<p>sed - 流编辑器</p>
+<p>awk - 格式化文本报告生成器</p>
+<h4 id="grep"><a href="#grep" class="headerlink" title="grep"></a>grep</h4><p>global search regular expression and print out the line</p>
+<p>文本搜索工具, 根据用户指定的模式逐行匹配目标文本, 打印匹配的行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">grep [OPTION]... PATTERN [FILE]...</span><br><span class="line">Search for PATTERN in each FILE.</span><br><span class="line">Example: grep -i &#x27;hello world&#x27; menu.h main.c</span><br><span class="line"> -i --ignore-case 忽略字符大小写</span><br><span class="line"> -o --only-matching 仅显示匹配到的字符串本身而不是整行</span><br><span class="line"> -v --invert-match 显示未被匹配到的行</span><br><span class="line"> -E --extended-regexp 支持扩展正则</span><br><span class="line"> -q --quiet 不输出任何匹配信息</span><br><span class="line"> -n 显示行号</span><br><span class="line"> -c 仅统计匹配行数</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 排除所有空行</span></span><br><span class="line">grep &#x27;^$&#x27; passwd.txt -v</span><br><span class="line"><span class="meta">#</span><span class="bash"> 排除所有空行和注释行</span></span><br><span class="line">grep &#x27;^$&#x27; passwd.txt -v | grep &#x27;^#&#x27; passwd.txt -v</span><br></pre></td></tr></table></figure>
+
+<h4 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h4><p>Stream Editor 字符流编辑器</p>
+<p>用于操作、过滤、转换文本内容的工具, 常用于过滤指定字符串, 取出指定行数据等</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4f202efa4f14dbf2a5503531cbd2769a-f219d25.png" alt="image-20220421235311504"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">sed [OPTION]... &#123;script-only-if-no-other-script&#125; [input-file]...</span><br><span class="line">	 选项				内置命令字符					 输入文件</span><br><span class="line">选项参数:</span><br><span class="line">	-n 取消默认输出(默认输出全部,包括未匹配与匹配到的行), 一般与命令字符p一起用</span><br><span class="line">	-i 将修改结果写入文件,不用-i是修改sed内存数据</span><br><span class="line">	-e 多次编辑,免用管道符</span><br><span class="line">	-r 支持扩展正则模式</span><br><span class="line">内置命令字符参数:</span><br><span class="line">	a  append,追加文本,在指定行后添加文本内容</span><br><span class="line">	i  insert,插入文本,在指定行之前插入文本内容</span><br><span class="line">	d  delete,删除匹配文本行</span><br><span class="line">	p  print,打印匹配行内容,通常与选项-n一起使用</span><br><span class="line">	s/匹配正则/替换内容/g  匹配内容并替换(支持正则),g代表全局替换</span><br><span class="line">匹配范围参数:</span><br><span class="line">	空地址    全文处理</span><br><span class="line">	单地址    指定文件某一行</span><br><span class="line">	/pattern/ 匹配到的每一行</span><br><span class="line">	范围区间   10,20 - 10到20行全部 | 10,+5 - 从第十行起向下5步 | /pattern1/,/pattern2/</span><br><span class="line">	步长		1~2 - 从一开始,两步一跳,即1,3,5,7...  | 2~2 - 从二开始,两步一跳,即2,4,6,...</span><br></pre></td></tr></table></figure>
+
+<h5 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 输出测试文件第2,3行内容</span></span><br><span class="line">sed -n &#x27;2,4p&#x27; passwd.txt # 取消默认输出,仅打印2到4行</span><br><span class="line"><span class="meta">#</span><span class="bash"> 过滤出含有ni9ne字符串的行</span></span><br><span class="line">sed -n &#x27;/ni9ne/p&#x27; passwd.txt </span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除含有root的行</span></span><br><span class="line">sed &#x27;/root/d&#x27; passwd.txt	# 仅显示删除后文本的剩余内容</span><br><span class="line">sed -i &#x27;/root/d&#x27; passwd.txt	# 加-i参数后直接修改文件,无回显</span><br><span class="line"><span class="meta">#</span><span class="bash"> 替换文件中的ni9ne为user09</span></span><br><span class="line">sed -i &#x27;s/ni9ne/user09/g&#x27; passwd.txt # 无回显</span><br><span class="line"><span class="meta">#</span><span class="bash"> 替换文件中的ni9ne为user09,同时替换root为naxx</span></span><br><span class="line">sed -i -e &#x27;s/ni9ne/user09/g&#x27; -e &#x27;s/root/naxx/g&#x27;passwd.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在文件第二行追加字符 game:x:1000:33:game:/home/game:/bin/bash</span></span><br><span class="line">sed -i &#x27;2a game:x:1000:33:game:/home/game:/bin/bash&#x27; passwd.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在文件首行插入多行字符</span> </span><br><span class="line">sed -i &#x27;1i root1 \n root2&#x27; passwd.txt # 多行数据用\n隔开即可</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在每行文本下添加分隔符 ----</span></span><br><span class="line">sed -i &#x27;a -----------&#x27; passwd.txt # 空地址代表全文处理</span><br><span class="line"><span class="meta">#</span><span class="bash"> 为前五行数据添加分隔符---</span></span><br><span class="line">sed -i &#x27;1,5a ------&#x27; passwd.txt</span><br></pre></td></tr></table></figure>
+
+<p>使用sed取出linux的IP地址</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ifconfig ens33 | sed -n &#x27;2p&#x27; | sed &#x27;s/^.*inet //&#x27; | sed &#x27;s/ netmask.*$//&#x27;</span><br><span class="line">或者</span><br><span class="line">ifconfig ens33 | sed -n -e &#x27;2s/^.*inet //&#x27; -e &#x27;2s/ netmask.*$//p&#x27;</span><br></pre></td></tr></table></figure>
+
+<h4 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h4><p>拥有强大的文本格式化能力, 可以将文本数据格式化成对应格式输出或显示</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">awk [option] &#x27;pattern[action]&#x27; file ...</span><br><span class="line">     选项      模式/动作条件			文件</span><br><span class="line">如: awk &#x27;&#123;print $2&#125;&#x27; passwd.txt  #表示打印以空格分隔符的第二行数据</span><br><span class="line"> - awk中默认以空格作为分隔符, 且多个空格识别为单个空格</span><br><span class="line"> - awk默认按行处理文件</span><br><span class="line"> - $0代表所有行, $n代表第n列数据, $NF代表最后一列,倒数第二列可以写为$(NF-1)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">awk选项参数</span><br><span class="line">-F 指定字段分隔符</span><br><span class="line">-v 定义或修改awk内部变量</span><br><span class="line">-f 从脚本文件中读取awk命令</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">awk内置变量</span><br><span class="line">- $n	指定分隔符分隔的第n列</span><br><span class="line">- $0	所有列,完整的列数据</span><br><span class="line">- FS(field_separator)  字段分隔符, 默认为空格</span><br><span class="line">- NF(number_of_fields)  分隔后的字段总个数</span><br><span class="line">- NR(number_of_records) 记录行总行数</span><br><span class="line">- RS(record_separator) 记录行分隔符, 默认为换行符</span><br><span class="line">- OFS(output_field_separator)  输出字段分隔符, 默认为空格</span><br><span class="line">- ORS(output_record_separator) 输出记录行分隔符, 默认为换行符</span><br><span class="line">- FNR 各文件分别计数行号</span><br><span class="line">- FILENAME 当前处理文件名</span><br><span class="line">- ARGC 命令行参数个数</span><br><span class="line">- ARGV 数组,保存命令行给定参数</span><br><span class="line">awk自定义变量</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>自定义输出内容时, 必须外层单引号, 内层双引号, 变量<code>$1</code>,<code>$2</code> 不可以添加双引号, 否则会识别为文本</p>
+</blockquote>
+<h5 id="案例-1"><a href="#案例-1" class="headerlink" title="案例"></a>案例</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 输出整行信息</span></span><br><span class="line">awk &#x27;&#123;print&#125;&#x27; passwd.txt</span><br><span class="line">awk &#x27;&#123;print $0&#125;&#x27; passwd.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出第1,2列和倒数第二列数据</span></span><br><span class="line">awk &#x27;&#123;print $1,&quot;------&quot;,$2,&quot;------&quot;,$(NF-1)&#125;&#x27; passwd.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出文件第五行数据</span></span><br><span class="line">awk &#x27;NR==5&#x27; passwd.txt		# =是给变量赋值, ==表示判断符</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出文件第二到第五行数据</span></span><br><span class="line">awk &#x27;NR==2,NR==5&#x27; passwd.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出第2行和第五行的内容</span></span><br><span class="line">awk &#x27;NR==2||NR==5&#123;print $0&#125;&#x27; passwd.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出第二到第五行的第1,2列数据</span></span><br><span class="line">awk &#x27;NR==2,NR==5&#123;print $1,$2&#125;&#x27; passwd.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出所有数据并添加行号</span></span><br><span class="line">awk &#x27;&#123;print NR,$0&#125;&#x27; passwd.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出以:分隔的passwd文件为以----或制表符为分隔符</span></span><br><span class="line">awk -F &quot;:&quot; -v OFS=&quot;----&quot; &#x27;&#123;print $1,$NF&#125;&#x27; passwd.txt</span><br><span class="line">awk -v FS=&quot;:&quot; -v OFS=&quot;\t&quot; &#x27;&#123;print $1,$NF&#125;&#x27; passwd.txt  </span><br><span class="line"><span class="meta">#</span><span class="bash"> 处理多个文件显示行号</span></span><br><span class="line">awk &#x27;&#123;print FNR,$0&#125;&#x27; passwd.txt spasswd.txt</span><br></pre></td></tr></table></figure>
+
+<p>使用awk取出IP地址</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ifconfig ens33 | awk &#x27;NR==2&#123;print $2&#125;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2022/01/12/Linux/LINUX%E6%93%8D%E4%BD%9C(grep_seed_awk)/" title="LINUXLINUX操作(grep_seed_awk)">https://ni9ne.github.io/2022/01/12/Linux/LINUX操作(grep_seed_awk)/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/10/22/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/%E7%94%B5%E5%AD%90%E5%90%88%E5%90%8C%E5%B9%B3%E5%8F%B0%E6%93%8D%E4%BD%9C%E6%96%87%E6%A1%A3/" rel="prev" title="电子合同平台操作文档">
+                  <i class="fa fa-chevron-left"></i> 电子合同平台操作文档
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/01/19/%E6%9D%82%E9%A1%B9%E6%93%8D%E4%BD%9C/VM%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%9B%BA%E5%AE%9Aip/" rel="next" title="VM虚拟机固定IP配置">
+                  VM虚拟机固定IP配置 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>
