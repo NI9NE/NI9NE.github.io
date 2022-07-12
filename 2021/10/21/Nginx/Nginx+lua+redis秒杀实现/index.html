@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="秒杀设计秒杀特点时间短, 并发访问量大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx+lua+redis秒杀实现">
+<meta property="og:url" content="https://ni9ne.github.io/2021/10/21/Nginx/Nginx+lua+redis%E7%A7%92%E6%9D%80%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="秒杀设计秒杀特点时间短, 并发访问量大">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211114002141949.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211114023236143.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/851d55833ca1f2a006d32a83c36a45f8-af497f4.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/069276e410c012eabf5d4318e3085915-cbff945.png">
+<meta property="article:published_time" content="2021-10-21T12:53:43.000Z">
+<meta property="article:modified_time" content="2022-07-12T11:44:20.400Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="Nginx">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="Lua">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211114002141949.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2021/10/21/Nginx/Nginx+lua+redis%E7%A7%92%E6%9D%80%E5%AE%9E%E7%8E%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/10/21/Nginx/Nginx+lua+redis%E7%A7%92%E6%9D%80%E5%AE%9E%E7%8E%B0/","path":"2021/10/21/Nginx/Nginx+lua+redis秒杀实现/","title":"Nginx+lua+redis秒杀实现"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Nginx+lua+redis秒杀实现 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">53</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">95</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A7%92%E6%9D%80%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.</span> <span class="nav-text">秒杀设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%92%E6%9D%80%E7%89%B9%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">秒杀特点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E7%AB%AF%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98"><span class="nav-number">1.1.1.</span> <span class="nav-text">前端优化问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%A6%E5%AE%BD%E9%97%AE%E9%A2%98"><span class="nav-number">1.1.2.</span> <span class="nav-text">带宽问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B6%85%E5%8D%96%E9%97%AE%E9%A2%98"><span class="nav-number">1.1.3.</span> <span class="nav-text">超卖问题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E6%B5%81%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.2.</span> <span class="nav-text">主流解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-mysql%E6%82%B2%E8%A7%82%E9%94%81"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.mysql悲观锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-mysql%E4%B9%90%E8%A7%82%E9%94%81"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.mysql乐观锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-PHP%E9%98%9F%E5%88%97"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.PHP队列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-PHP-Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.PHP+Redis分布式锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-PHP-Redis%E4%B9%90%E8%A7%82%E9%94%81"><span class="nav-number">1.2.5.</span> <span class="nav-text">5.PHP+Redis乐观锁</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%A1%88"><span class="nav-number">1.3.</span> <span class="nav-text">使用方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.3.1.</span> <span class="nav-text">具体实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E7%BB%93%E6%9E%9C"><span class="nav-number">1.3.2.</span> <span class="nav-text">查看结果</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">95</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/10/21/Nginx/Nginx+lua+redis%E7%A7%92%E6%9D%80%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nginx+lua+redis秒杀实现
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-21 20:53:43" itemprop="dateCreated datePublished" datetime="2021-10-21T20:53:43+08:00">2021-10-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="秒杀设计"><a href="#秒杀设计" class="headerlink" title="秒杀设计"></a>秒杀设计</h2><h3 id="秒杀特点"><a href="#秒杀特点" class="headerlink" title="秒杀特点"></a>秒杀特点</h3><p>时间短, 并发访问量大</p>
+<blockquote>
+<p>秒杀系统独立部署, 独立域名, 不影响现有系统业务</p>
+</blockquote>
+<h4 id="前端优化问题"><a href="#前端优化问题" class="headerlink" title="前端优化问题"></a>前端优化问题</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">秒杀页面有大量访问, 需要做限制</span><br><span class="line">- 按钮置灰, 时间不到不发送请求(后端需要双重验证)</span><br><span class="line">- 用户点击请求后, 按钮置灰, 防止重复提交</span><br><span class="line">- 限制用户在n秒内只能提交一次</span><br><span class="line">- 前端缓存前端资源, 刷新时从缓存中获取数据</span><br></pre></td></tr></table></figure>
+
+<h4 id="带宽问题"><a href="#带宽问题" class="headerlink" title="带宽问题"></a>带宽问题</h4><p>提前购买或租借新增网络带宽 ,减轻服务器带宽压力, 并推荐租用CDN服务</p>
+<h4 id="超卖问题"><a href="#超卖问题" class="headerlink" title="超卖问题"></a>超卖问题</h4><p>下单数大于库存数, 导致超卖</p>
+<h3 id="主流解决方案"><a href="#主流解决方案" class="headerlink" title="主流解决方案"></a>主流解决方案</h3><h4 id="1-mysql悲观锁"><a href="#1-mysql悲观锁" class="headerlink" title="1.mysql悲观锁"></a>1.mysql悲观锁</h4><p>即使用MySQL悲观锁实现数据的一致性和排它性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from t_goods where id = 1 for update;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>但会导致MySQL性能问题, 存在大量锁等待</p>
+</blockquote>
+<h4 id="2-mysql乐观锁"><a href="#2-mysql乐观锁" class="headerlink" title="2.mysql乐观锁"></a>2.mysql乐观锁</h4><p>引入MySQL版本号的概念, 实现代码层的数据一致</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; update goods set quantity = quantity - 1,version = version - 1 where id = 1 and version = &#123;$version&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>执行成功的, 代表秒杀成功, 继续执行订单操作,</p>
+<p>SQL执行失败, 则代表秒杀失败</p>
+<blockquote>
+<p>但由于需要在数据库中操作, 大量连接会给MySQL造成压力</p>
+</blockquote>
+<h4 id="3-PHP队列"><a href="#3-PHP队列" class="headerlink" title="3.PHP队列"></a>3.PHP队列</h4><p>引入队列, 将所有请求序列化放入队列, 依次执行</p>
+<blockquote>
+<p>但会导致执行时间过长</p>
+</blockquote>
+<h4 id="4-PHP-Redis分布式锁"><a href="#4-PHP-Redis分布式锁" class="headerlink" title="4.PHP+Redis分布式锁"></a>4.PHP+Redis分布式锁</h4><p>引入Redis分布式锁, 锁定PHP线程, 只有抢到锁的线程会执行, 其余线程空转等待</p>
+<p>Redis特性如下:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211114002141949.png" alt="image-20211114002141949"></p>
+<blockquote>
+<p>即setnx只会给第一个用户赋予, 返回1成功, 后续用户无法设置成功, 返回0失败</p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$redis</span> = <span class="keyword">new</span> Redis();</span><br><span class="line"><span class="variable">$redis</span>-&gt;connect(<span class="string">&#x27;127.0.0.1&#x27;</span>,<span class="string">&#x27;6379&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$expire</span> = <span class="number">10</span>;</span><br><span class="line"><span class="variable">$key</span> = <span class="string">&#x27;lock_key&#x27;</span>;</span><br><span class="line"><span class="variable">$value</span> = time()+<span class="variable">$expire</span>;</span><br><span class="line"><span class="variable">$status</span> = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(<span class="variable">$status</span>)&#123;</span><br><span class="line">    <span class="variable">$lock</span> = <span class="variable">$redis</span>-&gt;setnx(<span class="variable">$key</span>, <span class="variable">$value</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="variable">$lock</span>))&#123;</span><br><span class="line">        usleep(<span class="number">20</span>);</span><br><span class="line">        <span class="variable">$value</span> = <span class="variable">$redis</span>-&gt;get(<span class="variable">$key</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$value</span> &lt; time())&#123;</span><br><span class="line">            <span class="variable">$redis</span>-&gt;del(<span class="variable">$key</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="variable">$status</span> = <span class="literal">false</span>;</span><br><span class="line">        secKillSuccess(<span class="variable">$redis</span>, <span class="variable">$key</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">secKillSuccess</span>(<span class="params">Redis <span class="variable">$redis</span>, <span class="variable">$key</span></span>)</span>&#123;</span><br><span class="line">    <span class="variable">$redis</span>-&gt;del(<span class="variable">$key</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;kill success in &#x27;</span> . date(time());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>该方案弊端在于PHP线程空转导致PHP进程激增, 直到上限</p>
+</blockquote>
+<h4 id="5-PHP-Redis乐观锁"><a href="#5-PHP-Redis乐观锁" class="headerlink" title="5.PHP+Redis乐观锁"></a>5.PHP+Redis乐观锁</h4><p>打断机制</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="variable">$redis</span> = <span class="keyword">new</span> Redis();</span><br><span class="line"><span class="variable">$redis</span>-&gt;connect(<span class="string">&#x27;127.0.0.1&#x27;</span>,<span class="string">&#x27;6379&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$key</span> = <span class="string">&#x27;lock_optimistic&#x27;</span>;</span><br><span class="line"><span class="variable">$number</span> = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$redis</span>-&gt;watch(<span class="variable">$key</span>);	<span class="comment">// 乐观锁, 监视key变化时,回滚当前事务 </span></span><br><span class="line"><span class="variable">$sales</span> = <span class="variable">$redis</span>-&gt;get(<span class="variable">$key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="variable">$sales</span> &gt;= <span class="variable">$number</span>)&#123;</span><br><span class="line">    <span class="keyword">exit</span>(<span class="string">&#x27;结束秒杀&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 开启redis事务</span></span><br><span class="line"><span class="variable">$redis</span>-&gt;multi();</span><br><span class="line"><span class="variable">$redis</span>-&gt;incr(<span class="variable">$key</span>);</span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$redis</span>-&gt;exec();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="variable">$result</span>)&#123;</span><br><span class="line">    secKillSuccess();</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">exit</span>(<span class="string">&#x27;抢购失败&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">secKillSuccess</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;kill success in &#x27;</span> . date(time());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>压测结果如下</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/image-20211114023236143.png" alt="image-20211114023236143"></p>
+<blockquote>
+<p>存在序列优先但被打断的案例, 非真实的优先排列</p>
+</blockquote>
+<h3 id="使用方案"><a href="#使用方案" class="headerlink" title="使用方案"></a>使用方案</h3><p>nginx+lua+redis</p>
+<p>1.前端资源静态化, 使用cdn</p>
+<p>2.后端提交请求处理</p>
+<p>​    接入层使用nginx漏桶限流, nginx+lua+redis实现乐观锁, 解决超卖问题</p>
+<p>​    应用层只需处理设定秒杀量的请求, 利用缓存+队列+分布式+分库分表处理订单</p>
+<p>安装nginx_lua扩展</p>
+<h4 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h4><p><strong>nginx.conf</strong></p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">lua_shared_dict</span> my_limit_req_store <span class="number">100m</span>;    <span class="comment"># 设置lua共享内存</span></span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">            <span class="attribute">location</span> /sec_kill&#123;</span><br><span class="line">            <span class="attribute">default_type</span> <span class="string">&#x27;text/html&#x27;</span>;</span><br><span class="line">            <span class="attribute">content_by_lua_file</span> /usr/local/openresty/nginx/lua_script/lua_sec_kill.lua;</span><br><span class="line">        	&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>lua_sec_kill.lua</strong></p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> request_method = ngx.var.request_method</span><br><span class="line"><span class="keyword">local</span> args = <span class="literal">nil</span></span><br><span class="line"><span class="keyword">local</span> param = <span class="literal">nil</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 处理请求参数</span></span><br><span class="line"><span class="keyword">if</span> request_method == <span class="string">&#x27;GET&#x27;</span> <span class="keyword">then</span></span><br><span class="line">	args = ngx.req.get_uri_args()</span><br><span class="line"><span class="keyword">elseif</span> request_method == <span class="string">&#x27;POST&#x27;</span> <span class="keyword">then</span></span><br><span class="line">	ngx.req.read_body()</span><br><span class="line">	args = ngx.req.get_post_args()</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> user_id = args[<span class="string">&quot;user_id&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 关闭Redis本地函数</span></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">close_redis</span><span class="params">(redis_instance)</span></span></span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> redis_instance <span class="keyword">then</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	<span class="keyword">local</span> ok,err = redis_instance:<span class="built_in">close</span>()</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> ok <span class="keyword">then</span></span><br><span class="line">		ngx.say(<span class="string">&#x27;Redis server close failed: &#x27;</span>, err)</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 限流</span></span><br><span class="line"><span class="keyword">local</span> limit_req = <span class="built_in">require</span> <span class="string">&quot;resty.limit.req&quot;</span></span><br><span class="line"><span class="comment">-- 设置速率为50个请求/每秒, 漏桶容量为1000个请求</span></span><br><span class="line"><span class="keyword">local</span> lim,err = limit_req.new(<span class="string">&quot;my_limit_req_store&quot;</span>, <span class="number">50</span>, <span class="number">1000</span>)</span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> lim <span class="keyword">then</span></span><br><span class="line">	ngx.say(<span class="string">&#x27;Failed to instantiate a resty.limit.req object:&#x27;</span>,err)</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> key = ngx.var.remote_addr</span><br><span class="line">ngx.say(<span class="string">&#x27;key is: &#x27;</span>,key,<span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line"><span class="keyword">local</span> delay,err = lim:incoming(key, <span class="literal">true</span>)</span><br><span class="line">ngx.say(<span class="string">&#x27;delay is: &#x27;</span>, delay,<span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 1000以外的请求全部溢出拒绝掉</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> delay <span class="keyword">then</span></span><br><span class="line">	<span class="keyword">if</span> err == <span class="string">&#x27;rejected&#x27;</span> <span class="keyword">then</span></span><br><span class="line">		<span class="keyword">return</span> ngx.say(<span class="string">&#x27;1000 over, spill them all!&#x27;</span>)</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">		ngx.<span class="built_in">log</span>(ngx.ERR, <span class="string">&#x27;failed to limit req: &#x27;</span>,err)</span><br><span class="line">		ngx.say(ngx.ERR, <span class="string">&#x27;failed to limit req: &#x27;</span>,err,<span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line">	<span class="keyword">return</span> ngx.<span class="built_in">exit</span>(<span class="number">502</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> delay&gt;<span class="number">10</span> <span class="keyword">then</span></span><br><span class="line">	ngx.say(<span class="string">&#x27;delay time over time!&#x27;</span>,<span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- Redis中添加sku_num键(商品数量), 并添加watch_key(乐观锁用)</span></span><br><span class="line"><span class="comment">-- 连接Redis服务</span></span><br><span class="line"><span class="keyword">local</span> redis = <span class="built_in">require</span> <span class="string">&#x27;resty.redis&#x27;</span></span><br><span class="line"><span class="keyword">local</span> redis_instance = redis:new()</span><br><span class="line"></span><br><span class="line">redis_instance:set_timeout(<span class="number">1000</span>)</span><br><span class="line"><span class="keyword">local</span> ok,err = redis_instance:connect(<span class="string">&quot;192.168.253.135&quot;</span>,<span class="number">6379</span>)</span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> ok <span class="keyword">then</span></span><br><span class="line">    ngx.say(<span class="string">&#x27;failed to connection with redis&#x27;</span>,err,<span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line"><span class="keyword">end</span> </span><br><span class="line"></span><br><span class="line"><span class="comment">-- 秒杀逻辑</span></span><br><span class="line"><span class="keyword">local</span> resp, err = redis_instance:get(<span class="string">&#x27;sku_num&#x27;</span>)</span><br><span class="line">resp = <span class="built_in">tonumber</span>(resp)</span><br><span class="line">ngx.say(<span class="string">&#x27;goods number sku_number is : &#x27;</span>, resp, <span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line"><span class="keyword">if</span> resp&gt;<span class="number">0</span> <span class="keyword">then</span></span><br><span class="line">	ngx.say(<span class="string">&#x27;sec_kill success&#x27;</span>,<span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line">	redis_instance:watch(<span class="string">&#x27;watch_key&#x27;</span>)</span><br><span class="line">	ngx.sleep(<span class="number">1</span>)</span><br><span class="line">	<span class="keyword">local</span> ok,err = redis_instance:multi();</span><br><span class="line">	<span class="keyword">local</span> sku_num = resp - <span class="number">1</span></span><br><span class="line">	ngx.say(<span class="string">&#x27;goods number sku_number now is : &#x27;</span>, sku_num, <span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line">	redis_instance:set(<span class="string">&#x27;sku_num&#x27;</span>, sku_num)</span><br><span class="line">	redis_instance:set(<span class="string">&#x27;watch_key&#x27;</span>, <span class="number">1</span>)</span><br><span class="line">	ans,err = redis_instance:exec()</span><br><span class="line">	ngx.say(<span class="string">&#x27;Redis response is : &#x27;</span>, <span class="built_in">tostring</span>(ans), <span class="string">&#x27;--&#x27;</span>, <span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">tostring</span>(ans) == <span class="string">&#x27;userdata: NULL&#x27;</span> <span class="keyword">then</span></span><br><span class="line">		ngx.say(<span class="string">&#x27;purchase failed, please earlier next&#x27;</span>, <span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		ngx.say(<span class="string">&#x27;purchase success!&#x27;</span>, <span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	ngx.say(<span class="string">&#x27;sec_kill failed!&#x27;</span>, <span class="string">&#x27;&lt;br/&gt;&#x27;</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 执行下单</span></span><br><span class="line"><span class="comment">-- ngx.exec(&#x27;/create_order&#x27;)</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="查看结果"><a href="#查看结果" class="headerlink" title="查看结果"></a>查看结果</h4><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/851d55833ca1f2a006d32a83c36a45f8-af497f4.png" alt="image-20220614124541176"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/069276e410c012eabf5d4318e3085915-cbff945.png" alt="image-20220614124518241"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2021/10/21/Nginx/Nginx+lua+redis%E7%A7%92%E6%9D%80%E5%AE%9E%E7%8E%B0/" title="Nginx+lua+redis秒杀实现">https://ni9ne.github.io/2021/10/21/Nginx/Nginx+lua+redis秒杀实现/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+              <a href="/tags/Lua/" rel="tag"># Lua</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/08/13/Composer%E5%8C%85%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA/" rel="prev" title="Composer包从零搭建">
+                  <i class="fa fa-chevron-left"></i> Composer包从零搭建
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/10/22/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/%E7%94%B5%E5%AD%90%E5%90%88%E5%90%8C%E5%B9%B3%E5%8F%B0%E6%93%8D%E4%BD%9C%E6%96%87%E6%A1%A3/" rel="next" title="电子合同平台操作文档">
+                  电子合同平台操作文档 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>

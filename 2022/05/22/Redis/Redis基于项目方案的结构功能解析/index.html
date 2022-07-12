@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Redis结构功能解析Remote Dictionary Server , 一款开源, 使用key-value存储的内存型数据结构服务器 简介">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis基于项目方案的结构功能解析">
+<meta property="og:url" content="https://ni9ne.github.io/2022/05/22/Redis/Redis%E5%9F%BA%E4%BA%8E%E9%A1%B9%E7%9B%AE%E6%96%B9%E6%A1%88%E7%9A%84%E7%BB%93%E6%9E%84%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="Redis结构功能解析Remote Dictionary Server , 一款开源, 使用key-value存储的内存型数据结构服务器 简介">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c5b247ab9c91caade37188088776d78c-867cbcb.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8682aa520d3fe6a4c5bc8c8caea2d109-0baefc4.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e667b50359f06a70000759de780998bc-241e460.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8aa48b6c8279825ef834517f50dc6f2e-fc53c1f.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/04a64730d992a27752f40ca6cf53e957-51a43c2.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f9f034efaec6dd7c8015fc84cfa2a3df-1ab9138.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/20ad7cc2e5939ab3060472ac015ef852-403e38b.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6a090a820f731c62f078f8f847934e5d-164280e.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f115c6e4273792d5bfcc44b04f163f53-d685727.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bcfddbbd31559e50e502c5da065091c0-915c9bb.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/31a2c5e83c16a4a0fa22f83e3ef66057-ec06370.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ebd3eeaba133170a56989c71e4f376b6-e2f07d5.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/41a2b07b4e90afa062dd2dce722544b7-91a4667.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/93be2b13772b00f36fa68d824127b7cc-e91bd6a.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/064df9baad2d7d4bd7fdd5e135a8010e-983a062.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/fbcd511e5166a6d9ab22cf1f8f63f7b0-25021a8.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a941d8bf2be24a30a25910df426dd5c6-f360cb2.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9bd89d9e607fc15391c5a28c262a1f34-e5616f7.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2ed9a95d612045c36c7f7648bd5400d1-55a65b4.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6febe8acff4a74a6275846cbfd775725-60b3c8b.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/508bcea8290cc87d862f6c8af6a68160-c6422f8.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7870d776b742ca4af93598e8c67bb1f0-48e5de3.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/07d5bfa0963b8ebc98bcdb519d0eaf5c-af60793.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a987eddbef20815c974ea7d2d95e17ad-0b7b5fc.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8064d2b50500df28634d827529fb4524-4dbffc3.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4548a0cc9c2ebba130f0eb0c92848532-572bafe.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b1f0012333262396b443adf75827726d-f9c3f5d.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/425846a4f3751e8f81c71fbbad51f5e4-1145f78.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/505aab244e64a1c6c51de02b11706309-4108d43.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/46a1e8366ed8dc727cd82ec30f638c15-15132b8.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/535c4f73ee6bfed588e44c713b541355-f3946f9.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dbb7b44c6d3caa6324a3c00ffe775e88-738b7ba.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5594625fddb9d0285432202d50a5914b-baa920c.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7588aaa662653c09b5dbe9311c84a4a3-8abe6c9.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e4a0b30bae41977290196250196ab3d7-0737a13.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3a2822c849cbd63bde1326898186591d-cfe309a.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/184566b4ca21bc3316d5524de424fd37-990bf6f.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5a7fb859b4d7e30e5abe2b9cd3db357e-c98b0e9.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4bb5faf47d11f4c66d4db5417a0ca638-7a08d47.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8b612caf55f3038ef5f4eb9c9b078b00-e6d2759.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eea124a2276e4af5bb679b93caf22f9e-9d50a50.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5a5a39b34fb7a52fe9e05240e48c0f25-10d4f35.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/aad4777df22b54b9586fbcbc217b3d77-0cfa7f0.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c204c892efc78b95ac73cc026ac378b1-4dae19c.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/757d776092ea0d45a6226cc7a22926cd-d9ebfe3.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bdd543a67b84922f3ebe9865ff4cdc5b-7c4734b.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3fe5221171221e83332b4f3e78abbffe-5c86f89.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2df5d6ef452775dcf7d3e6d5a0538afb-9bfc89c.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8686f87de06898009aacce20107bd7fd-1baed67.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/63e4cd409e86a98361d606e5cac36784-be31b25.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/45578980c8ed72402dc636f6bc74794b-acbfa6f.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/50d67dac0523469fdd04d00f8f6e8c87-bdf44ea.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9fe4a67430450f20240ed8ae73077dca-5b4da2f.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a99867cd7aecd83a562ab648db406501-38c0546.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e54c8e0d325e24679ad514fdd3fd92b5-3c1746b.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/cca322c4caa3f526103c55850a0767e7-3cab63e.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bd9d8c950d6d1b9c108d6415fd246bf1-46b59be.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6f10237a48bb88c7f24cda9535b0780d-aa18910.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3ab290395fd616c321112dbac064c032-e8377d5.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/11303f304772ffdea2e495afbb5e69ff-07b01d5.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1d27f22ef113e0ac198ad475a40f64fa-0df149b.png">
+<meta property="article:published_time" content="2022-05-22T12:37:22.000Z">
+<meta property="article:modified_time" content="2022-07-12T11:36:25.713Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c5b247ab9c91caade37188088776d78c-867cbcb.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2022/05/22/Redis/Redis%E5%9F%BA%E4%BA%8E%E9%A1%B9%E7%9B%AE%E6%96%B9%E6%A1%88%E7%9A%84%E7%BB%93%E6%9E%84%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2022/05/22/Redis/Redis%E5%9F%BA%E4%BA%8E%E9%A1%B9%E7%9B%AE%E6%96%B9%E6%A1%88%E7%9A%84%E7%BB%93%E6%9E%84%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/","path":"2022/05/22/Redis/Redis基于项目方案的结构功能解析/","title":"Redis基于项目方案的结构功能解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Redis基于项目方案的结构功能解析 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">53</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">95</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis%E7%BB%93%E6%9E%84%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Redis结构功能解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.1.</span> <span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NoSQL"><span class="nav-number">1.1.1.</span> <span class="nav-text">NoSQL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E5%BE%81"><span class="nav-number">1.1.2.</span> <span class="nav-text">特征</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#apt%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.1.</span> <span class="nav-text">apt安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.2.</span> <span class="nav-text">编译安装</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">运行</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%B3%E9%97%AD"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">关闭</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEsystemctl"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">配置systemctl</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E8%BF%87systemctl%E9%85%8D%E7%BD%AE%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E5%8A%A8"><span class="nav-number">1.2.2.5.</span> <span class="nav-text">通过systemctl配置开机自启动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">1.3.</span> <span class="nav-text">客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">1.3.1.</span> <span class="nav-text">命令行客户端</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BE%E5%BD%A2%E5%8C%96%E6%A1%8C%E9%9D%A2%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">1.3.2.</span> <span class="nav-text">图形化桌面客户端</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">1.4.</span> <span class="nav-text">数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">1.4.1.</span> <span class="nav-text">通用命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#String%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4"><span class="nav-number">1.4.2.</span> <span class="nav-text">String类型命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Hash%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4"><span class="nav-number">1.4.3.</span> <span class="nav-text">Hash类型命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#List%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4"><span class="nav-number">1.4.4.</span> <span class="nav-text">List类型命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Set%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4"><span class="nav-number">1.4.5.</span> <span class="nav-text">Set类型命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SortedSet%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4"><span class="nav-number">1.4.6.</span> <span class="nav-text">SortedSet类型命令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Redis%E5%A4%84%E7%90%86%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">使用Redis处理方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9F%AD%E4%BF%A1%E7%99%BB%E9%99%86"><span class="nav-number">2.1.</span> <span class="nav-text">短信登陆</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8Esession%E5%AE%9E%E7%8E%B0%E7%99%BB%E9%99%86%E6%B5%81%E7%A8%8B"><span class="nav-number">2.1.1.</span> <span class="nav-text">基于session实现登陆流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8ERedis%E5%AE%9E%E7%8E%B0%E5%85%B1%E4%BA%ABsession%E7%99%BB%E9%99%86%E6%B5%81%E7%A8%8B"><span class="nav-number">2.1.2.</span> <span class="nav-text">基于Redis实现共享session登陆流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%95%86%E6%88%B7%E7%BC%93%E5%AD%98%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.2.</span> <span class="nav-text">商户缓存查询</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98"><span class="nav-number">2.2.1.</span> <span class="nav-text">缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0Redis%E7%BC%93%E5%AD%98"><span class="nav-number">2.2.2.</span> <span class="nav-text">添加Redis缓存</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%9B%B4%E6%96%B0%E7%AD%96%E7%95%A5"><span class="nav-number">2.3.</span> <span class="nav-text">缓存更新策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F"><span class="nav-number">2.4.</span> <span class="nav-text">缓存穿透</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BA%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.4.1.</span> <span class="nav-text">缓存空对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4"><span class="nav-number">2.4.2.</span> <span class="nav-text">布隆过滤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E9%A2%84%E9%98%B2%E6%96%B9%E5%BC%8F"><span class="nav-number">2.4.3.</span> <span class="nav-text">其他预防方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9"><span class="nav-number">2.5.</span> <span class="nav-text">缓存雪崩</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">2.5.1.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF"><span class="nav-number">2.6.</span> <span class="nav-text">缓存击穿</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E9%94%81"><span class="nav-number">2.6.1.</span> <span class="nav-text">互斥锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E8%BF%87%E6%9C%9F"><span class="nav-number">2.6.2.</span> <span class="nav-text">逻辑过期</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E5%B0%81%E8%A3%85%E5%B7%A5%E5%85%B7"><span class="nav-number">2.7.</span> <span class="nav-text">缓存封装工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E6%83%A0%E5%88%B8%E7%A7%92%E6%9D%80"><span class="nav-number">2.8.</span> <span class="nav-text">优惠券秒杀</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E5%94%AF%E4%B8%80ID"><span class="nav-number">2.8.1.</span> <span class="nav-text">全局唯一ID</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%BC%98%E6%83%A0%E5%88%B8%E7%A7%92%E6%9D%80%E4%B8%8B%E5%8D%95"><span class="nav-number">2.8.2.</span> <span class="nav-text">实现优惠券秒杀下单</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B6%85%E5%8D%96%E9%97%AE%E9%A2%98"><span class="nav-number">2.8.3.</span> <span class="nav-text">超卖问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E4%BA%BA%E4%B8%80%E5%8D%95"><span class="nav-number">2.8.4.</span> <span class="nav-text">一人一单</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="nav-number">2.8.5.</span> <span class="nav-text">分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8ERedis%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="nav-number">2.8.5.1.</span> <span class="nav-text">基于Redis实现分布式锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%9D%9E%E9%98%BB%E5%A1%9E%E5%BC%8F%E8%8E%B7%E5%8F%96%E9%94%81"><span class="nav-number">2.8.5.2.</span> <span class="nav-text">非阻塞式获取锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E4%B8%80-%E8%AF%AF%E5%88%A0%E4%BB%96%E9%94%81"><span class="nav-number">2.8.5.3.</span> <span class="nav-text">问题一: 误删他锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E4%BA%8C-%E5%88%A4%E6%96%AD-%E5%88%A0%E9%94%81-%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="nav-number">2.8.5.4.</span> <span class="nav-text">**问题二: 判断&#x2F;删锁 原子性 **</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E9%97%AE%E9%A2%98"><span class="nav-number">2.8.5.5.</span> <span class="nav-text">其他问题</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis%E7%A7%92%E6%9D%80%E4%BC%98%E5%8C%96"><span class="nav-number">2.8.6.</span> <span class="nav-text">Redis秒杀优化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5%E7%A7%92%E6%9D%80"><span class="nav-number">2.8.7.</span> <span class="nav-text">Redis消息队列实现异步秒杀</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">2.8.7.1.</span> <span class="nav-text">消息队列</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8ERedis%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">2.8.7.2.</span> <span class="nav-text">基于Redis实现消息队列</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EList%E6%A8%A1%E6%8B%9F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">2.8.7.3.</span> <span class="nav-text">基于List模拟消息队列</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EPubSub%E6%A8%A1%E6%8B%9F%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">2.8.7.4.</span> <span class="nav-text">基于PubSub模拟消息队列</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EStream%E7%9A%84%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">2.8.7.5.</span> <span class="nav-text">基于Stream的消息队列</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Stream"><span class="nav-number">2.8.7.5.1.</span> <span class="nav-text">Stream</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84"><span class="nav-number">2.8.7.5.2.</span> <span class="nav-text">消费者组</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F%E5%AF%B9%E6%AF%94"><span class="nav-number">2.8.7.6.</span> <span class="nav-text">三种模式对比</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EStream%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5%E7%A7%92%E6%9D%80%E4%B8%8B%E5%8D%95"><span class="nav-number">2.8.7.7.</span> <span class="nav-text">基于Stream实现异步秒杀下单</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%BE%E4%BA%BA%E6%8E%A2%E5%BA%97"><span class="nav-number">2.9.</span> <span class="nav-text">达人探店</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%91%E5%B8%83%E6%8E%A2%E5%BA%97%E7%AC%94%E8%AE%B0"><span class="nav-number">2.9.1.</span> <span class="nav-text">发布探店笔记</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%82%B9%E8%B5%9E"><span class="nav-number">2.9.2.</span> <span class="nav-text">点赞</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%82%B9%E8%B5%9E%E6%8E%92%E8%A1%8C%E6%A6%9C"><span class="nav-number">2.9.3.</span> <span class="nav-text">点赞排行榜</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A5%BD%E5%8F%8B%E5%85%B3%E6%B3%A8"><span class="nav-number">2.10.</span> <span class="nav-text">好友关注</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E5%92%8C%E5%8F%96%E5%85%B3"><span class="nav-number">2.10.1.</span> <span class="nav-text">关注和取关</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B1%E5%90%8C%E5%85%B3%E6%B3%A8"><span class="nav-number">2.10.2.</span> <span class="nav-text">共同关注</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E6%8E%A8%E9%80%81"><span class="nav-number">2.10.3.</span> <span class="nav-text">关注推送</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%84%E8%BF%91%E5%95%86%E6%88%B7"><span class="nav-number">2.11.</span> <span class="nav-text">附近商户</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GEO%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.11.1.</span> <span class="nav-text">GEO数据结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%99%84%E8%BF%91%E5%95%86%E6%88%B7-1"><span class="nav-number">2.11.2.</span> <span class="nav-text">附近商户</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%AD%BE%E5%88%B0"><span class="nav-number">2.12.</span> <span class="nav-text">用户签到</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#BitMap%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.12.1.</span> <span class="nav-text">BitMap数据结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%BE%E5%88%B0%E5%8A%9F%E8%83%BD"><span class="nav-number">2.12.2.</span> <span class="nav-text">签到功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%BE%E5%88%B0%E7%BB%9F%E8%AE%A1"><span class="nav-number">2.12.3.</span> <span class="nav-text">签到统计</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UV%E7%BB%9F%E8%AE%A1"><span class="nav-number">2.13.</span> <span class="nav-text">UV统计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HyperLogLog%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.13.1.</span> <span class="nav-text">HyperLogLog数据结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0UV%E7%BB%9F%E8%AE%A1"><span class="nav-number">2.13.2.</span> <span class="nav-text">实现UV统计</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">95</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2022/05/22/Redis/Redis%E5%9F%BA%E4%BA%8E%E9%A1%B9%E7%9B%AE%E6%96%B9%E6%A1%88%E7%9A%84%E7%BB%93%E6%9E%84%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis基于项目方案的结构功能解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-05-22 20:37:22" itemprop="dateCreated datePublished" datetime="2022-05-22T20:37:22+08:00">2022-05-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="Redis结构功能解析"><a href="#Redis结构功能解析" class="headerlink" title="Redis结构功能解析"></a>Redis结构功能解析</h2><p><strong>Remote Dictionary Server</strong> , 一款开源, 使用key-value存储的内存型数据结构服务器</p>
+<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><h4 id="NoSQL"><a href="#NoSQL" class="headerlink" title="NoSQL"></a>NoSQL</h4><table>
+<thead>
+<tr>
+<th></th>
+<th>SQL数据库</th>
+<th>NoSQL数据库</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据结构</td>
+<td>结构化(Structured)</td>
+<td>非结构化</td>
+</tr>
+<tr>
+<td>数据关联</td>
+<td>关联(Relational)</td>
+<td>无关联</td>
+</tr>
+<tr>
+<td>查询方式</td>
+<td>SQL查询</td>
+<td>非SQL</td>
+</tr>
+<tr>
+<td>事务特性</td>
+<td>ACID</td>
+<td>BASE</td>
+</tr>
+<tr>
+<td>存储方式</td>
+<td>磁盘</td>
+<td>内存</td>
+</tr>
+<tr>
+<td>扩展性</td>
+<td>垂直</td>
+<td>水平</td>
+</tr>
+<tr>
+<td>使用场景</td>
+<td>1) 数据结构固定<br />2) 业务对数据安全性、<br />一致性要求较高</td>
+<td>1) 数据结构不固定<br />2) 对一致性、安全性要求不高<br />3) 对性能需求优先级高</td>
+</tr>
+</tbody></table>
+<h4 id="特征"><a href="#特征" class="headerlink" title="特征"></a>特征</h4><ul>
+<li>键值(key-value)型, value支持多种<strong>不同数据结构</strong>, 功能丰富</li>
+<li>工作线程为<strong>单线程</strong>, 每个命令具备原子性</li>
+<li>低延迟、速度快(<strong>基于内存</strong>、I/O多路复用、良好编码)</li>
+<li>支持数据持久化</li>
+<li>支持主从集群、分片集群</li>
+<li>支持多语言客户端</li>
+</ul>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><h4 id="apt安装"><a href="#apt安装" class="headerlink" title="apt安装"></a>apt安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo apt install redis	<span class="comment"># 安装</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ps aux | grep redis		<span class="comment"># 查看进程</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo service redis-server stop	<span class="comment"># 停止服务</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt remove redis-server		<span class="comment"># 移除安装</span></span></span><br></pre></td></tr></table></figure>
+
+<h4 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 安装编译器</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt install make gcc tcl</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载源码包</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> wget https://github.com/redis/redis/archive/refs/tags/6.2.6.tar.gz</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 解压并移动到指定目录</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tar -zxvf 6.2.6.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo mv redis-6.2.6 /usr/<span class="built_in">local</span>/src/</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /usr/<span class="built_in">local</span>/src/redis-6.2.6</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译/测试</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make &amp;&amp; make install</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> make <span class="built_in">test</span></span></span><br></pre></td></tr></table></figure>
+
+<h5 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 备份原有配置文件</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> cp /usr/<span class="built_in">local</span>/src/redis-6.2.6/redis.conf /usr/<span class="built_in">local</span>/src/redis-6.2.6/redis.conf.bak</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改配置文件</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> vim /usr/<span class="built_in">local</span>/src/redis-6.2.6/redis.conf</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bind 127.0.0.1 -::1	# 修改为允许任意IP访问</span></span><br><span class="line"><span class="attr">bind</span> <span class="string">0.0.0.0 -::1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># daemonize no			# 修改为守护进程运行</span></span><br><span class="line"><span class="attr">daemonize</span> <span class="string">yes</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># requirepass foobared	# 修改为需要密码</span></span><br><span class="line"><span class="attr">requirepass</span> <span class="string">xxxxxxxxx</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># port 6379				# 修改默认端口</span></span><br><span class="line"><span class="attr">port</span> <span class="string">16379</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># dir ./				# 修改工作目录</span></span><br><span class="line"><span class="attr">dir</span> <span class="string">/usr/local/src/redis-6.2.6/work/</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># databases 16			# 修改数据库数量</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># maxmemory &lt;bytes&gt;		# 设置能够使用的最大内存</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># logfile &quot;&quot;			# 指定日志文件名,不设置则标准输出,守护进程则废弃日志</span></span><br><span class="line"><span class="attr">logfile</span> <span class="string">&quot;/var/log/redis.log&quot;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 保护模式，关闭保护模式</span></span><br><span class="line"><span class="meta">protected-mode</span> <span class="string">no</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 数据库数量，设置为1</span></span><br><span class="line"><span class="attr">databases</span> <span class="string">1</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /usr/<span class="built_in">local</span>/src/redis-6.2.6</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 指定配置文件运行</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> redis-server redis.conf</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="关闭"><a href="#关闭" class="headerlink" title="关闭"></a>关闭</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> redis-cli -a xxxxxxxxx -p 16379 shutdown</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="配置systemctl"><a href="#配置systemctl" class="headerlink" title="配置systemctl"></a>配置systemctl</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo vi /etc/systemd/system/redis.service</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">[Unit]</span></span><br><span class="line"><span class="attr">Description</span>=<span class="string">redis-server</span></span><br><span class="line"><span class="attr">After</span>=<span class="string">network.target</span></span><br><span class="line"></span><br><span class="line"><span class="attr">[Service]</span></span><br><span class="line"><span class="attr">Type</span>=<span class="string">forking</span></span><br><span class="line"><span class="attr">ExecStart</span>=<span class="string">/usr/local/bin/redis-server /usr/local/src/redis-6.2.6/redis.conf</span></span><br><span class="line"><span class="attr">PrivateTmp</span>=<span class="string">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">[Install]</span></span><br><span class="line"><span class="attr">WantedBy</span>=<span class="string">multi-user.target</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl daemon-reload 	<span class="comment"># 载入</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl start redis			<span class="comment"># 启动Redis服务</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl stop redis			<span class="comment"># 停止Redis服务</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl restart redis	 	<span class="comment"># 重启Redis服务</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 若报错:</span> </span><br><span class="line"><span class="meta">#</span><span class="bash"> Failed to start redis.service: Unit redis-server.service is masked.</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl unmask redis-server.service</span> </span><br></pre></td></tr></table></figure>
+
+<h5 id="通过systemctl配置开机自启动"><a href="#通过systemctl配置开机自启动" class="headerlink" title="通过systemctl配置开机自启动"></a>通过systemctl配置开机自启动</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl <span class="built_in">enable</span> redis</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 若报错:</span> </span><br><span class="line"><span class="meta">#</span><span class="bash"> Failed to <span class="built_in">enable</span> unit: Refusing to operate on linked unit file redis.service</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl is-enabled redis	<span class="comment"># 检查是否已存在自启动文件</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl <span class="built_in">disable</span> redis		<span class="comment"># 关闭原有自启动文件</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo vi /etc/systemd/system/redis.service	<span class="comment"># 重新写入文件</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl <span class="built_in">enable</span> redis		<span class="comment"># 开启自启动</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><h4 id="命令行客户端"><a href="#命令行客户端" class="headerlink" title="命令行客户端"></a>命令行客户端</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> redis-cli [options] [<span class="built_in">command</span>]</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">options:</span><br><span class="line">	-h 192.168.253.138: 指定需要连接的redis节点的IP地址, 默认为127.0.0.1</span><br><span class="line">	-p 16379: 指定需要连接的redis节点的端口, 默认为6379</span><br><span class="line">	-a xxxxxx: 指定redis的访问密码</span><br><span class="line">command:</span><br><span class="line">	需要redis服务器执行的操作命令, 若不指定, 进入交互控制台</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c5b247ab9c91caade37188088776d78c-867cbcb.png" alt="image-20220617110016109"></p>
+<blockquote>
+<p>可以在连接服务时不指定密码, 进入控制台后使用auth命令补充密码</p>
+</blockquote>
+<h4 id="图形化桌面客户端"><a href="#图形化桌面客户端" class="headerlink" title="图形化桌面客户端"></a>图形化桌面客户端</h4><p>AnotherRedisDesktopManager</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/qishibo/AnotherRedisDesktopManager</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><p>key-value数据库, key一般为String, value支持多种数据类型:</p>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>字符串 - String</td>
+<td>‘hello redis’</td>
+</tr>
+<tr>
+<td>哈希 - Hash</td>
+<td>{name: ‘jack’, age: 21}</td>
+</tr>
+<tr>
+<td>列表 - List</td>
+<td>[A -&gt; B -&gt; C -&gt; C]</td>
+</tr>
+<tr>
+<td>集合 - Set</td>
+<td>{A, B, C}</td>
+</tr>
+<tr>
+<td>有序集合 - SortedSet</td>
+<td>{A: 1, B: 2, C: 3}</td>
+</tr>
+<tr>
+<td>GEO</td>
+<td>{A: (120.3, 30.3)}</td>
+</tr>
+<tr>
+<td>BitMap</td>
+<td>0110110101110101011</td>
+</tr>
+<tr>
+<td>HyperLogLog</td>
+<td>0110110101110101011</td>
+</tr>
+</tbody></table>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">数据结构对应命令可通过官方文档或客户端help @[数据类型]查看</span><br><span class="line"> 	- https://redis.io/commands/</span><br><span class="line">	- help @string</span><br></pre></td></tr></table></figure>
+
+<h4 id="通用命令"><a href="#通用命令" class="headerlink" title="通用命令"></a>通用命令</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">文档: [Redis Generic Commands](https://redis.io/commands/?group=generic)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">keys	查看符合模板pattern的所有key, 可能耗费较多系统资源</span><br><span class="line">	支持的pattern模式</span><br><span class="line">	- h?llo		匹配hello，hallo和hxllo</span><br><span class="line">    - h*llo		匹配hllo和heeeello</span><br><span class="line">    - h[ae]llo	匹配hello但hallo,不匹配hillo</span><br><span class="line">    - h[^e]llo	匹配hallo, hbllo, ... 但不匹配hello</span><br><span class="line">    - h[a-b]llo	匹配hallo和hbllo</span><br><span class="line">del 	删除指定的键。如果键不存在，则忽略它. 返回值为已删除成功的键数量</span><br><span class="line">copy	复制指定键内容到指定键</span><br><span class="line">rename	重命名键名</span><br><span class="line">exists 	判断指定key是否存在</span><br><span class="line">expire 	为一个key设置有效期, 过期自动删除</span><br><span class="line">ttl 	查看一个key的过期剩余时间, -1代表永不过期, -2代表key已不存在</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="String类型命令"><a href="#String类型命令" class="headerlink" title="String类型命令"></a>String类型命令</h4><blockquote>
+<p>字符串类型包括: string普通字符串, int整数类型, 可以自增减, float浮点类型, 可以自增减</p>
+<p>最大空间不超过512m</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">set			添加或修改一个字符串类型的键值对</span><br><span class="line">get			获取指定key对应的值</span><br><span class="line">getdel 	 	获取key对应的值后删除key</span><br><span class="line">mset  		批量设置键值对</span><br><span class="line">mget 		获取多个key对应的值</span><br><span class="line">incr 		为一个整型key对应的值自增1</span><br><span class="line">incrby 	 	为一个整型key对应的值以指定步长自增</span><br><span class="line">incrbyfloat 为一个浮点型key对应的值以指定步长自增</span><br><span class="line">decr 		为一个整型key对应的值自减1</span><br><span class="line">decrby 		为一个整型key对应的值以指定步长自减</span><br><span class="line">setnx		仅在指定key不存在时才执行set操作, 相当于set key value nx</span><br><span class="line">msetnx		仅在指定key不存在时才执行多个set操作</span><br><span class="line">setex 		设置指定key-value并指定过期时间, 相当于set key value ex 10</span><br><span class="line">psetex		使用微秒作为单位设置指定key-value并指定过期时间</span><br><span class="line">setrange 	指定从偏移位置起, 覆写原有字符串</span><br><span class="line">getrange 	指定起始-结束获取子字符串, 相当于 substr key 0 2</span><br><span class="line">strlen 		获取key对应值的字符串长度</span><br></pre></td></tr></table></figure>
+
+
+
+<p>存储多项目, 多类型, 多用户时, 可以使用符号 <code>:</code> 格式设置键名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mset </span><br><span class="line">project1:module1:user1 v1 </span><br><span class="line">project1:module2:user1 v2 </span><br><span class="line">project1:module1:user2 v3  </span><br><span class="line">project1:module2:user2 v1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8682aa520d3fe6a4c5bc8c8caea2d109-0baefc4.png" alt="image-20220621004805666"></p>
+<h4 id="Hash类型命令"><a href="#Hash类型命令" class="headerlink" title="Hash类型命令"></a>Hash类型命令</h4><blockquote>
+<p>哈希类型, 也叫散列, 其value为一个无序字典, 可以将对象中每个字段独立存储, 单独做CURD</p>
+</blockquote>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e667b50359f06a70000759de780998bc-241e460.png" alt="image-20220620220446322"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">hset		添加或修改hash类型key的值</span><br><span class="line">hget		获取一个hash类型key的field对应的值</span><br><span class="line">hmset		批量添加多个hash类型key的field对应的值</span><br><span class="line">hmget		批量获取多个hash类型key的field对应的值</span><br><span class="line">hgetall		获取一个hash类型key的所有field对应的值</span><br><span class="line">hkeys		获取一个hash类型key中的所有fields</span><br><span class="line">hvals		获取一个hash类型key中的所有fields对应的值</span><br><span class="line">hincrby		使一个hash类型key的field对应的整型值自增并指定步长</span><br><span class="line">hsetnx		仅在不存在时, 添加一个hash类型key的field对应的值</span><br><span class="line">hlen		获取一个hash类型key中field的数量</span><br><span class="line">hstrlen		获取一个hash类型key中field对应值的长度</span><br></pre></td></tr></table></figure>
+
+<h4 id="List类型命令"><a href="#List类型命令" class="headerlink" title="List类型命令"></a>List类型命令</h4><blockquote>
+<p>可以看做双向链表, 即支持正向检索, 也支持反向检索</p>
+<p>特征: 有序, 元素可重复, 插入/删除比较快, 查询速度一般</p>
+<p>一般用于存储有序数据, 包括点赞列表, 评论列表等</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">lpush		向列表左侧插入一个或多个元素</span><br><span class="line">lpop		移除并返回左侧第一个元素, 没有则返回nil</span><br><span class="line">rpush		向列表右侧插入一个或多个元素</span><br><span class="line">rpop		移除并返回右侧第一个元素, 没有则返回nil</span><br><span class="line">lrange		返回一段索引范围内的所有元素</span><br><span class="line">blpop		阻塞式移除并返回左侧第一个元素, 无元素则等待至超时</span><br><span class="line">brpop		阻塞式移除并返回右侧第一个元素, 无元素则等待至超时</span><br></pre></td></tr></table></figure>
+
+<p>模拟栈(先进后出, 即入口出口在同一边) </p>
+<p><code>rpush + rpop / lpush + lpop</code></p>
+<p>模拟队列(先进先出, 即入口出口在不同边)    </p>
+<p><code>rpush + lpop / lpush + rpop</code></p>
+<p>模拟阻塞队列(先进先出, 无则不出, 即入口出口在不同边, 出队时采用<code>blpop</code>或<code>brpop</code>)</p>
+<p><code>rpush + blpop / lpush + brpop</code></p>
+<h4 id="Set类型命令"><a href="#Set类型命令" class="headerlink" title="Set类型命令"></a>Set类型命令</h4><blockquote>
+<p>特征: 无序, 元素不可重复, 查找快, 支持交并差集操作</p>
+<p>一般用于好友列表/ 共同关注/ 好友关系等</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">数据结构对应命令可通过官方文档或客户端help @[数据类型]查看</span><br><span class="line"> 	- https://redis.io/commands/</span><br><span class="line">	- help @set</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sadd key member 	向集合中添加一个或多个元素</span><br><span class="line">srem key member		移除集合中的指定元素</span><br><span class="line">scard key			返回集合中元素的个数</span><br><span class="line">sismember key member	判断某个元素是否存在于集合中</span><br><span class="line">smembers key		获取集合中的所有元素</span><br><span class="line">sinter key1 key2	获取集合key1和key2的交集</span><br><span class="line">sdiff key1 key2		获取集合key1与key2的差集</span><br><span class="line">dunion key1 key2	获取集合key1与key2的并集</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8aa48b6c8279825ef834517f50dc6f2e-fc53c1f.png" alt="image-20220621170701153"></p>
+<h4 id="SortedSet类型命令"><a href="#SortedSet类型命令" class="headerlink" title="SortedSet类型命令"></a>SortedSet类型命令</h4><blockquote>
+<p>可排序集合, 集合中的每一个元素都带有一个score属性, 基于score实现元素排序</p>
+<p>特性: 可排序 , 元素不可重复, 查询速度快</p>
+<p>基于可排序性 , 一般用于排行榜功能</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">数据结构对应命令可通过官方文档或客户端help @[数据类型]查看</span><br><span class="line"> 	- https://redis.io/commands/</span><br><span class="line">	- help @sorted_set</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">zadd key score member		添加一个或多个元素到有序集合, 如果已存在则更新其score值</span><br><span class="line">zrem key member				删除有序集合的一个指定元素</span><br><span class="line">zscore key member			获取有序集合中指定元素的score值</span><br><span class="line">zcard key					获取有序集合中的元素个数</span><br><span class="line">zcount key min max			统计score值在指定范围内的所有元素个数</span><br><span class="line">zincrby key incr member		使有序集合中的指定元素自增, 步长为指定incr值</span><br><span class="line">zrank key member			获取有序集合中指定元素的排名</span><br><span class="line">zrevrank key member			获取有序集合中逆序排序后指定元素的排名</span><br><span class="line">zrange key min max			按照score排序后, 获取指定排名范围内的元素</span><br><span class="line">zrevrange key min max		按照score逆序排序后, 获取指定排名范围内的元素</span><br><span class="line">zrangebyscore key min max	按照score排序后, 获取指定score范围内的元素</span><br><span class="line">zrevrangebyscore key min max	按照score逆序排序后, 获取指定score范围内的元素</span><br><span class="line">zinter|zunion|zdiff			求交|并|差集</span><br></pre></td></tr></table></figure>
+
+<p>score默认为正序, 正序排序为从小到大, 逆序为从大到小, 一般是在命令中加<code>rev</code></p>
+<h2 id="使用Redis处理方案"><a href="#使用Redis处理方案" class="headerlink" title="使用Redis处理方案"></a>使用Redis处理方案</h2><ul>
+<li><p>短信登陆: Redis的共享session应用</p>
+</li>
+<li><p>商户查询缓存: 企业缓存使用技巧、缓存雪崩 穿透等问题</p>
+</li>
+<li><p>达人探店: 基于List的点赞列表, 基于SortedSet的点赞排行榜</p>
+</li>
+<li><p>优惠券秒杀: Redis计数器、Lua脚本Redis、分布式锁、三种消息队列</p>
+</li>
+<li><p>好友关注: 基于Set集合的关注、取关、共同关注、消息推送等功能</p>
+</li>
+<li><p>附近的商户: Redis的GeoHash应用</p>
+</li>
+<li><p>用户签到: BitMap数据统计功能</p>
+</li>
+<li><p>UV统计: HyperLogLog统计功能</p>
+</li>
+</ul>
+<h3 id="短信登陆"><a href="#短信登陆" class="headerlink" title="短信登陆"></a>短信登陆</h3><h4 id="基于session实现登陆流程"><a href="#基于session实现登陆流程" class="headerlink" title="基于session实现登陆流程"></a>基于session实现登陆流程</h4><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/04a64730d992a27752f40ca6cf53e957-51a43c2.png" alt="image-20220622014130177"></p>
+<p>**集群的session共享问题:**多台服务器不共享session存储空间, 当请求被切换到不同服务器时导致数据丢失</p>
+<p>**替代方案特征:**数据共享, 内存存储, key-value结构</p>
+<h4 id="基于Redis实现共享session登陆流程"><a href="#基于Redis实现共享session登陆流程" class="headerlink" title="基于Redis实现共享session登陆流程"></a>基于Redis实现共享session登陆流程</h4><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f9f034efaec6dd7c8015fc84cfa2a3df-1ab9138.png" alt="image-20220622124601044"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">需要考虑问题: </span><br><span class="line">	选择合适的数据结构		String(json) 或 Hash(对象)</span><br><span class="line">	选择合适的key		使用login:user:[手机号]存储验证码, 使用login:token:[随机数]存储用户信息</span><br><span class="line">	选择合适的存储粒度		仅存储非敏感用户信息</span><br></pre></td></tr></table></figure>
+
+<h3 id="商户缓存查询"><a href="#商户缓存查询" class="headerlink" title="商户缓存查询"></a>商户缓存查询</h3><h4 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h4><p>数据交换的缓冲区(cache), 是存贮数据的临时地址, 一般读写性能较高, 可以使用Redis充当应用层缓存</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">优势:</span><br><span class="line"> - 减低后端负载</span><br><span class="line"> - 提高读写效率, 降低响应时间</span><br><span class="line">劣势:</span><br><span class="line"> - 数据一致性成本</span><br><span class="line"> - 代码维护成本</span><br><span class="line"> - 运维成本(集群, 预热)</span><br></pre></td></tr></table></figure>
+
+<h4 id="添加Redis缓存"><a href="#添加Redis缓存" class="headerlink" title="添加Redis缓存"></a>添加Redis缓存</h4><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/20ad7cc2e5939ab3060472ac015ef852-403e38b.png" alt="image-20220622190047562"></p>
+<h3 id="缓存更新策略"><a href="#缓存更新策略" class="headerlink" title="缓存更新策略"></a>缓存更新策略</h3><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6a090a820f731c62f078f8f847934e5d-164280e.png" alt="image-20220622191427917"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">业务场景:</span><br><span class="line"> - 低一致性场景: 使用内存淘汰机制, 如店铺类型等几乎不变动的查询缓存</span><br><span class="line"> - 高一致性场景: 主动更新为主, 并以超时剔除作为兜底, 如店铺详情查询缓存</span><br></pre></td></tr></table></figure>
+
+
+
+<p>一般由缓存调用者在更新数据库时更新缓存, 需要考虑如下问题:</p>
+<ul>
+<li>删除缓存/更新缓存<ul>
+<li>更新缓存可能造成多次无效写操作, 推荐使用删除缓存, 等查询时再更新缓存</li>
+</ul>
+</li>
+<li>保证缓存与数据库操作同时成功/失败<ul>
+<li>单体系统可以使用事务保证原子性, 分布式考虑利用TCC等分布式事务方案</li>
+</ul>
+</li>
+<li>先操作缓存/先操作数据库<ul>
+<li>推荐先操作数据库, 再删除缓存, 降低线程安全问题发生的概率</li>
+</ul>
+</li>
+</ul>
+<h3 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h3><p>客户端请求的数据在缓存中和数据库中都不存在, 导致每次请求都直接访问数据库, 缓存永远不生效</p>
+<p><strong>解决方案:</strong> </p>
+<h4 id="缓存空对象"><a href="#缓存空对象" class="headerlink" title="缓存空对象"></a><strong>缓存空对象</strong></h4><p>将不存在的数据结果也缓存在Redis中, 赋值为<code>null</code> </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">优点:</span><br><span class="line"> - 实现简单, 维护方便</span><br><span class="line">缺点:</span><br><span class="line"> - 额外的内存消耗</span><br><span class="line"> - 可能造成短期不一致(设置短TTL 或 新增数据时更新缓存)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f115c6e4273792d5bfcc44b04f163f53-d685727.png" alt="image-20220622200822389"></p>
+<h4 id="布隆过滤"><a href="#布隆过滤" class="headerlink" title="布隆过滤"></a><strong>布隆过滤</strong></h4><p>在请求缓存时, 先通过布隆过滤器, 若数据库不存在该数据, 则拒绝请求. 若存在, 才会通过</p>
+<blockquote>
+<p>布隆过滤器实际上是一个很长的二进制向量和一系列随机映射hash函数。将数据通过hash运算后映射到二进制向量位上, 当请求参数时, 同样运算后判断结果位是否都为1, 便可以判断是否存在该数据.</p>
+<p>Redis中支持 <code>setbit</code> 和 <code>getbit</code> 操作, 可以利用其实现布隆过滤操作</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">优点:</span><br><span class="line"> - 内存占用少, 没有多余的key</span><br><span class="line">缺点</span><br><span class="line"> - 实现复杂</span><br><span class="line"> - 存在误判可能(不存在数据精确判断, 存在数据可能误判)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bcfddbbd31559e50e502c5da065091c0-915c9bb.png" alt="image-20220622195854529"></p>
+<h4 id="其他预防方式"><a href="#其他预防方式" class="headerlink" title="其他预防方式"></a>其他预防方式</h4><ul>
+<li>增强ID复杂度, 避免被猜测ID规律</li>
+<li>做好数据的基础格式校验</li>
+<li>加强用户权限校验</li>
+<li>做好热点参数限流, 峰值限流</li>
+</ul>
+<h3 id="缓存雪崩"><a href="#缓存雪崩" class="headerlink" title="缓存雪崩"></a>缓存雪崩</h3><p>同一时段内大量缓存key失效或Redis服务宕机, 导致大量请求到达数据库, 带来数据库压力</p>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- 给不同key的TTL添加随机值</span><br><span class="line">- 利用Redis集群提高服务可用性(主-从, 哨兵)</span><br><span class="line">- 给缓存业务添加降级限流策略(保护Redis/数据库服务)</span><br><span class="line">- 给业务添加多级缓存</span><br></pre></td></tr></table></figure>
+
+<h3 id="缓存击穿"><a href="#缓存击穿" class="headerlink" title="缓存击穿"></a>缓存击穿</h3><p>也叫热点key问题, 就是一个被<strong>高并发访问</strong>并且<strong>缓存重建业务较复杂</strong>的key突然失效, 在这期间大量请求直接访问数据库, 带来大量服务压力</p>
+<p><strong>解决方案</strong></p>
+<h4 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h4><p>当发现无缓存数据时, 由当前进程<code>setnx</code>获取互斥锁, 然后进行缓存重建, 其余进程无法获取锁, 等待或返回空数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">优点:</span><br><span class="line"> - 没有额外的内存消耗</span><br><span class="line"> - 保证一致性</span><br><span class="line"> - 实现简单</span><br><span class="line">缺点:</span><br><span class="line"> - 线程需要等待, 性能受影响</span><br><span class="line"> - 可能有死锁风险</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/31a2c5e83c16a4a0fa22f83e3ef66057-ec06370.png" alt="image-20220622204332516"></p>
+<p>使用互斥锁方式解决缓存击穿问题逻辑:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ebd3eeaba133170a56989c71e4f376b6-e2f07d5.png" alt="image-20220622204714884"></p>
+<h4 id="逻辑过期"><a href="#逻辑过期" class="headerlink" title="逻辑过期"></a>逻辑过期</h4><p>缓存数据永不过期, 额外添加过期字段, 当用户请求发现该字段已过期时, 加锁并重建缓存, 其余进程无法获取锁, 返回该已过期数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">优点:</span><br><span class="line"> - 线程无需等待, 性能较好</span><br><span class="line">缺点:</span><br><span class="line"> - 不保证一致性</span><br><span class="line"> - 有额外的内存消耗</span><br><span class="line"> - 实现复杂</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/41a2b07b4e90afa062dd2dce722544b7-91a4667.png" alt="image-20220622204418325"></p>
+<p>使用逻辑过期方式解决缓存击穿问题逻辑:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/93be2b13772b00f36fa68d824127b7cc-e91bd6a.png" alt="image-20220622205539234"></p>
+<h3 id="缓存封装工具"><a href="#缓存封装工具" class="headerlink" title="缓存封装工具"></a>缓存封装工具</h3><p>方法1: 将任意对象序列化为json并存储在String类型的key中, 并可以设置TTL过期时间</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>方法2: 将任意对象序列化为json并存储在String类型的key中, 并可以设置逻辑过期时间, 用于处理缓存击穿</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>方法3: 根据指定key查询缓存, 并解析为指定类型, 利用缓存空值null的方式解决缓存穿透问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>方法4: 根据指定key查询缓存, 并解析为指定类型,  利用逻辑过期解决缓存击穿问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="优惠券秒杀"><a href="#优惠券秒杀" class="headerlink" title="优惠券秒杀"></a>优惠券秒杀</h3><h4 id="全局唯一ID"><a href="#全局唯一ID" class="headerlink" title="全局唯一ID"></a>全局唯一ID</h4><p><strong>Redis自增</strong></p>
+<p>优惠券-用户订单表中, 不推荐使用自增ID, 因为规律性太明显, 且受表单数据量的限制(分表/分库)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">全局ID生成器:</span><br><span class="line">	在分布式系统下生成全局唯一ID的工具</span><br><span class="line">需要具备: 唯一性, 高可用, 高性能, 递增性, 安全性</span><br><span class="line">可以基于Redis的incr特性, 构建ID生成器</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/064df9baad2d7d4bd7fdd5e135a8010e-983a062.png" alt="image-20220622233011002"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">组成部分: </span><br><span class="line"> - 符号位: 1bit, 永远为0</span><br><span class="line"> - 时间戳: 31bit, 以秒为单位, 可以使用69年</span><br><span class="line"> - 序列号: 32bit, 秒内计数器, 支持每秒产生2^32个不同的ID</span><br><span class="line">注意: </span><br><span class="line"> - key可以使用: incr:[业务类型]:[本日日期(天)]来构建</span><br><span class="line"> - 时间戳拼接时可以使用位左移实现 timestap &lt;&lt; 32, 保证拼接结果为数字</span><br><span class="line"> - 结果转为10进制</span><br></pre></td></tr></table></figure>
+
+<p><strong>其他方案</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- UUID </span><br><span class="line">- 雪花算法snowflake </span><br><span class="line">- 数据库自增 (特定表生成序列号部分)</span><br></pre></td></tr></table></figure>
+
+<h4 id="实现优惠券秒杀下单"><a href="#实现优惠券秒杀下单" class="headerlink" title="实现优惠券秒杀下单"></a>实现优惠券秒杀下单</h4><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/fbcd511e5166a6d9ab22cf1f8f63f7b0-25021a8.png" alt="image-20220623000818493"></p>
+<h4 id="超卖问题"><a href="#超卖问题" class="headerlink" title="超卖问题"></a>超卖问题</h4><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a941d8bf2be24a30a25910df426dd5c6-f360cb2.png" alt="image-20220623001841084"></p>
+<p>超卖问题是典型的多线程安全问题, 常见解决方案就是加锁:</p>
+<ul>
+<li><p>悲观锁:</p>
+<p>认为线程安全问题一定会发生, 因此在操作数据前先获取锁, 确保线程串行执行. 如mysql的<code>for update</code> 和 Redis的<code>setnx</code></p>
+<p>实现方式简单粗暴, 但性能一般</p>
+</li>
+<li><p>乐观锁:</p>
+<p>认为线程安全问题不一定发生, 因此不加锁, 只是在更新数据时判断有没有其他线程对数据做了修改, 如果没有修改则认为是安全的, 才更新数据. 如果已经被其他线程修改, 则说明发生了线程安全问题, 尝试重试或异常</p>
+<p>优点是性能好, 但存在成功率较低的问题</p>
+</li>
+</ul>
+<p><strong>乐观锁实现方式</strong></p>
+<p><strong>版本号法</strong>: 添加版本号字段, 修改前与获取版本号对照</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9bd89d9e607fc15391c5a28c262a1f34-e5616f7.png" alt="image-20220623004315848"></p>
+<p><strong>CAS</strong> - Compare And Set: 对照原有数据, 没有修改才更新数据</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2ed9a95d612045c36c7f7648bd5400d1-55a65b4.png" alt="image-20220623004340797"></p>
+<blockquote>
+<p>为解决失败率过高问题,  可以修改<code>stock = 1</code> 条件为 <code>stock &gt; 0</code></p>
+</blockquote>
+<h4 id="一人一单"><a href="#一人一单" class="headerlink" title="一人一单"></a>一人一单</h4><p>修改秒杀业务, 要求同一个优惠券, 一个用户只能下一单</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6febe8acff4a74a6275846cbfd775725-60b3c8b.png" alt="image-20220623005610699"></p>
+<blockquote>
+<p>需要为每个用户的行为加悲观锁, 以用户ID作为锁key, 否则查询订单结果不存在会被多个进程执行</p>
+</blockquote>
+<p><strong>集群服务器中的并发安全问题</strong> </p>
+<blockquote>
+<p>锁只能保证在本服务器中线程安全, 集群服务时会失效</p>
+</blockquote>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/508bcea8290cc87d862f6c8af6a68160-c6422f8.png" alt="image-20220623021155653"></p>
+<h4 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h4><p>满足分布式系统或集群模式下多进程可见并且互斥的锁</p>
+<p>实现方式:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center">MySQL</th>
+<th align="center">Redis</th>
+<th align="center">Zookeeper</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>互斥</td>
+<td align="center">利用mysql自身的互斥锁机制</td>
+<td align="center">利用setnx互斥命令</td>
+<td align="center">利用节点的唯一性和有序性实现互斥</td>
+</tr>
+<tr>
+<td>高可用</td>
+<td align="center">主从保证 好</td>
+<td align="center">好</td>
+<td align="center">好</td>
+</tr>
+<tr>
+<td>高性能</td>
+<td align="center">一般</td>
+<td align="center">好</td>
+<td align="center">一般</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td align="center">断开连接, 自动释放锁</td>
+<td align="center">服务宕机,未释放锁<br />可以利用锁超时时间, 到期释放</td>
+<td align="center">临时节点, 断开连接自动释放</td>
+</tr>
+</tbody></table>
+<h5 id="基于Redis实现分布式锁"><a href="#基于Redis实现分布式锁" class="headerlink" title="基于Redis实现分布式锁"></a><strong>基于Redis实现分布式锁</strong></h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">获取锁</span><br><span class="line"> - 互斥: 确保只有一个线程可以获取到锁</span><br><span class="line">	setnx lock thread1</span><br><span class="line"> - 设置过期时间</span><br><span class="line"> 	expire lock 10</span><br><span class="line"> - 为保证两条命令的原子性, 可以使用 set lock thread1 EX 10 NX 一次性执行</span><br><span class="line">释放锁</span><br><span class="line"> - 手动释放: del lock</span><br><span class="line"> - 超时释放</span><br></pre></td></tr></table></figure>
+
+<h5 id="非阻塞式获取锁"><a href="#非阻塞式获取锁" class="headerlink" title="非阻塞式获取锁"></a><strong>非阻塞式获取锁</strong></h5><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7870d776b742ca4af93598e8c67bb1f0-48e5de3.png" alt="image-20220623023611603"></p>
+<h5 id="问题一-误删他锁"><a href="#问题一-误删他锁" class="headerlink" title="问题一: 误删他锁"></a><strong>问题一: 误删他锁</strong></h5><p>该流程中可能发生误删锁的状况, 流程如下:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/07d5bfa0963b8ebc98bcdb519d0eaf5c-af60793.png" alt="image-20220623184522714"></p>
+<p>解决方案: </p>
+<p>需要在加锁时添加自己<strong>进程/服务身份的标识</strong>(uuid+id), 删除锁前判断该锁是否属于本进程/服务, 再执行释放锁操作</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a987eddbef20815c974ea7d2d95e17ad-0b7b5fc.png" alt="image-20220623184818921"></p>
+<p>修改流程为:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8064d2b50500df28634d827529fb4524-4dbffc3.png" alt="image-20220623184930462"></p>
+<h5 id="问题二-判断-删锁-原子性"><a href="#问题二-判断-删锁-原子性" class="headerlink" title="**问题二: 判断/删锁 原子性 **"></a>**问题二: 判断/删锁 原子性 **</h5><p>在判断锁标识是自己的之后, 由于系统阻塞, 阻塞期间锁超时释放, 导致其他锁被误删</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4548a0cc9c2ebba130f0eb0c92848532-572bafe.png" alt="image-20220623185830646"></p>
+<p>解决方案: </p>
+<p>Lua脚本, 在一个脚本中编写多条Redis命令, 确保多条命令执行时的原子性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">流程:</span><br><span class="line"> - 获取锁的线程/服务标识</span><br><span class="line"> - 判断是否与当前标识一致</span><br><span class="line"> - 如果一致则释放锁(删除)</span><br><span class="line"> - 如果不一致则什么都不做</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Redis-Lua脚本文档: https://redis.io/docs/manual/programmability/eval-intro/</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b1f0012333262396b443adf75827726d-f9c3f5d.png" alt="image-20220623192800695"></p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- Lua脚本 unlock.lua</span></span><br><span class="line"><span class="comment">-- 获取参数中锁的key</span></span><br><span class="line"><span class="keyword">local</span> key = KEYS[<span class="number">1</span>]</span><br><span class="line"><span class="comment">-- 当前线程/服务标识</span></span><br><span class="line"><span class="keyword">local</span> threadId = ARGV[<span class="number">1</span>]</span><br><span class="line"><span class="comment">-- 获取锁中的线程/服务标识</span></span><br><span class="line"><span class="keyword">local</span> id = redis.call(<span class="string">&#x27;get&#x27;</span>, key)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 比较线程/服务标识是否与锁标识一致</span></span><br><span class="line"><span class="keyword">if</span> id == threadId <span class="keyword">then</span></span><br><span class="line">    <span class="keyword">return</span> redis.call(<span class="string">&#x27;del&#x27;</span>, key)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="其他问题"><a href="#其他问题" class="headerlink" title="其他问题"></a><strong>其他问题</strong></h5><ul>
+<li><p><strong>不可重入</strong> </p>
+<p>同一线程无法多次获取同一把锁( 函数调用 )</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">可通过使用Redis-hash类型数据, 同时加入锁次数字段.</span><br><span class="line">当同一个线程/服务再次请求时, 为锁字段添加1, 同时添加有效期.</span><br><span class="line">执行业务结束后, 释放锁, 即锁次数减1. </span><br><span class="line">当所有业务结束, 锁次数为0时, 删除锁对应key</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/425846a4f3751e8f81c71fbbad51f5e4-1145f78.png" alt="image-20220623200923180"></p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 获取锁 tryLock.lua</span></span><br><span class="line"><span class="keyword">local</span> key = KEYS[<span class="number">1</span>]				<span class="comment">-- 锁的key</span></span><br><span class="line"><span class="keyword">local</span> threadId = ARGV[<span class="number">1</span>]		<span class="comment">-- 线程/服务唯一标识</span></span><br><span class="line"><span class="keyword">local</span> releaseTime = ARGV[<span class="number">2</span>]		<span class="comment">-- 锁过期时间</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> redis.call(<span class="string">&#x27;exists&#x27;</span>, key) == <span class="number">0</span> <span class="keyword">then</span>			<span class="comment">-- 判断是否存在锁</span></span><br><span class="line">    redis.call(<span class="string">&#x27;hset&#x27;</span>, key, threadId, <span class="number">1</span>)		<span class="comment">-- 不存在, 获取锁</span></span><br><span class="line">    redis.call(<span class="string">&#x27;expire&#x27;</span>, key, releaseTime)		<span class="comment">-- 设置有效期</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>									<span class="comment">-- 返回成功结果</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">if</span> redis.call(<span class="string">&#x27;hexists&#x27;</span>, key, threadId) == <span class="number">1</span> <span class="keyword">then</span>	<span class="comment">-- 锁已存在, 判断是否可以重入</span></span><br><span class="line">    redis.call(<span class="string">&#x27;hincrby&#x27;</span>, key, threadId, <span class="number">1</span>)		<span class="comment">-- 获取锁, 重入次数加1</span></span><br><span class="line">    redis.call(<span class="string">&#x27;expire&#x27;</span>, key, releaseTime)			<span class="comment">-- 重置锁有效期</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>										<span class="comment">-- 返回成功结果</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>						<span class="comment">-- 获取锁失败</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 释放锁 unlock.lua</span></span><br><span class="line"><span class="keyword">local</span> key = KEYS[<span class="number">1</span>]				<span class="comment">-- 锁的key</span></span><br><span class="line"><span class="keyword">local</span> threadId = ARGV[<span class="number">1</span>]		<span class="comment">-- 线程/服务唯一标识</span></span><br><span class="line"><span class="keyword">local</span> releaseTime = ARGV[<span class="number">2</span>]		<span class="comment">-- 锁过期时间</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> redis.call(<span class="string">&#x27;hexists&#x27;</span>, key, threadId) == <span class="number">0</span> <span class="keyword">then</span>		<span class="comment">-- 判断当前锁是否被自己持有</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>											<span class="comment">-- 不是自己持有, 返回</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">local</span> count = redis.call(<span class="string">&#x27;hincrby&#x27;</span>, key, threadId, <span class="number">-1</span>)	<span class="comment">-- 是自己持有, 次数加1</span></span><br><span class="line"><span class="keyword">if</span> count &gt; <span class="number">0</span> <span class="keyword">then</span>										<span class="comment">-- 判断重入次数是否已经为0</span></span><br><span class="line">    redis.call(<span class="string">&#x27;expire&#x27;</span>, key, releaseTime)				<span class="comment">-- 大于0说明不能释放锁, 重置过期时间</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    redis.call(<span class="string">&#x27;del&#x27;</span>, key)								<span class="comment">-- 等于0说明可以释放锁, 删除</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></li>
+<li><p><strong>不可重试</strong> </p>
+<p>获取锁只尝试一次就返回false, 没有重试机制</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">利用信号量和Redis-PubSub功能实现等待、唤醒, 获取锁失败的重试机制</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/505aab244e64a1c6c51de02b11706309-4108d43.png" alt="image-20220623205331596"></p>
+</li>
+<li><p><strong>超时释放</strong> </p>
+<p>锁超时释放虽然可以避免死锁, 但在业务耗时较长的场景, 存在安全隐患</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">利用watchDog, 每隔一段时间(releaseTime/3), 重置超时时间</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>主从一致性</strong> </p>
+<p>如果在主从集群中, 同步存在延迟, 从服务器还未同步到主服务器的写入的锁数据, 其余进程读从服务器数据, 可能导致出现多个锁</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">multilock, 同时在多个同级节点设置锁, 仅在所有节点可以获取锁才算成功</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/46a1e8366ed8dc727cd82ec30f638c15-15132b8.png" alt="image-20220623211428015"></p>
+</li>
+</ul>
+<h4 id="Redis秒杀优化"><a href="#Redis秒杀优化" class="headerlink" title="Redis秒杀优化"></a>Redis秒杀优化</h4><p>可以将判断库存/校验一人一单操作需要信息放入Redis, 再通过Lua脚本执行, 只有校验通过的用户请求才会被后台继续执行, 实际操作数据库, 流程如下:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/535c4f73ee6bfed588e44c713b541355-f3946f9.png" alt="image-20220624025059182"></p>
+<p>其中库存数据可以通过String格式存储, 一人一单验证则通过将用户ID放入指定集合, 判断集合是否存在用户判断</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dbb7b44c6d3caa6324a3c00ffe775e88-738b7ba.png" alt="image-20220624025358277"></p>
+<p>加快了处理和响应速度, 同时减轻了数据库的访问压力</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">实际操作:</span><br><span class="line"> - 新增秒杀优惠券的同时, 将优惠券库存信息存入Redis</span><br><span class="line"> - 基于Lua脚本, 判断秒杀库存、一人一单, 决定用户是否抢购成功</span><br><span class="line"> - 若抢购成功, 将优惠券ID和用户ID封装后存入阻塞队列</span><br><span class="line"> - 开启线程任务, 不断从阻塞队列中获取信息, 实现异步下单功能</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 秒杀预处理脚本  seckill.lua</span></span><br><span class="line"><span class="keyword">local</span> voucherId = ARGV[<span class="number">1</span>]	<span class="comment">-- 优惠券ID, 作为键名</span></span><br><span class="line"><span class="keyword">local</span> userId = ARGV[<span class="number">2</span>]		<span class="comment">-- 用户ID</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> stockKey = <span class="string">&#x27;seckill:stock:&#x27;</span> .. voucherId	<span class="comment">-- 库存数量Key</span></span><br><span class="line"><span class="keyword">local</span> orderKey = <span class="string">&#x27;seckill:order:&#x27;</span> .. voucherId	<span class="comment">-- 订单用户集合Key</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">tonumber</span>(redis.call(<span class="string">&#x27;get&#x27;</span>, stockKey)) &lt;= <span class="number">0</span> <span class="keyword">then</span>		<span class="comment">-- 若库存数量不足</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>	</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">if</span> redis.call(<span class="string">&#x27;sismember&#x27;</span>, orderKey, userId) == <span class="number">1</span> <span class="keyword">then</span>	<span class="comment">-- 若用户已在集合中</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span>	<span class="comment">-- 说明已经下过单</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">redis.call(<span class="string">&#x27;decr&#x27;</span>, stockKey)			<span class="comment">-- 扣除Redis缓存中的库存</span></span><br><span class="line">redis.call(<span class="string">&#x27;sadd&#x27;</span>, orderKey, userId)	<span class="comment">-- 保存用户到订单集合中</span></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>但该方案仍旧存在内存限制(服务队列消耗本机内存)和数据安全(异常/宕机)问题</p>
+</blockquote>
+<h4 id="Redis消息队列实现异步秒杀"><a href="#Redis消息队列实现异步秒杀" class="headerlink" title="Redis消息队列实现异步秒杀"></a>Redis消息队列实现异步秒杀</h4><h5 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">消息队列(Message Queue), 即存放消息的队列, 包括三个角色:</span><br><span class="line"> - 消息队列: 存储和管理消息, 也称消息代理(Message Broker)</span><br><span class="line"> - 生产者: 发送消息到消息队列</span><br><span class="line"> - 消费者: 从消息队列中获取消息并处理消息</span><br></pre></td></tr></table></figure>
+
+<h5 id="基于Redis实现消息队列"><a href="#基于Redis实现消息队列" class="headerlink" title="基于Redis实现消息队列"></a>基于Redis实现消息队列</h5><p>Redis中提供了三种不同的方式实现消息队列</p>
+<ul>
+<li>List结构: 基于列表结构模拟消息队列</li>
+<li>PubSub: 基本的点对点消息模型</li>
+<li>Stream:  比较完善的消息队列模型</li>
+</ul>
+<h5 id="基于List模拟消息队列"><a href="#基于List模拟消息队列" class="headerlink" title="基于List模拟消息队列"></a><strong>基于List模拟消息队列</strong></h5><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5594625fddb9d0285432202d50a5914b-baa920c.png" alt="image-20220624135444114"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7588aaa662653c09b5dbe9311c84a4a3-8abe6c9.png" alt="image-20220624140312907"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">优点:</span><br><span class="line"> - 基于Redis存储, 不受限于服务所在内存上限</span><br><span class="line"> - 基于Redis的持久化机制, 数据安全性有保证</span><br><span class="line"> - 满足消息有序性</span><br><span class="line">缺点:</span><br><span class="line"> - 无法避免消息丢失(获取Redis信息后服务宕机)</span><br><span class="line"> - 只支持单消费者</span><br></pre></td></tr></table></figure>
+
+<h5 id="基于PubSub模拟消息队列"><a href="#基于PubSub模拟消息队列" class="headerlink" title="基于PubSub模拟消息队列"></a><strong>基于PubSub模拟消息队列</strong></h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">文档: https://redis.io/commands/?group=pubsub</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e4a0b30bae41977290196250196ab3d7-0737a13.png" alt="image-20220624141222597"></p>
+<p>发布订阅(<code>PubSub</code>)是Redis2.0引入的消息传递模型. 即消费者可以订阅一个或多个频道(<code>channel</code>), 生产者向对应<code>channel</code>发送消息后, 所有订阅者都能收到相关消息. 主要使用以下命令实现</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">publish channel message			向一个频道发送消息</span><br><span class="line">subscribe channel [channel]		订阅一个或多个频道</span><br><span class="line">psubscribe pattern [pattern]	订阅符合pattern格式的所有频道</span><br><span class="line">	- h?llo		匹配hello,hallo和hxllo</span><br><span class="line">	- h*llo		匹配hllo和heeeello</span><br><span class="line">	- h[ae]llo	匹配hello但hallo,不匹配hillo</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3a2822c849cbd63bde1326898186591d-cfe309a.png" alt="image-20220624142526418"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">优点:</span><br><span class="line"> - 支持多生产、多消费</span><br><span class="line">缺点:</span><br><span class="line"> - 不支持数据持久化</span><br><span class="line"> - 无法避免消息丢失</span><br><span class="line"> - 消息堆积有上限, 超出时数据丢失 (消费者处理缓慢造成堆积)</span><br></pre></td></tr></table></figure>
+
+<h5 id="基于Stream的消息队列"><a href="#基于Stream的消息队列" class="headerlink" title="基于Stream的消息队列"></a><strong>基于Stream的消息队列</strong></h5><h6 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a><strong>Stream</strong></h6><p>Stream是Redis5.0引入的一种数据类型, 可以实现一个功能完善的消息队列 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">类型文档: </span><br><span class="line">http://www.redis.cn/topics/streams-intro.html</span><br><span class="line">https://redis.io/docs/manual/data-types/streams/</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心命令</strong>:</p>
+<ul>
+<li><p><strong>发送消息命令</strong> <code>xadd </code><br>添加一个新的entry到stream</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/184566b4ca21bc3316d5524de424fd37-990bf6f.png" alt="image-20220624200053580"></p>
+<ul>
+<li><p>创建名为<code>users</code>的队列, 并向其中发送一个消息, 内容为<code>&#123;name=Tom, age=5&#125;</code> ,无最大消息数量限制, 且使用Redis自动生成ID</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5a7fb859b4d7e30e5abe2b9cd3db357e-c98b0e9.png" alt="image-20220624200239341"></p>
+</li>
+</ul>
+</li>
+<li><p><strong>读取消息命令</strong> <code>xread</code></p>
+<p>从一个或者多个流中读取数据，仅返回ID大于调用者报告的最后接收ID的条目。此命令有一个阻塞选项</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4bb5faf47d11f4c66d4db5417a0ca638-7a08d47.png" alt="image-20220624200745831"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">命令特点: </span><br><span class="line"> - 消息可回溯</span><br><span class="line"> - 一个消息队列可以被多个消费者读取</span><br><span class="line"> - 可以阻塞读取</span><br><span class="line"> - 有消息漏读风险</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>使用xread读取第一条信息</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8b612caf55f3038ef5f4eb9c9b078b00-e6d2759.png" alt="image-20220624200834375"></p>
+</li>
+<li><p>阻塞方式读取当前信息</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eea124a2276e4af5bb679b93caf22f9e-9d50a50.png" alt="image-20220624201048597"></p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>命令效果</strong> </p>
+<p>使用 <code>xread ... 0</code> 从头获取消息时, 每个线程都可以获取到该队列第一条数据</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5a5a39b34fb7a52fe9e05240e48c0f25-10d4f35.png" alt="image-20220624202534310"></p>
+<p>使用 <code>xread ... block ... $ </code> 阻塞获取最新一条信息</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/aad4777df22b54b9586fbcbc217b3d77-0cfa7f0.png" alt="image-20220624203417782"></p>
+<p><strong>实际使用</strong> </p>
+<p>可以通过循环调用xread以阻塞方式查询最新消息, 从而实现持续监听队列效果</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (<span class="literal">true</span>)&#123;</span><br><span class="line">    <span class="comment">// 尝试读取队列消息, 最多阻塞2秒</span></span><br><span class="line">    msg = redis.<span class="keyword">eval</span>(<span class="string">&#x27;xread count 1 block 2000 streams users $&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (msg == <span class="literal">null</span>)&#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    handleMessage(msg)	<span class="comment">// 处理消息</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 但当指定起始ID为<code>$</code>时, 代表读取最新消息, 若在处理一条信息时, 有超过1条消息到达队列, 则下次获取时也只能获取到最新一条, 出现 <strong>消息漏读</strong> 问题</p>
+</blockquote>
+<h6 id="消费者组"><a href="#消费者组" class="headerlink" title="消费者组"></a>消费者组</h6><p>Consumer Group: 将多个消费者划分到一个组中, 监听同一个队列. </p>
+<p><strong>特征</strong> </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- 消息分流</span><br><span class="line">	列中的消息会分流给组内的不同消费者，而不是重复消费，从而加快消息处理的速度</span><br><span class="line">- 消息标示</span><br><span class="line">	消费者组会维护一个标示，记录最后一个被处理的消息，哪怕消费者宕机重启，还会从标示之后读取消息。确保每一个消息都会被消费</span><br><span class="line">- 消息确认</span><br><span class="line">	消费者获取消息后，消息处于pending状态，并存入一个pending-list。当处理完成后需要通过XACK来确认消息，标记消息为已处理，才会从pending-list移除。</span><br></pre></td></tr></table></figure>
+
+<p><strong>命令</strong> </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">xgroup CREATE key groupname ID [MKSTREAM]	管理消费者组</span><br><span class="line"> - key 			队列key名称</span><br><span class="line"> - groupname 	消费者组名称</span><br><span class="line"> - ID 			起始ID标示, $代表队列中最后一个消息, 0代表第一个消息</span><br><span class="line"> - MKSTREAM 	队列不存在时自动创建</span><br><span class="line"></span><br><span class="line">其他命令:</span><br><span class="line">xgroup DESTORY key groupname	删除指定消费者组</span><br><span class="line">xgroup CREATECONSUMER key groupname cousumername  	给指定的消费者组添加消费者</span><br><span class="line">xgroup DELCONSUMER key groupname consumername		删除消费者组中的指定消费者</span><br><span class="line"></span><br><span class="line">从消费者组读取消息:</span><br><span class="line">xreadgroup GROUP group consumer [COUNT count] [BLOCK milliseconds] [NOACK] STREAMS key [key ...] ID [ID ...]	</span><br><span class="line"> - group		消费组名称</span><br><span class="line"> - consumer		消费者名称，如果消费者不存在，会自动创建一个消费者</span><br><span class="line"> - count		本次查询的最大数量</span><br><span class="line"> - BLOCK milliseconds	阻塞读取, 当没有消息时最长等待时间</span><br><span class="line"> - NOACK		无需手动ACK，获取到消息后自动确认</span><br><span class="line"> - STREAMS key	指定队列名称</span><br><span class="line"> - ID			获取消息的起始ID：</span><br><span class="line">   - &gt;		从下一个未消费的消息开始</span><br><span class="line">   - 其它    根据指定id从pending-list中获取已消费但未确认的消息，例如0，是从pending-list中的第一个消息开始</span><br><span class="line"></span><br><span class="line">确认消息:</span><br><span class="line">xack group ID [ID ...]  	将pending的消息标记为已正确处理，从而有效地将其从使用者组的pending-list中删除.</span><br><span class="line"></span><br><span class="line">查看pending-list:</span><br><span class="line">xpending key group start end count  	从消费者组待处理条目列表中返回信息和条目,即获取但从未确认的消息。 </span><br></pre></td></tr></table></figure>
+
+<p><strong>命令效果</strong> </p>
+<p>添加消费者组队列, 并使用消费者组消费Stream数据</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c204c892efc78b95ac73cc026ac378b1-4dae19c.png" alt="image-20220624211113218"></p>
+<p>查看pending-list数据, 并重新获取数据处理, 确认消息后再查看</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/757d776092ea0d45a6226cc7a22926cd-d9ebfe3.png" alt="image-20220624213103935"></p>
+<blockquote>
+<p>获取数据时, 将ID由 <code>&gt;</code> 改为 <code>0</code>, 即可从获取消息 转为 获取 pending-list 未确认消息</p>
+</blockquote>
+<p><strong>实际使用</strong> </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (<span class="literal">true</span>)&#123;</span><br><span class="line">    <span class="comment">//监听队列, 阻塞模式, 最长等待2秒</span></span><br><span class="line">    msg = redis.<span class="keyword">eval</span>(<span class="string">&#x27;xreadgroup GROUP group_x1 consumer1 COUNT 1 BLOCK 2000 STREAMS x1 &gt;&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (msg == <span class="literal">null</span>)&#123;	<span class="comment">// 返回结果为null, 说明没有消息, 继续下次循环</span></span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        handleMessage(msg);	<span class="comment">// 处理消息函数, 内部完成后应使用xack确认</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>(<span class="built_in">Exception</span> e)&#123; 	<span class="comment">// 捕获异常, 说明没有完成消息处理</span></span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>)&#123;</span><br><span class="line">            <span class="comment">// 重新获取pending-list中最新消息</span></span><br><span class="line">            msg = redis.<span class="keyword">eval</span>(<span class="string">&#x27;xreadgroup GROUP group_x1 consumer1 COUNT 1 STREAMS x1 0&#x27;</span>);</span><br><span class="line">            <span class="keyword">if</span> (msg == <span class="literal">null</span>)&#123;	<span class="comment">// 返回null说明没有异常未确认消息, 结束循环</span></span><br><span class="line">                <span class="keyword">break</span>;	</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                handleMessage(msg);	<span class="comment">// 返回数据包含未确认异常消息, 再次处理, 完成后xack确认</span></span><br><span class="line">            &#125;<span class="keyword">catch</span>(<span class="built_in">Exception</span> e)&#123;</span><br><span class="line">                LogErrors(e)	<span class="comment">// 捕获异常, 处理失败, 记录日志, 重新尝试</span></span><br><span class="line">                <span class="keyword">continue</span>;		<span class="comment">// 或者返回ack, break中断尝试</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特征</strong> </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- 消息可回溯</span><br><span class="line">- 可以多消费者争抢消息, 加快消费速度</span><br><span class="line">- 可以阻塞读取</span><br><span class="line">- 没有消息漏读的风险</span><br><span class="line">- 有消息确认机制, 保证消息至少被消费一次</span><br></pre></td></tr></table></figure>
+
+<h5 id="三种模式对比"><a href="#三种模式对比" class="headerlink" title="三种模式对比"></a>三种模式对比</h5><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">List</th>
+<th align="center">PubSub</th>
+<th align="center">Stream</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">消息持久化</td>
+<td align="center">支持</td>
+<td align="center">不支持</td>
+<td align="center">支持</td>
+</tr>
+<tr>
+<td align="center">阻塞读取</td>
+<td align="center">支持</td>
+<td align="center">支持</td>
+<td align="center">支持</td>
+</tr>
+<tr>
+<td align="center">消息堆积处理</td>
+<td align="center">受限于内存空间大小, 可以利用多消费者加快处理</td>
+<td align="center">受限于消费者缓冲区</td>
+<td align="center">受限于队列长度, 可以利用消费者组提高消费速度, 减少堆积</td>
+</tr>
+<tr>
+<td align="center">消息确认机制</td>
+<td align="center">不支持</td>
+<td align="center">不支持</td>
+<td align="center">支持</td>
+</tr>
+<tr>
+<td align="center">消息回溯</td>
+<td align="center">不支持</td>
+<td align="center">不支持</td>
+<td align="center">支持</td>
+</tr>
+</tbody></table>
+<h5 id="基于Stream实现异步秒杀下单"><a href="#基于Stream实现异步秒杀下单" class="headerlink" title="基于Stream实现异步秒杀下单"></a>基于Stream实现异步秒杀下单</h5><ul>
+<li><p>创建一个Stream类型的消息队列，名为stream.orders</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xgroup CREATE stream.order group1 0 MKSTREAM</span><br></pre></td></tr></table></figure></li>
+<li><p>修改秒杀下单Lua脚本，在认定有抢购资格后，直接向stream.orders中添加消息，内容包含voucherId、userId、orderId</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 秒杀预处理脚本  seckill.lua</span></span><br><span class="line"><span class="keyword">local</span> voucherId = ARGV[<span class="number">1</span>]	<span class="comment">-- 优惠券ID, 作为键名</span></span><br><span class="line"><span class="keyword">local</span> userId = ARGV[<span class="number">2</span>]		<span class="comment">-- 用户ID</span></span><br><span class="line"><span class="keyword">local</span> orderId = ARGV[<span class="number">3</span>]		<span class="comment">-- 订单ID</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> stockKey = <span class="string">&#x27;seckill:stock:&#x27;</span> .. voucherId	<span class="comment">-- 库存数量Key</span></span><br><span class="line"><span class="keyword">local</span> orderKey = <span class="string">&#x27;seckill:order:&#x27;</span> .. voucherId	<span class="comment">-- 订单用户集合Key</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">tonumber</span>(redis.call(<span class="string">&#x27;get&#x27;</span>, stockKey)) &lt;= <span class="number">0</span> <span class="keyword">then</span>		<span class="comment">-- 若库存数量不足</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>	</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">if</span> redis.call(<span class="string">&#x27;sismember&#x27;</span>, orderKey, userId) == <span class="number">1</span> <span class="keyword">then</span>	<span class="comment">-- 若用户已在集合中</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span>	<span class="comment">-- 说明已经下过单</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">redis.call(<span class="string">&#x27;decr&#x27;</span>, stockKey)			<span class="comment">-- 扣除Redis缓存中的库存</span></span><br><span class="line">redis.call(<span class="string">&#x27;sadd&#x27;</span>, orderKey, userId)	<span class="comment">-- 保存用户到订单集合中</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 发送消息到stream队列中</span></span><br><span class="line">redis.call(<span class="string">&#x27;xadd&#x27;</span>, <span class="string">&#x27;stream.order&#x27;</span>, <span class="string">&#x27;*&#x27;</span>, <span class="string">&#x27;userId&#x27;</span>, userId, <span class="string">&#x27;voucherId&#x27;</span>, voucherId, <span class="string">&#x27;orderId&#x27;</span>, orderId)</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>服务代码</strong>  </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis.<span class="keyword">eval</span>(<span class="string">&#x27;path_of_seckill_lua_script&#x27;</span>,[voucherId, userId, orderId])</span><br></pre></td></tr></table></figure></li>
+<li><p>项目启动时，开启任务，尝试获取stream.orders中的消息，完成下单</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (<span class="literal">true</span>)&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="comment">// 获取消息队列中的订单信息</span></span><br><span class="line">        xreadgroup GROUP group1 consumer1 COUNT <span class="number">1</span> BLOCK <span class="number">2000</span> STREAMS stream.order &gt;</span><br><span class="line">        <span class="comment">// 判断消息获取是否成功</span></span><br><span class="line">            <span class="comment">// 若获取失败, 说明没有消息, 继续下次循环</span></span><br><span class="line">        <span class="comment">// 若获取成功, 可以下单</span></span><br><span class="line">        <span class="comment">// ACK确认</span></span><br><span class="line">        xack stream.order group1 [ID]</span><br><span class="line">    &#125;<span class="keyword">catch</span>(<span class="built_in">Exception</span> e)&#123;</span><br><span class="line">        <span class="comment">// 订单处理异常</span></span><br><span class="line">        <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                <span class="comment">// 获取pending-list队列中的未确认订单信息</span></span><br><span class="line">                xreadgroup GROUP group1 consumer1 COUNT <span class="number">1</span> STREAMS stream.order <span class="number">0</span></span><br><span class="line">                <span class="comment">// 判断消息获取是否成功</span></span><br><span class="line">                    <span class="comment">// 若获取失败, 说明pending-list没有消息, break</span></span><br><span class="line">                <span class="comment">// 若获取成功, 可以下单</span></span><br><span class="line">                <span class="comment">// ACK确认</span></span><br><span class="line">            &#125;<span class="keyword">catch</span>(<span class="built_in">Exception</span> e)&#123;</span><br><span class="line">                <span class="comment">// 处理pending-list异常信息 sleep + continue + count + break / log + break</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="达人探店"><a href="#达人探店" class="headerlink" title="达人探店"></a>达人探店</h3><h4 id="发布探店笔记"><a href="#发布探店笔记" class="headerlink" title="发布探店笔记"></a>发布探店笔记</h4><h4 id="点赞"><a href="#点赞" class="headerlink" title="点赞"></a>点赞</h4><p>使用Redis中的<code>Set</code>数据结构, 实现点赞功能</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- 将当前blog对应的点赞人员ID放入以blogId为键的Set集合中. </span><br><span class="line">  用sismember判断是否点赞, 若当前用户存在于集合中, 则已点赞, 若不存在, 说明未点赞</span><br><span class="line">- 修改点赞功能, 点赞过用srem取出该用户ID, 数据库点赞数减一, 未点赞用sadd加入该用户ID, 数据库点赞数加一</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bdd543a67b84922f3ebe9865ff4cdc5b-7c4734b.png" alt="image-20220625171949106"></p>
+<h4 id="点赞排行榜"><a href="#点赞排行榜" class="headerlink" title="点赞排行榜"></a>点赞排行榜</h4><p>使用Redis中的<code>SortedSet</code>数据结构, 实现点赞排行功能</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在blog详情页, 需要添加点赞列, 显示前几个点赞用户头像</span><br><span class="line">- 将点赞用户ID放入SortedSet集合, 以点赞动作时间戳作为score</span><br><span class="line">- 查询用户ID是否存在时, 可以用zscore查询对应元素是否存在</span><br><span class="line">- 选出前几个点赞用户ID时, 可以用zrange依据时间戳排序获取</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3fe5221171221e83332b4f3e78abbffe-5c86f89.png" alt="image-20220625171808437"></p>
+<h3 id="好友关注"><a href="#好友关注" class="headerlink" title="好友关注"></a>好友关注</h3><h4 id="关注和取关"><a href="#关注和取关" class="headerlink" title="关注和取关"></a>关注和取关</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- 在关注时, 使用sadd将目标用户ID放入以用户ID为key的set集合中</span><br><span class="line">- 取关时, 使用srem移除用户ID</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2df5d6ef452775dcf7d3e6d5a0538afb-9bfc89c.png" alt="image-20220626223314304"></p>
+<h4 id="共同关注"><a href="#共同关注" class="headerlink" title="共同关注"></a>共同关注</h4><p>使用Redis中的Set数据结构, 实现显示当前用户与指定用户的共同好友</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- 共同关注, 获取当前用户与目标用户的set集合,使用sinter获取交集,即为共同关注用户ID集合</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8686f87de06898009aacce20107bd7fd-1baed67.png" alt="image-20220626223435628"></p>
+<h4 id="关注推送"><a href="#关注推送" class="headerlink" title="关注推送"></a>关注推送</h4><p>也叫Feed流. 为用户持续的提供, 通过无限下拉刷新获取新的信息, 有两种常见模式:</p>
+<ul>
+<li><p>TimeLine:</p>
+<p>不做内容筛选, 简单按照内容发布时间排序, 常用于好友或关注信息. 如朋友圈</p>
+</li>
+<li><p>智能排序:</p>
+<p>利用算法屏蔽违规、不感兴趣内容. 推送感兴趣的信息吸引用户</p>
+</li>
+</ul>
+<p><strong>TimeLine模式实现方式:</strong></p>
+<ul>
+<li><p>拉模式</p>
+<p>也叫读扩散, 只有在关注后查看, 才会主动从目标用户的发件箱中获取信息</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/63e4cd409e86a98361d606e5cac36784-be31b25.png" alt="image-20220626230838432"></p>
+</li>
+<li><p>推模式</p>
+<p>也叫写扩散, 发送消息时向所有关注者同时发送信息</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/45578980c8ed72402dc636f6bc74794b-acbfa6f.png" alt="image-20220626231133371"></p>
+</li>
+<li><p>推拉结合</p>
+<p>也叫读写混合, 兼具推和拉模式的优点</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/50d67dac0523469fdd04d00f8f6e8c87-bdf44ea.png" alt="image-20220626234458042"></p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center">拉模式</th>
+<th align="center">推模式</th>
+<th align="center">推拉结合</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>写消耗</td>
+<td align="center">低</td>
+<td align="center">高</td>
+<td align="center">中</td>
+</tr>
+<tr>
+<td>读消耗</td>
+<td align="center">高</td>
+<td align="center">低</td>
+<td align="center">中</td>
+</tr>
+<tr>
+<td>用户读取延迟</td>
+<td align="center">高</td>
+<td align="center">低</td>
+<td align="center">低</td>
+</tr>
+<tr>
+<td>实现难度</td>
+<td align="center">简单</td>
+<td align="center">简单</td>
+<td align="center">复杂</td>
+</tr>
+<tr>
+<td>使用场景</td>
+<td align="center">很少使用</td>
+<td align="center">用户量少, 没有大V</td>
+<td align="center">千万级别用户量,有大V</td>
+</tr>
+</tbody></table>
+<p><strong>Feed流中的滚动分页</strong></p>
+<p>由于Feed流中的数据会不断更新, 数据角标索引也在实时变化, 所以不能采用传统分页模式, 而是使用<code>SortedSet</code>数据结构, 使用时间戳为<code>score</code>, 查询分页时记录<code>lastId</code>, 下一页数据从<code>lastId</code>开始查询</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9fe4a67430450f20240ed8ae73077dca-5b4da2f.png" alt="image-20220626235842629"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">命令参数:</span><br><span class="line">zrevrangebyscore key max min [WITHSCORES] [LIMIT offset count]</span><br><span class="line"> - max: 最大分数, 可以使用 +inf 代表最大值</span><br><span class="line"> - min: 最小分数, 可以使用 -inf 代表最小值</span><br><span class="line"> - offset: 偏移量, 指定score后继续向后偏移取值</span><br><span class="line"> - count: 返回取值的数量</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a99867cd7aecd83a562ab648db406501-38c0546.png" alt="image-20220627212622920"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e54c8e0d325e24679ad514fdd3fd92b5-3c1746b.png" alt="image-20220627212512932"></p>
+<p><strong>使用推模式完成推送</strong> </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- 被关注用户发送blog时, 查询所有关注者, 同时使用Redis中的SortedSet数据结构记录blog_ID到关注者ID的key, 作为关注者收件箱内容, score为发布时间戳</span><br><span class="line">- 关注者收件箱中存在SortedSet数据结构, 存储多位关注者锁发blogId, 前端发送上一次查询的最小时间戳lastId(初始值为当前时间戳, 后续从后端获取)和偏移量offset(初始值为0, 后续由后端返回偏移量取值)</span><br><span class="line">- 获取第一页数据时, 后端获取用户当前时间戳作为lastId, 偏移量offset, 执行命令:</span><br><span class="line">	zrevrangebyscore key lastId -inf WITHSCORES limit offset 3</span><br><span class="line">	并返回最后一个ID和最后一个元素score值重复出现的次数作为下次请求offset</span><br><span class="line">- 获取后续页数据时, 后端获取lastId和offset, 执行命令</span><br><span class="line">	zrevrangebyscore key lastId -inf WITHSCORES limit offset 3</span><br><span class="line">	并返回最后一个ID和最后一个元素score值重复出现的次数作为下次请求offset</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>简便方式: 在添加score时, 在时间戳后添加随机数或有序自增数</p>
+</blockquote>
+<h3 id="附近商户"><a href="#附近商户" class="headerlink" title="附近商户"></a>附近商户</h3><h4 id="GEO数据结构"><a href="#GEO数据结构" class="headerlink" title="GEO数据结构"></a>GEO数据结构</h4><p>地理坐标Geolocation, Redis3.2版本后提供, 允许存储地理经纬度信息, 常见命令有:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">geoadd 		添加一个地理空间信息到SortedSet,经纬度作为score,名称作为member</span><br><span class="line">geodist 	计算指定两个点或两个member之间的距离</span><br><span class="line">geohash		将指定member坐标转为hash字符串并返回</span><br><span class="line">geopos		返回指定member的坐标</span><br><span class="line">georadius	以指定圆点, 半径, 返回圆范围内的所有member</span><br><span class="line">geosearch	在指定范围内搜索member, 可以指定圆形还是矩形, 6.2版本后提供</span><br><span class="line">geosearchstore	功能与geosearch一致, 但可以将结果存入一个指定的key, 6.2版本后提供</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/cca322c4caa3f526103c55850a0767e7-3cab63e.png" alt="image-20220628032347306"></p>
+<h4 id="附近商户-1"><a href="#附近商户-1" class="headerlink" title="附近商户"></a>附近商户</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- 将店铺所在经纬度x,y存入Redis的GEO数据类型中, 可以考虑以搜索类型分类分Key存储</span><br><span class="line">  - 查询店铺信息</span><br><span class="line">  - 将店铺按照TypeId分组, typeId一致的放入同一个GEO集合</span><br><span class="line">  - 分批完成写入Redis:</span><br><span class="line">  	geoadd shop:geo:[typeId] [LON] [LAT] [shopId] ...</span><br><span class="line">- 获取用户当前经纬度x,y. 执行命令:</span><br><span class="line">  geosearch shop:geo:[typeId] FROMLONLAT x y BYRADIUS 10 km COUNT 100 WITHDIST</span><br><span class="line">- 截取分页数据后获取商户ID集合[key=shopId,value=distance]</span><br><span class="line">- 有序查询出商户具体数据</span><br><span class="line">  select * from table where id in [shopIds] order by field(id,[idsString])</span><br><span class="line">- 整理后返回前端</span><br></pre></td></tr></table></figure>
+
+<h3 id="用户签到"><a href="#用户签到" class="headerlink" title="用户签到"></a>用户签到</h3><h4 id="BitMap数据结构"><a href="#BitMap数据结构" class="headerlink" title="BitMap数据结构"></a>BitMap数据结构</h4><p><strong>Redis</strong>中是利用string类型数据结构实现<strong>BitMap</strong>，因此最大上限是512M，转换为bit则是 2^32个bit位</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SETBIT		向指定位置（offset）存入一个0或1</span><br><span class="line">GETBIT		获取指定位置（offset）的bit值</span><br><span class="line">BITCOUNT	统计BitMap中值为1的bit位的数量</span><br><span class="line">BITFIELD 	操作（查询、修改、自增）BitMap中bit数组中的指定位置（offset）的值</span><br><span class="line">BITFIELD_RO	获取BitMap中bit数组，并以十进制形式返回</span><br><span class="line">BITOP		将多个BitMap的结果做位运算（与 、或、异或）</span><br><span class="line">BITPOS		查找bit数组中指定范围内第一个0或1出现的位置</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bd9d8c950d6d1b9c108d6415fd246bf1-46b59be.png" alt="image-20220628050958496"></p>
+<h4 id="签到功能"><a href="#签到功能" class="headerlink" title="签到功能"></a>签到功能</h4><p>如果使用数据库实现功能, 可能造成数据大表出现</p>
+<p>可以按月统计用户签到数据, 签到记录为1, 未签到记录为0</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6f10237a48bb88c7f24cda9535b0780d-aa18910.png" alt="image-20220628044934145"></p>
+<p>把每一个bit位对应当前的每一天, 形成映射关系. 用0和1标识业务状态, 即<strong>位图(BitMap)</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- 获取当前用户</span><br><span class="line">- 获取当前日期</span><br><span class="line">- 依据用户ID和日期生成当月key:sign:[uid]:202203</span><br><span class="line">- 根据当前月天数写入BitMap</span><br><span class="line">  setbit key offset 1</span><br></pre></td></tr></table></figure>
+
+<h4 id="签到统计"><a href="#签到统计" class="headerlink" title="签到统计"></a>签到统计</h4><p><strong>本月已连续签到天数</strong> </p>
+<p>从最后一次签到开始向前统计，直到遇到第一次未签到为止，计算总的签到次数，就是连续签到天数。</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3ab290395fd616c321112dbac064c032-e8377d5.png" alt="image-20220628052723165"></p>
+<ul>
+<li><p><strong>获取一个月全部签到数据</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitfield key get u[天数] 0</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>从后向前遍历每个bit位</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">整体向右移动一位, 依次与1做与运算获取+最后一个bit位</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>实现</strong> </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- 获取本月截止当前天的所有签到记录</span><br><span class="line">  bitfield sign:[uid]:202203 GET u[天数] 0</span><br><span class="line">- 循环遍历while</span><br><span class="line">  - 让结果与1做与运算, 获取最后一个Bit位, 若为0, 结束循环, 若为1, 计数器加1</span><br><span class="line">  - 右移一位 (num &gt;&gt; 1), 继续下次循环</span><br><span class="line">- 返回连续签到次数计数器</span><br></pre></td></tr></table></figure>
+
+<h3 id="UV统计"><a href="#UV统计" class="headerlink" title="UV统计"></a>UV统计</h3><p><strong>UV</strong>(Unique Visitor), 也叫独立访客量，是指通过互联网访问、浏览这个网页的自然人。1天内同一个用户多次访问该网站，只记录1次。</p>
+<p><strong>PV</strong>(Page View), 也叫页面访问量或点击量，用户每访问网站的一个页面，记录1次PV，用户多次打开页面，则记录多次PV。往往用来衡量网站的流量。</p>
+<h4 id="HyperLogLog数据结构"><a href="#HyperLogLog数据结构" class="headerlink" title="HyperLogLog数据结构"></a>HyperLogLog数据结构</h4><p>Hyperloglog(HLL)是从Loglog算法派生的概率算法，用于确定非常大的集合的基数，而不需要存储其所有值。相关算法原理可以参考：<a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903785744056333">HyperLogLog 算法的原理讲解以及 Redis 是如何应用它的</a></p>
+<p>Redis中的HLL是基于string结构实现的，单个HLL的内存永远小于16kb。作为代价，其测量结果是概率性的，有小于0.81％的误差。不过对于UV统计来说，这完全可以忽略。</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/11303f304772ffdea2e495afbb5e69ff-07b01d5.png" alt="image-20220628055820857"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1d27f22ef113e0ac198ad475a40f64fa-0df149b.png" alt="image-20220628060045303"></p>
+<h4 id="实现UV统计"><a href="#实现UV统计" class="headerlink" title="实现UV统计"></a>实现UV统计</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- 用户访问时, 将用户信息存入Redis中的HyperLogLog数据结构中</span><br><span class="line">- 统计时, 可以使用pfmerge将每月/每年数据合并, 通过频繁count获取UV数据</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<p>PS:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">课程文档:  https://pan.baidu.com/s/1189u6u4icQYHg_9_7ovWmA?pwd=eh11</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2022/05/22/Redis/Redis%E5%9F%BA%E4%BA%8E%E9%A1%B9%E7%9B%AE%E6%96%B9%E6%A1%88%E7%9A%84%E7%BB%93%E6%9E%84%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/" title="Redis基于项目方案的结构功能解析">https://ni9ne.github.io/2022/05/22/Redis/Redis基于项目方案的结构功能解析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/05/22/Redis/Redis%E9%AB%98%E5%B9%B6%E5%8F%91%E9%AB%98%E5%8F%AF%E7%94%A8%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98/" rel="prev" title="Redis高并发高可用的分布式缓存">
+                  <i class="fa fa-chevron-left"></i> Redis高并发高可用的分布式缓存
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/05/22/Redis/Redis%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" rel="next" title="Redis原理解析">
+                  Redis原理解析 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>
