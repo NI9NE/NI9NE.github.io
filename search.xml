@@ -36586,4 +36586,5958 @@ end
         <tag>Lua</tag>
       </tags>
   </entry>
+  <entry>
+    <title>MySQL高可用</title>
+    <url>/2022/07/12/MySql/MySQL%E8%BF%90%E7%BB%B4/</url>
+    <content><![CDATA[
+## 日志
+
+### 错误日志
+
+错误日志记录了当 mysqld 启动和停止时，以及服务器在运行过程中发生任何严重错误时的相关信息。当数据库出现任何故障导致无法正常使用时，建议首先查看此日志。
+
+该日志是默认开启的，默认存放目录 `/var/log/`
+
+```mysql
+show variables like '%log_error%';
+```
+
+![image-20220726121449746](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5939161a61c708ad819f9ee6427dd637-e7b480c.png)
+
+### 二进制日志
+
+#### 介绍
+
+二进制日志（**binlog**）记录了所有的 DDL（数据定义语言）语句和 DML（数据操作语言）语句，但不包括数据查询（SELECT、SHOW）语句。
+
+作用：①. 灾难时的数据恢复；②. MySQL的主从复制。
+
+```mysql
+show variables like '%log_bin%';
+```
+
+![image-20220726121634318](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d17b108b420f774120654be6a4ebf94e-5f5b0e1.png)
+
+```
+参数说明：
+	log_bin_basename：当前数据库服务器的binlog日志的基础名称(前缀)，具体的binlog文件名需要在该basename的基础上加上编号(编号从000001开始)。
+	log_bin_index：binlog的索引文件，里面记录了当前服务器关联的binlog文件有哪些。
+```
+
+#### 格式
+
+MySQL服务器中提供了多种格式来记录二进制日志，具体格式及特点如下：
+
+| 日志格式 | 含义 |
+| -------- | ---- |
+|STATEMENT|基于SQL语句的日志记录，记录的是SQL语句，对数据进行修改的SQL都会记录在日志文件中。|
+|ROW |基于行的日志记录，记录的是每一行的数据变更。（默认）|
+|MIXED|混合了STATEMENT和ROW两种格式，默认采用STATEMENT，在某些特殊情况下会自动切换为ROW进行记录。|
+
+```mysql
+show variables like '%binlog_format%';
+```
+
+![image-20220726121932942](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/166f4c7675401ddea5e0d8f3f40a6ca1-257b7cf.png)
+
+#### 查看
+
+由于日志是以二进制方式存储的，不能直接读取，需要通过二进制日志查询工具 mysqlbinlog 来查看.
+
+```
+语法：
+	mysqlbinlog [ 参数选项 ] logfilename
+参数选项：
+ -d 指定数据库名称，只列出指定的数据库相关操作。
+ -o 忽略掉日志中的前n行命令。
+ -v 将行事件(数据变更)重构为SQL语句
+ -vv 将行事件(数据变更)重构为SQL语句，并输出注释信息
+```
+
+#### 删除
+
+对于比较繁忙的业务系统，每天生成的binlog数据巨大，如果长时间不清除，将会占用大量磁盘空间。可以通过以下几种方式清理日志：
+
+- 手动清理
+
+    ```mysql
+    -- 删除全部 binlog 日志，删除之后，日志编号，将从 binlog.000001重新开始
+    reset master;
+
+    -- 删除 * 编号之前的所有日志
+    purge master logs to 'binlog.*';
+
+    -- 删除日志为 "yyyy-mm-dd hh24:mi:ss" 之前产生的所有日志
+    purge master logs before 'yyyy-mm-dd hh24:mi:ss';
+    ```
+
+- 自动清理
+
+  也可以在mysql的配置文件中配置二进制日志的过期时间，设置了之后，二进制日志过期会自动删除。
+
+    ```mysql
+  show variables like '%binlog_expire%';
+    ```
+
+  ![image-20220726122244549](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b67cce64faed825f2989c1f4b34c3078-18a1b02.png)
+
+### 查询日志
+
+查询日志中记录了客户端的所有操作语句。默认情况下，查询日志是关闭的。
+
+```mysql
+show variables like '%general%';
+```
+
+![image-20220726122453590](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3d5af4d55f81ff3674f178c530c6d00d-c6698bb.png)
+
+开启了查询日志之后，在MySQL的数据存放目录 `/var/lib/mysql/` 下就会出现QUERY_LOG文件。之后所有的客户端的增删改查操作都会记录在该日志文件之中，长时间运行后，该日志文件将会非常大。
+
+### 慢查询日志
+
+慢查询日志记录了所有执行时间超过参数 `long_query_time` 设置值并且扫描记录数不小于`min_examined_row_limit` 的所有的SQL语句的日志，默认关闭的。long_query_time 默认为10 秒，最小为 0， 精度可以到微秒。
+
+```mysql
+show variables like '%slow_query%';
+show variables like '%long_query%';
+show variables like '%min_examined%';
+```
+
+![image-20220726122845752](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/36d1221132a385354e3aa4270c294e14-ee376c0.png)
+
+![image-20220726122858753](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/302dc0be08a63e0b49e0f643951a9f1d-7cfe564.png)
+
+![image-20220726123029616](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/17c5a52aedf3c3f28793f50a0b494bc7-bc76aca.png)
+
+
+
+默认情况下，不会记录管理语句，也不会记录不使用索引进行查找的查询。
+
+```mysql
+-- 是否记录执行较慢的管理语句
+show variables like '%log_slow_admin%';
+
+-- 是否记录执行较慢的未使用索引的语句
+show variables like '%log_queries%';
+```
+
+![image-20220726123224650](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/96aff562f836bac3d6a526a654e8652d-7aff177.png)
+
+![image-20220726123143437](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8422dc20d38bed30242cf9954d1ebdd8-abe53a2.png)
+
+
+
+## 主从复制
+
+**主从复制**是指将**主数据库**的 DDL 和 DML 操作通过二进制日志传到**从库服务器**中，然后在**从库**上对这些日志**重新执行**（也叫**重做**），从而使得从库和主库的**数据保持同步**。
+
+MySQL支持一台主库同时向多台从库进行复制， 从库同时也可以作为其他从服务器的主库，实现链状复制。
+
+MySQL 复制的优点主要包含以下三个方面：
+
+- 主库出现问题，可以快速切换到从库提供服务。
+- 实现读写分离，降低主库的访问压力。
+- 可以在从库中执行备份，以避免备份期间影响主库服务。
+
+### 原理
+
+MySQL主从复制的核心就是 **二进制日志(binlog)**，具体的过程如下：
+
+![image-20220726153302978](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/15d2d051abdc7d99c05e705d14b96abe-aa6eb8c.png)
+
+主从复制分成三步：
+1. Master 主库在事务提交时，会把数据变更记录在二进制日志文件 **Binlog** 中。
+2. 从库读取主库的二进制日志文件 **Binlog** ，写入到从库的中继日志 **Relay Log** 。
+3. slave**重做**中继日志中的事件，将改变反映它自己的数据。
+
+### 搭建
+
+#### 准备服务器
+
+1. 准备主从服务器
+
+   在两台服务器中分别安装好MySQL，并完成基础的初始化准备(安装、密码配置等操作)工作。 其中：
+
+   - 192.168.253.134 作为主服务器master
+   - 192.168.253.135 作为从服务器slave
+
+2. 开启防火墙端口
+
+   ```shell
+   sudo ufw allow 3306
+   或关闭
+   sudo ufw disable
+   ```
+
+   ![image-20220726153946997](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9edc3b5b82bcd7d14ef1ba0dfe0973dd-602b76a.png)
+
+3. 检测mysql安装状态
+
+   ![image-20220726154224171](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c2f9a7477d1304b47ca633562f5fce48-f7e5965.png)
+
+#### 主库配置
+
+1. 修改配置文件 `/etc/mysql/mysql.conf.d/mysqld.cnf` 
+
+    ```properties
+    # mysql 服务ID，保证整个集群环境中唯一，取值范围：1 – 2^32-1，默认为1
+    server-id               = 1000
+    # 开启binlog,指定日志文件目录及名称
+    log_bin                 = /var/log/mysql/mysql-bin.log
+    max_binlog_size   		= 100M
+    #是否只读,1 代表只读, 0 代表读写
+    read-only				= 0
+    # 指定同步的数据库
+    binlog_do_db           = ni9nes_DB
+    # 忽略的数据库, 指不需要同步的数据库
+    #binlog_ignore_db       = include_database_name
+    ```
+    
+2. 登录mysql，创建远程连接的账号，并授予主从复制权限
+
+    ```mysql
+    -- 创建用户，并设置密码，该用户可在任意主机连接该MySQL服务
+    CREATE USER 'replica'@'%' IDENTIFIED WITH mysql_native_password BY 'Root@123456';
+    -- 为 'replica'@'%' 用户分配主从复制权限
+    GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%';
+    FLUSH PRIVILEGES;
+    ```
+
+3. 重启MySQL服务器
+
+    ```shell
+    $ sudo service mysql restart
+    ```
+
+4. 通过指令，查看二进制日志坐标
+
+    ```mysql
+    show master status; 
+    ```
+
+    ![image-20220726163143220](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c96da3c23d9889af986289fc60678f1b-eb68f33.png)
+
+    ```
+    字段含义说明：
+      file : 从哪个日志文件开始推送日志文件
+      position ： 从哪个位置开始推送日志
+      binlog_do_db : 指定需要同步的数据库
+      binlog_ignore_db : 指定不需要同步的数据库
+    ```
+
+#### 从库配置
+
+1. 修改配置文件 `/etc/mysql/mysql.conf.d/mysqld.cnf` 
+
+   ```properties
+   # mysql 服务ID，保证整个集群环境中唯一，取值范围：1 – 2^32-1，和主库不一样即可
+   server-id			= 1001
+   # 是否只读,1 代表只读, 0 代表读写
+   read-only			= 1
+   ```
+
+2. 重新启动MySQL服务
+
+   ```shell
+   $ sudo service mysql restart
+   ```
+
+3. 登录从库mysql，设置主从配置
+
+   ```mysql
+   CHANGE MASTER TO MASTER_HOST='192.168.253.134', MASTER_USER='replica',MASTER_PASSWORD='Root@123456', MASTER_LOG_FILE='mysql-bin.000030',MASTER_LOG_POS=154;
+   ```
+
+   | 参数名 | 含义 |
+   | ------ | ---- |
+   |MASTER_HOST |主库IP地址 |
+   |MASTER_USER |连接主库的用户名 |
+   |MASTER_PASSWORD |连接主库的密码 |
+   |MASTER_LOG_FILE |binlog日志文件名 |
+   |MASTER_LOG_POS |binlog日志文件位置 |
+   
+4. 开启同步操作
+
+   ```mysql
+   start slave;
+   ```
+
+5. 查看主从同步状态
+
+   ```mysql
+   show slave status;
+   ```
+
+   ![image-20220726170420647](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/35cd7c142633767ff218600b4bf8656c-6ed84e1.png)
+
+> 注意: 若虚拟机为复制的多个实例, 需要修改server_uuid, 避免报错
+>
+> `sudo vi /var/lib/mysql/auto.cnf`
+
+## 分库分表
+
+### 介绍
+
+随着互联网及移动互联网的发展，应用系统的数据量也是成指数式增长，若采用单数据库进行数据存储，存在以下性能瓶颈：
+
+- **IO瓶颈**：热点数据太多，数据库缓存不足，产生大量磁盘IO，效率较低。 请求数据太多，带宽不够，网络IO瓶颈。
+
+- **CPU瓶颈**：排序、分组、连接查询、聚合统计等SQL会耗费大量的CPU资源，请求数太多，CPU出现瓶颈。
+
+为了解决上述问题，我们需要对数据库进行分库分表处理。
+
+分库分表的中心思想都是将数据分散存储，使得单一数据库/表的数据量变小来缓解单一数据库的性能问题，从而达到提升数据库性能的目的。
+
+#### 拆分策略
+
+分库分表的形式主要包括两种：**垂直拆分**和**水平拆分**。而拆分的粒度，一般又分为**分库**和**分表**，所以组成的拆分策略最终如下：
+
+![image-20220726182856006](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b2aa28fa5ffccbf741f43b92507e143e-6576386.png)
+
+#### 垂直拆分
+
+- **垂直分库**
+
+  以表为依据，根据业务将不同**表**拆分到不同库中。
+
+  ![image-20220726182946400](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7dfab875fa4ca4d4844585b1ef3752cb-a6fc689.png)
+
+  **特点**：
+
+  - 每个库的表结构都不一样。
+  - 每个库的数据也不一样。
+  - 所有库的并集是全量数据。
+
+- **垂直分表**
+
+  以字段为依据，根据字段属性将不同**字段**拆分到不同表中。
+
+  ![image-20220726183044965](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ad69ec9372cbfb228d677fdfbedc16c1-b5ab145.png)
+
+  **特点**：
+
+  - 每个表的结构都不一样。
+  - 每个表的数据也不一样，一般通过一列（主键/外键）关联。
+  - 所有表的并集是全量数据。
+
+#### 水平拆分
+
+- **水平分库** 
+
+  以字段为依据，按照一定策略，将一个库的**数据**拆分到多个库中。
+
+  ![image-20220726183221920](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d43a718930437b9619f6496196efee99-ed6dce2.png)
+
+  **特点**：
+
+  - 每个库的表结构都一样。
+  - 每个库的数据都不一样。
+  - 所有库的并集是全量数据。
+
+- **水平分表** 
+
+  以字段为依据，按照一定策略，将一个表的**数据**拆分到多个表中。
+
+  ![image-20220726183338309](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/40ba72c642b2b834fe65c56fb8d2e6ab-4fa860b.png)
+
+  **特点**： 
+
+  - 每个表的表结构都一样。
+  - 每个表的数据都不一样。
+  - 所有表的并集是全量数据。
+
+#### 实现技术
+
+**MyCat**：数据库分库分表中间件，不用调整代码即可实现分库分表，支持多种语言。
+
+![image-20220726183443726](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/530a85596ff33ddf75eda119e21b3a10-b46f5bc.png)
+
+### MyCat概述
+
+Mycat是开源的、活跃的、基于Java语言编写的MySQL数据库中间件。可以像使用mysql一样来使用mycat，对于开发人员来说根本感觉不到mycat的存在。
+
+开发人员只需要连接MyCat即可，而具体底层用到几台数据库，每一台数据库服务器里面存储了什么数据，都无需关心。 具体的分库分表的策略，只需要在MyCat中配置即可。
+
+在MyCat的整体结构中，分为两个部分：上面的逻辑结构、下面的物理结构。
+
+![image-20220726190129925](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f3a4bcf335705dc09a4712b9ff45b83c-a308a72.png)
+
+在MyCat的逻辑结构主要负责逻辑库、逻辑表、分片规则、分片节点等逻辑结构的处理，而具体的数据存储还是在物理结构，也就是数据库服务器中存储的。
+
+### MyCat搭建
+
+#### 下载
+
+```
+官网: http://www.mycat.org.cn/
+下载站: http://dl.mycat.org.cn/
+文档: https://www.yuque.com/ccazhw/tuacvk
+```
+
+#### 安装
+
+Mycat是采用java语言开发的开源的数据库中间件，支持Windows和Linux运行环境，下面介绍MyCat的Linux中的环境搭建。我们需要在准备好的服务器中安装如下软件。
+
+| 服务器 | 安装软件 | 说明 |
+| ------ | -------- | ---- |
+|192.168.253.134 |JDK、Mycat |MyCat中间件服务器|
+|192.168.253.135 |MySQL |分片服务器|
+|192.168.253.136 |MySQL |分片服务器|
+|192.168.253.137 |MySQL |分片服务器|
+
+```shell
+wget http://dl.mycat.org.cn/1.6.7.6/20210831141727/Mycat-server-1.6.7.6-release-20210831141727-linux.tar.gz
+sudo tar -zxvf Mycat-server-1.6.7.3-release-20210913163959-linux.tar.gz -C /usr/local/
+```
+
+> 解压后, 如果mysql版本不对, 可以访问`https://dev.mysql.com/downloads/connector/j/` 获取jar包替换`/usr/local/mycat/lib/mysql-connctor-java-xxx.jar`
+
+#### 目录
+
+![image-20220726190038442](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4db5860d46d646825ddda49d6e7871a7-0db6b22.png)
+
+```
+bin 	: 存放可执行文件，用于启动停止mycat
+conf	: 存放mycat的配置文件
+lib		: 存放mycat的项目依赖包（jar）
+logs	: 存放mycat的日志文件
+```
+
+#### 配置
+
+主要配置项包括`schema.xml` 和 `server.xml`
+
+- **schema.xml** 
+
+  在schema.xml中配置逻辑库、逻辑表、数据节点、节点主机等相关信息。具体的配置如下：
+
+  ```xml
+  <?xml version="1.0"?>
+  <!DOCTYPE mycat:schema SYSTEM "schema.dtd">
+  <mycat:schema xmlns:mycat="http://io.mycat/">
+  	<schema name="NI9NES_DB" checkSQLschema="true" sqlMaxLimit="100">
+  		<table name="TB_ORDER" dataNode="dn1,dn2,dn3" rule="auto-sharding-long" />
+  	</schema>
+  	<dataNode name="dn1" dataHost="dhost1" database="ni9nes" />
+  	<dataNode name="dn2" dataHost="dhost2" database="ni9nes" />
+  	<dataNode name="dn3" dataHost="dhost3" database="ni9nes" />
+  
+  	<dataHost name="dhost1" maxCon="1000" minCon="10" balance="0"
+  			  writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+  		<heartbeat>select user()</heartbeat>
+  		<writeHost host="master" url="192.168.253.135:3306" user="root" password="123456" /> 
+          <!-- <writeHost host="master" url="jdbc:mysql://192.168.253.135:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456" /> -->
+  
+  	</dataHost>
+  	<dataHost name="dhost2" maxCon="1000" minCon="10" balance="0"
+  			  writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+  		<heartbeat>select user()</heartbeat>
+  		<writeHost host="master" url="192.168.253.136:3306" user="root" password="123456" />
+  	</dataHost>
+  	<dataHost name="dhost3" maxCon="1000" minCon="10" balance="0"
+  			  writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+  		<heartbeat>select user()</heartbeat>
+  		<writeHost host="master" url="192.168.253.137:3306" user="root" password="123456" />
+  	</dataHost>
+  </mycat:schema>
+  ```
+
+- **server.xml** 
+
+  需要在server.xml中配置用户名、密码，以及用户的访问权限信息，具体的配置如下：
+
+  ```xml
+  <user name="root" defaultAccount="true">
+      <property name="password">123456</property>
+      <property name="schemas">NI9NES_DB</property>
+      <property name="defaultSchema">NI9NES_DB</property>
+  </user>
+  
+  <user name="user">
+      <property name="password">user</property>
+      <property name="schemas">NI9NES_DB</property>
+      <property name="readOnly">true</property>
+  </user>
+  ```
+
+#### 启动
+
+配置完毕后，先启动涉及到的3台分片服务器，然后启动MyCat服务器。切换到Mycat的安装目录，执行如下指令，启动Mycat：
+
+```shell
+#启动
+$ bin/mycat start
+#停止
+$ bin/mycat stop
+```
+
+> Mycat启动之后，占用端口号 8066。可以使用mysql客户端使用8066端口访问
+>
+> `mysql -h192.168.253.134 -P8066 -uroot -p`
+
+#### 查看运行
+
+启动完毕之后，可以查看logs目录下的启动日志，查看Mycat是否启动完成。
+
+```shell
+$ tail -f /usr/local/mycat/logs/wrapper.log
+```
+
+![image-20220728172523045](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/958590e4aecdd530c1c11d3916dedb39-02395c2.png)
+
+在往 TB_ORDER 表中插入数据时：
+
+- 如果id的值在1-500w之间，数据将会存储在第一个分片数据库中。
+- 如果id的值在500w-1000w之间，数据将会存储在第二个分片数据库中。
+- 如果id的值在1000w-1500w之间，数据将会存储在第三个分片数据库中。
+- 如果id的值超出1500w，在插入数据时，将会报错。
+
+为什么会出现这种现象，数据到底落在哪一个分片服务器到底是如何决定的呢？ 这是由逻辑表配置时的一个参数 rule 决定的，而这个参数配置的就是分片规则，
+
+![image-20220728173123679](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7533b708fefa036b5f794b1d205eff90-4e8c4da.png)
+
+### MyCat配置解析
+
+#### schema.xml
+
+![image-20220728173730792](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/27ea9e7ac603bea2efcef759ac4a0fe0-e1e7858.png)
+
+主要包含以下三组标签：
+
+- **schema**标签  
+
+  ```xml
+  <schema name="NI9NES_DB" checkSQLschema="true" sqlMaxLimit="100">
+      <table name="TB_ORDER" dataNode="dn1,dn2,dn3" rule="auto-sharding-long" />
+  </schema>
+  ```
+
+  **1) . schema 定义逻辑库** 
+
+  schema 标签用于定义 MyCat实例中的逻辑库 , 一个MyCat实例中, 可以有多个逻辑库 , 可以通过 schema 标签来划分不同的逻辑库。
+
+  MyCat中的逻辑库的概念，等同于MySQL中的**database**概念, 需要操作某个逻辑库下的表时, 也需要切换逻辑库(`use xxx`)。
+
+  **核心属性**：
+
+  - **name**：指定自定义的逻辑库库名
+  - **checkSQLschema**：在SQL语句操作时指定了数据库名称，执行时是否自动去除；true：自动去除，false：不自动去除
+  - **sqlMaxLimit**：如果未指定limit进行查询，列表查询模式查询多少条记录
+
+  
+
+  **2). schema 中的table定义逻辑表** 
+
+  table 标签定义了MyCat中逻辑库schema下的逻辑表 , 所有需要拆分的表都需要在table标签中定义 。
+
+  **核心属性**：
+
+  - **name**：定义逻辑表表名，在该逻辑库下唯一
+  - **dataNode**：定义逻辑表所属的dataNode，该属性需要与dataNode标签中name对应；多个dataNode逗号分隔
+  - **rule**：分片规则的名字，分片规则名字是在rule.xml中定义的
+  - **primaryKey**：逻辑表对应真实表的主键
+  - **type**：逻辑表的类型，目前逻辑表只有全局表和普通表，如果未配置，就是普通表；全局表，配
+    置为 global
+
+- **datanode**标签
+
+  ```xml
+  <dataNode name="dn1" dataHost="dhost1" database="ni9nes" />
+  <dataNode name="dn2" dataHost="dhost2" database="ni9nes" />
+  <dataNode name="dn3" dataHost="dhost3" database="ni9nes" />
+  ```
+
+  **核心属性**：
+
+  - **name**：定义数据节点名称
+  - **dataHost**：数据库实例主机名称，引用自 dataHost 标签中name属性
+  - **database**：定义分片所属数据库
+
+- **datahost**标签
+
+  ```xml
+  <dataHost name="dhost1" maxCon="1000" minCon="10" balance="0"
+            writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+      <heartbeat>select user()</heartbeat>
+      <writeHost host="master" url="192.168.253.135:3306" user="root" password="123456" /> 
+      <!-- <writeHost host="master" url="jdbc:mysql://192.168.253.135:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="1234" /> -->
+  </dataHost>
+  ```
+
+  该标签在MyCat逻辑库中作为底层标签存在, 直接定义了具体的数据库实例、读写分离、心跳语句。
+
+  **核心属性**：
+
+  - **name**：唯一标识，供上层标签使用
+  - **maxCon/minCon**：最大连接数/最小连接数
+  - **balance**：负载均衡策略，取值 0,1,2,3
+  - **writeType**：写操作分发方式（0：写操作转发到第一个writeHost，第一个挂了，切换到第二个；1：写操作随机分发到配置的writeHost）
+  - **dbDriver**：数据库驱动，支持 native、jdbc
+
+#### rule.xml
+
+rule.xml 中定义所有拆分表的规则, 在使用过程中可以灵活的使用分片算法, 或者对同一个分片算法使用不同的参数, 它让分片过程可配置化。主要包含两类标签：tableRule、Function。
+
+```xml
+<tableRule name="auto-sharding-long">
+    <rule>
+        <columns>id</columns>
+        <algorithm>rang-long</algorithm>
+    </rule>
+</tableRule>
+<function name="rang-long"
+          class="io.mycat.route.function.AutoPartitionByLong">
+    <property name="mapFile">autopartition-long.txt</property>
+</function>
+```
+
+![image-20220728175004503](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/422faa391d4d3c80ecc662b9805da837-b705298.png)
+
+#### server.xml
+
+server.xml配置文件包含了MyCat的系统配置信息，主要有两个重要的标签：system、user。
+
+**1). system标签** 
+
+```xml
+<system>
+	<property name="nonePasswordLogin">0</property> <!-- 0为需要密码登陆、1为不需要密码登陆 ,默认为0，设置为1则需要指定默认账户-->
+	<property name="ignoreUnknownCommand">0</property><!-- 0遇上没有实现的报文(Unknown command:),就会报错、1为忽略该报文，返回ok报文。
+	在某些mysql客户端存在客户端已经登录的时候还会继续发送登录报文,mycat会报错,该设置可以绕过这个错误-->
+	<!--  ... -->
+</system>
+```
+
+主要配置MyCat中的系统配置信息，对应的系统配置项及其含义，如下：
+
+| 属性 | 取值 | 含义 |
+| ---- | ---- | ---- |
+|charset |utf8|设置Mycat的字符集, 字符集需要与MySQL的字符集保持一致|
+|nonePasswordLogin |0,1|0为需要密码登陆、1为不需要密码登陆 ,默认为0，设置为1则需要指定默认账户|
+|useHandshakeV10 |0,1|使用该选项主要的目的是为了能够兼容高版本的jdbc驱动, 是否采用HandshakeV10Packet来与client进行通信, 1:是, 0:否|
+|useSqlStat |0,1|开启SQL实时统计, 1 为开启 , 0 为关闭 ;开启之后, MyCat会自动统计SQL语句的执行情况 ;mysql -h 127.0.0.1 -P 9066 -u root -p 查看MyCat执行的SQL, 执行效率比较低的SQL , SQL的整体执行情况、读写比例等 ; show @@sql ; show @@sql.slow ; show @@sql.sum ;|
+|useGlobleTableCheck |0,1|是否开启全局表的一致性检测。1为开启 ，0为关闭 。|
+|sqlExecuteTimeout |1000 |SQL语句执行的超时时间 , 单位为 s ;|
+|sequnceHandlerType |0,1,2|用来指定Mycat全局序列类型，0 为本地文件，1 为数据库方式，2 为时间戳列方式，默认使用本地文件方式，文件方式主要用于测试|
+|sequnceHandlerPattern |正则表达式|必须带有MYCATSEQ或者 mycatseq进入序列匹配流程 注意MYCATSEQ_有空格的情况|
+|subqueryRelationshipCheck |true,false|子查询中存在关联查询的情况下,检查关联字段中是否有分片字段 .默认 false|
+|useCompression |0,1|开启mysql压缩协议 , 0 : 关闭, 1 : 开启|
+|fakeMySQLVersion |5.5,5.6 |设置模拟的MySQL版本号|
+|defaultSqlParser||由于MyCat的最初版本使用了FoundationDB的SQL解析器, 在MyCat1.3后增加了Druid解析器, 所以要设置defaultSqlParser属性来指定默认的解析器; 解析器有两个 :druidparser 和 fdbparser, 在MyCat1.4之后,默认是druidparser,fdbparser已经废除了|
+|processors |1,2....|指定系统可用的线程数量, 默认值为CPU核心 x 每个核心运行线程数量; processors 会影响processorBufferPool, processorBufferLocalPercent, processorExecutor属性, 所有, 在性能调优时, 可以适当地修改processors值|
+|processorBufferChunk||指定每次分配Socket Direct Buffer默认值为4096字节, 也会影响BufferPool长度,如果一次性获取字节过多而导致buffer不够用, 则会出现警告, 可以调大该值|
+|processorExecutor||指定NIOProcessor上共享businessExecutor固定线程池的大小; MyCat把异步任务交给 businessExecutor线程池中, 在新版本的MyCat中这个连接池使用频次不高, 可以适当地把该值调小|
+|packetHeaderSize||指定MySQL协议中的报文头长度, 默认4个字节|
+|maxPacketSize||指定MySQL协议可以携带的数据最大大小, 默认值为16M|
+|idleTimeout |30|指定连接的空闲时间的超时长度;如果超时,将关闭资源并回收, 默认30分钟|
+|txIsolation |1,2,3,4|初始化前端连接的事务隔离级别,默认为REPEATED_READ , 对应数字为3 READ_UNCOMMITED=1; READ_COMMITTED=2; REPEATED_READ=3;SERIALIZABLE=4;|
+|sqlExecuteTimeout |300|执行SQL的超时时间, 如果SQL语句执行超时,将关闭连接; 默认300秒;|
+|serverPort |8066 |定义MyCat的使用端口, 默认8066|
+|managerPort |9066 |定义MyCat的管理端口, 默认9066|
+
+**2). user标签** 
+
+```xml
+<user name="root" defaultAccount="true">
+    <property name="password">123456</property>
+    <property name="schemas">NI9NES_DB</property>
+    <property name="defaultSchema">NI9NES_DB</property>
+</user>
+
+<user name="user">
+    <property name="password">user</property>
+    <property name="schemas">NI9NES_DB</property>
+    <property name="readOnly">true</property>
+    <property name="defaultSchema">NI9NES_DB</property>
+</user>
+```
+
+配置MyCat中的用户、访问密码，以及用户针对于逻辑库、逻辑表的权限信息，权限描述方式及配置说明如下：
+
+![image-20220728181011744](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bb798f91e99df291d1935cd89dfa6ecb-5026139.png)
+
+在进行权限操作时，我们只需要将 `privileges` 标签的注释放开。 在 `privileges` 下的`schema标签`中配置的`dml属性`配置的是**逻辑库的权限**。 在`privileges`的`schema`下的`table标签`的`dml属性`中配置**逻辑表的权限**。
+
+### MyCat分片
+
+#### 垂直拆分
+
+![image-20220904065344210](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/aa43d34f21263716255c8ab5a7af5a20-3eb4aa2.png)
+
+##### 环境准备
+
+| 服务器          | 安装软件   | 说明              |
+| --------------- | ---------- | ----------------- |
+| 192.168.253.134 | JDK、Mycat | MyCat中间件服务器 |
+| 192.168.253.135 | MySQL      | 分片服务器        |
+| 192.168.253.136 | MySQL      | 分片服务器        |
+| 192.168.253.137 | MySQL      | 分片服务器        |
+
+##### 配置
+
+**1) . schema.xml**
+
+```xml
+	<schema name="shopping" checkSQLschema="true" sqlMaxLimit="100">
+		<table name="tb_goods_base" dataNode="dn1" primaryKey="id" />
+		<table name="tb_goods_brand" dataNode="dn1" primaryKey="id" />
+		<table name="tb_goods_cat" dataNode="dn1" primaryKey="id" />
+		<table name="tb_goods_desc" dataNode="dn1" primaryKey="goods_id" />
+		<table name="tb_goods_item" dataNode="dn1" primaryKey="id" />
+
+		<table name="tb_order_item" dataNode="dn2" primaryKey="id" />
+		<table name="tb_order_master" dataNode="dn2" primaryKey="order_id" />
+		<table name="tb_order_pay_log" dataNode="dn2" primaryKey="out_trade_no" />
+
+		<table name="tb_user" dataNode="dn3" primaryKey="id" />
+		<table name="tb_user_address" dataNode="dn3" primaryKey="id" />
+
+        <table name="tb_areas_provinces" dataNode="dn1,dn2,dn3" primaryKey="id" type="global"/>
+		<table name="tb_areas_city" dataNode="dn1,dn2,dn3" primaryKey="id" type="global"/>
+		<table name="tb_areas_region" dataNode="dn1,dn2,dn3" primaryKey="id" type="global"/>
+	</schema>
+
+	<schema name="logs" checkSQLschema="true" sqlMaxLimit="100">
+		<table name="tb_log" dataNode="dn4,dn5,dn6" primaryKey="id" rule="mod-long"/>
+		<table name="tb_user" dataNode="dn4,dn5,dn6" rule="sharding-by-intfile-enumstatus"/>
+	</schema>
+
+	<dataHost name="dhost1" maxCon="1000" minCon="10" balance="0" writeType="0" dbType="mysql" dbDriver="jdbc" switchType="1"  slaveThreshold="100">
+		<heartbeat>select user()</heartbeat>
+		<!-- <writeHost host="master1" url="192.168.253.135:3306" user="root" password="123456" />  -->
+		<!-- <writeHost host="master" url="jdbc:mysql://192.168.253.136:3306?autoReconnect=true&amp;allowMultiQueries=true&amp;useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456" /> -->
+		<writeHost host="master" url="jdbc:mysql://192.168.253.135:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456" />
+	</dataHost>
+	<dataHost name="dhost2" maxCon="1000" minCon="10" balance="0" writeType="0" dbType="mysql" dbDriver="jdbc" switchType="1"  slaveThreshold="100">
+		<heartbeat>select user()</heartbeat>
+		<!-- <writeHost host="master2" url="192.168.253.136:3306" user="root" password="123456" /> -->
+		<writeHost host="master" url="jdbc:mysql://192.168.253.136:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456" />
+
+	</dataHost>
+	<dataHost name="dhost3" maxCon="1000" minCon="10" balance="0" writeType="0" dbType="mysql" dbDriver="jdbc" switchType="1"  slaveThreshold="100">
+		<heartbeat>select user()</heartbeat>
+		<!-- <writeHost host="master3" url="192.168.253.137:3306" user="root" password="123456" /> -->
+		<writeHost host="master" url="jdbc:mysql://192.168.253.137:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456" />
+	</dataHost>
+</mycat:schema>
+```
+
+**2) . server.xml**
+
+```xml
+	<user name="root" defaultAccount="true">
+		<property name="password">123456</property>
+		<property name="schemas">shopping</property>
+		<property name="defaultSchema">shopping</property>
+		<!--No MyCAT Database selected 错误前会尝试使用该schema作为schema，不设置则为null,报错 -->
+		<!-- 表级 DML 权限设置 -->
+		<!-- 		
+		<privileges check="false">
+			<schema name="TESTDB" dml="0110" >
+				<table name="tb01" dml="0000"></table>
+				<table name="tb02" dml="1111"></table>
+			</schema>
+		</privileges>		
+		 -->
+	</user>
+
+	<user name="user">
+		<property name="password">user</property>
+		<property name="schemas">shopping</property>
+		<property name="readOnly">true</property>
+		<property name="defaultSchema">shopping</property>
+	</user>
+```
+
+##### 重新启动服务
+
+```shell
+$ bin/mycat restart
+```
+
+##### 表结构/数据导入
+
+![image-20220904070228438](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9daa336a4ddbe9d085c90b68b1f2c724-deecb34.png)
+
+```mysql
+mysql> source /pwd/shopping-table.sql
+mysql> source /pwd/shopping-insert.sql
+```
+
+![image-20220904070622826](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e26bd9062b4db0ebb51f9f742fc4f329-a6eae90.png)
+
+##### 测试SQL
+
+```mysql
+select ua.user_id, ua.contact, p.province, c.city, r.area , ua.address from tb_user_address ua ,tb_areas_city c , tb_areas_provinces p ,tb_areas_region r where ua.province_id = p.provinceid and ua.city_id = c.cityid and ua.town_id = r.areaid ;
+```
+
+![image-20220904070928845](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3b94337d4a96ee43a89a15b22ea8731f-867de0e.png)
+
+```mysql
+SELECT order_id , payment ,receiver, province , city , area FROM tb_order_master o, tb_areas_provinces p , tb_areas_city c , tb_areas_region r WHERE o.receiver_province = p.provinceid AND o.receiver_city = c.cityid AND o.receiver_region = r.areaid ;
+```
+
+![image-20220904071016391](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f2acb1ffc4b55349e52c1d39ec6f013c-8bcf210.png)
+
+##### 全局表
+
+对于省、市、区/县表`tb_areas_provinces` , `tb_areas_city` , `tb_areas_region`，是属于**数据字典表**，在多个业务模块中都可能会遇到，可以将其设置为**全局表**，利于业务操作, 避免跨库查询操作失败。
+
+schema.xml中的逻辑表的配置，修改 `tb_areas_provinces`、`tb_areas_city`、`tb_areas_region` 三个逻辑表，增加 `type` 属性，配置为`global`，就代表该表是全局表，就会在所涉及到的dataNode中创建给表。对于当前配置来说，也就意味着所有的节点中都有该表了。
+
+#### 水平拆分
+
+日志表, 业务系统每天都会产生大量的日志数据 , 单台服务器的数据存储及处理能力是有限的, 可以对数据库表进行拆分。
+
+![image-20220904071353629](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ba72aca0adeed132eea92095d759aebd-0c72af6.png)
+
+##### 配置
+
+**1). schema.xml**
+
+```xml
+	<schema name="logs" checkSQLschema="true" sqlMaxLimit="100">
+		<table name="tb_log" dataNode="dn4,dn5,dn6" primaryKey="id" rule="mod-long"/>
+	</schema>
+
+	<dataNode name="dn4" dataHost="dhost1" database="logs" />
+	<dataNode name="dn5" dataHost="dhost2" database="logs" />
+	<dataNode name="dn6" dataHost="dhost3" database="logs" />
+```
+
+tb_log表最终落在3个节点中，分别是 dn4、dn5、dn6 ，而具体的数据分别存储在 dhost1、dhost2、dhost3的itcast数据库中。
+
+**2). server.xml** 
+
+```xml
+	<user name="root" defaultAccount="true">
+		<property name="password">123456</property>
+		<property name="schemas">shopping,logs</property>
+		<property name="defaultSchema">shopping</property>
+	</user>
+
+	<user name="user">
+		<property name="password">user</property>
+		<property name="schemas">shopping,logs</property>
+		<property name="readOnly">true</property>
+		<property name="defaultSchema">shopping</property>
+	</user>
+```
+
+配置root用户既可以访问 SHOPPING 逻辑库，又可以访问ITCAST逻辑库。
+
+##### 重新启动服务
+
+```shell
+$ bin/mycat restart
+```
+
+##### 表结构/数据导入
+
+8066端口连接Mycat服务
+
+```mysql
+mysql> source /pwd/tb-log.sql
+```
+
+![image-20220904072107090](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e7099999fd444149d22ac1d8f7dbff69-3c2ac40.png)
+
+### 分片规则
+
+#### 范围分片
+
+**auto-sharding-long** , 根据指定的字段及其配置的范围与数据节点的对应情况， 来决定该数据属于哪一个分片。该分片规则，主要是针对于数字类型的字段。
+
+![image-20220904072242948](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f5aa563193d8ba654c5d42aa628bdfa7-8b6b796.png)
+
+配置:
+
+```xml
+<!-- schema.xml -->
+<table name="TB_ORDER" dataNode="dn1,dn2,dn3" rule="auto-sharding-long" /> 
+
+<dataNode name="dn1" dataHost="dhost1" database="db01" />
+<dataNode name="dn2" dataHost="dhost2" database="db01" />
+<dataNode name="dn3" dataHost="dhost3" database="db01" />
+
+<!-- rule.xml -->
+<tableRule name="auto-sharding-long">
+    <rule>
+    	<columns>id</columns>
+    	<algorithm>rang-long</algorithm>
+    </rule>
+</tableRule>
+<function name="rang-long" class="io.mycat.route.function.AutoPartitionByLong">
+	<property name="mapFile">autopartition-long.txt</property>
+	<property name="defaultNode">0</property>
+</function>
+
+<!-- autopartition-long.txt -->
+# range start-end ,data node index
+# K=1000,M=10000.
+0-500M=0
+500M-1000M=1
+1000M-1500M=2
+#含义：
+#0-500万之间的值，存储在0号数据节点(数据节点的索引从0开始) ； 
+#500万-1000万之间的数据存储在1号数据节点 ；
+#1000万-1500万的数据节点存储在2号节点 ；
+```
+
+分片规则配置属性含义:
+
+| 属性 | 描述 |
+| ---- | ---- |
+|columns |标识将要分片的表字段|
+|algorithm |指定分片函数与function的对应关系|
+|class |指定该分片算法对应的类|
+|mapFile |对应的外部配置文件|
+|type |默认值为0 ; 0 表示Integer , 1 表示String|
+|defaultNode|默认节点 默认节点的所用:枚举分片时,如果碰到不识别的枚举值, 就让它路由到默认节点 ; 如果没有默认值,碰到不识别的则报错 。|
+
+#### 取模分片
+
+**mod-long**, 根据指定的字段值与节点数量进行求模运算，根据运算结果， 来决定该数据属于哪一个分片。该分片规则，主要是针对于数字类型的字段。
+
+![image-20220904072842806](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a97a3395cd98b150dbd48775c8abd014-353e68c.png)
+
+
+
+配置:
+
+```xml
+<!-- schema.xml -->
+<table name="tb_log" dataNode="dn4,dn5,dn6" primaryKey="id" rule="mod-long" /> 
+
+<dataNode name="dn4" dataHost="dhost1" database="db01" />
+<dataNode name="dn5" dataHost="dhost2" database="db01" />
+<dataNode name="dn6" dataHost="dhost3" database="db01" />
+
+<!-- rule.xml -->
+<tableRule name="mod-long">
+    <rule>
+        <columns>id</columns>
+        <algorithm>mod-long</algorithm>
+    </rule>
+</tableRule>
+<function name="mod-long" class="io.mycat.route.function.PartitionByMod">
+	<property name="count">3</property>
+</function>
+```
+
+分片规则配置属性含义:
+
+| 属性 | 描述 |
+| ---- | ---- |
+|columns |标识将要分片的表字段|
+|algorithm |指定分片函数与function的对应关系|
+|class |指定该分片算法对应的类|
+|count |数据节点的数量|
+
+#### 一致性hash分片
+
+**sharding-by-murmur**, 所谓一致性哈希，相同的哈希因子计算值总是被划分到相同的分区表中，不会因为分区节点的增加而改变原来数据的分区位置，有效的解决了分布式数据的拓容问题。该分片规则，可以针对于字符串类型的字段。
+
+![image-20220904073248002](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e2e99ea4a034f0df030e7eaf3b0d6296-e1311a8.png)
+
+配置:
+
+```xml
+<!-- schema.xml -->
+<table name="tb_order" dataNode="dn4,dn5,dn6" rule="sharding-by-murmur" />
+
+<dataNode name="dn4" dataHost="dhost1" database="db01" />
+<dataNode name="dn5" dataHost="dhost2" database="db01" />
+<dataNode name="dn6" dataHost="dhost3" database="db01" />
+
+<!-- rule.xml -->
+<tableRule name="sharding-by-murmur">
+    <rule>
+        <columns>id</columns>
+        <algorithm>murmur</algorithm>
+    </rule>
+</tableRule>
+<function name="murmur" class="io.mycat.route.function.PartitionByMurmurHash">
+    <property name="seed">0</property><!-- 默认是0 -->
+    <property name="count">3</property>
+    <property name="virtualBucketTimes">160</property>
+</function>
+```
+
+分片规则配置属性含义:
+
+| 属性 | 描述 |
+| ---- | ---- |
+|columns |标识将要分片的表字段|
+|algorithm |指定分片函数与function的对应关系|
+|class |指定该分片算法对应的类|
+|seed |创建murmur_hash对象的种子，默认0|
+|count |要分片的数据库节点数量，必须指定，否则没法分片|
+|virtualBucketTimes|一个实际的数据库节点被映射为这么多虚拟节点，默认是160倍，也就是虚拟节点数是物理节点数的160倍;virtualBucketTimes*count就是虚拟结点数量 ;|
+|weightMapFile|节点的权重，没有指定权重的节点默认是1。以properties文件的格式填写，以从0开始到count-1的整数值也就是节点索引为key，以节点权重值为值。所有权重值必须是正整数，否则以1代替|
+|bucketMapPath|用于测试时观察各物理节点与虚拟节点的分布情况，如果指定了这个属性，会把虚拟节点的murmur hash值与物理节点的映射按行输出到这个文件，没有默认值，如果不指定，就不会输出任何东西|
+
+#### 枚举分片
+
+**sharding-by-intfile**, 通过在配置文件中配置可能的枚举值, 指定数据分布到不同数据节点上, 本规则适用于按照省份、性别、状态拆分数据等业务 。
+
+![image-20220904073659891](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/481f190a98f9c5e11a9d31362f3446f0-1a08ecc.png)
+
+配置:
+
+```xml
+<!-- schema.xml -->
+<table name="tb_user" dataNode="dn4,dn5,dn6" rule="sharding-by-intfile-enumstatus"/>
+
+<dataNode name="dn4" dataHost="dhost1" database="db01" />
+<dataNode name="dn5" dataHost="dhost2" database="db01" />
+<dataNode name="dn6" dataHost="dhost3" database="db01" />
+
+<!-- rule.xml -->
+<tableRule name="sharding-by-intfile">
+    <rule>
+        <columns>sharding_id</columns>
+        <algorithm>hash-int</algorithm>
+    </rule>
+</tableRule>
+<!-- 自己增加 tableRule -->
+<tableRule name="sharding-by-intfile-enumstatus">
+    <rule>
+        <columns>status</columns>
+        <algorithm>hash-int</algorithm>
+    </rule>
+</tableRule>
+<function name="hash-int" class="io.mycat.route.function.PartitionByFileMap">
+	<property name="defaultNode">2</property>
+	<property name="mapFile">partition-hash-int.txt</property>
+</function>
+
+<!-- partition-hash-int.txt -->
+1=0
+2=1
+3=2
+```
+
+分片规则配置属性含义:
+
+| 属性 | 描述 |
+| ---- | ---- |
+|columns |标识将要分片的表字段|
+|algorithm |指定分片函数与function的对应关系|
+|class |指定该分片算法对应的类|
+|mapFile |对应的外部配置文件|
+|type |默认值为0 ; 0 表示Integer , 1 表示String|
+|defaultNode|默认节点 ; 小于0 标识不设置默认节点 , 大于等于0代表设置默认节点 ;默认节点的所用:枚举分片时,如果碰到不识别的枚举值, 就让它路由到默认节点 ; 如果没有默认值,碰到不识别的则报错 。|
+
+#### 应用指定算法
+
+**sharding-by-substring**, 运行阶段由应用自主决定路由到那个分片 , 直接根据字符子串（必须是数字）计算分片号。
+
+![image-20220904074627892](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2abb48e0ee2537c3b20e31d73d82671e-51199e3.png)
+
+配置:
+
+```xml
+<!-- schema.xml -->
+<table name="tb_app" dataNode="dn4,dn5,dn6" rule="sharding-by-substring" />
+
+<dataNode name="dn4" dataHost="dhost1" database="db01" />
+<dataNode name="dn5" dataHost="dhost2" database="db01" />
+<dataNode name="dn6" dataHost="dhost3" database="db01" />
+
+<!-- rule.xml -->
+<tableRule name="sharding-by-substring">
+    <rule>
+        <columns>id</columns>
+        <algorithm>sharding-by-substring</algorithm>
+    </rule>
+</tableRule>
+<function name="sharding-by-substring" class="io.mycat.route.function.PartitionDirectBySubString">
+    <property name="startIndex">0</property> <!-- zero-based -->
+    <property name="size">2</property>
+    <property name="partitionCount">3</property>
+    <property name="defaultPartition">0</property>
+</function>
+```
+
+分片规则配置属性含义:
+
+| 属性 | 描述 |
+| ---- | ---- |
+|columns |标识将要分片的表字段|
+|algorithm |指定分片函数与function的对应关系|
+|class |指定该分片算法对应的类|
+|startIndex |字符子串起始索引|
+|size |字符长度|
+|partitionCount |分区(分片)数量|
+|defaultPartition|默认分片(在分片数量定义时, 字符标示的分片编号不在分片数量内时,使用默认分片)|
+
+#### 固定分片hash算
+
+**sharding-by-long-hash**, 该算法类似于十进制的求模运算，但是为二进制的操作，例如，取 id 的二进制低 10 位 (即与1111111111 进行位 & 运算)，位与运算最小值为 0000000000，最大值为1111111111，转换为十进制，也就是位于0-1023之间。分片字段必须为数字类型。
+
+![image-20220904074917262](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/79657456d9d65f607627035aae72cfa2-96e9c6f.png)
+
+配置:
+
+```xml
+<!-- schema.xml -->
+<table name="tb_longhash" dataNode="dn4,dn5,dn6" rule="sharding-by-long-hash" />
+
+<dataNode name="dn4" dataHost="dhost1" database="db01" />
+<dataNode name="dn5" dataHost="dhost2" database="db01" />
+<dataNode name="dn6" dataHost="dhost3" database="db01" />
+
+<!-- rule.xml -->
+<tableRule name="sharding-by-long-hash">
+    <rule>
+        <columns>id</columns>
+        <algorithm>sharding-by-long-hash</algorithm>
+    </rule>
+</tableRule>
+<!-- 分片总长度为1024，count与length数组长度必须一致； -->
+<function name="sharding-by-long-hash" class="io.mycat.route.function.PartitionByLong">
+    <property name="partitionCount">2,1</property>
+    <property name="partitionLength">256,512</property>
+</function>
+```
+
+分片规则配置属性含义:
+
+| 属性 | 描述 |
+| ---- | ---- |
+|columns |标识将要分片的表字段名|
+|algorithm |指定分片函数与function的对应关系|
+|class |指定该分片算法对应的类|
+|partitionCount |分片个数列表|
+|partitionLength |分片范围列表|
+
+> 约束 :
+> 1). 分片长度 : 默认最大2^10 , 为 1024 ;
+> 2). count, length的数组长度必须是一致的 ;
+> 以上分为三个分区:0-255,256-511,512-1023
+
+![image-20220904075152895](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/018ca302654c14d78e500465230a2fce-5276642.png)
+
+#### 字符串hash解析算法
+
+**sharding-by-stringhash**, 截取字符串中的指定位置的子字符串, 进行hash算法， 算出分片。
+
+![image-20220904075232616](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4bf6a40fbfc12f3b5dc7dde9369a9441-8682de3.png)
+
+配置:
+
+```xml
+<!-- schema.xml -->
+<table name="tb_strhash" dataNode="dn4,dn5" rule="sharding-by-stringhash" />
+
+<dataNode name="dn4" dataHost="dhost1" database="db01" />
+<dataNode name="dn5" dataHost="dhost2" database="db01" />
+
+<!-- rule.xml -->
+<tableRule name="sharding-by-stringhash">
+    <rule>
+        <columns>name</columns>
+        <algorithm>sharding-by-stringhash</algorithm>
+    </rule>
+</tableRule>
+<function name="sharding-by-stringhash" class="io.mycat.route.function.PartitionByString">
+    <property name="partitionLength">512</property> <!-- zero-based -->
+    <property name="partitionCount">2</property>
+    <property name="hashSlice">0:2</property>
+</function>
+```
+
+分片规则配置属性含义:
+
+| 属性 | 描述 |
+| ---- | ---- |
+|columns |标识将要分片的表字段|
+|algorithm |指定分片函数与function的对应关系|
+|class |指定该分片算法对应的类|
+|partitionLength |hash求模基数 ; length*count=1024 (出于性能考虑)|
+|partitionCount |分区数|
+|hashSlice|hash运算位 , 根据子字符串的hash运算 ; 0 代表 str.length(), -1 代表 str.length()-1 , 大于0只代表数字自身 ; 可以理解为substring（start，end），start为0则只表示0|
+
+![image-20220904075426113](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a9e824571cd31738542d6541009d3cad-6f784f3.png)
+
+#### 按天分片算法
+
+**sharding-by-date**, 按照日期及对应的时间周期来分片。
+
+![image-20220904075515828](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c51cda7cb49f674d0c51589087bc7558-0586801.png)
+
+配置:
+
+```xml
+<!-- schema.xml -->
+<table name="tb_datepart" dataNode="dn4,dn5,dn6" rule="sharding-by-date" />
+
+<dataNode name="dn4" dataHost="dhost1" database="db01" />
+<dataNode name="dn5" dataHost="dhost2" database="db01" />
+<dataNode name="dn6" dataHost="dhost3" database="db01" />
+
+<!-- rule.xml -->
+<tableRule name="sharding-by-date">
+    <rule>
+        <columns>create_time</columns>
+        <algorithm>sharding-by-date</algorithm>
+    </rule>
+</tableRule>
+<function name="sharding-by-date" class="io.mycat.route.function.PartitionByDate">
+    <property name="dateFormat">yyyy-MM-dd</property>
+    <property name="sBeginDate">2022-01-01</property>
+    <property name="sEndDate">2022-01-30</property>
+    <property name="sPartionDay">10</property>
+</function>
+<!-- 从开始时间开始，每10天为一个分片，到达结束时间之后，会重复开始分片插入.
+	配置表的 dataNode 的分片，必须和分片规则数量一致，
+	例如 2022-01-01 到 2022-12-31 ，每10天一个分片，一共需要37个分片。
+-->
+```
+
+分片规则配置属性含义:
+
+| 属性 | 描述 |
+| ---- | ---- |
+|columns |标识将要分片的表字段|
+|algorithm |指定分片函数与function的对应关系|
+|class |指定该分片算法对应的类|
+|dateFormat |日期格式|
+|sBeginDate |开始日期|
+|sEndDate|结束日期，如果配置了结束日期，则代码数据到达了这个日期的分片后，会重复从开始分片插入sPartionDay 分区天数，默认值 10 ，从开始日期算起，每个10天一个分区|
+
+#### 自然月分片
+
+**sharding-by-month**, 使用场景为按照月份来分片, 每个自然月为一个分片。
+
+![image-20220904075805615](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/469e4b63a7942818ff887b69ec7fb023-3d23d70.png)
+
+配置:
+
+```xml
+<!-- schema.xml -->
+<table name="tb_monthpart" dataNode="dn4,dn5,dn6" rule="sharding-by-month" />
+
+<dataNode name="dn4" dataHost="dhost1" database="db01" />
+<dataNode name="dn5" dataHost="dhost2" database="db01" />
+<dataNode name="dn6" dataHost="dhost3" database="db01" />
+
+<!-- rule.xml -->
+<tableRule name="sharding-by-month">
+    <rule>
+        <columns>create_time</columns>
+        <algorithm>partbymonth</algorithm>
+    </rule>
+</tableRule>
+<function name="partbymonth" class="io.mycat.route.function.PartitionByMonth">
+    <property name="dateFormat">yyyy-MM-dd</property>
+    <property name="sBeginDate">2022-01-01</property>
+    <property name="sEndDate">2022-03-31</property>
+</function>
+<!-- 从开始时间开始，一个月为一个分片，到达结束时间之后，会重复开始分片插入. 
+	配置表的 dataNode 的分片，必须和分片规则数量一致，
+	例如 2022-01-01 到 2022-12-31 ，一共需要12个分片。
+-->
+```
+
+分片规则配置属性含义:
+
+| 属性 | 描述 |
+| ---- | ---- |
+|columns |标识将要分片的表字段|
+|algorithm |指定分片函数与function的对应关系|
+|class |指定该分片算法对应的类|
+|dateFormat |日期格式|
+|sBeginDate |开始日期|
+|sEndDate|结束日期，如果配置了结束日期，则代码数据到达了这个日期的分片后，会重复从开始分片插入|
+
+## MyCat管理监控
+
+在MyCat中，当执行一条SQL语句时，MyCat需要进行**SQL解析**、**分片分析**、**路由分析**、**读写分离分析**等操作，最终经过一系列的分析决定将当前的SQL语句到底路由到那几个(或哪一个)节点数据库，数据库将数据执行完毕后，如果有返回的结果，则将结果返回给**MyCat**，最终还需要在MyCat中进行**结果合并**、**聚合处理**、**排序处理**、**分页处理**等操作，最终再将结果返回给客户端。
+
+而在MyCat的使用过程中，MyCat官方也提供了一个管理监控平台**MyCat-Web**（MyCat-eye）。Mycat-web 是 Mycat 可视化运维的管理和监控平台，弥补了 Mycat 在监控上的空白。帮 Mycat分担统计任务和配置管理任务。Mycat-web 引入了 ZooKeeper 作为配置中心，可以管理多个节点。Mycat-web 主要管理和监控 Mycat 的流量、连接、活动线程和内存等，具备 IP 白名单、邮件告警等模块，还可以统计 SQL 并分析慢 SQL 和高频 SQL 等。为优化 SQL 提供依据。
+
+![image-20220904080048504](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c95e3c48dc06cb333b053681149779af-2c251d1.png)
+
+### MyCat命令行管理
+
+Mycat默认开通2个端口，可以在server.xml中进行修改。
+
+- 8066 数据访问端口，即进行 DML 和 DDL 操作。
+
+- 9066 数据库管理端口，即 mycat 服务管理控制功能，用于管理mycat的整个集群状态
+
+连接MyCat的管理控制台：
+
+```shell
+mysql -h 192.168.253.134 -P 9066 -uroot -p123456 
+```
+
+![image-20220904080409680](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7dfd8f3f085f34da422dfa0b81a247f7-46cee3e.png)
+
+ 常用命令:
+
+| 命令 | 含义 |
+| ---- | ---- |
+|show @@help |查看Mycat管理工具帮助文档|
+|show @@version |查看Mycat的版本|
+|reload @@config |重新加载Mycat的配置文件|
+|show @@datasource |查看Mycat的数据源信息|
+|show @@datanode |查看MyCat现有的分片节点信息|
+|show @@threadpool |查看Mycat的线程池信息|
+|show @@sql |查看执行的SQL|
+|show @@sql.sum |查看执行的SQL统计|
+
+### Mycat-web
+
+Mycat-web(Mycat-eye)是对mycat-server提供监控服务，功能不局限于对mycat-server使用。他通过JDBC连接对Mycat、Mysql监控，监控远程服务器(目前仅限于linux系统)的cpu、内存、网络、磁盘。
+
+Mycat-eye运行过程中需要依赖zookeeper，因此需要先安装zookeeper。
+
+#### 安装
+
+```shell
+sudo tar -zxvf zookeeper-3.4.6.tar.gz -C /usr/local/
+cd /usr/local/zookeeper-3.4.6/
+mkdir date
+mv conf/zoo_sample.cfg conf/zoo.cfg
+sudo vi conf/zoo.cfg	# 修改dataDir=/usr/local/zookeeper-3.4.6/date
+bin/zkServer.sh start
+
+sudo tar -zxvf Mycat-web.tar.gz -C /usr/local/
+cd /usr/local/zookeeper-3.4.6/
+cd /usr/local/mycat-web/
+sudo vi mycat-web/WEB-INF/classes/mycat.properties # 指定 zookeeper=localhost:2181
+./start.sh &
+```
+
+![image-20220904081348446](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a7da7dd57f76505e38d596bb04531363-906a034.png)
+
+#### 访问后台
+
+```
+http://192.168.253.134:8082/mycat
+```
+
+#### 配置Mycat服务信息
+
+![image-20220904081605194](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/100147841310998035c18c3561c51096-7ad63df.png)
+
+配置完成后即可查看Mycat运行状态及节点信息
+
+## 基于Mycat的读写分离
+
+读写分离,把对数据库的读和写操作分开,以对应不同的数据库服务器。主数据库提供写操作，从数据库提供读操作，这样能有效地减轻单台数据库的压力。
+
+MySQL的主从复制，是基于二进制日志（binlog）实现的。
+
+![image-20220904125741223](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f5f3b706d952b99de31f91bb5ef72f15-096b424.png)
+
+### 一主一从
+
+| 主机 | 角色 |
+| ---- | ---- |
+|192.168.253.134:8066 |Mycat |
+|192.168.253.134 |master |
+|192.168.253.135 |slave |
+
+参考【主从复制】内容, 完成两台服务器(134, 135)的MySQL主从搭建
+
+MyCat控制后台数据库的读写分离和负载均衡由schema.xml文件`datahost`标签的`balance`属性控制。
+
+**1). schema.xml配置**
+
+```xml
+	<schema name="ms_rep" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn7">
+	</schema>
+
+	<dataNode name="dn7" dataHost="dhost7" database="ms_rep" />
+
+	<dataHost name="dhost7" maxCon="1000" minCon="10" balance="1" writeType="0" dbType="mysql" dbDriver="jdbc" switchType="1"  slaveThreshold="100">
+		<heartbeat>select user()</heartbeat>
+		<!-- <writeHost host="master3" url="192.168.253.137:3306" user="root" password="123456" /> -->
+		<writeHost host="master" url="jdbc:mysql://192.168.253.134:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456">
+			<readHost host="slave" url="jdbc:mysql://192.168.253.135:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456" />
+		</writeHost>
+	</dataHost>
+```
+
+`writeHost代`表的是写操作对应的数据库，`readHost`代表的是读操作对应的数据库。 要想实现读写分离，就得配置`writeHost`关联主库，`readHost`关联从库。
+
+而仅仅配置好了writeHost以及readHost还不能完成读写分离，还需要配置一个非常重要的负责均衡的参数`balance`，取值有4种，具体含义如下：
+
+| 参数值 | 含义 |
+| ------ | ---- |
+|0 |不开启读写分离机制 , 所有读操作都发送到当前可用的writeHost上|
+|1|全部的readHost 与 备用的writeHost 都参与select 语句的负载均衡（主要针对于双主双从模式）|
+|2 |所有的读写操作都随机在writeHost , readHost上分发|
+|3|所有的读请求随机分发到writeHost对应的readHost上执行, writeHost不负担读压力|
+
+> 在一主一从模式的读写分离中，balance配置1或3都可以完成读写分离的。
+
+**2). server.xml配置**
+
+```xml
+	<user name="root" defaultAccount="true">
+		<property name="password">123456</property>
+		<property name="schemas">shopping,logs,ms_rep</property>
+		<property name="defaultSchema">shopping</property>
+	</user>
+
+	<user name="user">
+		<property name="password">user</property>
+		<property name="schemas">shopping,logs,ms_rep</property>
+		<property name="readOnly">true</property>
+		<property name="defaultSchema">shopping</property>
+	</user>
+```
+
+配置完毕后，重新启动Mycat
+
+```shell
+bin/mycat restart
+```
+
+
+
+在执行增删改操作时，对应的主库及从库的数据均发生变化。 在执行查询操作时，仅从从库查询数据。
+
+当主节点Master宕机之后，业务系统就只能够读，而不能写入数据了。
+
+就得通过另外一种主从复制结构**双主双从**来解决了。
+
+### 双主双从
+
+一个主机 Master1 用于处理所有写请求，它的从机 Slave1 和另一台主机 Master2 还有它的从机 Slave2 负责所有读请求。当 Master1 主机宕机后，Master2 主机负责写请求，Master1 、Master2 互为备机。架构图如下:
+
+![image-20220904131002903](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c401becd97dff145e617f6da9e80d9d8-ad28060.png)
+
+| 编号 | IP   | 预装软件 | 角色 |
+| ---- | ---- | -------- | ---- |
+|1 |192.168.253.134 |MyCat|MyCat中间件服务器|
+|2 |192.168.253.134  |MySQL |M1|
+|3 |192.168.253.135|MySQL |S1|
+|4 |192.168.253.136 |MySQL |M2|
+|5 |192.168.253.137 |MySQL |S2|
+
+#### 搭建双主从复制
+
+**1). 主库配置(134,136)**
+
+```shell
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+
+	#mysql 服务ID，保证整个集群环境中唯一，取值范围：1 – 2^32-1，默认为1
+    server-id=1000  # server-id=1002
+    #指定同步的数据库
+    binlog-do-db=ms_rep
+    log_bin = /var/log/mysql/mysql-bin.log
+    # 在作为从数据库的时候，有写入操作也要更新二进制日志文件
+    log-slave-updates
+
+sudo systemctl restart mysql
+mysql -uroot -p123456
+
+	> CREATE USER 'replica'@'%' IDENTIFIED WITH mysql_native_password BY 'Root@123456';
+	> GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%';
+	> FLUSH PRIVILEGES;
+	> show master status ;
+```
+
+![image-20220904131725144](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/58984a5441939e74820822c52ccc0a56-0488186.png)
+
+**2). 从库配置(135,137)**
+
+```shell
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+
+	#mysql 服务ID，保证整个集群环境中唯一，取值范围：1 – 2^32-1，默认为1
+    server-id=1001  # server-id=1003
+
+sudo systemctl restart mysql
+mysql -uroot -p123456
+
+	> CHANGE MASTER TO MASTER_HOST='192.168.253.134', MASTER_USER='replica',MASTER_PASSWORD='Root@123456', MASTER_LOG_FILE='binlog.000002',MASTER_LOG_POS=1545;
+	> start slave;
+	> show slave status \G;
+```
+
+![image-20220904132107977](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/529fccd92f5f71af051b209a8c79ba74-9be9f35.png)
+
+**3). 两台主库相互复制(134,136)**
+
+```mysql
+# 134服务器
+mysql -uroot -p123456
+	> CHANGE MASTER TO MASTER_HOST='192.168.253.136', MASTER_USER='replica',MASTER_PASSWORD='Root@123456', MASTER_LOG_FILE='mysql-bin.000003',MASTER_LOG_POS=663;
+	> start slave;
+	> show slave status \G;
+
+# 136服务器
+mysql -uroot -p123456
+	> CHANGE MASTER TO MASTER_HOST='192.168.253.134', MASTER_USER='replica',MASTER_PASSWORD='Root@123456', MASTER_LOG_FILE='mysql-bin.000003',MASTER_LOG_POS=663;
+	> start slave;
+	> show slave status \G;
+```
+
+![image-20220904133952908](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b442059a9f698bf5fd67c773d3138bd7-7d4031e.png)
+
+#### 配置双主双从读写分离
+
+MyCat控制后台数据库的读写分离和负载均衡由schema.xml文件`datahost`标签的`balance`属性控制，通过`writeType`及`switchType`来完成失败自动切换的。
+
+**1). schema.xml**
+
+```xml
+	<schema name="ms_rep" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn7">
+	</schema>
+
+	<dataNode name="dn7" dataHost="dhost7" database="ms_rep" />
+
+	<dataHost name="dhost7" maxCon="1000" minCon="10" balance="1" writeType="0" dbType="mysql" dbDriver="jdbc" switchType="1"  slaveThreshold="100">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="master1" url="jdbc:mysql://192.168.253.134:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456">
+			<readHost host="slave1" url="jdbc:mysql://192.168.253.135:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456" />
+		</writeHost>
+		<writeHost host="master2" url="jdbc:mysql://192.168.253.136:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456">
+			<readHost host="slave2" url="jdbc:mysql://192.168.253.137:3306?useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;characterEncoding=utf8" user="root" password="123456" />
+		</writeHost>
+	</dataHost>
+```
+
+属性说明
+
+|属性| 参数值 | 含义                                                         |
+|---| ------ | ------------------------------------------------------------ |
+|balance| 1     | 代表全部的 readHost 与 stand by writeHost 参与 select 语句的负载均衡，简单的说，当双主双从模式(M1->S1，M2->S2，并且 M1 与 M2 互为主备)，正常情况下, M2,S1,S2 都参与 select 语句的负载均衡 ; |
+|writeType| 0      | 写操作都转发到第1台writeHost, writeHost1挂了, 会切换到writeHost2上 |
+|| 1      | 所有的写操作都随机地发送到配置的writeHost上 ; |
+|switchType| -1     | 不自动切换 |
+||1|自动切换|
+
+**2). server.xml**
+
+```xml
+	<user name="root" defaultAccount="true">
+		<property name="password">123456</property>
+		<property name="schemas">shopping,logs,ms_rep</property>
+		<property name="defaultSchema">shopping</property>
+	</user>
+
+	<user name="user">
+		<property name="password">user</property>
+		<property name="schemas">shopping,logs,ms_rep</property>
+		<property name="readOnly">true</property>
+		<property name="defaultSchema">shopping</property>
+	</user>
+```
+
+**3).重新加载配置**
+
+```shell
+mysql -h192.168.253.134 -P9066 -uroot -p123456
+	
+	> reload @@config_all;
+```
+
+> 此时, 当一个主库服务停止时, 可以自动切换到备用主库, 实现高可用]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL基础</title>
+    <url>/2022/07/12/MySql/MySQL%E5%9F%BA%E7%A1%80/</url>
+    <content><![CDATA[
+## SQL分类
+
+SQL语言在功能上主要分为如下3大类：
+
+- DDL
+
+  **DDL**（**Data Definition Languages**, 数据定义语言），这些语句定义了不同的数据库、表、视图、索
+  引等数据库对象，还可以用来创建、删除、修改数据库和数据表的结构。
+
+  主要的语句关键字包括 `CREATE` 、 `DROP` 、 `ALTER` 等。
+
+- DML
+
+  **DML**（**Data Manipulation Language**, 数据操作语言），用于添加、删除、更新和查询数据库记
+  录，并检查数据完整性。
+
+  主要的语句关键字包括 `INSERT` 、 `DELETE `、 `UPDATE` 、 `SELECT` 等。
+
+- DCL
+
+  **DCL**（**Data Control Language**, 数据控制语言），用于定义数据库、表、字段、用户的访问权限和
+  安全级别。
+  主要的语句关键字包括 `GRANT `、 `REVOKE `、 `COMMIT` 、 `ROLLBACK` 、 `SAVEPOINT` 等。
+
+## 通用语法
+
+### 基本规则
+
+- SQL 可以写在一行或者多行。为了提高可读性，各子句分行写，必要时使用缩进
+- 每条命令以 `; `或 `\g` 或 `\G` 结束
+- 关键字不能被缩写也不能分行
+- 关于标点符号
+  - 必须保证所有的`()`、单引号`''`、双引号`""`是成对结束的
+  - 必须使用英文状态下的半角输入方式
+  - 字符串型和日期时间类型的数据可以使用单引号`''`表示
+  - 列的别名，尽量使用双引号`""`，而且不建议省略`as`
+
+### SQL大小写规范 
+
+- MySQL 在 **Windows** 环境下是**大小写不敏感**的
+- MySQL 在 **Linux** 环境下是**大小写敏感**的
+  - 数据库名、表名、表的别名、变量名是严格区分大小写的
+  - 关键字、函数名、列名(或字段名)、列的别名(字段的别名) 是忽略大小写的。
+- 推荐采用统一的书写规范：
+  - 数据库名、表名、表别名、字段名、字段别名等都小写
+  - SQL 关键字、函数名、绑定变量等都大写
+
+###  注释
+
+可以使用如下格式的注释结构:
+
+```
+单行注释：#注释文字
+单行注释：-- 注释文字(--后面必须包含一个空格。)
+多行注释：/* 注释文字 */
+```
+
+## 运算符
+
+### 算术运算符
+
+算术运算符主要用于数学运算，其可以连接运算符前后的两个数值或表达式，对数值或表达式进行加（+）、减（-）、乘（*）、除（/）和取模（%）运算
+
+| 运算符       | 名称             | 作用                     | 示例           |
+| ------------ | ---------------- | ------------------------ | -------------- |
+| `+`          | 加法运算符       | 计算两个值或表达式的和   | `SELECT a + b` |
+| `-`          | 减法运算符       | 计算两个值或表达式的差   | `SELECT a - b` |
+| `*`          | 乘法运算符       | 计算两个值或表达式的乘积 | `SELECT a * b` |
+| `/` 或 `DIV` | 除法运算符       | 计算两个值或表达式的商   | `SELECT a / b` |
+| `%` 或 `MOD` | 取余(求模)运算符 | 计算两个值或表达式的余数 | `SELECT a % b` |
+
+运算规则
+
+- **加/减法**
+
+  ![image-20220705102340555](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7ee8a713c20a11a3b10145a16cbb7bbd-526d560.png)
+
+  由此可以得知:
+
+    ```
+  - 一个整数类型的值对整数进行加法和减法操作，结果还是一个整数；
+  - 一个整数类型的值对浮点数进行加法和减法操作，结果是一个浮点数；
+  - 在MySQL中+只表示数值相加。如果遇到非数值类型，先尝试转成数值，如果转失败，就按0计算。
+  （补充：MySQL中字符串拼接要使用字符串函数CONCAT()实现）
+    ```
+
+- **乘/除法**
+
+  ![image-20220705102550438](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/56f18a97f0e6c097ba06e11f038bd67d-e288d95.png)
+
+  由此可以得知:
+
+  ```
+  - 一个数乘以整数1和除以整数1后仍得原数；
+  - 一个数乘以浮点数1和除以浮点数1后变成浮点数，数值与原数相等；
+  - 一个数除以整数后，不管是否能除尽，结果都为一个浮点数；
+  - 一个数除以另一个数，除不尽时，结果为一个浮点数，并保留到小数点后4位；
+  - 乘法和除法的优先级相同，进行先乘后除操作与先除后乘操作，得出的结果相同。
+  - 在数学运算中，0不能用作除数，在MySQL中，一个数除以0为NULL
+  ```
+
+- **取余** 
+
+  ![image-20220705102749895](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5e6cae893bd7d78dfb696145b59d3aa5-9a266ee.png)
+
+###  比较运算符
+
+比较运算符用来对表达式左边的操作数和右边的操作数进行比较，比较的结果为真则返回`1`，比较的结果为假则返回`0`，其他情况则返回`NULL`。
+
+| 运算符       | 名称           | 作用                                             | 示例                                |
+| ------------ | -------------- | ------------------------------------------------ | ----------------------------------- |
+| `=`          | 等于运算符     | 判断两个值、字符串或表达式是否相等               | `SELECT * FROM TABLE WHERE A = B`   |
+| `<=>`        | 安全等于运算符 | 安全的判断两个值、字符串或表达式是否相等         | `SELECT * FROM TABLE WHERE A <=> B` |
+| `<>` 或 `!=` | 不等于运算符   | 判断两个值、字符串或表达式是否不相等             | `SELECT * FROM TABLE WHERE A <> B`  |
+| `<`          | 小于运算符     | 判断前面的值、字符串或表达式是否大于后面的       | `SELECT * FROM TABLE WHERE A < B`   |
+| `<=`         | 小于等于运算符 | 判断前面的值、字符串或表达式是否大于或等于后面的 | `SELECT * FROM TABLE WHERE A <= B`  |
+| `>`          | 大于运算符     | 判断前面的值、字符串或表达式是否小于后面的       | `SELECT * FROM TABLE WHERE A > B`   |
+| `>=`         | 大于等于运算符 | 判断前面的值、字符串或表达式是否小于或等于后面的 | `SELECT * FROM TABLE WHERE A >= B`  |
+
+- **等号运算符**
+
+  等号运算符（`=`）判断等号两边的值、字符串或表达式是否相等，如果相等则返回1，不相等则返回0。
+
+  ![image-20220705103744522](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/25a71c1f12f8dcaa6574a0cb1143f3af-3e065df.png)
+
+  在使用等号运算符时，遵循如下规则：
+
+  ```
+  - 如果等号两边的值、字符串或表达式都为字符串，则MySQL会按照字符串进行比较，其比较的是每个字符串中字符的ANSI编码是否相等。
+  - 如果等号两边的值都是整数，则MySQL会按照整数来比较两个值的大小。
+  - 如果等号两边的值一个是整数，另一个是字符串，则MySQL会将字符串转化为数字进行比较。
+  - 如果等号两边的值、字符串或表达式中有一个为NULL，则比较结果为NULL。
+  ```
+
+- **安全等于运算符**
+
+  安全等于运算符（`<=>`）与等于运算符（`=`）的作用是相似的， 唯一的区别 是`<=>`可以用来对NULL进行判断。在两个操作数均为NULL时，其返回值为1，而不为NULL；当一个操作数为NULL时，其返回值为0，而不为NULL。
+
+  ![image-20220705104054544](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8cbed56f1a965a9b84580518ee5fbf15-a237fb6.png)
+
+- **不等于运算符**
+
+  不等于运算符（`<>`和`!=`）用于判断两边的数字、字符串或者表达式的值是否不相等，如果不相等则返回1，相等则返回0。**不等于运算符不能判断NULL值**。如果两边的值有任意一个为NULL，或两边都为NULL，则结果为NULL。 SQL语句示例如下：
+
+  ![image-20220705104218469](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8da1e7dc5d3f822ac9b320a24f45b0cb-0a1db98.png)
+
+### 非符号类型的运算符
+
+| 运算符        | 名称             | 作用                               | 示例                                          |
+| ------------- | ---------------- | ---------------------------------- | --------------------------------------------- |
+| `IS NULL`     | 为空运算符       | 判断值、字符串或表达式是否为空     | `SELECT B FROM TABLE WHERE A IS NULL`         |
+| `ISNOTNULL`   | 不为空运算符     | 判断值、字符串或表达式是否不为空   | `SELECT B FROM TABLE WHERE A IS NOT NULL`     |
+| `LEAST`       | 最小值运算符     | 在多个值中返回最小值               | `SELECT LEAST(A,B,C)`                         |
+| `GREATEST`    | 最大值运算符     | 在多个值中返回最大值               | `SELECT GREATEST(A,B,C)`                      |
+| `BETWEEN AND` | 两个值之间算符   | 判断一个值是否在两个值之间         | `SELECT * FROM TABLE WHERE C BETWEEN A AND B` |
+| `IN`          | 属于运算符       | 判断一个值是否在列表中             | `SELECT * FROM TABLE WHERE C IN(A, B)`        |
+| `NOT IN`      | 不属于运算符     | 判断一个值是否不在列表中           | `SELECT * FROM TABLE WHERE C NOT IN(A, B)`    |
+| `LIKE`        | 模糊匹配运算符   | 判断一个值是否符合模糊匹配规则     | `SELECT * FROM TABLE WHERE C LIKE '__'`       |
+| `REGEXP`      | 正则表达式运算符 | 判断一个值是否符合正则表达式的规则 | `SELECT * FROM TABLE WHERE C REGEXP B`        |
+| `RLIKE`       | 正则表达式运算符 | 判断一个值是否符合正则表达式的规则 | `SELECT * FROM TABLE WHERE C RLIKE B`         |
+
+- **空运算符**
+
+  空运算符（`IS NULL`）判断一个值是否为NULL，如果为NULL则返回1，否则返回0。 
+
+  ![image-20220705110122730](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/86e1e52f8bf134eb1d43d9ad543d63da-a9447ba.png)
+
+- **非空运算符**
+
+  非空运算符（`IS NOT NULL`）判断一个值是否不为NULL，如果不为NULL则返回1，否则返回0。
+
+  ![image-20220705110236772](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/93ee0ae3b31e51102d07946e84a2e331-1416223.png)
+
+- **最小值运算符**
+
+  语法格式为：`LEAST(值1，值2，...，值n)`。其中，“值n”表示参数列表中有n个值。在有两个或多个参数的情况下，返回最小值。
+
+  ![image-20220705110338880](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/13b411c50c56a379bf0707e736192bc8-35800d2.png)
+
+  ```
+  - 当参数是整数或者浮点数时，LEAST将返回其中最小的值
+  - 当参数为字符串时，返回字母表中顺序最靠前的字符
+  - 当比较值列表中有NULL时，不能判断大小，返回值为NULL
+  ```
+
+- **最大值运算符**
+
+  语法格式为：`GREATEST(值1，值2，...，值n)`。其中，n表示参数列表中有n个值。当有两个或多个参数时，返回值为最大值。假如任意一个自变量为NULL，则GREATEST()的返回值为NULL。
+
+  ![image-20220705110506031](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a5863d6d94f192f15b51434cd5242820-211b3b8.png)
+
+  ```
+  - 当参数中是整数或者浮点数时，GREATEST将返回其中最大的值
+  - 当参数为字符串时，返回字母表中顺序最靠后的字符
+  - 当比较值列表中有NULL时，不能判断大小，返回值为NULL
+  ```
+
+- **BETWEEN AND运算符**
+
+  `BETWEEN AND`运算符使用的格式通常为`SELECT D FROM TABLE WHERE C BETWEEN A AND B`，此时，当C大于或等于A，并且C小于或等于B时，结果为1，否则结果为0。
+
+  ![image-20220705110623796](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/689b17db860235d7c8247d54f0a16a67-2424ada.png)
+
+- **IN运算符**
+
+  `IN`运算符用于判断给定的值是否是IN列表中的一个值，如果是则返回1，否则返回0。如果给定的值为NULL，则结果为NULL。
+
+  ![image-20220705110751507](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1cf296866e06b4f21b040cb70e7a5614-6e14801.png)
+
+-  **NOT IN运算符**
+
+  `NOT IN`运算符用于判断给定的值是否不是IN列表中的一个值，如果不是IN列表中的一个值，则返回1，否则返回0。
+
+  ![image-20220705110841206](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/511808d6855885c516350be6c0890cf4-4603021.png)
+
+- **LIKE运算符**
+
+  ` LIKE`运算符主要用来匹配字符串，通常用于模糊匹配，如果满足条件则返回1，否则返回0。如果给定的值或者匹配条件为NULL，则返回结果为NULL。
+
+  ```
+  LIKE运算符通常使用如下通配符：
+  	%：匹配0个或多个字符。
+  	_：只能匹配一个字符。
+  ```
+
+  ![image-20220705110958835](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/65e3aae55c3d6cfb54fe3f4e21b277ac-90a6a56.png)
+
+- **REGEXP运算符**
+
+  `REGEXP`运算符用来匹配字符串，语法格式为： `expr REGEXP 匹配条件` 。如果expr满足匹配条件，返回1；如果不满足，则返回0。若expr或匹配条件任意一个为NULL，则结果为NULL。
+
+  ```
+  REGEXP运算符在进行匹配时，常用的有下面几种通配符：
+  （1）^	匹配以该字符后面的字符开头的字符串。
+  （2）$	匹配以该字符前面的字符结尾的字符串。
+  （3）.	匹配任何一个单字符。
+  （4）[...]匹配在方括号内的任何字符。例如，“[abc]”匹配“a”或“b”或“c”。为了命名字符的范围，使用一个‘-’。“[a-z]”匹配任何字母，而“[0-9]”匹配任何数字。
+  （5）*	匹配零个或多个在它前面的字符。例如，“x*”匹配任何数量的‘x’字符，“[0-9]*”匹配任何数量的数字,而“*”匹配任何数量的任何字符。
+  ```
+
+  ![image-20220705111506394](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8b6252cb8a4db3ed9261a6b043647f03-8411a57.png)
+
+### 逻辑运算符
+
+MySQL中支持4种逻辑运算符如下：
+
+| 运算符        | 作用     | 示例             |
+| ------------- | -------- | ---------------- |
+| `AND` 或 `&&` | 逻辑与   | `SELECT A && B`  |
+| `OR` 或 `||`  | 逻辑或   | `SELECT A || B`  |
+| `NOT` 或 `!`  | 逻辑非   | `SELECT NOT B`   |
+| `XOR`         | 逻辑异或 | `SELECT A XOR B` |
+
+- **逻辑与运算符**
+
+  逻辑与（`AND`或`&&`）运算符是当给定的所有值均为非0值，并且都不为NULL时，返回1；当给定的一个值或者多个值为0时则返回0；否则返回NULL。
+
+  ![image-20220705162417398](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/083e9780c3370007e04a93ff60f11b93-e5e93d4.png)
+
+- **逻辑或运算符**
+
+  逻辑或（`OR`或`||`）运算符是当给定的值都不为NULL，并且任何一个值为非0值时，则返回1，否则返回0；当一个值为NULL，并且另一个值为非0值时，返回1，否则返回NULL；当两个值都为NULL时，返回NULL。
+
+  ![image-20220705162525765](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f9e403b47cd9a7d0e2ddb7ae100ab46e-14ef01b.png)
+
+  > OR可以和AND一起使用，但是在使用时要注意两者的优先级，由于AND的优先级高于OR，因此先对AND两边的操作数进行操作，再与OR中的操作数结合
+
+- **逻辑非运算符**
+
+  逻辑非（`NOT`或`!`）运算符表示当给定的值为0时返回1；当给定的值为非0值时返回0；当给定的值为NULL时，返回NULL。
+
+  ![image-20220705162636209](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/72ffd747c57da1fdc0a62ff9455fab22-17653cc.png)
+
+- **逻辑异或运算符** 
+
+  逻辑异或（`XOR`）运算符是当给定的值中任意一个值为NULL时，则返回NULL；如果两个非NULL的值都是0或者都不等于0时，则返回0；如果一个值为0，另一个值不为0时，则返回1。
+
+  ![image-20220705163817068](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a0f91db337374e536331a127518db191-7d97ea9.png)
+
+### 位运算符
+
+位运算符是在二进制数上进行计算的运算符。位运算符会先将操作数变成二进制数，然后进行位运算，最后将计算结果从二进制变回十进制数。
+
+MySQL支持的位运算符如下:
+
+| 运算符 | 作用            | 示例            |
+| ------ | --------------- | --------------- |
+| `&`    | 按位与(位AND)   | `SELECT A & B`  |
+| `|`    | 按位或(位OR)    | `SELECT A | B`  |
+| `^`    | 按位异或(位XOR) | `SELECT A ^ B`  |
+| `~`    | 按位取反        | `SELECT ~ A`    |
+| `>>`   | 按位右移        | `SELECT A >> 2` |
+| `<<`   | 按位左移        | `SELECT A << 2` |
+
+- **按位与运算符**
+
+  按位与（`&`）运算符将给定值对应的二进制数**逐位**进行**逻辑与**运算。当给定值对应的二进制位的数值都为1时，则该位返回1，否则返回0。
+
+  ![image-20220705163245044](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/989392f1dc8b9a89703cf8dcdbcc5791-5fa0bfa.png)
+
+  ```
+  - 1的二进制数为0001，10的二进制数为1010，所以1 & 10的结果为0000，对应的十进制数为0。
+  - 20的二进制数为10100，30的二进制数为11110，所以20 & 30的结果为10100，对应的十进制数为20。
+  ```
+
+  ![image-20220705163924499](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5c8518a1f41cb925803acb40e7bf85af-c6e8910.png)
+
+- **按位或运算符**
+
+  按位或（`|`）运算符将给定的值对应的二进制数**逐位**进行**逻辑或**运算。当给定值对应的二进制位的数值有一个或两个为1时，则该位返回1，否则返回0。
+
+  ![image-20220705163519020](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2a1b89a33731acb4abfee6eead655474-ef949f3.png)
+
+  ```
+  - 1的二进制数为0001，10的二进制数为1010，所以1 | 10的结果为1011，对应的十进制数为11。
+  - 20的二进制数为10100，30的二进制数为11110，所以20 | 30的结果为11110，对应的十进制数为30。
+  ```
+
+  ![image-20220705163951001](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d9526563a808aa2bb6064efc1ad107f8-8db7393.png)
+
+- **按位异或运算符**
+
+  按位异或（`^`）运算符将给定的值对应的二进制数**逐位**进行**逻辑异或**运算。当给定值对应的二进制位的数值不同时，则该位返回1，否则返回0。
+
+  ![image-20220705163731301](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a213ee77ca2dc1386b1b6eca88d72be3-8437a5c.png)
+
+  ```
+  - 1的二进制数为0001，10的二进制数为1010，所以1 ^ 10的结果为1011，对应的十进制数为11。
+  - 20的二进制数为10100，30的二进制数为11110，所以20 ^ 30的结果为01010，对应的十进制数为10。
+  ```
+
+  ![image-20220705164003169](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/db798bc395ccf50ea941f02f6e840870-2409781.png)
+
+- **按位取反运算符** 
+
+  按位取反（`~`）运算符将给定的值的二进制数**逐位**进行**取反**操作，即将1变为0，将0变为1。
+
+  ![image-20220705165925877](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bbbae16149e3ecff74a34c22dd0d21c1-03e7f79.png)
+
+  ```
+  由于按位取反（~）运算符的优先级高于按位与（&）运算符的优先级，所以10 & ~1中首先对数字1进行按位取反操作，结果除了最低位为0，其他位都为1，然后与10进行按位与操作，结果为10。
+  ```
+
+- **按位右移运算符**
+
+  按位右移（`>>`）运算符将给定的值的二进制数的所有位**右移指定的位数**。右移指定的位数后，右边低位的数值被移出并丢弃，左边高位空出的位置用0补齐。
+
+  ![image-20220705170032268](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3977f4622d2e174c49baadbf248b000f-9900f92.png)
+
+  ```
+  - 1的二进制数为0000 0001，右移2位为0000 0000，对应的十进制数为0。
+  - 4的二进制数为0000 0100，右移2位为0000 0001，对应的十进制数为1。
+  ```
+
+- **按位左移运算符**
+
+  按位左移（`<<`）运算符将给定的值的二进制数的所有位**左移指定的位数**。左移指定的位数后，左边高位的数值被移出并丢弃，右边低位空出的位置用0补齐。
+
+  ![image-20220705170246024](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8b0d05e9bb44638f0ee080628e6af7e4-9312172.png)
+
+  ```
+  - 1的二进制数为0000 0001，左移两位为0000 0100，对应的十进制数为4。
+  - 4的二进制数为0000 0100，左移两位为0001 0000，对应的十进制数为16。
+  ```
+
+### 空值参与运算
+
+所有运算符或列值遇到 `null` 值，运算的结果都为`null` 
+
+> 在 MySQL 里面， 空值不等于空字符串。一个空字符串的长度是 0，而一个空值的长度是空。
+>
+> 而且，在 MySQL 里面，空值是占用空间的
+
+###  运算符的优先级
+
+| 优先级 | 运算符                                                       |
+| :----: | ------------------------------------------------------------ |
+|   1    | `:=`, `=`                                                    |
+|   2    | `||` , `OR` , `XOR`                                          |
+|   3    | `&&` , `AND`                                                 |
+|   4    | `NOT`                                                        |
+|   5    | `BETWEEN AND`, `CASE`, `WHEN`, `THEN`, `ELSE`                |
+|   6    | `=`(比较) , `<=>`, `>=`, `<=`, `<`, `>`, `<>`, `!=`, `IS`, `LIKE`, `REGEXP`, `IN` |
+|   7    | `|`                                                          |
+|   8    | `&`                                                          |
+|   9    | `<<`,  `>>`                                                  |
+|   10   | `-`, `+`                                                     |
+|   11   | `*`, `/` , `%`                                               |
+|   12   | `^`(按位异或)                                                |
+|   13   | `-`(负号),  `~`(按位取反)                                    |
+|   14   | `!`                                                          |
+|   15   | `()`                                                         |
+
+> 数字编号越大，优先级越高，优先级高的运算符先进行计算。
+>
+> 可以看到，赋值运算符的优先级最低，使用`()`括起来的表达式的优先级最高。
+
+## DDL
+
+**Data Definition Language**，数据定义语言，用来定义数据库对象(数据库，表，字段) 。
+
+### 数据库操作
+
+- 查询所有数据库
+
+  ```mysql
+  show databases; 
+  ```
+
+- 查询当前数据库
+
+  ```mysql
+  select database(); 
+  ```
+
+- 创建数据库
+
+  ```mysql
+  create database [if not exists] 数据库名 [default charset 字符集 ] [collate 排序规则];
+  ```
+
+- 删除数据库
+
+  ```mysql
+  drop database [ if exists ] 数据库名;
+  ```
+
+- 切换数据库
+
+  ```mysql
+  use 数据库名; 
+  ```
+
+使用示例
+
+```mysql
+-- 创建一个itheima数据库，并且指定字符集
+create database if not extists ni9nes_DB default charset utf8mb4;
+
+-- 删除数据库
+drop database if exists ni9nes_DB;
+```
+
+### 表操作
+
+#### 表操作-查询创建
+
+- 查询当前数据库所有表
+
+  ```mysql
+  show tables; 
+  ```
+
+-  查看指定表结构
+
+  ```mysql
+  desc 表名;
+  ```
+
+  > 通过这条指令，我们可以查看到指定表的字段，字段的类型、是否可以为NULL，是否存在默认值等信
+  > 息。
+
+- 查询指定表的建表语句
+
+  ```mysql
+  show create table 表名; 
+  ```
+
+  > 这条指令，主要是用来查看建表语句的，而有部分参数我们在创建表的时候，并未指定也会查询
+  > 到，因为这部分是数据库的默认值，如：存储引擎、字符集等。
+
+- 创建表结构
+
+  ```mysql
+  CREATE TABLE 表名(
+  字段1 字段1类型 [ COMMENT 字段1注释 ],
+  字段2 字段2类型 [COMMENT 字段2注释 ],
+  字段3 字段3类型 [COMMENT 字段3注释 ],
+  ......
+  字段n 字段n类型 [COMMENT 字段n注释 ]
+  ) [ COMMENT 表注释 ] ;
+  ```
+
+  ![image-20220707161926712](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9dfac63ec776e6735184c4e9254c7a3f-b8f2689.png)
+
+#### 表操作-数据类型
+
+MySQL中的数据类型有很多，主要分为三类：**数值类型**、**字符串类型**、**日期时间类型**。
+
+##### 数值类型
+
+| 类型              | 大小   | 有符号(SIGNED)范围                                        | 无符号(UNSIGNED)范围                                         | 描述                   |
+| ----------------- | ------ | --------------------------------------------------------- | ------------------------------------------------------------ | ---------------------- |
+| `TINYINT`         | 1byte  | (-128，127)                                               | (0，255)                                                     | 小整数值               |
+| `SMALLINT`        | 2bytes | (-32768，32767)                                           | (0，65535)                                                   | 大整数值               |
+| `MEDIUMINT`       | 3bytes | (-8388608，8388607)                                       | (0，16777215)                                                | 大整数值               |
+| `INT`/I`NTEGER  ` | 4bytes | (-2147483648，  2147483647)                               | (0，4294967295)                                              | 大整数值               |
+| `BIGIN`T          | 8bytes | (-2^63，2^63-1)                                           | (0，2^64-1)                                                  | 极大整数值             |
+| `FLOAT`           | 4bytes | (-3.402823466 E+38，  3.402823466351  E+38)               | 0 和  (1.175494351 E-  38，3.402823466  E+38)                | 单精度浮点数值         |
+| `DOUBLE`          | 8bytes | (-1.7976931348623157  E+308，  1.7976931348623157  E+308) | 0 和  (2.2250738585072014  E-308，  1.7976931348623157  E+308) | 双精度浮点数值         |
+| `DECIMAL`         |        | 依赖于M(精度)和D(标度) 的值                               | 依赖于M(精度)和D(标度)的值                                   | 小数  值(精  确定点数) |
+
+```
+如:
+1). 年龄字段 -- 不会出现负数, 而且人的年龄不会太大
+age tinyint unsigned
+2). 分数 -- 总分100分, 最多出现一位小数
+score double(4,1)
+```
+
+##### 字符串类型
+
+| **类型**     | **大小**               | **描述**                     |
+| ------------ | ---------------------- | ---------------------------- |
+| `CHAR`       | 0-255  bytes           | 定长字符串(需要指定长度)     |
+| `VARCHAR `   | 0-65535  bytes         | 变长字符串(需要指定长度)     |
+| `TINYBLOB`   | 0-255  bytes           | 不超过255个字符的二进制数据  |
+| `TINYTEXT`   | 0-255  bytes           | 短文本字符串                 |
+| `BLOB `      | 0-65  535 bytes        | 二进制形式的长文本数据       |
+| `TEXT`       | 0-65  535 bytes        | 长文本数据                   |
+| `MEDIUMBLOB` | 0-16  777 215 bytes    | 二进制形式的中等长度文本数据 |
+| `MEDIUMTEXT` | 0-16  777 215 bytes    | 中等长度文本数据             |
+| `LONGBLOB`   | 0-4  294 967 295 bytes | 二进制形式的极大文本数据     |
+| `LONGTEXT`   | 0-4  294 967 295 bytes | 极大文本数据                 |
+
+char 与 varchar 都可以描述字符串
+char是定长字符串，指定长度多长，就占用多少个字符，和字段值的长度无关.
+而varchar是变长字符串，指定的长度为最大占用长度.
+相对来说，char的性能会更高些。
+
+```
+如：
+1). 用户名 username ------> 长度不定, 最长不会超过50
+username varchar(50)
+2). 性别 gender ---------> 存储值, 不是男,就是女
+gender char(1)
+3). 手机号 phone --------> 固定长度为11
+phone char(11)
+```
+
+##### 日期时间类型
+
+| **类型**      | **大小** | **范围**                                      | **格式**             | **描述**                 |
+| ------------- | -------- | --------------------------------------------- | -------------------- | ------------------------ |
+| `DATE`        | 3        | 1000-01-01  至  9999-12-31                    | YYYY-MM-DD           | 日期值                   |
+| `TIME`        | 3        | -838:59:59  至 838:59:59                      | HH:MM:SS             | 时间值或持续时间         |
+| `YEAR`        | 1        | 1901  至 2155                                 | YYYY                 | 年份值                   |
+| `DATETIME`    | 8        | 1000-01-01  00:00:00 至  9999-12-31  23:59:59 | YYYY-MM-DD  HH:MM:SS | 混合日期和时间值         |
+| `TIMESTAMP  ` | 4        | 1970-01-01  00:00:01 至  2038-01-19  03:14:07 | YYYY-MM-DD  HH:MM:SS | 混合日期和时间值，时间戳 |
+
+```
+如:
+1). 生日字段 birthday
+birthday date
+2). 创建时间 createtime
+createtime datetime
+```
+
+#### 表操作-案例
+
+```
+设计一张员工信息表，要求如下：
+1. 编号（纯数字）
+2. 员工工号 (字符串类型，长度不超过10位)
+3. 员工姓名（字符串类型，长度不超过10位）
+4. 性别（男/女，存储一个汉字）
+5. 年龄（正常人年龄，不可能存储负数）
+6. 身份证号（二代身份证号均为18位，身份证中有X这样的字符）
+7. 入职时间（取值年月日即可）
+```
+
+对应的建表语句如下:
+
+```mysql
+create table emp(
+    id 			int 		comment '编号',
+    workno 		varchar(10) comment '工号',
+    name 		varchar(10) comment '姓名',
+    gender 		char(1) 	comment '性别',
+    age 		tinyint unsigned 	comment '年龄',
+    idcard 		char(18) 	comment '身份证号',
+    entrydate 	date 		comment '入职时间'
+) comment '员工表';
+```
+
+![image-20220707163016487](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3af6ea4802347da0d64b046919c25d18-882e3bc.png)
+
+#### 表操作-修改
+
+- 添加字段
+
+  ```mysql
+  ALTER TABLE 表名 ADD 字段名 类型 (长度) [ COMMENT 注释 ] [ 约束 ]; 
+  ```
+
+  ```mysql
+  -- 如 , 为emp表增加一个新的字段”昵称”为nickname，类型为varchar(20)
+  ALTER TABLE emp ADD nickname varchar(20) COMMENT '昵称';
+  ```
+
+- 修改数据类型
+
+  ```mysql
+  ALTER TABLE 表名 MODIFY 字段名 新数据类型 (长度); 
+  ```
+
+- 修改字段名和字段类型
+
+  ```mysql
+  ALTER TABLE 表名 CHANGE 旧字段名 新字段名 类型 (长度) [ COMMENT 注释 ] [ 约束 ];
+  ```
+
+  ```mysql
+  -- 如, 将emp表的nickname字段修改为username，类型为varchar(30)
+  ALTER TABLE emp CHANGE nickname username varchar(30) COMMENT '昵称'; 
+  ```
+
+- 删除字段
+
+  ```mysql
+  ALTER TABLE 表名 DROP 字段名; 
+  ```
+
+  ```mysql
+  -- 如, 将emp表的字段username删除
+  ALTER TABLE emp DROP username; 
+  ```
+
+- 修改表名
+
+  ```mysql
+  ALTER TABLE 表名 RENAME TO 新表名; 
+  ```
+
+  ```mysql
+  -- 如, 将emp表的表名修改为 employee
+  ALTER TABLE emp RENAME TO employee; 
+  ```
+
+#### 表操作-删除
+
+- 删除表
+
+  ```mysql
+  DROP TABLE [ IF EXISTS ] 表名; 
+  ```
+
+  > 可选项 IF EXISTS 代表，只有表名存在时才会删除该表，表名不存在，则不执行删除操作(如果不加该参数项，删除一张不存在的表，执行将会报错)。
+
+  ```mysql
+  -- 如, 如果tb_user表存在，则删除tb_user表
+  DROP TABLE IF EXISTS tb_user; 
+  ```
+
+- 清空表数据
+
+  ```mysql
+  TRUNCATE TABLE 表名; 
+  ```
+
+## DML
+
+**Data Manipulation Language**(数据操作语言)，用来对数据库中表的数据记录进行增、删、改操作。
+
+- 添加数据（INSERT）
+- 修改数据（UPDATE）
+- 删除数据（DELETE）
+
+### 添加数据
+
+- 给指定字段添加数据
+
+    ```mysql
+    INSERT INTO 表名 (字段名1, 字段名2, ...) VALUES (值1, 值2, ...); 
+    ```
+
+    ```mysql
+    -- 如, 给employee表所有的字段添加数据
+    insert into emp(id,workno,name,gender,age,idcard,entrydate)
+    values(1,'1','ni9ne','男',10,'123456789012345678','2000-01-01');
+    ```
+
+- 给全部字段添加数据
+
+    ```mysql
+    INSERT INTO 表名 VALUES (值1, 值2, ...); 
+    ```
+
+    ```mysql
+    -- 如, 给employee表所有的字段添加数据
+    insert into employee values(2,'2','usern','男',18,'123456789012345670','2005-01-01');
+    ```
+
+- 批量添加数据
+
+  ```mysql
+  INSERT INTO 表名 (字段名1, 字段名2, ...) VALUES (值1, 值2, ...), (值1, 值2, ...);
+  
+  INSERT INTO 表名 VALUES (值1, 值2, ...), (值1, 值2, ...), (值1, 值2, ...) ; 
+  ```
+  
+  ```mysql
+  -- 如, 批量插入数据到employee表
+  insert into emp values
+      (3,'3','user1','男',38,'123456789012345670','2005-01-01'),
+      (4,'4','user2','女',18,'123456789012345670','2005-01-01');
+  ```
+  
+  **注意事项:** 
+  •  插入数据时，指定的字段顺序需要与值的顺序是一一对应的。
+  •  字符串和日期型数据应该包含在引号中。
+  •  插入的数据大小，应该在字段的规定范围内。
+
+### 修改数据
+
+修改数据的具体语法为:
+
+```mysql
+UPDATE 表名 SET 字段名1 = 值1 , 字段名2 = 值2 , .... [ WHERE 条件 ] ; 
+```
+
+```mysql
+-- 如, 修改id为1的数据，将name修改为 user_new
+update emp set name = 'user_new' where id = 1; 
+```
+
+**注意事项:** 
+
+修改语句的条件可以有，也可以没有，如果没有条件，则会修改整张表的所有数据。
+
+### 删除数据
+
+删除数据的具体语法为：
+
+```mysql
+DELETE FROM 表名 [ WHERE 条件 ] ; 
+```
+
+```mysql
+-- 如, 删除gender为女的员工
+delete from emp where gender = '女'; 
+```
+
+**注意事项:**
+
+•  DELETE 语句的条件可以有，也可以没有，如果没有条件，则会删除整张表的所有数据。
+•  DELETE 语句不能删除某一个字段的值 (可以使用UPDATE，将该字段值置为NULL即可)。
+
+## DQL
+
+**Data Query Language**(数据查询语言)，数据查询语言，用来查询数据库中表的记录。
+
+### 基本语法
+
+DQL 查询语句，语法结构如下：
+
+```mysql
+SELECT 	字段列表
+FROM 	表名列表
+WHERE 	条件列表
+GROUP BY 分组字段列表
+HAVING 	分组后条件列表
+ORDER BY 排序字段列表
+LIMIT 	分页参数
+```
+
+### 基础查询
+
+在基本查询的DQL语句中，不带任何的查询条件，查询的语法如下：
+
+#### 查询多个字段
+
+```mysql
+-- 语法:
+SELECT 字段1, 字段2, 字段3 ... FROM 表名 ; 
+SELECT * FROM 表名 ; 
+```
+
+> 注意 : * 号代表查询所有字段，在实际开发中尽量少用（不直观、影响效率）。
+
+#### 字段设置别名
+
+```mysql
+-- 语法:
+SELECT 字段1 [ AS 别名1 ] , 字段2 [ AS 别名2 ] ... FROM 表名; 
+SELECT 字段1 [ 别名1 ] , 字段2 [ 别名2 ] ... FROM 表名; 
+```
+
+在列名之后加入关键字`AS`, 代表给该字段起别名。
+
+别名可以使用双引号，以便在别名中包含空格或特殊的字符并区分大小写。
+
+关键字 `AS` 可以省略
+
+#### 去除重复记录
+
+默认情况下，查询会返回全部行，包括重复行。在SELECT语句中使用关键字 `DISTINCT` 去除重复行
+
+```mysql
+SELECT DISTINCT 字段列表 FROM 表名; 
+```
+
+有两点需要注意：
+
+- DISTINCT 需要放到所有列名的前面，如果写成 以下方式会**报错**。
+
+  ```mysql
+  SELECT salary, DISTINCT department_id FROM employees 
+  ```
+
+- DISTINCT 其实是对后面所有列名的组合进行去重
+
+### 条件查询
+
+```mysql
+-- 语法:
+SELECT 字段列表 FROM 表名 WHERE 条件列表 ; 
+```
+
+```mysql
+-- 如, 查询年龄等于 88 的员工
+select * from emp where age = 88; 
+-- 查询有身份证号的员工信息
+select * from emp where idcard is not null; 
+-- 查询年龄在15岁(包含) 到 20岁(包含)之间的员工信息
+select * from emp where age between 15 and 20;
+```
+
+### 聚合函数
+
+将一列数据作为一个整体，进行纵向计算 。
+
+常见的聚合函数:
+
+| **函数** | **功能** |
+| -------- | -------- |
+| count    | 统计数量 |
+| max      | 大值     |
+| min      | 小值     |
+| avg      | 平均值   |
+| sum      | 求和     |
+
+```mysql
+-- 语法:
+SELECT 聚合函数(字段列表) FROM 表名 ; 
+```
+
+> 注意 : NULL值是不参与所有聚合函数运算的。
+
+```mysql
+-- 如, 统计该企业员工数量
+select count(*) from emp; -- 统计的是总记录数
+select count(idcard) from emp; -- 统计的是idcard字段不为null的记录数
+-- 统计该企业员工的平均年龄
+select avg(age) from emp; 
+-- 统计西安地区员工的年龄之和
+select sum(age) from emp where workaddress = '西安'; 
+```
+
+### 分组查询
+
+```mysql
+-- 语法
+SELECT 字段列表 FROM 表名 [ WHERE 条件 ] GROUP BY 分组字段名 [ HAVING 分组后过滤条件 ];
+```
+
+```mysql
+-- 如, 根据性别分组, 统计男性员工和女性员工的数量
+select gender, count(*) from emp group by gender ; 
+-- 查询年龄小于45的员工 , 并根据工作地址分组 , 获取员工数量大于等于3的工作地址
+select workaddress, count(*) address_count from emp 
+where age < 45 
+group by workaddress 
+having address_count >= 3;
+-- 统计各个工作地址上班的男性及女性员工的数量
+select workaddress, gender, count(*) '数量' from emp group by gender, workaddress;
+```
+
+**注意事项**:
+
+•  分组之后，查询的字段一般为聚合函数和分组字段，查询其他字段无任何意义。
+•  执行顺序: `where` > 聚合函数 > `having` 。
+•  支持多字段分组, 具体语法为 : `group by columnA,columnB`
+
+ **`where`与`having`区别**
+
+- 执行时机不同：`where`是**分组之前**进行过滤，不满足`where`条件，不参与分组；而`having`是**分组之后**对结果进行过滤。
+- 判断条件不同：`where`不能对聚合函数进行判断，而`having`可以
+
+**`WITH ROLLUP` 使用**
+
+使用 `WITH ROLLUP` 关键字之后，在所有查询出的分组记录之后增加一条记录，该记录计算查询出的所
+有记录的总和，即统计记录数量。
+
+```mysql
+-- 根据性别分组 , 统计男性员工、女性员工的平均年龄, 及全部员工的平均年龄
+select gender, avg(age) from emp group by gender with rollup; 
+```
+
+![image-20220707171949006](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/38b6127cddb1dd0925396e7ea31db5bc-ed94968.png)
+
+> 当使用ROLLUP时，不能同时使用ORDER BY子句进行结果排序，即ROLLUP和ORDER BY是互相排斥的
+
+### 排序查询
+
+```mysql
+-- 语法:
+SELECT 字段列表 FROM 表名 ORDER BY 字段1 排序方式1 , 字段2 排序方式2 ; 
+```
+
+排序方式
+
+- `ASC` : 升序(默认值)
+- `DESC`: 降序
+
+```mysql
+-- 如, 根据年龄对公司的员工进行升序排序
+select * from emp order by age asc;
+-- 根据年龄对公司的员工进行升序排序 , 年龄相同 , 再按照入职时间进行降序排序
+select * from emp order by age asc , entrydate desc; 
+```
+
+**注意:**
+
+可以使用不在SELECT列表中的列排序。
+
+在对多列进行排序的时候，首先排序的第一列必须有相同的列值，才会对第二列进行排序。如果第一列数据中所有值都是唯一的，将不再对第二列进行排序。
+
+### 分页查询
+
+MySQL中使用 `LIMIT` 实现分页, 格式:
+
+```mysql
+SELECT 字段列表 FROM 表名 LIMIT 起始索引, 查询记录数 ; 
+```
+
+**注意事项:** 
+
+•  起始索引从0开始，`起始索引 = （查询页码 - 1）* 每页显示记录数`。
+•  分页查询是数据库的方言，不同的数据库有不同的实现，MySQL中是`LIMIT`。
+•  如果查询的是第一页数据，起始索引可以省略，直接简写为 `limit 10`。
+
+```mysql
+-- 如, 查询第1页员工数据, 每页展示10条记录
+select * from emp limit 0,10;
+-- 查询第2页员工数据, 每页展示10条记录    (页码-1)*页展示记录数
+select * from emp limit 10,10; 
+```
+
+### 执行顺序
+
+![image-20220707173247097](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d853fafde5669486800d47f66b494e48-a876385.png)
+
+比如一个 SQL 语句，那么它的关键字顺序和执行顺序是下面这样的:
+
+```mysql
+SELECT DISTINCT player_id, player_name, count(*) as num 	# 顺序 5
+FROM player JOIN team ON player.team_id = team.team_id 		# 顺序 1
+WHERE height > 1.80 			# 顺序 2
+GROUP BY player.team_id 		# 顺序 3
+HAVING num > 2 					# 顺序 4
+ORDER BY num DESC 				# 顺序 6
+LIMIT 2 						# 顺序 7
+```
+
+在 SELECT 语句执行这些步骤的时候，每个步骤都会产生一个 **虚拟表** ，然后将这个虚拟表传入下一个步
+骤中作为输入。需要注意的是，这些步骤隐含在 SQL 的执行过程中，对于我们来说是不可见的。
+
+### 执行原理
+
+1. SELECT语句是先执行 **FROM** 这一步的。在这个阶段，如果是多张表联查，还会经历下面的几个步骤：
+
+    ```
+    1. 首先先通过 CROSS JOIN 求笛卡尔积，相当于得到虚拟表 vt（virtual table）1-1；
+    2. 通过 ON 进行筛选，在虚拟表 vt1-1 的基础上进行筛选，得到虚拟表 vt1-2；
+    3. 添加外部行。如果我们使用的是左连接、右链接或者全连接，就会涉及到外部行，也就是在虚拟表 vt1-2 的基础上增加外部行，得到虚拟表 vt1-3。
+
+    如果操作的是两张以上的表，还会重复上面的步骤，直到所有表都被处理完为止。这个过程得到是原始数据。
+    ```
+
+2. 在虚拟表 vt1基础上再进行 **WHERE** 阶段 。在这个阶段中，会根据 vt1表的结果进行筛选过滤，得到虚拟表 vt2 。
+
+3. 然后进入第三步和第四步，也就是  **GROUP** 和 **HAVING** 阶段 。在这个阶段中，实际上是在虚拟表 vt2 的基础上进行分组和分组过滤，得到中间的虚拟表  vt3 和  vt4 。
+
+4. 进入到  **SELECT** 和 **DISTINCT**阶段 。首先在 SELECT 阶段会提取想要的字段，然后在 DISTINCT 阶段过滤掉重复的行，分别得到中间的虚拟表vt5-1 和  vt5-2 。
+
+5. 当提取了想要的字段数据之后，就可以按照指定的字段进行排序，也就是 **ORDER BY** 阶段 ，得到虚拟表 vt6。
+
+6. 最后在 vt6 的基础上，取出指定行的记录，也就是  **LIMIT** 阶段 ，得到最终的结果，对应的是虚拟表vt7 。
+
+> 在写 SELECT 语句的时候，不一定存在所有的关键字，相应的阶段就会省略
+
+## DCL
+
+**Data Control Language**(数据控制语言)，用来管理数据库用户、控制数据库的访问权限。
+
+### 管理用户
+
+- 查询用户
+
+  ```mysql
+  select * from mysql.user; 
+  ```
+
+  ![image-20220707174342109](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3bb4db041c21281a42825822c642c84c-9a59222.png)
+
+  其中 `Host`代表当前用户访问的主机, 如果为localhost, 仅代表只能够在当前本机访问，是不可以远程访问的。 
+
+  `User`代表的是访问该数据库的用户名。在MySQL中需要通过Host和User来唯一标识一个用户。
+
+- 创建用户
+
+  ```mysql
+  CREATE USER '用户名'@'主机名' IDENTIFIED BY '密码'; 
+  ```
+
+- 修改用户密码
+
+  ```mysql
+  ALTER USER '用户名'@'主机名' IDENTIFIED WITH mysql_native_password BY '新密码' ;
+  ```
+
+- 删除用户
+
+  ```mysql
+  DROP USER '用户名'@'主机名' ;  
+  ```
+
+**注意事项:** 
+
+• 在MySQL中需要通过`用户名@主机名`的方式，来唯一标识一个用户。
+
+• 主机名可以使用 `%` 通配，代表所有。
+
+### 权限控制
+
+MySQL中定义了很多种权限，但是常用的就以下几种：
+
+| **权限**                 | **说明**           |
+| ------------------------ | ------------------ |
+| `ALL`,  `ALL PRIVILEGES` | 所有权限           |
+| `SELECT`                 | 查询数据           |
+| `INSERT`                 | 插入数据           |
+| `UPDATE`                 | 修改数据           |
+| `DELETE`                 | 删除数据           |
+| `ALTER`                  | 修改表             |
+| `DROP`                   | 删除数据库/表/视图 |
+| `CREATE`                 | 创建数据库/表      |
+
+上述只是简单罗列了常见的几种权限描述，其他权限描述及含义，可以直接参考官方文档。
+
+```
+https://dev.mysql.com/doc/refman/8.0/en/privileges-provided.html
+```
+
+- 查询权限
+
+  ```mysql
+  SHOW GRANTS FOR '用户名'@'主机名' ; 
+  ```
+
+- 授予权限
+
+  ```mysql
+  GRANT 权限列表 ON 数据库名.表名 TO '用户名'@'主机名'; 
+  ```
+
+- 撤销权限
+
+  ```mysql
+  REVOKE 权限列表 ON 数据库名.表名 FROM '用户名'@'主机名'; 
+  ```
+
+**注意事项：**
+
+•  多个权限之间，使用逗号分隔
+
+•  授权时， 数据库名和表名可以使用 `*` 进行通配，代表所有。
+
+
+
+## 函数
+
+MySQL提供了丰富的内置函数，这些函数使得数据的维护与管理更加方便，能够更好地提供数据的分析与统计功能，在一定程度上提高了开发人员进行数据分析与统计的效率。
+
+MySQL提供的内置函数从 **实现的功能角度** 可以分为**数值函数**、**字符串函数**、**日期和时间函数**、**流程控制函数**、**加密与解密函数**、**获取MySQL信息函数**、**聚合函数**等。
+
+### 数值函数
+
+#### 基本函数
+
+| **函数**                  | **用法**                                                     |
+| ------------------------- | ------------------------------------------------------------ |
+| `ABS(x)  `                | 返回x的绝对值                                                |
+| ` SIGN(X)  `              | 返回X的符号。正数返回1，负数返回-1，0返回0                   |
+| `PI()  `                  | 返回圆周率的值                                               |
+| `CEIL(x)`，`CEILING(x) `  | 返回大于或等于某个值的最小整数                               |
+| `FLOOR(x)  `              | 返回小于或等于某个值的最大整数                               |
+| `LEAST(e1,e2,e3…)  `      | 返回列表中的最小值                                           |
+| `  GREATEST(e1,e2,e3…)  ` | 返回列表中的最大值                                           |
+| `MOD(x,y)  `              | 返回X除以Y后的余数                                           |
+| `  RAND()  `              | 返回0~1的随机值                                              |
+| `  RAND(x)  `             | 返回0~1的随机值，其中x的值用作种子值，相同的X值会产生相同的随数 |
+| ` ROUND(x)  `             | 返回一个对x的值进行四舍五入后，最接近于X的整数               |
+| ` ROUND(x,y)  `           | 返回一个对x的值进行四舍五入后 接近X的值，并保留到小数点后面Y位 |
+| `TRUNCATE(x,y)  `         | 返回数字x截断为y位小数的结果                                 |
+| `SQRT(x)  `               | 返回x的平方根。当X的值为负数时，返回NULL                     |
+| `RADIANS(x)`              | 将角度转化为弧度，其中，参数x为角度值                        |
+| `DEGREES(x)`              | 将弧度转化为角度，其中，参数x为弧度值                        |
+
+**使用范例** 
+
+ ```mysql
+SELECT 
+ABS(-123),ABS(32),SIGN(-23),SIGN(43),PI(),CEIL(32.32),CEILING(-43.23),FLOOR(32.32),FLOOR(-43.23),MOD(12,5);
+ ```
+
+![image-20220706195815666](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f5bca1efda8dc5b5edaaf0f5787ae394-b94aaf7.png)
+
+```mysql
+SELECT RAND(),RAND(),RAND(10),RAND(10),RAND(-1),RAND(-1);
+```
+
+![image-20220706195909263](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5615db74db433691532999a50e0ae891-7b295c2.png)
+
+> 随机数rand()函数, 获取0~1之间的随机数值. 
+>
+> 支持传入参数, 代表随机数因子, 当传入相同因子时, 同一次获取到的随机数是相同的
+
+```mysql
+SELECT ROUND(12.33),ROUND(12.343,2),ROUND(12.324,-1),TRUNCATE(12.66,1),TRUNCATE(12.66,-1)
+```
+
+![image-20220706200555076](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/808dcab2e61529ce934d4543def80043-aafd8db.png)
+
+```mysql
+SELECT RADIANS(30),RADIANS(60),RADIANS(90),DEGREES(2*PI()),DEGREES(RADIANS(90));
+```
+
+![image-20220706201057191](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/931110c751cc58f92e897617a57b80c6-1f3fb8f.png)
+
+#### 三角函数
+
+| **函数**     | **用法**                                                     |
+| ------------ | ------------------------------------------------------------ |
+| `SIN(x)  `   | 返回x的正弦值，其中，参数x为弧度值                           |
+| `ASIN(x)  `  | 返回x的反正弦值，即获取正弦为x的值。如果x的值不在-1到1之间，则返回NULL |
+| `COS(x)  `   | 返回x的余弦值，其中，参数x为弧度值                           |
+| `ACOS(x)  `  | 返回x的反余弦值，即获取余弦为x的值。如果x的值不在-1到1之间，则返回NULL |
+| `TAN(x)  `   | 返回x的正切值，其中，参数x为弧度值                           |
+| `ATAN(x)  `  | 返回x的反正切值，即返回正切值为x的值                         |
+| `ATAN2(m,n)` | 返回两个参数的反正切值                                       |
+| `COT(x) `    | 返回x的余切值，其中，X为弧度值                               |
+
+```mysql
+SELECT SIN(RADIANS(30)),DEGREES(ASIN(1)),TAN(RADIANS(45)),DEGREES(ATAN(1)),DEGREES(ATAN2(1,1));
+```
+
+![image-20220707123537722](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4c3c6faaf104a27b490b0343dde89423-2d49fa0.png)
+
+#### 指数对数函数
+
+| **函数**                 | **用法**                                             |
+| ------------------------ | ---------------------------------------------------- |
+| `POW(x,y)`，`POWER(X,Y)` | 返回x的y次方                                         |
+| `EXP(X)`                 | 返回e的X次方，其中e是一个常数，2.718281828459045     |
+| `LN(X)`，`LOG(X)`        | 返回以e为底的X的对数，当X <= 0 时，返回的结果为NULL  |
+| `LOG10(X) `              | 返回以10为底的X的对数，当X <= 0 时，返回的结果为NULL |
+| `LOG2(X) `               | 返回以2为底的X的对数，当X <= 0 时，返回NULL          |
+
+```mysql
+SELECT POW(2,5),POWER(2,4),EXP(2),LN(10),LOG10(10),LOG2(4);
+```
+
+![image-20220707123757518](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f2de7e76b39e7fd6e3fc41c57305c31e-7ae0da0.png)
+
+#### 进制转换函数
+
+| **函数**        | **用法**                 |
+| --------------- | ------------------------ |
+| `BIN(x)`        | 返回x的二进制编码        |
+| `HEX(x)`        | 返回x的十六进制编码      |
+| `OCT(x)`        | 返回x的八进制编码        |
+| `CONV(x,f1,f2)` | 返回f1进制数变成f2进制数 |
+
+```mysql
+SELECT BIN(10),HEX(10),OCT(10),CONV(10,2,8)
+```
+
+![image-20220707123940222](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6826fc71dcfa36f03f7a72dda820e6f6-9916815.png)
+
+### 字符串函数
+
+| **函数**                          | **用法**                                                     |
+| --------------------------------- | ------------------------------------------------------------ |
+| `ASCII(S)`                        | 返回字符串S中的第一个字符的ASCII码值                         |
+| `CHAR_LENGTH(s)`                  | 返回字符串s的字符数。作用与`CHARACTER_LENGTH(s)`相同         |
+| `LENGTH(s)`                       | 返回字符串s的字节数，和字符集有关                            |
+| `CONCAT(s1,s2,......,sn)`         | 连接s1,s2,......,sn为一个字符串                              |
+| `CONCAT_WS(x, s1,s2,......,sn)` | 同CONCAT(s1,s2,...)函数，但是每个字符串之间要加上x           |
+| `INSERT(str, idx, len,replacestr)` | 将字符串str从第idx位置开始，len个字符长的子串替换为字符串replacestr |
+| `REPLACE(str, a, b)`              | 用字符串b替换字符串str中所有出现的字符串a                    |
+| `UPPER(s)` 或 `UCASE(s)`          | 将字符串s的所有字母转成大写字母                              |
+| `LOWER(s) `或`LCASE(s)`           | 将字符串s的所有字母转成小写字母                              |
+| `LEFT(str,n)`                     | 返回字符串str左边的n个字符                                   |
+| `RIGHT(str,n)`                    | 返回字符串str右边的n个字符                                   |
+| `LPAD(str, len, pad)`             | 用字符串pad对str左边进行填充，直到str的长度为len个字符       |
+| `RPAD(str ,len, pad)`             | 用字符串pad对str右边进行填充，直到str的长度为len个字符       |
+| `LTRIM(s)`                        | 去掉字符串s左侧的空格                                        |
+| `RTRIM(s)`                        | 去掉字符串s右侧的空格                                        |
+| `TRIM(s)`                         | 去掉字符串s开始与结尾的空格                                  |
+| `TRIM(s1 FROM s)`                 | 去掉字符串s开始与结尾的s1                                    |
+| `TRIM(LEADING s1  FROM s)`        | 去掉字符串s开始处的s1                                        |
+| `TRIM(TRAILING s1  FROM s)`       | 去掉字符串s结尾处的s1                                        |
+| `REPEAT(str, n)`                  | 返回str重复n次的结果                                         |
+| `SPACE(n)`                        | 返回n个空格                                                  |
+| `STRCMP(s1,s2)`                   | 比较字符串s1,s2的ASCII码值的大小                             |
+| `SUBSTR(s,index,len)`             | 返回从字符串s的index位置其len个字符，作用与`SUBSTRING(s,n,len)`、  `MID(s,n,len)`相同 |
+| `LOCATE(substr,str)`              | 返回字符串substr在字符串str中首次出现的位置，作用于`POSITION(substr  IN str)`、`INSTR(str,substr)`相同。未找到，返回0 |
+| `ELT(m,s1,s2,…,sn)`               | 返回指定位置的字符串，如果m=1，则返回s1，如果m=2，则返回s2，如果m=n，则返回sn |
+| `FIELD(s,s1,s2,…,sn)`             | 返回字符串s在字符串列表中第一次出现的位置                    |
+| `FIND_IN_SET(s1,s2)`  | 返回字符串s1在字符串s2中出现的位置。其中，字符串s2是一个以逗号分隔的字符串 |
+| `REVERSE(s)`          | 返回s反转后的字符串                                          |
+| `NULLIF(value1,value2)` | 比较两个字符串，如果value1与value2相等，则返回NULL，否则返回 value1 |
+
+> 注意：MySQL中，字符串的位置是从1开始的。
+
+### 日期和时间函数
+
+#### 获取日期、时间
+
+| **函数**                                                     | **用法**                       |
+| ------------------------------------------------------------ | ------------------------------ |
+| `CURDATE()` ，`CURRENT_DATE()`                               | 返回当前日期，只包含年、月、日 |
+| `CURTIME()` ， `CURRENT_TIME() `                             | 返回当前时间，只包含时、分、秒 |
+| `NOW()` / `SYSDATE() `/ `CURRENT_TIMESTAMP()` /  <br />`LOCALTIME()` /  `LOCALTIMESTAMP() ` | 返回当前系统日期和时间         |
+| `UTC_DATE()`                                                 | 返回UTC（世界标准时间）日期    |
+| `UTC_TIME()`                                                 | 返回UTC（世界标准时间）时间    |
+
+```mysql
+SELECT CURDATE(),CURTIME(),NOW(),SYSDATE()+0,UTC_DATE(),UTC_DATE()+0,UTC_TIME(),UTC_TIME();
+```
+
+![image-20220707125419937](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5eed3199770bf0af80d697ce98df3e95-2976588.png)
+
+#### 日期与时间戳的转换
+
+| **函数**                     | **用法**                               |
+| ---------------------------- | -------------------------------------- |
+| `UNIX_TIMESTAMP()`           | 以UNIX时间戳的形式返回当前时间。       |
+| `UNIX_TIMESTAMP(date) `      | 将时间date以UNIX时间戳的形式返回。     |
+| `FROM_UNIXTIME(timestamp)  ` | 将UNIX时间戳的时间转换为普通格式的时间 |
+
+```mysql
+SELECT UNIX_TIMESTAMP(), UNIX_TIMESTAMP('2011-11-11 11:11:11'), FROM_UNIXTIME(1576380910);
+```
+
+![image-20220707130551116](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2a4a8f23fd36566e626f5dbd967addd4-6ccef1c.png)
+
+#### 获取月份、星期、星期数、天数等函数
+
+| **函数**                                    | **用法**                                          |
+| ------------------------------------------- | ------------------------------------------------- |
+| `YEAR(date)` / `MONTH(date)` / `DAY(date)`  | 返回具体的日期值                                  |
+| `HOUR(time)`/`MINUTE(time)`/ `SECOND(time)` | 返回具体的时间值                                  |
+| `MONTHNAME(date)`                           | 返回月份：January，...                            |
+| `DAYNAME(date)`                             | 返回星期几：MONDAY，TUESDAY.....SUNDAY            |
+| `WEEKDAY(date)`                             | 返回周几，注意，周1是0，周2是1，。。。周日是6     |
+| `QUARTER(date)`                             | 返回日期对应的季度，范围为1～4                    |
+| `WEEK(date)` ， `WEEKOFYEAR(date)`          | 返回一年中的第几周                                |
+| `DAYOFYEAR(date)`                           | 返回日期是一年中的第几天                          |
+| `DAYOFMONTH(date)`                          | 返回日期位于所在月份的第几天                      |
+| `DAYOFWEEK(date)`                           | 返回周几，注意：周日是1，周一是2，。。。周六是  7 |
+
+```mysql
+SELECT 
+YEAR(CURDATE()),MONTH(CURDATE()),DAY(CURDATE()),
+HOUR(CURTIME()),MINUTE(NOW()),SECOND(SYSDATE());
+```
+
+![image-20220707130851404](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4b7b74ccb638f8cbfa0de08db3c01f43-2757fec.png)
+
+```mysql
+SELECT MONTHNAME('2021-10-26'),DAYNAME('2021-10-26'),WEEKDAY('2021-10-26'),
+QUARTER(CURDATE()),WEEK(CURDATE()),DAYOFYEAR(NOW()),
+DAYOFMONTH(NOW()),DAYOFWEEK(NOW());
+```
+
+![image-20220707131104475](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5431f8decdd870150d1e335435b6c1c5-2f091ea.png)
+
+#### 日期的操作函数
+
+| **函数**                  | **用法**                                   |
+| ------------------------- | ------------------------------------------ |
+| `EXTRACT(type FROM date)` | 返回指定日期中特定的部分，type指定返回的值 |
+
+函数中`type`的取值与含义：
+
+![image-20220707131225431](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f27a751254afb237adedbc80578768c9-08aca16.png)
+
+![image-20220707131231606](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4aa7ecb5ef74032876f671b11f8fa2df-7a2949d.png)
+
+```mysql
+SELECT NOW(),EXTRACT(MINUTE FROM NOW()),EXTRACT( WEEK FROM NOW()),
+EXTRACT( QUARTER FROM NOW()),EXTRACT( MINUTE_SECOND FROM NOW());
+```
+
+![image-20220707131353893](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/39ef9b6c3aaff0fe81add12a5e380a10-8c357b4.png)
+
+#### 时间和秒钟转换的函数
+
+| **函数**               | **用法**                                                     |
+| ---------------------- | ------------------------------------------------------------ |
+| `TIME_TO_SEC(time)`    | 将 time 转化为秒并返回结果值。转化的公式为：小时x3600+分钟x60+秒 |
+| `SEC_TO_TIME(seconds)` | 将 seconds 描述转化为包含小时、分钟和秒的时间                |
+
+```mysql
+SELECT TIME_TO_SEC('05:16:42'), SEC_TO_TIME('19002');
+```
+
+![image-20220707131824120](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2676c9b6eb72c184990c8e03a03ea6f1-bfb6159.png)
+
+#### 计算日期和时间的函数
+
+- **date类型**
+
+    | **函数**                                                     | **用法**                                       |
+    | ------------------------------------------------------------ | ---------------------------------------------- |
+    | `DATE_ADD(datetime, INTERVAL expr  type)`，`ADDDATE(date,INTERVAL expr type)` | 返回与给定日期时间相差INTERVAL时间段的日期时间 |
+    | `DATE_SUB(date,INTERVAL expr type)`，  `SUBDATE(date,INTERVAL expr type) ` | 返回与date相差INTERVAL时间间隔的日期           |
+
+    `type`的取值：
+
+    ![image-20220707133114760](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2ac627268b214c85dbe26d13f1f1debf-e7b59b0.png)
+
+    ```mysql
+    SELECT 
+    DATE_ADD(NOW(), INTERVAL 1 DAY) AS col1,
+    DATE_ADD('2021-10-21 23:32:12',INTERVAL 1 SECOND) AS col2,
+    ADDDATE('2021-10-21 23:32:12',INTERVAL 1 SECOND) AS col3,
+    DATE_ADD('2021-10-21 23:32:12',INTERVAL '1_1' MINUTE_SECOND) AS col4,
+    DATE_ADD(NOW(), INTERVAL -1 YEAR) AS col5, #可以是负数
+    DATE_ADD(NOW(), INTERVAL '1_1' YEAR_MONTH) AS col6 #需要单引号
+    ```
+
+    ![image-20220707133309139](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8826d8585990d50d863b4c21d91b0829-18acb61.png)
+
+    ```mysql
+    SELECT 
+    DATE_SUB('2021-01-21',INTERVAL 31 DAY) AS col1,
+    SUBDATE('2021-01-21',INTERVAL 31 DAY) AS col2,
+    DATE_SUB('2021-01-21 02:01:01',INTERVAL '1 1' DAY_HOUR) AS col3
+    ```
+
+    ![image-20220707133349081](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/97adfc0b78a3e2fb30f84839e4e07bd7-3a498c6.png)
+    
+- **time类型**
+
+    | **函数**                       | **用法**                                                     |
+    | ------------------------------ | ------------------------------------------------------------ |
+    | `ADDTIME(time1,time2)`         | 返回time1加上time2的时间。当time2为一个数字时，代表的是秒，可以为负数 |
+    | `SUBTIME(time1,time2)`         | 返回time1减去time2后的时间。当time2为一个数字时，代表的是秒，可以为负数 |
+    | `DATEDIFF(date1,date2)`        | 返回date1 - date2的日期间隔天数                              |
+    | `TIMEDIFF(time1, time2)`       | 返回time1 - time2的时间间隔                                  |
+    | `FROM_DAYS(N)`                 | 返回从0000年1月1日起，N天以后的日期                          |
+    | `TO_DAYS(date) `               | 返回日期date距离0000年1月1日的天数                           |
+    | `LAST_DAY(date)`               | 返回date所在月份的最后一天的日期                             |
+    | `MAKEDATE(year,n) `            | 针对给定年份与所在年份中的天数返回一个日期                   |
+    | `MAKETIME(hour,minute,second)` | 将给定的小时、分钟和秒组合成时间并返回                       |
+    | `PERIOD_ADD(time,n`)           | 返回time加上n后的时间                                        |
+
+    ```mysql
+    SELECT
+    NOW(),					# 2022-07-07 05:41:32
+    ADDTIME(NOW(),20),		# 2022-07-07 05:41:52
+    SUBTIME(NOW(),30),		# 2022-07-07 05:41:02
+    SUBTIME(NOW(),'1:1:3'),	# 2022-07-07 04:40:29
+    DATEDIFF(NOW(),'2022-5-01'),	# 67
+    TIMEDIFF(NOW(),'2022-5-25 22:10:10'),	# 838:59:59
+    FROM_DAYS(366),			# 0001-01-01
+    TO_DAYS('0000-12-25'),	# 359
+    LAST_DAY(NOW()),		# 2022-07-31
+    MAKEDATE(YEAR(NOW()),12),		# 2022-01-12
+    MAKETIME(10,21,23),		# 10:21:23
+    PERIOD_ADD(20200101010101, 10)	# 13754718911
+    ```
+
+#### 日期的格式化与解析
+
+| **函数**                            | **用法**                                   |
+| ----------------------------------- | ------------------------------------------ |
+| `DATE_FORMAT(date,fmt)`             | 按照字符串fmt格式化日期date值              |
+| `TIME_FORMAT(time,fmt)`             | 按照字符串fmt格式化时间time值              |
+| `GET_FORMAT(date_type,format_type)` | 返回日期字符串的显示格式                   |
+| `STR_TO_DATE(str, fmt) `            | 按照字符串fmt对str进行解析，解析为一个日期 |
+
+- fmt参数常用的格式符：
+
+    | **格式符** | **说明**                                                     | **格式符**    | **说明**                                                     |
+    | ---------- | ------------------------------------------------------------ | ------------- | ------------------------------------------------------------ |
+    | `%Y`       | 4位数字表示年份                                              | `%y`          | 表示两位数字表示年份                                         |
+    | `%M  `     | 月名表示月份（January,....）                                 | `%m`          | 两位数字表示月份  （01,02,03。。。）                         |
+    | `%b  `     | 缩写的月名（Jan.，Feb.，....）                               | `%c  `        | 数字表示月份（1,2,3,...）                                    |
+    | `%D`       | 英文后缀表示月中的天数  （1st,2nd,3rd,...）                  | `%d`          | 两位数字表示月中的天数(01,02...)                             |
+    | `%e  `     | 数字形式表示月中的天数  （1,2,3,4,5.....）                   |               |                                                              |
+    | `%H  `     | 两位数字表示小数，24小时制  （01,02..）                      | `%h` 和`%I`   | 两位数字表示小时，12小时制  （01,02..）                      |
+    | `%k`       | 数字形式的小时，24小时制(1,2,3)                              | `%l`          | 数字形式表示小时，12小时制  （1,2,3,4....）                  |
+    | `%i `      | 两位数字表示分钟（00,01,02）                                 | `%S` 和`%s  ` | 两位数字表示秒(00,01,02...)                                  |
+    | `%W`       | 一周中的星期名称（Sunday...）                                | `%a`          | 一周中的星期缩写（Sun.，  Mon.,Tues.，..）                   |
+    | `%w  `     | 以数字表示周中的天数  (0=Sunday,1=Monday....)                |               |                                                              |
+    | `%j`       | 以3位数字表示年中的天数(001,002...)                          | `%U  `        | 以数字表示年中的第几周，  （1,2,3。。）其中Sunday为周中第一天 |
+    | `%u  `     | 以数字表示年中的第几周，  （1,2,3。。）其中Monday为周中第一天 |               |                                                              |
+    | `%T`       | 24小时制                                                     | `%r`          | 12小时制                                                     |
+    | `%p`       | AM或PM                                                       | `%%`          | 表示%                                                        |
+
+- GET_FORMAT函数中date_type和format_type参数取值如下：
+
+    ![image-20220707135101922](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dbc51b202250a992a589b3437074dc3b-315443f.png)
+
+```mysql
+SELECT 
+NOW(),
+DATE_FORMAT(NOW(), '%H:%i:%s'), 
+STR_TO_DATE('2014-04-22 15:47:06','%Y-%m-%d %H:%i:%s'),
+GET_FORMAT(DATE, 'USA');
+```
+
+![image-20220707135301222](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/456ebd13bfc0800684cf2dc37ee6034d-4a6f291.png)
+
+### 流程控制函数
+
+流程处理函数可以根据不同的条件，执行不同的处理流程，可以在SQL语句中实现不同的条件选择。
+
+| **函数**                                                     | **用法**                                        |
+| ------------------------------------------------------------ | ----------------------------------------------- |
+| `IF(value,value1,value2)`                                    | 如果value的值为TRUE，返回value1，否则返回value2 |
+| `IFNULL(value1, value2)`                                     | 如果value1不为NULL，返回value1，否则返回value2  |
+| `CASE WHEN 条件1 THEN 结果1 WHEN 条件2 THEN 结果2  .... [ELSE resultn] END` | 相当于if...else if...else...                    |
+| `CASE expr WHEN 常量值1 THEN 值1 WHEN 常量值1 THEN 值1 .... [ELSE 值n] END` | 相当于switch...case...                          |
+
+### 加密与解密函数
+
+加密与解密函数主要用于对数据库中的数据进行加密和解密处理，以防止数据被他人窃取。这些函数在保证数据库安全时非常有用。
+
+| **函数**                      | **用法**                                                     |
+| ----------------------------- | ------------------------------------------------------------ |
+| `PASSWORD(str)`               | 返回字符串str的加密版本，41位长的字符串。加密结果不可逆，常用于用户的密码加密 |
+| `MD5(str)`                    | 返回字符串str的md5加密后的值，也是一种加密方式。若参数为  NULL，则会返回NULL |
+| `SHA(str)`                    | 从原明文密码str计算并返回加密后的密码字符串，当参数为 NULL时，返回NULL。SHA加密算法比MD5更加安全。 |
+| `ENCODE(value,password_seed)` | 返回使用password_seed作为加密密码加密value                   |
+| `DECODE(value,password_seed)` | 返回使用password_seed作为加密密码解密value                   |
+
+```mysql
+ SELECT 
+ PASSWORD('mysql'), PASSWORD(NULL), 
+ md5('123'), SHA('123'), 
+ ENCODE('mysql', 'mysql'), DECODE(ENCODE('mysql','mysql'),'mysql')
+```
+
+![image-20220707135922748](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2bdd5ec64f9c13ffaf7341cafe14574b-12192ff.png)
+
+### MySQL信息函数
+
+MySQL中内置了一些可以查询MySQL信息的函数，这些函数主要用于帮助数据库开发或运维人员更好地对数据库进行维护工作。
+
+| **函数**                                                     | **用法**                                                   |
+| ------------------------------------------------------------ | ---------------------------------------------------------- |
+| `VERSION()`                                                  | 返回当前MySQL的版本号                                      |
+| `CONNECTION_ID()`                                            | 返回当前MySQL服务器的连接数                                |
+| `DATABASE()`，`SCHEMA()`                                     | 返回MySQL命令行当前所在的数据库                            |
+| `USER()`，`CURRENT_USER()`、<br />`SYSTEM_USER()`，`SESSION_USER()` | 返回当前连接MySQL的用户名，返回结果格式为  “主机名@用户名” |
+| `CHARSET(value)`                                             | 返回字符串value自变量的字符集                              |
+| `COLLATION(value)`                                           | 返回字符串value的比较规则                                  |
+
+```mysql
+SELECT DATABASE(),SCHEMA(),VERSION(),CONNECTION_ID(), USER(), CURRENT_USER(), SYSTEM_USER(),SESSION_USER(),CHARSET('ABC'),COLLATION('ABC')
+```
+
+![image-20220707140254594](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/58542c5e20c48f14bfac27dd34926c7c-26e92eb.png)
+
+### 其他函数
+
+MySQL中有些函数无法对其进行具体的分类，但是这些函数在MySQL的开发和运维过程中也是不容忽视的。
+
+| **函数**                         | **用法**                                                     |
+| -------------------------------- | ------------------------------------------------------------ |
+| `FORMAT(value,n) `               | 返回对数字value进行格式化后的结果数据。n表示四舍五入后保留到小数点后n位 |
+| `CONV(value,from,to) `           | 将value的值进行不同进制之间的转换                            |
+| `INET_ATON(ipvalue)`             | 将以点分隔的IP地址转化为一个数字                             |
+| `INET_NTOA(value)`               | 将数字形式的IP地址转化为以点分隔的IP地址                     |
+| `BENCHMARK(n,expr)`              | 将表达式expr重复执行n次。用于测试MySQL处理expr表达式所耗费的时间 |
+| `CONVERT(value USING char_code)` | 将value所使用的字符编码修改为char_code                       |
+
+```mysql
+SELECT INET_ATON('192.168.1.100'), INET_NTOA(3232235876), BENCHMARK(1000000, MD5('mysql'))
+```
+
+![image-20220707140632895](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ffd2f0fdd076e15166feb900c1237dbd-bce4fff.png)
+
+## 约束
+
+### 概述
+
+约束是表级的强制规定。可以在创建表时规定约束（通过 CREATE TABLE 语句），或者在表创建之后通过 ALTER TABLE 语句规定约束。
+
+**概念**：约束是作用于表中字段上的规则，用于限制存储在表中的数据。
+
+**目的**：保证数据库中数据的正确、有效性和完整性。
+
+**分类**:
+
+| 约束                   | 描述                                                     | 关键字       |
+| ---------------------- | -------------------------------------------------------- | ------------ |
+| 非空约束               | 限制该字段的数据不能为null                               | NOT  NULL    |
+| 唯一约束               | 保证该字段的所有数据都是唯一、不重复的                   | UNIQUE       |
+| 主键约束               | 主键是一行数据的唯一标识，要求非空且唯一                 | PRIMARY  KEY |
+| 默认约束               | 保存数据时，如果未指定该字段的值，则采用默认值           | DEFAULT      |
+| 检查约束(8.0.16版本后) | 保证字段值满足某一个条件                                 | CHECK        |
+| 外键约束               | 用来让两张表的数据之间建立连接，保证数据的一致性和完整性 | FOREIGN KEY  |
+
+> 注意：约束是作用于表中字段上的，可以在创建表/修改表的时候添加约束。
+
+#### 非空约束
+
+`NOT NULL` , 限定某个字段/某列的值不允许为空
+
+```
+特点
+- 默认，所有的类型的值都可以是NULL，包括INT、FLOAT等数据类型
+- 非空约束只能出现在表对象的列上，只能某个列单独限定非空，不能组合非空
+- 一个表可以有很多列都分别限定了非空
+- 空字符串''不等于NULL，0也不等于NULL
+```
+
+```mysql
+-- 建表添加非空约束
+CREATE TABLE 表名称(
+ ...
+ 字段名 数据类型 NOT NULL, 
+ ...
+);
+-- 添加非空约束
+alter table 表名称 modify 字段名 数据类型 not null;
+-- 删除非空约束
+alter table 表名称 modify 字段名 数据类型 NULL;#去掉not null，相当于修改字段，该字段允许为空
+alter table 表名称 modify 字段名 数据类型;#去掉not null，相当于修改某个非注解字段，该字段允许为空
+```
+
+#### 唯一性约束
+
+`UNIQUE` , 用来限制某个字段/某列的值不能重复
+
+```
+特点
+- 同一个表可以有多个唯一约束。
+- 唯一约束可以是某一个列的值唯一，也可以多个列组合的值唯一。
+- 唯一性约束允许列值为空。
+- 在创建唯一约束的时候，如果不给唯一约束命名，就默认和列名相同。
+- MySQL会给唯一约束的列上默认创建一个唯一索引。
+```
+
+```mysql
+-- 建表时添加唯一约束
+create table 表名称(
+ ...
+ 字段名 数据类型  unique, 
+ 字段名 数据类型  unique key,
+ ...
+);
+create table 表名称(
+ ...
+ 字段名 数据类型, 
+ ... 
+ [constraint 约束名] unique(字段名)
+);
+
+-- 添加唯一约束
+-- 字段列表中如果是一个字段，表示该列的值唯一。如果是两个或更多个字段，那么复合唯一，即多个字段的组合是唯一的
+alter table 表名称 add unique key(字段列表);	# 表级约束
+alter table 表名称 modify 字段名 字段类型 unique;  # 行级约束
+
+-- 删除唯一约束
+-- 删除唯一约束只能通过删除唯一索引的方式删除。
+SELECT * FROM information_schema.table_constraints WHERE table_name = '表名'; #查看都有哪些约束
+ALTER TABLE 表名称 DROP INDEX 唯一索引名;
+```
+
+> 注意：可以通过  `show index from 表名称;` 查看表的索引
+
+#### 主键约束
+
+`PRIMARY KEY`, 用来唯一标识表中的一行记录。
+
+```
+特点:
+- 主键约束相当于唯一约束+非空约束的组合，主键约束列不允许重复，也不允许出现空值。
+- 一个表最多只能有一个主键约束，建立主键约束可以在列级别创建，也可以在表级别上创建。
+- 主键约束对应着表中的一列或者多列（复合主键）
+- 如果是多列组合的复合主键约束，那么这些列都不允许为空值，并且组合的值不允许重复。
+- MySQL的主键名总是PRIMARY，就算自己命名了主键约束名也没用。
+- 当创建主键约束时，系统默认会在所在的列或列组合上建立对应的主键索引（能够根据主键查询的，就根据主键查询，效率更高）。如果删除主键约束了，主键约束对应的索引就自动删除了。
+- 需要注意的一点是，不要修改主键字段的值。因为主键是数据记录的唯一标识，如果修改了主键的值，就有可能会破坏数据的完整性。
+```
+
+```mysql
+-- 建表时指定主键约束
+create table 表名称(
+ 字段名 数据类型  primary key, #列级模式
+ 字段名 数据类型, 
+ 字段名 数据类型 
+);
+create table 表名称(
+ 字段名 数据类型,
+ 字段名 数据类型, 
+ 字段名 数据类型,
+ [constraint 约束名] primary key(字段名) #表级模式
+);
+
+-- 建表后增加主键约束
+ALTER TABLE 表名称 ADD PRIMARY KEY(字段列表); #字段列表可以是一个字段，也可以是多个字段，如果是多个字段的话，是复合主键
+
+-- 删除主键约束
+-- 说明：删除主键约束，不需要指定主键名，因为一个表只有一个主键，删除主键约束后，非空还存在。
+alter table 表名称 drop primary key;
+```
+
+#### 自增列
+
+`AUTO_INCREMENT` , 某个字段的值自增
+
+```
+特点:
+- 一个表最多只能有一个自增长列
+- 当需要产生唯一标识符或顺序值时，可设置自增长
+- 自增长列约束的列必须是键列（主键列，唯一键列）
+- 自增约束的列的数据类型必须是整数类型
+- 如果自增列指定了 0 和 null，会在当前最大值的基础上自增；如果自增列手动指定了具体值，直接赋值为具体值。
+```
+
+```mysql
+-- 建表时指定自增约束
+create table 表名称(
+ 字段名 数据类型  primary key auto_increment,
+ 字段名 数据类型,
+ 字段名 数据类型,
+);
+create table 表名称(
+ 字段名 数据类型,
+ 字段名 数据类型 unique key auto_increment, 
+ 字段名 数据类型,
+);
+
+-- 建表后增加自增约束
+alter table 表名称 modify 字段名 数据类型 auto_increment;
+
+-- 删除自增约束
+alter table 表名称 modify 字段名 数据类型;  	#去掉auto_increment相当于删除
+```
+
+#### 外键约束
+
+`FOREIGN KEY`, 用来让两张表的数据之间建立连接，从而保证数据的一致性和完整性。
+
+**主表和从表/父表和子表**:
+
+- 主表（父表）：被引用的表，被参考的表
+- 从表（子表）：引用别人的表，参考别人的表
+
+例如：员工表的员工所在部门这个字段的值要参考部门表：部门表是主表，员工表是从表。
+例如：学生表、课程表、选课表：选课表的学生和课程要分别参考学生表和课程表，学生表和课程表是
+主表，选课表是从表。
+
+```
+特点:
+- 从表的外键列，必须引用/参考主表的主键或唯一约束的列
+	为什么？因为被依赖/被参考的值必须是唯一的
+- 在创建外键约束时，如果不给外键约束命名，默认名不是列名，而是自动产生一个外键名（例如student_ibfk_1），也可以指定外键约束名。
+- 创建(CREATE)表时就指定外键约束的话，先创建主表，再创建从表
+- 删表时，先删从表（或先删除外键约束），再删除主表
+- 当主表的记录被从表参照时，主表的记录将不允许删除，如果要删除数据，需要先删除从表中依赖该记录的数据，然后才可以删除主表的数据
+- 在“从表”中指定外键约束，并且一个表可以建立多个外键约束
+- 从表的外键列与主表被参照的列名字可以不相同，但是数据类型必须一样，逻辑意义一致。如果类型不一样，创建子表时，就会出现错误“ERROR 1005 (HY000): Can't create table'database.tablename'(errno: 150)”。
+	例如：都是表示部门编号，都是int类型。
+- 当创建外键约束时，系统默认会在所在的列上建立对应的普通索引。但是索引名是外键的约束名。（根据外键查询效率很高）
+- 删除外键约束后，必须手动删除对应的索引
+```
+
+```mysql
+-- 建表时指定外键约束
+create table 主表名称(
+ 字段1 数据类型  primary key,
+ 字段2 数据类型
+);
+create table 从表名称(
+ 字段1 数据类型,
+ 字段2 数据类型,
+ [CONSTRAINT <外键约束名称>] FOREIGN KEY（从表的某个字段) references 主表名(被参考字段)
+);
+
+-- 建表后增加外键约束
+ALTER TABLE 从表名 ADD [CONSTRAINT 约束名] FOREIGN KEY (从表的字段) REFERENCES 主表名(被引用字段) [on update xx][on delete xx];
+
+-- 删除外键约束(必须手动删除对应的索引)
+SELECT * FROM information_schema.table_constraints WHERE table_name = '表名称';#查看某个表的约束名
+ALTER TABLE 从表名 DROP FOREIGN KEY 外键约束名;	# 删除外键约束
+SHOW INDEX FROM 表名称; #查看某个表的索引名
+ALTER TABLE 从表名 DROP INDEX 索引名;	# 删除外键约束对应索引
+```
+
+**总结**：约束关系是针对双方的
+
+- 添加了外键约束后，主表的修改和删除数据受约束
+- 添加了外键约束后，从表的添加和修改数据受约束
+- 在从表上建立外键，要求主表必须存在
+- 删除主表时，要求从表从表先删除，或将从表中外键引用该主表的关系先删除 
+
+#### 外键约束等级
+
+添加外键约束时, 提供可选参数 `[on update 约束等级][on delete 约束等级];`, 约束等级有以下几种:
+
+- **Cascade**方式 ：
+
+  在父表上update/delete记录时，同步update/delete掉子表的匹配记录
+
+- **Set null**方式 ：
+
+  在父表上update/delete记录时，将子表上匹配记录的列设为null，但是要注意子表的外键列不能为not null
+
+- **No action**方式 ：
+
+  如果子表中有匹配的记录，则不允许对父表对应候选键进行update/delete操作
+
+- **Restrict**方式 ：
+
+  同no action， 都是立即检查外键约束
+
+- **Set default**方式 : 
+
+  父表有变更时，子表将外键列设置成一个默认的值，但Innodb不能识别 
+
+> 如果没有指定等级，就相当于Restrict方式。
+
+```mysql
+create table dept(
+ did int primary key, 	#部门编号
+ dname varchar(50) 		#部门名称
+);
+create table emp(
+ eid int primary key,  	#员工编号
+ ename varchar(5),   	#员工姓名
+ deptid int, 			#员工所在的部门
+ foreign key (deptid) references dept(did)  on update cascade on delete set null
+ #把修改操作设置为级联修改等级，把删除操作设置为set null等级
+);
+```
+
+#### 默认值约束
+
+`DEFAULT` , 给某个字段/某列指定默认值，一旦设置默认值，在插入数据时，如果此字段没有显式赋值，则赋值为默认值。
+
+```mysql
+-- 建表时给字段加默认值
+create table 表名称(
+ 字段名 数据类型  not null default 默认值,
+);
+# 说明：默认值约束一般不在唯一键和主键列上加
+
+-- 建表后给字段加默认值
+alter table 表名称 modify 字段名 数据类型 default 默认值;
+
+-- 删除默认值约束
+alter table 表名称 modify 字段名 数据类型 ;			#删除默认值约束，也不保留非空约束
+alter table 表名称 modify 字段名 数据类型  not null; 	#删除默认值约束，保留非空约束
+```
+
+### 约束使用
+
+```
+案例需求： 根据需求，完成表结构的创建。需求如下
+字段名		字段含义	字段类型			约束条件			约束关键字
+id		ID唯一标识		int			主键，并且自动增长		  PRIMARY KEY,AUTO_INCREMENT
+name	姓名			varchar(10)	  不为空，并且唯一			NOT NULL , UNIQUE
+age		年龄			int	
+status	状态			char(1)		  如果没有指定该值，默认为1	 DEFAULT
+gender	性别			char(1)		        
+```
+
+```mysql
+-- 建表语句
+CREATE TABLE tb_user(
+	id int AUTO_INCREMENT PRIMARY KEY COMMENT 'ID唯一标识',
+	name varchar(10) NOT NULL UNIQUE COMMENT '姓名' ,
+	age int  COMMENT '年龄' ,
+	status char(1) default '1' COMMENT '状态',
+	gender char(1) COMMENT '性别'
+);
+```
+
+查看某个表已有的约束:
+
+```mysql
+SELECT * FROM information_schema.table_constraints WHERE table_name = '表名称';
+```
+
+![image-20220707180448064](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/06eeda1896341f336de56c9d2d479af3-59d544a.png)
+
+
+
+## 多表查询
+
+### 等值连接/非等值连接
+
+- **等值连接**
+
+  关联条件为相等关系的多表查询
+
+  ```mysql
+  -- 查询员工信息及部门信息
+  SELECT emp.employee_id,dept.department_name,emp.department_id
+  FROM employees emp,departments dept
+  WHERE emp.`department_id` = dept.department_id;
+  ```
+
+- **非等值连接**
+
+  关联条件为其他关系的多表查询
+
+  ```mysql
+  -- 查询员工的工资等级
+  SELECT e.last_name,e.salary,j.grade_level
+  FROM employees e,job_grades j
+  where e.`salary` BETWEEN j.`lowest_sal` AND j.`highest_sal`;
+  ```
+
+### 自连接
+
+关联条件为同一个表的不同字段的多表查询
+
+```mysql
+-- 查询员工id,员工姓名及其管理者的id和姓名
+SELECT emp.employee_id,emp.last_name,mgr.employee_id,mgr.last_name
+FROM employees emp ,employees mgr
+WHERE emp.`manager_id` = mgr.`employee_id`;
+```
+
+### 内连接/外连接
+
+- **内连接**
+
+  多表查询结果集中不包含一个表与另一个表不匹配的行
+
+  ```mysql
+  -- 查询员工信息及部门信息(隐式内连接)
+  SELECT employee_id,department_name
+  FROM employees e,departments d
+  WHERE e.`department_id` = d.department_id;
+  
+  -- 或使用INNER JOIN 实现同样的需求(显示内连接)
+  SELECT employee_id,department_name
+  FROM employees e INNER JOIN departments d
+  ON e.`department_id` = d.department_id;
+  ```
+
+- **外连接**
+
+  多表查询结果集中除了包含一个表与另一个表匹配的行之外的行数据, 包含**左外连接**和**右外连接**
+
+  - **左外连接**
+
+    两个表在连接过程中除了返回满足连接条件的行以外, 还返回左表中不满足条件的行
+
+    ```mysql
+    -- 查询 所有 的员工的last_name,department_name信息 
+    SELECT employee_id,department_name
+    FROM employees e LEFT JOIN departments d
+    ON e.`department_id` = d.department_id;
+    ```
+
+    ![image-20220706175720567](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c614c7ec461a46bff9711fe282da7aa7-b65701c.png)
+
+    > 左表与右表不匹配, 默认赋值为Null
+
+  - **右外连接**
+
+    两个表在连接过程中除了返回满足连接条件的行以外, 还返回右表中不满足条件的行
+
+    ```mysql
+    -- 查询 所有 的部门的last_name,department_name信息 
+    SELECT last_name,department_name
+    FROM employees e RIGHT OUTER JOIN departments d
+    ON e.`department_id` = d.`department_id`;
+    ```
+
+    ![image-20220706175904303](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/34de1b0cfa18f40716059232a78abc6e-ddbf100.png)
+
+    > 某些部门没有员工, 即右表与左表不匹配, 默认赋值为Null
+
+  - **满外连接**
+
+    **满外连接**的结果 = 左右表匹配的数据 + 左表没有匹配到的数据 + 右表没有匹配到的数据。
+    SQL99是支持满外连接的。使用`FULL JOIN` 或 `FULL OUTER JOIN`来实现。
+    需要注意的是，**MySQL不支持FULL JOIN**，但是可以用 `LEFT JOIN UNION RIGHT join`代替。
+
+    ```mysql
+    SELECT employee_id,department_name
+    FROM employees e LEFT JOIN departments d
+    ON e.`department_id` = d.`department_id`
+    UNION ALL
+    SELECT employee_id,department_name
+    FROM employees e RIGHT JOIN departments d
+    ON e.`department_id` = d.`department_id`
+    WHERE e.`department_id` IS NULL;
+    ```
+
+### UNION使用
+
+**UNION** 用于合并查询结果.
+
+利用`UNION`关键字，可以给出多条SELECT语句，并将它们的结果组合成单个结果集。合并时，两个表对应的列数和数据类型必须相同，并且相互对应。各个SELECT语句之间使用`UNION`或`UNION ALL`关键字分隔。
+
+```mysql
+-- 语法格式
+SELECT column,... FROM table1
+UNION [ALL]
+SELECT column,... FROM table2
+```
+
+- **UNION**
+
+  `UNION` 操作符返回两个查询的结果集的并集，去除重复记录。
+
+  ![image-20220706180626678](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/0d33119ab35af3c54266157e3f6d7e46-685723f.png)
+
+  
+
+
+
+- **UNION ALL**
+
+  `UNION ALL`操作符返回两个查询的结果集的并集。对于两个结果集的重复部分，不去重
+
+  ![image-20220706180704144](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c138fdc2c606340c06eba10ffd3f19f3-b87c761.png)
+
+> 注意：执行`UNION ALL`语句时所需要的资源比`UNION`语句少。如果明确知道合并数据后的结果数据不存在重复数据，或者不需要去除重复的数据，则尽量使用`UNION ALL`语句，以提高数据查询的效率
+
+```MYSQL
+-- 查询中国用户中男性的信息以及美国用户中年男性的用户信息
+SELECT id,cname FROM t_cnmale WHERE csex='男'
+UNION ALL
+SELECT id,tname FROM t_usmale WHERE tGender='male';
+```
+
+### 7种 JOINS的实现
+
+![image-20220706181002857](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d1f150388b55b7629b82c24fe51f6852-f0d198f.png)
+
+### 自然连接
+
+SQL99 在 SQL92 的基础上提供了一些特殊语法，比如  `NATURAL JOIN` 用来表示**自然连接**。我们可以把自然连接理解为的等值连接。它会帮你**自动查询**两张连接表中 **所有相同的字段** ，然后进行 **等值连接** 。
+
+```mysql
+-- 下面两句SQL执行结果是一样的
+SELECT employee_id,last_name,department_name
+FROM employees e NATURAL JOIN departments d;
+
+SELECT employee_id,last_name,department_name
+FROM employees e JOIN departments d
+ON e.`department_id` = d.`department_id`
+AND e.`manager_id` = d.`manager_id`;
+```
+
+### USING
+
+当多表进行连接的时候，还支持使用 `USING` 指定数据表里的 **同名字段** 进行等值连接。但是**只能配合JOIN**一起使用。比如：
+
+```mysql
+-- 下面两句SQL执行结果是一样的
+SELECT employee_id,last_name,department_name
+FROM employees e JOIN departments d
+USING (department_id);
+
+SELECT employee_id,last_name,department_name
+FROM employees e ,departments d
+WHERE e.department_id = d.department_id;
+```
+
+### 多表连接注意
+
+要 **控制连接表的数量** 。多表连接就相当于嵌套 for 循环一样，非常消耗资源，会让 SQL 查询性能下降得很严重，因此不要连接不必要的表。在许多 DBMS 中，也都会有最大连接表的限制。
+
+```
+【强制】超过三个表禁止 join。需要 join 的字段，数据类型保持绝对一致；多表关联查询时， 保
+证被关联的字段需要有索引。
+说明：即使双表 join 也要注意表索引、SQL 性能。
+```
+
+### 多表查询示例
+
+![image-20220706190420600](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/db8ddca1f2e68a9171a6e36ad4be0e71-30f5961.png)
+
+```mysql
+-- 1.显示所有员工的姓名，部门号和部门名称。
+SELECT CONCAT(e.first_name, '.', e.last_name) ename, d.department_id, d.department_name
+FROM employees e 
+LEFT JOIN departments d USING(department_id)
+
+-- 2.查询90号部门员工的job_id和90号部门的location_id
+SELECT e.job_id,d.location_id
+FROM employees e 
+RIGHT JOIN departments d USING(department_id) 
+WHERE d.department_id = 90;
+
+-- 3.查询所有有奖金的员工的 last_name , department_name , location_id , city
+SELECT e.last_name,d.department_name,l.location_id,l.city
+FROM employees e 
+LEFT JOIN departments d USING(department_id) 
+LEFT JOIN locations l USING (location_id)
+WHERE e.commission_pct IS NOT NULL;
+
+-- 4.选择city在Toronto工作的员工的 last_name , job_id , department_id , department_name
+SELECT e.last_name,e.job_id,d.department_name,d.department_name
+FROM employees e LEFT JOIN departments d USING(department_id) 
+LEFT JOIN locations l USING (location_id)
+WHERE l.city = 'Toronto';
+
+-- 6.选择指定员工的姓名，员工号，以及他的管理者的姓名和员工号，结果类似于下面的格式
+-- employees 	Emp# 		manager 		Mgr#
+-- kochhar 		101 		king 				100
+SELECT e.last_name employees, e.employee_id 'Emp#', m.last_name manager, m.employee_id 'Mgr#'
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.employee_id;
+
+-- 7.查询哪些部门没有员工
+SELECT e.employee_id,d.department_id,d.department_name
+FROM employees e RIGHT JOIN departments d USING(department_id) 
+WHERE e.employee_id IS NULL;
+
+-- 8. 查询哪个城市没有部门
+SELECT l.city, d.department_id
+FROM locations l
+LEFT JOIN departments d USING(location_id)
+WHERE d.department_id IS NULL;
+```
+
+## 子查询
+
+SQL语句中嵌套SELECT语句，称为嵌套查询，又称子查询。
+
+```mysql
+SELECT * FROM t1 WHERE column1 = ( SELECT column1 FROM t2 ); 
+```
+
+子查询外部的语句可以是INSERT / UPDATE / DELETE / SELECT 的任何一个。
+
+### 子查询分类
+
+根据**子查询结果**不同，分为：
+
+- **标量子查询**  (子查询结果为单个值）
+
+  子查询返回的结果是单个值（数字、字符串、日期等），最简单的形式，这种子查询称为标量子查询。
+
+  > 常用的操作符：`= `  `<>`   `>`   `>=`   `<`   `<=`
+
+  ```mysql
+  -- 查询 "销售部" 的所有员工信息
+  select * from emp where dept_id = (select id from dept where name = '销售部');
+  
+  -- 查询在 "Hunold" 入职之后的员工信息
+  select * from emp where entrydate > (select entrydate from emp where name = 'Hunold');
+  ```
+
+- **列子查询**  (子查询结果为一列)
+
+  子查询返回的结果是一列（可以是多行），这种子查询称为列子查询。
+
+  常用操作符:
+
+  | 操作符 | 描述                                   |
+  | ------ | -------------------------------------- |
+  | IN     | 在指定的集合范围之内，多选一           |
+  | NOT IN | 不在指定的集合范围之内                 |
+  | ANY    | 子查询返回列表中，有任意一个满足即可   |
+  | SOME   | 与ANY等同，使用SOME的地方都可以使用ANY |
+  | ALL    | 子查询返回列表的所有值都必须满足       |
+
+    ```mysql
+  -- 查询 "销售部" 和 "市场部" 的所有员工信息
+  select * from emp where dept_id 
+  in (select id from dept where name = '销售部' or name = '市场部');
+  
+  -- 查询比 "财务部" 所有人工资都高的员工信息
+  select * from emp where salary 
+  > all ( 
+      select salary from emp where dept_id =(select id from dept where name = '财务部') 
+  );
+    ```
+
+- **行子查询**  (子查询结果为一行)
+
+  子查询返回的结果是一行（可以是多列），这种子查询称为行子查询。
+
+  > 常用的操作符：`= `、`<>` 、`IN` 、`NOT IN`
+
+  ```mysql
+  -- 查询与 "Hunold" 的薪资及直属领导相同的员工信息 ;
+  select * from emp where (salary,managerid) = (select salary, managerid from emp where name = 'Hunold') and name != 'Hunold';
+  ```
+
+- **表子查询**  (子查询结果为多行多列)
+
+  子查询返回的结果是多行多列，这种子查询称为表子查询。
+
+  > 常用的操作符：`IN ` 
+
+  ```mysql
+  -- 查询与 "Lex" , "David" 的职位和薪资相同的员工信息
+  select * from emp where (job,salary) in ( select job, salary from emp where name ='Lex' or name = 'David' );
+  
+  -- 查询入职日期是 "2006-01-01" 之后的员工信息 , 及其部门信息
+  select e.*, d.* from (select * from emp where entrydate > '2006-01-01') e left join dept d on e.dept_id = d.id ;
+  ```
+
+
+
+按**内查询是否被执行多次**，将子查询划分为 **相关(或关联)子查询** 和 **不相关(或非关联)子查询** 。
+
+- 关联子查询
+
+  如果子查询需要执行多次，即采用循环的方式，先从外部查询开始，每次都传入子查询进行查询，然后再将结果反馈给外部，这种嵌套的执行方式就称为相关子查询。
+
+- 非关联子查询 
+
+  子查询从数据表中查询了数据结果，如果这个数据结果只执行一次，然后这个数据结果作为主查询的条件进行执行，那么这样的子查询叫做不相关子查询。
+
+### 相关子查询
+
+如果子查询的执行依赖于外部查询，通常情况下都是因为**子查询中的表用到了外部的表**，并进行了**条件关联**，因此每执行一次外部查询，子查询都要**重新计算**一次，这样的子查询就称之为 **关联子查询** 。
+
+```mysql
+-- 查询员工中工资大于本部门平均工资的员工的last_name,salary和其department_id
+
+-- 方式一：相关子查询
+SELECT e.last_name,e.salary,e.department_id FROM employees e 
+WHERE e.salary > 
+	(SELECT AVG(salary) FROM employees WHERE department_id = e.department_id);
+
+-- 方式二：在 FROM 中使用子查询
+SELECT e1.last_name,e1.salary,e1.department_id 
+FROM employees e1,
+	(SELECT department_id,AVG(salary) dept_avg_sal 
+    FROM employees 
+    GROUP BY department_id) e2
+WHERE e1.`department_id` = e2.department_id AND e2.dept_avg_sal < e1.`salary`;
+```
+
+#### `EXISTS` 与 `NOT EXISTS`关键字
+
+- 关联子查询通常也会和 EXISTS操作符一起来使用，用来检查在子查询中是否存在满足条件的行。
+- 如果在子查询中**不存在**满足条件的行：
+  - 条件返回 FALSE
+  - 继续在子查询中查找
+- 如果在子查询中**存在**满足条件的行：
+  - 不在子查询中继续查找
+  - 条件返回 TRUE
+- NOT EXISTS关键字表示如果不存在某种条件，则返回TRUE，否则返回FALSE。
+
+```mysql
+-- 查询公司管理者的employee_id，last_name，job_id，department_id信息
+SELECT e1employee_id, e1last_name, e1job_id, e1department_id
+FROM  employees e1
+WHERE EXISTS ( SELECT * FROM  employees e2 WHERE e2.manager_id = e1.employee_id);
+
+-- 查询departments表中，不存在于employees表中的部门的department_id和department_name
+SELECT department_id, department_name
+FROM departments d
+WHERE NOT EXISTS (SELECT 'X' FROM  employees WHERE department_id = d.department_id);
+```
+
+#### 相关更新
+
+使用相关子查询依据一个表中的数据更新另一个表的数据。
+
+```mysql
+UPDATE table1 alias1
+SET column = (SELECT expression FROM  table2 alias2 WHERE alias1.column = alias2.column);
+```
+
+```mysql
+-- 在employees中增加一个department_name字段，数据为员工对应的部门名称
+UPDATE employees e
+SET department_name = 
+(SELECT department_name FROM departments d WHERE e.department_id = d.department_id);
+```
+
+#### 相关删除
+
+使用相关子查询依据一个表中的数据删除另一个表的数据。
+
+```mysql
+DELETE FROM table1 alias1
+WHERE column operator 
+(SELECT expression FROM  table2 alias2 WHERE alias1.column = alias2.column);
+```
+
+```mysql
+-- 删除表employees中，其与emp_history表皆有的数据
+DELETE FROM employees e
+WHERE e.employee_id in (SELECT employee_id FROM emp_history);
+```
+
+## 事务
+
+**事务** 是一组操作的集合，它是一个不可分割的工作单位，事务会把所有的操作作为一个整体一起向系统提交或撤销操作请求，即这些操作要么同时成功，要么同时失败。
+
+### 事务操作
+
+- **控制事务一**
+
+  查看/设置事务提交方式
+
+  ```mysql
+  -- 查询当前事务提交方式
+  SELECT @@autocommit;
+  -- 设置为手动提交
+  SET @@autocommit = 0;	
+  ```
+
+  提交事务
+
+  ```mysql
+  COMMIT;
+  ```
+
+  回滚事务
+
+  ```mysql
+  ROLLBACK;
+  ```
+
+  > 注意：上述的这种方式是修改了事务的自动提交行为, 把默认的自动提交修改为了手动提交, 此时执行的DML语句都不会提交, 需要手动的执行commit进行提交。
+
+- **控制事务二**
+
+  开启事务
+
+  ```mysql
+  START TRANSACTION;
+  -- 或 
+  BEGIN; 
+  ```
+
+  提交事务
+
+  ```mysql
+  COMMIT; 
+  ```
+
+  回滚事务
+
+  ```mysql
+  ROLLBACK;
+  ```
+
+  示例: 
+
+  ```mysql
+  -- 开启事务
+  start transaction
+  
+  -- 1. 查询张三余额
+  select * from account where name = '张三';
+  
+  -- 2. 张三的余额减少1000
+  update account set money = money - 1000 where name = '张三';
+  
+  -- 3. 李四的余额增加1000
+  update account set money = money + 1000 where name = '李四';
+  
+  -- 如果正常执行完毕, 则提交事务
+  commit;
+  
+  -- 如果执行过程中报错, 则回滚事务
+  -- rollback;
+  ```
+
+### 事务四大特性
+
+事务的四大特性，简称**ACID**。
+
+- **原子性**（Atomicity）：事务是不可分割的最小操作单元，要么全部成功，要么全部失败。
+- **一致性**（Consistency）：事务完成时，必须使所有的数据都保持一致状态。
+- **隔离性**（Isolation）：数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行。
+- **持久性**（Durability）：事务一旦提交或回滚，它对数据库中的数据的改变就是永久的。
+
+### 并发事务问题
+
+![image-20220714142522324](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e8a93d8e3554ac398a5beed445dac42b-58499ec.png)
+
+#### 脏读
+
+一个事务读到另外一个事务还没有提交的数据。
+
+![image-20220714143052165](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a2cc0340f66205bce44c8b152ab96eb8-cd17406.png)
+
+#### 不可重复读
+
+一个事务先后读取同一条记录，但两次读取的数据不同，称之为不可重复读。
+
+![](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/19a214c3ca1f8f45c1ca7c330b321f0f-58b7eaa.png)
+
+#### 幻读
+
+一个事务按照条件查询数据时，没有对应的数据行，但是在插入数据时，又发现这行数据已经存在，好像出现了 "幻影"。
+
+![image-20220714143140146](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c5566878b8fb3db9274efea9a3300d06-f7e2dfe.png)
+
+### 事务隔离级别
+
+为了解决并发事务所引发的问题，在数据库中引入了**事务隔离级别**。主要有以下几种：
+
+|隔离级别 |脏读 |不可重复读 |幻读|
+| ---- | ---- | ---- | ---- |
+|**未提交度** Read Uncommitted |√ |√ |√|
+|**已提交读** Read Committed |× |√ |√|
+|**可重复读** Repeatable Read(默认) |× |× |√|
+|**序列化** Serializable |× |× |×|
+
+查看事务隔离级别
+
+```mysql
+SELECT @@transaction_isolation;
+```
+
+设置事务隔离级别
+
+```mysql
+SET [ SESSION | GLOBAL ] TRANSACTION ISOLATION LEVEL { READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SERIALIZABLE }
+```
+
+> 注意：事务隔离级别越高，数据越安全，但是性能越低。]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL进阶</title>
+    <url>/2022/07/12/MySql/MySQL%E8%BF%9B%E9%98%B6/</url>
+    <content><![CDATA[
+## 存储引擎
+
+### MySQL体系结构
+
+![image-20220714150546597](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8ff19007681d8bae395ce72447d04899-24be7f1.png)
+
+- 连接层
+
+  最上层是一些**客户端**和**链接服务**，包含本地sock 通信和大多数基于客户端/服务端工具实现的类似于TCP/IP的通信。主要完成一些类似于连接处理、授权认证、及相关的安全方案。
+
+  在该层上引入了线程池的概念，为通过认证安全接入的客户端提供线程。
+
+  同样在该层上可以实现基于SSL的安全链接。服务器也会为安全接入的每个客户端验证它所具有的操作权限。
+
+- 服务层
+
+  第二层架构主要完成大多数的**核心服务功能**，如SQL接口，并完成缓存的查询，SQL的分析和优化，部分内置函数的执行。
+
+  所有跨存储引擎的功能也在这一层实现，如 过程、函数等。在该层，服务器会解析查询并创建相应的内部解析树，并对其完成相应的优化如确定表的查询的顺序，是否利用索引等，最后生成相应的执行操作。
+
+  如果是select语句，服务器还会查询内部的缓存，如果缓存空间足够大，这样在解决大量读操作的环境中能够很好的提升系统的性能。
+
+- 引擎层
+
+  存储引擎层， 存储引擎真正的负责了MySQL中数据的**存储**和**提取**，服务器通过API和存储引擎进行**通信**。
+
+  不同的存储引擎具有不同的功能，这样我们可以根据自己的需要，来选取合适的存储引擎。
+
+  数据库中的索引是在存储引擎层实现的。
+
+- 存储层
+
+  数据存储层， 主要是将数据(如: redolog、undolog、数据、索引、二进制日志、错误日志、查询日志、慢查询日志等)存储在文件系统之上，并完成与存储引擎的交互。
+
+### **SQL执行流程**
+
+![image-20220714162837039](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/76c1ef0894e7d9c8410576f12e4c4b97-6215ad2.png)
+
+> 从MySQL 5.7.20开始，不推荐使用查询缓存，并在 MySQL 8.0中删除
+
+查询缓存
+
+### 引擎简介
+
+存储引擎就是**存储数据**、**建立索引**、**更新/查询数据**等技术的**实现方式** 。
+
+存储引擎是**基于表**的，而不是基于库的，所以存储引擎也可被称为表类型。我们可以在创建表的时候，来指定选择的存储引擎，如果没有指定将自动选择默认的存储引擎。
+
+**建表时指定存储引擎**
+
+```mysql
+CREATE TABLE 表名(
+    字段1 字段1类型 [ COMMENT 字段1注释 ] ,
+    ......
+    字段n 字段n类型 [COMMENT 字段n注释 ]
+) ENGINE = INNODB [ COMMENT 表注释 ] ;
+```
+
+**修改存储引擎**
+
+```mysql
+ALTER TABLE 表名 ENGINE = 存储引擎名称;
+```
+
+**查询当前数据库支持的存储引擎**
+
+```mysql
+SHOW ENGINES;
+```
+
+![image-20220714151323425](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9edd74fd37b68133f8dfdf84692aae56-ab774eb.png)
+
+**查询默认使用引擎**
+
+```mysql
+show variables like '%storage_engine%';
+```
+
+![image-20220714161858612](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dc5c63c310c3aae1f6cf88146d8632e4-2427e0a.png)
+
+**查询建表语句** 
+
+```mysql
+SHOW CREATE TABLE account;
+```
+
+```mysql
+CREATE TABLE `account` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `name` varchar(10) DEFAULT NULL COMMENT '姓名',
+  `money` double(10,2) DEFAULT NULL COMMENT '余额',
+   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='账户表'
+```
+
+### 引擎特点
+
+介绍三种存储引擎 InnoDB、MyISAM、Memory的特点。
+
+#### InnoDB
+
+InnoDB是一种兼顾高可靠性和高性能的通用存储引擎，在 MySQL 5.5 之后，InnoDB是默认的MySQL 存储引擎。
+
+- **特点**
+  - DML操作遵循ACID模型，支持**事务**；
+  - 支持**行级锁**，提高并发访问性能；
+  - 支持**外键**FOREIGN KEY约束，保证数据的完整性和正确性；
+
+- **文件**
+
+  **xxx.ibd**：xxx代表的是表名，innoDB引擎的每张表都会对应这样一个表空间文件，存储该表的数据和索引。
+
+  **xxx.frm**: 存储该表的表结构
+
+- **文件生成规则**
+
+    ```mysql
+    SHOW VARIABLES LIKE 'innodb_file_per_table';
+    ```
+
+    ![image-20220714154232882](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/38b22e59e547447c5513a8d94453d45a-eb74572.png)
+    
+    如果该参数开启，代表对于InnoDB引擎的表，每一张表都对应一个ibd文件。
+    
+- **逻辑存储结构**
+
+    ![image-20220714154417247](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d42eda2e8c09a47742a9b5ed59977aab-e209740.png)
+
+    ```
+    - 表空间(Tablespace): InnoDB存储引擎逻辑结构的最高层，ibd文件其实就是表空间文件，在表空间中可以包含多个Segment段。
+    
+    - 段(Segment): 表空间是由各个段组成的， 常见的段有数据段、索引段、回滚段等。InnoDB中对于段的管理，都是引擎自身完成，不需要人为对其控制，一个段中包含多个区。
+    
+    - 区(Extent): 区是表空间的单元结构，每个区的大小为1M。 默认情况下， InnoDB存储引擎页大小为16K， 即一个区中一共有64个连续的页。
+    
+    - 页(Page): 页是组成区的最小单元，页也是InnoDB 存储引擎磁盘管理的最小单元，每个页的大小默认为 16KB。为了保证页的连续性，InnoDB 存储引擎每次从磁盘申请 4-5 个区。
+    
+    - 行(Row): InnoDB存储引擎是面向行的，也就是说数据是按行进行存放的，在每一行中除了定义表时所指定的字段以外，还包含两个隐藏字段(最后一次操作事务的ID 和 指针)。
+    ```
+
+#### MyISAM
+
+MyISAM是MySQL早期的默认存储引擎。MyISAM提供了大量的特性，包括全文索引、压缩、空间函数(GIS)等，但MyISAM 不支持事务、行级锁、外键 ，有一个毫无疑问的缺陷就是 崩溃后无法安全恢复 。
+
+- **特点**
+  - 不支持事务，不支持外键
+  - 支持**表锁**，不支持行锁
+  - 访问速度快
+  
+- **文件**
+
+  **表名.frm** :  存储表结构
+
+  **表名.MYD** :  存储数据 (MYData)
+
+  **表名.MYI** :  存储索引 (MYIndex)
+
+#### Memory
+
+Memory引擎的表数据时存储在内存中的，由于受到硬件问题、或断电问题的影响，只能将这些表作为临时表或缓存使用。另外，要求存储的数据是数据长度不变的格式，比如，Blob和Text类型的数据不可用(长度不固定的)。
+
+- **特点**
+  - 内存存放
+  - 同时 支持哈希（HASH）索引 和 B+树索引 （默认）
+  - MEMORY 表的大小是受到限制 的。表的大小主要取决于两个参数，分别是 `max_rows` 和`max_heap_table_size` 。其中，`max_rows`可以在创建表时指定；`max_heap_table_size`的大小默认为16MB，可以按需要进行扩大。
+
+#### 区别及特点
+
+| 特点 | InnoDB | MyISAM | Memory |
+| ---- | ------ | ------ | ------ |
+|存储限制 |64TB |有 |有|
+|事务安全 |支持| - |-|
+|锁机制 |行锁 |表锁 |表锁|
+|B+tree索引 |支持 |支持 |支持|
+|Hash索引 |- |- |支持|
+|全文索引 |支持(5.6版本之后) |支持 |-|
+|空间使用 |高 |低 |N/A|
+|内存使用 |高 |低 |中等|
+|批量插入|速度 |低 |高 |高|
+|支持外键 |支持 |- |-|
+
+```
+其他见文档:
+https://dev.mysql.com/doc/refman/8.0/en/innodb-introduction.html
+https://dev.mysql.com/doc/refman/8.0/en/myisam-storage-engine.html
+```
+
+### 引擎选择
+
+在选择存储引擎时，应该根据应用系统的特点选择合适的存储引擎。对于复杂的应用系统，还可以根据实际情况选择多种存储引擎进行组合。
+
+- InnoDB: 是Mysql的默认存储引擎，支持事务、外键。如果应用对事务的完整性有比较高的要求，在并发条件下要求数据的一致性，数据操作除了插入和查询之外，还包含很多的更新、删除操作，那么InnoDB存储引擎是比较合适的选择。
+- MyISAM ： 如果应用是以读操作和插入操作为主，只有很少的更新和删除操作，并且对事务的完整性、并发性要求不是很高，那么选择这个存储引擎是非常合适的。(日志/评论)
+- MEMORY：将所有数据保存在内存中，访问速度快，通常用于临时表及缓存。MEMORY的缺陷就是对表的大小有限制，太大的表无法缓存在内存中，而且无法保障数据的安全性。
+
+## 索引
+
+### 索引概述
+
+**索引(index)**是帮助MySQL高效获取数据的**数据结构**(有序)。
+
+在数据之外，数据库系统还维护着满足特定查找算法的数据结构，这些数据结构**以某种方式引用（指向）数据**， 这样就可以在这些数据结构上实现高级查找算法，这种数据结构就是索引。
+
+### 索引特点
+
+| 优势 | 劣势 |
+| ---- | ---- |
+|提高数据检索的效率，降低数据库的IO成本|索引列也是要占用空间的。|
+|通过索引列对数据进行排序，降低数据排序的成本，降低CPU的消耗。|索引大大提高了查询效率，同时却也降低更新表的速度，如对表进行INSERT、UPDATE、DELETE时，效率降低。|
+
+### 索引结构
+
+MySQL的索引是在**存储引擎层**实现的，不同的存储引擎有不同的索引结构，主要包含以下几种：
+
+| 索引结构 | 描述 |
+| -------- | ---- |
+|**B+Tree**索引 |最常见的索引类型，大部分引擎都支持 B+ 树索引|
+|**Hash**索引|底层数据结构是用哈希表实现的, 只有精确匹配索引列的查询才有效, 不支持范围查询|
+|**R-tree**(空间索引）|空间索引是MyISAM引擎的一个特殊索引类型，主要用于地理空间数据类型，通常使用较少|
+|**Full-text**(全文索引)|是一种通过建立倒排索引,快速匹配文档的方式。类似于Lucene,Solr,ES|
+
+不同的存储引擎对于索引结构的支持情况:
+
+| 索引 | InnoDB | MyISAM | Memory |
+| ---- | ------ | ------ | ------ |
+|B+tree索引 |支持 |支持 |支持|
+|Hash 索引 |不支持 |不支持 |支持|
+|R-tree 索引 |不支持 |支持 |不支持|
+|Full-text |5.6版本之后支持 |支持 |不支持|
+
+> MySQL中平常所说的索引，如果没有特别指明，都是指B+树结构组织的索引。
+
+#### 二叉树
+
+若MySQL的索引结构采用二叉树的数据结构，比较理想的结构如下：
+
+![image-20220720170414537](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7242f0ebc2a73b2603d3ed03d1e32d97-850ae82.png)
+
+如果主键是顺序插入的，则会形成一个单向链表，结构如下:
+
+![image-20220720170441014](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c1ede0149249129101eee3ea24013662-dce5c2d.png)
+
+所以，如果选择二叉树作为索引结构，会存在以下缺点：
+
+- 顺序插入时，会形成一个链表，查询性能大大降低。
+- 大数据量情况下，层级较深，检索速度慢。
+
+#### 红黑树
+
+红黑树是一颗自平衡二叉树，那这样即使是顺序插入数据，最终形成的数据结构也是一颗平衡的二叉树, 结构如下:
+
+![image-20220720170557822](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/590ff9a99c6c6397419e6bba583b8b0b-2136f3a.png)
+
+由于红黑树也是一颗二叉树，所以也会存在一个缺点：
+
+- 大数据量情况下，层级较深，检索速度慢。
+
+#### B-Tree
+
+B树是一种**多叉路平衡查找树**，相对于二叉树，B树**每个节点可以有多个分支**，即多叉。以一颗最大度数（`max-degree`）为5(5阶)的b-tree为例，那这个B树每个节点最多存储4个key，5个指针：
+
+![image-20220720170743164](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/542e7a7071f6bcd83c328f2ace5c14ab-973af5d.png)
+
+> 树的度数指的是一个节点的子节点个数。
+
+特点：
+
+- 5阶的B树，每一个节点最多存储4个key，对应5个指针。
+- 一旦节点存储的key数量到达5，就会裂变，中间元素向上分裂。
+- 在B树中，非叶子节点和叶子节点都会存放数据。
+
+#### B+Tree
+
+B+Tree是B-Tree的变种，我们以一颗最大度数（max-degree）为4（4阶）的b+tree为例，来看一下其结构示意图：
+
+![image-20220720170909471](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/704f8a9105274bb583f9c31216494ec6-e3ca4b1.png)
+
+我们可以看到，两部分：
+
+- 绿色框框起来的部分，是索引部分，仅仅起到索引数据的作用，**不存储数据**。
+- 红色框框起来的部分，是数据存储部分，在其**叶子节点中要存储具体的数据**。
+
+B+Tree 与 B-Tree相比，主要有以下三点区别：
+
+- 所有的数据都会出现在叶子节点。
+- 叶子节点形成一个单向链表。
+- 非叶子节点仅仅起到索引数据作用，具体的数据都是在叶子节点存放的。
+
+#### MySQL中的B+Tree
+
+MySQL索引数据结构对经典的B+Tree进行了优化。在原B+Tree的基础上，增加一个指向相邻叶子节点的**链表指针**，就形成了带有顺序指针的B+Tree，提高区间访问的性能，利于排序。
+
+![image-20220720171110939](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ad21b813a25142af5c61f26c32ff2e53-e742874.png)
+
+#### Hash
+
+MySQL中除了支持B+Tree索引，还支持一种索引类型-Hash索引。
+
+**结构**
+
+哈希索引就是采用一定的hash算法，将键值换算成新的hash值，映射到对应的槽位上，然后存储在hash表中。
+
+如果两个(或多个)键值，映射到一个相同的槽位上，他们就产生了hash冲突（也称为hash碰撞），可以通过链表来解决。
+
+![image-20220720171228366](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4376240227a2cb936a9cf3556f08cf19-bba95c7.png)
+
+**特点**
+
+- Hash索引只能用于对等比较(=，in)，不支持范围查询（between，>，< ，...）
+- 无法利用索引完成排序操作
+- 查询效率高，通常(不存在hash冲突的情况)只需要一次检索就可以了，效率通常要高于B+tree索引
+
+> 在MySQL中，支持hash索引的是Memory存储引擎。 而InnoDB中具有**自适应hash**功能，hash索引是InnoDB存储引擎根据B+Tree索引在指定条件下自动构建的。
+
+```
+为什么InnoDB存储引擎选择使用B+tree索引结构?
+
+- 相对于二叉树，层级更少，搜索效率高；
+- 对于B-tree，无论是叶子节点还是非叶子节点，都会保存数据，这样导致一页中存储的键值减少，指针跟着减少，要同样保存大量数据，只能增加树的高度，导致性能降低；
+- 相对Hash索引，B+tree支持范围匹配及排序操作；
+```
+
+### 索引分类
+
+在MySQL数据库，将索引的具体类型主要分为以下几类：**主键索引**、**唯一索引**、**常规索引**、**全文索引**。
+
+| 分类 | 含义 | 特点 | 关键字 |
+| ---- | ---- | ---- | ------ |
+|主键索引|针对于表中主键创建的索引|默认自动创建, 只能有一个|PRIMARY|
+|唯一索引|避免同一个表中某数据列中的值重复 |可以有多个 |UNIQUE|
+|常规索引|快速定位特定数据 |可以有多个||
+|全文索引|全文索引查找的是文本中的关键词，<br />而不是比较索引中的值|可以有多个 |FULLTEXT|
+
+在**InnoDB**存储引擎中，根据索引的存储形式，又可以分为以下两种：
+
+| 分类 | 含义 | 特点 |
+| ---- | ---- | ---- |
+|**聚集索引/聚簇索引**(ClusteredIndex)|将数据存储与索引放到了一块，索引结构的叶子节点保存了行数据|必须有,而且只有一个|
+|**二级索引/非聚簇索引**(SecondaryIndex)|将数据与索引分开存储，索引结构的叶子节点关联的是对应的主键|可以存在多个|
+
+```
+聚集索引选取规则:
+
+- 如果存在主键，主键索引就是聚集索引。
+- 如果不存在主键，将使用第一个唯一（UNIQUE）索引作为聚集索引。
+- 如果表没有主键，或没有合适的唯一索引，则InnoDB会自动生成一个rowid作为隐藏的聚集索引。
+```
+
+#### 聚集索引
+
+聚集索引和二级索引的具体结构如下：
+
+![image-20220720172132142](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/247f73b0c1568d5fbbf85e612cda91c3-9616922.png)
+
+- 聚集索引的叶子节点下挂的是这一行的数据 。
+- 二级索引的叶子节点下挂的是该字段值对应的主键值。
+
+
+
+当执行SQL语句时，具体的查找过程:
+
+![image-20220720172245102](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2519a30bd71605f79dff0305a73cc5ba-1f13c21.png)
+
+① 由于是根据name字段进行查询，所以先根据`name='Arm'`到name字段的**二级索引**中进行匹配查找。但是在二级索引中只能查找到 `Arm` 对应的主键值 `10`。
+
+② 由于查询返回的数据是 `*`，所以此时，还需要根据主键值`10`，到**聚集索引**中查找`10`对应的记录，最终找到`10`对应的行row。
+
+③ 最终拿到这一行的数据，直接返回即可。
+
+> **回表查询**： 这种先到二级索引中查找数据，找到主键值，然后再到聚集索引中根据主键值，获取数据的方式，就称之为回表查询。
+
+```
+InnoDB主键索引的B+tree高度为多高呢?
+
+假设:
+一行数据大小为1k，一页中可以存储16行这样的数据。InnoDB的指针占用6个字节的空间，主键即使为bigint，占用字节数为8。
+
+高度为2：
+	n * 8 + (n + 1) * 6 = 16*1024 , 算出n为 1170
+	1171* 16 = 18736
+也就是说，如果树的高度为2，则可以存储 18000 多条记录。
+
+高度为3：
+	1171 * 1171 * 16 = 21939856
+也就是说，如果树的高度为3，则可以存储 2200w 左右的记录。
+```
+
+### 索引语法
+
+创建索引
+
+```mysql
+CREATE [ UNIQUE | FULLTEXT ] INDEX index_name ON table_name (index_col_name,... );
+```
+
+查看索引
+
+```mysql
+SHOW INDEX FROM table_name; 
+```
+
+删除索引
+
+```mysql
+DROP INDEX index_name ON table_name; 
+```
+
+### SQL性能分析
+
+#### SQL执行频率
+
+MySQL客户端连接成功后，通过 `show [session|global] status` 命令可以提供服务器状态信息。
+
+通过如下指令，可以查看当前数据库的`INSERT`、`UPDATE`、`DELETE`、`SELECT`的访问频次：
+
+```mysql
+-- session 是查看当前会话 ;
+-- global 是查询全局数据 ;
+SHOW GLOBAL STATUS LIKE 'Com_______';
+```
+
+![image-20220721103932087](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e71daab71791f26fa60cd71776269a59-18e334d.png)
+
+> 通过上述指令，我们可以查看到当前数据库到底是以查询为主，还是以增删改为主，从而为数据库优化提供参考依据。 如果是以增删改为主，我们可以考虑不对其进行索引的优化。 如果是以查询为主，那么就要考虑对数据库的索引进行优化了。
+
+#### 慢查询日志
+
+慢查询日志记录了所有执行时间超过指定参数(`long_query_time`，单位：秒，默认10秒)的所有SQL语句的日志。
+
+查看系统变量` slow_query_log` 确认MySQL的慢查询日志默认是否开启
+
+```mysql
+SHOW VARIABLES LIKE 'slow_query_log';
+```
+
+![image-20220721104940058](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/843ceb85ecc5e56542ac0eeebc19aff1-a9764fa.png)
+
+MySQL的慢查询日志默认没有开启，如果要开启慢查询日志，需要在MySQL的配置文件中配置信息：
+
+```shell
+$ sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+```
+
+```properties
+# 开启MySQL慢日志查询开关
+slow_query_log = 1
+# 设置慢日志的时间为2秒，SQL语句执行时间超过2秒，就会视为慢查询，记录慢查询日志
+long_query_time = 2
+# 配置慢日志文件位置
+slow_query_log_file     = /var/log/mysql/mysql-slow.log
+```
+
+```shell
+$ sudo service mysql restart
+```
+
+![image-20220721105637784](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/cc736bfad5b24584ed0a7027c9968a20-53c9710.png)
+
+#### profile详情
+
+`show profiles` 能够在做SQL优化时帮助我们了解时间都耗费到哪里去了。通过`have_profiling`参数，能够看到当前MySQL是否支持profile操作：
+
+```mysql
+SHOW VARIABLES LIKE 'have_profiling';
+```
+
+![image-20220721105804761](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e0efd5ad52550a9f2476586d03ec182d-8ac9233.png)
+
+- **开启配置**
+
+  可以通过set语句在 session/global 级别开启profiling：
+
+    ```mysql
+  SET profiling = 1; 
+    ```
+  
+  开关打开后，接下来所执行的SQL语句，都会被MySQL记录，并记录执行时间消耗到哪儿去了。
+
+- **执行查询**
+
+- **查看耗时**
+
+  执行一系列的业务SQL的操作，然后通过如下指令查看指令的执行耗时：
+
+  ```mysql
+  -- 查看每一条SQL的耗时基本情况
+  show profiles;
+  
+  -- 查看指定query_id的SQL语句各个阶段的耗时情况
+  show profile for query query_id;
+  
+  -- 查看指定query_id的SQL语句CPU的使用情况
+  show profile cpu for query query_id;
+  ```
+
+  示例:
+
+  ```mysql
+  show profiles;
+  ```
+
+  ![image-20220721110214454](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3c9a547d8bcfe8ed081381b7efb9fb2a-4658f89.png)
+
+  ```mysql
+  show profile for query 17;
+  ```
+
+  ![image-20220721110307453](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/93b362398e894058aac314e5627f2a8b-8c4b42e.png)
+
+#### explain
+
+`EXPLAIN` 或者 `DESC` 命令可以获取 MySQL 如何执行 SELECT 语句的信息，包括在 SELECT 语句执行过程中表如何连接和连接的顺序。
+
+```mysql
+-- 直接在select语句之前加上关键字 explain / desc
+EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件 ;
+```
+
+![image-20220721110551855](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5ff647c996af37ddd79f133c6fa32bd1-20d0da0.png)
+
+Explain 执行计划中各个字段的含义:
+
+| 字段 | 含义 |
+| ---- | ---- |
+|id|select查询的序列号，表示查询中执行select子句或者是操作表的顺序(id相同，执行顺序从上到下；id不同，值越大，越先执行)。|
+|select_type|表示 SELECT 的类型，常见的取值有 SIMPLE（简单表，即不使用表连接或者子查询）、PRIMARY（主查询，即外层的查询）、UNION（UNION 中的第二个或者后面的查询语句）、SUBQUERY（SELECT/WHERE之后包含了子查询）等|
+|type|表示连接类型，性能由好到差的连接类型为NULL、system、const、eq_ref、ref、range、 index、all 。|
+|possible_key |显示可能应用在这张表上的索引，一个或多个。|
+|key |实际使用的索引，如果为NULL，则没有使用索引。|
+|key_len|表示索引中使用的字节数， 该值为索引字段最大可能长度，并非实际使用长度，在不损失精确性的前提下， 长度越短越好 。|
+|rows|MySQL认为必须要执行查询的行数，在innodb引擎的表中，是一个估计值，可能并不总是准确的。|
+|filtered |表示返回结果的行数占需读取行数的百分比， filtered 的值越大越好。|
+
+### 索引使用
+
+#### 最左前缀法则
+
+如果索引了多列（**联合索引**），要遵守**最左前缀法则**。最左前缀法则指的是查询从索引的最左列开始，并且不跳过索引中的列。如果跳跃某一列，索引将会部分失效(后面的字段索引失效)。
+
+**示例:** 
+
+如在表`tb_user`中, 存在联合索引`idx_user_pro_age_sta` :
+
+```mysql
+SHOW INDEX FROM tb_user;
+```
+
+![image-20220721132803647](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5b43e1f5c940136aeb3c9e83c676d0fc-efb0116.png)
+
+查询时，最左变的列，也就是profession必须存在，否则索引全部失效。而且中间不能跳过某一列，否则该列后面的字段索引将失效。
+
+- **索引生效**
+
+  - 所有字段均存在
+
+    ```mysql
+    explain select * from tb_user where profession = '软件工程' and age = 31 and status = '0';
+    ```
+
+    ![image-20220721133048017](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5991e9c66b721b6ec78639318dcf0e49-341906d.png)
+
+  - 部分(前置)字段存在
+
+    ```mysql
+    explain select * from tb_user where profession = '软件工程' and age = 31; 
+    ```
+
+    ![image-20220721133152961](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5c7a849f5771511191ab0942a18cb951-7d61fe3.png)
+
+  - 仅前置字段存在
+
+    ```mysql
+    explain select * from tb_user where profession = '软件工程';
+    ```
+
+    ![image-20220721133233056](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9397934ba41710ed430f387cc834dcce-6a356b5.png)
+
+  - 所有字段存在但乱序
+
+    ```mysql
+    explain select * from tb_user where age = 31 and status = '0' and profession = '软件工程';
+    ```
+
+    ![image-20220721133801011](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2319b10404fe4145982738fc6e927993-267a03b.png)
+
+- **索引失效**
+
+  - 前置字段不存在
+
+    ```mysql
+    explain select * from tb_user where age = 31 and status = '0'; 
+    ```
+
+    ![image-20220721133342311](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/08165ab4b04921f25a02d4aae0d2b357-73afac7.png)
+
+  - 仅后置字段存在
+
+    ```mysql
+    explain select * from tb_user where status = '0';
+    ```
+
+    ![image-20220721133501680](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/06a89f3d23229a1e34224bb0d9aa0f9d-0fa40c9.png)
+
+- **索引部分生效**
+
+  - 中间字段缺失
+
+    ```mysql
+    explain select * from tb_user where profession = '软件工程' and status = '0'; 
+    ```
+
+    ![image-20220721133632546](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/cbe057c3a4c89690cae1ff6dc6ae8a9c-742e612.png)
+
+#### 范围查询
+
+**联合索引**中，出现范围查询(`>`,`<`)，范围查询**右侧**的列索引失效。
+
+**示例:** 
+
+如在表`tb_user`中, 存在联合索引`idx_user_pro_age_sta` :
+
+```mysql
+SHOW INDEX FROM tb_user;
+```
+
+![image-20220721132803647](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5b43e1f5c940136aeb3c9e83c676d0fc-efb0116.png)
+
+**示例:** 
+
+```mysql
+explain select * from tb_user where profession = '软件工程' and age > 30 and status = '0';
+```
+
+![image-20220721134127293](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e7128769a32d85f7d42f5ded7e8a8614-08f9fe2.png)
+
+> 当范围查询使用`>` 或 `<` 时，走联合索引了，但是索引的长度为49，就说明范围查询右边的`status`字段是没有走索引的。
+
+#### SQL提示
+
+SQL提示，是优化数据库的一个重要手段，简单来说，就是在SQL语句中加入一些人为的提示来达到优化操作的目的。
+
+1). `use index()` ： 建议MySQL使用哪一个索引完成此次查询（仅仅是建议，mysql内部还会再次进行评估）。
+
+2). `ignore index()` ： 忽略指定的索引。
+
+3). `force index() ` ： 强制使用索引。
+
+**示例:** 
+
+如在表`tb_user`中, 存在联合索引`idx_user_pro_age_sta` 和单列索引`idx_user_pro`:
+
+```mysql
+SHOW INDEX FROM tb_user;
+```
+
+![image-20220721160823707](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/922811f03894b6d5cdeadb1130f6e636-8043c96.png)
+
+```mysql
+explain select profession,status from tb_user where profession = '软件工程';
+```
+
+![image-20220721161314776](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/54b96c0da03cb90e0337e21c80f55e2c-4eb654a.png)
+
+> 可能使用两个索引, 实际使用了联合索引
+
+- 建议使用单列索引`idx_user_pro`
+
+  ```mysql
+  explain select profession,status from tb_user use index(idx_user_pro) where profession = '软件工程';
+  ```
+
+  ![image-20220721161515384](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2e5d4136361b42eef3f03c8bd840f572-f67f7c4.png)
+
+- 建议忽略联合索引`idx_user_pro_age_sta`
+
+  ```mysql
+  explain select profession,status from tb_user ignore index(idx_user_pro_age_sta) where profession = '软件工程';
+  ```
+
+  ![image-20220721161605443](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4e5c31e7d17940e42c399d24ed101cbc-e1e1970.png)
+
+- 强制使用单列索引`idx_user_pro`
+
+  ```mysql
+  explain select profession,status from tb_user force index(idx_user_pro) where profession = '软件工程';
+  ```
+
+  ![image-20220721161906966](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1730dad035d8a60e9755c0921c412e49-2765098.png)
+
+#### 覆盖索引
+
+覆盖索引是指查询使用了索引，并且需要返回的列，在该索引中已经全部能够找到 。尽量使用覆盖索引，减少`select *`。
+
+```mysql
+explain select id, profession from tb_user where profession = '软件工程' and age =31 and status = '0' ;
+explain select id,profession,age, status from tb_user where profession = '软件工程'and age = 31 and status = '0' ;
+
+explain select id,profession,age, status, name from tb_user where profession = '软件工程' and age = 31 and status = '0' ;
+explain select * from tb_user where profession = '软件工程' and age = 31 and status= '0';
+```
+
+![image-20220721162458786](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/673a38b4c91222ae2de0dee876ef69d4-970fb5f.png)
+
+> 从上述的执行计划我们可以看到，这四条SQL语句的执行计划前面所有的指标都是一样的，看不出来差异。但是后面的`Extra`，前面两条SQL的结果为 `Using where; Using Index` ; 而后面两条SQL的结果为: `Using index condition` 。
+
+| Extra | 含义 |
+| ----- | ---- |
+|Using where; Using Index|查找使用了索引，但是需要的数据都在索引列中能找到，所以不需要回表查询数据|
+|Using index condition|查找使用了索引，但是需要回表查询数据|
+
+```
+在tb_user表中有一个联合索引 idx_user_pro_age_sta，该索引关联了三个字段profession、age、status，而这个索引也是一个二级索引，所以叶子节点下面挂的是这一行的主键id。 
+所以当我们查询返回的数据在 id、profession、age、status 之中，则直接走二级索引直接返回数据。 
+如果超出这个范围，就需要拿到主键id，再去扫描聚集索引，再获取额外的数据，这个过程就是回表。 
+而我们如果一直使用select * 查询返回所有字段值，很容易就会造成回表查询（除非是根据主键查询，此时只会扫描聚集索引）。
+```
+
+- **覆盖索引查询**
+
+  ![image-20220721163323961](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/fe5732feaf57e90bb8efcf7c4d18e3c2-8238fcf.png)
+
+  > 根据id查询，直接走聚集索引查询，一次索引扫描，直接返回数据，性能高。
+
+  ![image-20220721163425667](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4f81ccf65d2044b51d594249e0e1e69c-4a2203c.png)
+
+  > 虽然是根据name字段查询，查询二级索引，但是由于查询返回字段为 id，name，在name的二级索引中，这两个值都是可以直接获取到的，因为覆盖索引，所以不需要回表查询，性能高。
+
+- **回表查询**
+
+  ![image-20220721163334823](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5aa007c732fb83b9ab8f501d52cf9c4c-4aaa791.png)
+
+  > 由于在name的二级索引中，不包含gender，所以，需要两次索引扫描，也就是需要回表查询，性能相对较差一点。
+
+#### 前缀索引
+
+当字段类型为字符串（varchar，text，longtext等）时，有时候需要索引很长的字符串，这会让索引变得很大，查询时，浪费大量的磁盘IO， 影响查询效率。
+
+此时可以只将字符串的一部分**前缀**，建立**索引**，这样可以大大节约索引空间，从而提高索引效率。
+
+```mysql
+-- 语法
+create index idx_xxxx on table_name(column(n)) ; 
+```
+
+**示例:**
+
+为`tb_user`表的`email`字段，建立长度为`5`的前缀索引。
+
+```mysql
+create index idx_email_5 on tb_user(email(5)); 
+```
+
+![image-20220721163843961](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/51d59ad752719f431e466df77b710810-93b9e0d.png)
+
+**前缀长度确认方式**:
+
+可以根据索引的**选择性**来决定，而选择性是指**不重复的索引值（基数）和数据表的记录总数的比值**，索引选择性越高则查询效率越高， 唯一索引的选择性是1，这是最好的索引选择性，性能也是最好的。
+
+```mysql
+select count(distinct email) / count(*) from tb_user;
+select count(distinct substring(email,1,5)) / count(*) from tb_user;
+```
+
+**前缀索引的查询流程**:
+
+![image-20220721164037661](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2814720ad13e0c6d510f594115f9709e-a18d822.png)
+
+#### 单列索引与联合索引
+
+- 单列索引：即一个索引只包含单个列。
+
+- 联合索引：即一个索引包含了多个列。
+
+> 在业务场景中，如果存在多个查询条件，考虑针对于查询字段建立索引时，建议建立联合索引，而非单列索引。
+
+**联合索引结构示意图**:
+
+![image-20220721164146041](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c9535c60f7693755f1a391a94e21b25f-74d573a.png)
+
+
+
+#### 索引失效情况
+
+##### **索引列运算** 
+
+不要在索引列上进行运算操作， 索引将失效。
+
+**示例:** 
+
+如在表`tb_user`中, 存在联合索引`idx_user_phone` :
+
+```mysql
+SHOW INDEX FROM tb_user;
+```
+
+![image-20220721134332039](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7f6ccc40c0f8f925768349f4fd324eb5-7b4f058.png)
+
+- 当根据`phone`字段进行等值匹配查询时, 索引生效。
+
+  ```mysql
+  explain select * from tb_user where phone = '17799990015'; 
+  ```
+
+  ![image-20220721134440077](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/0ca381b6d5c63dc3b25ddd9eb05a7ff9-e4daa6b.png)
+
+- 当根据`phone`字段进行函数运算操作之后，索引失效。
+
+  ```mysql
+  explain select * from tb_user where substring(phone,10,2) = '15';
+  ```
+
+  ![image-20220721134526343](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/412b3336d377b0c180d5c4719889a677-e49c05b.png)
+
+##### **字段格式隐式转换** 
+
+当字段参数发生隐式格式转换时, 索引失效, 如字符串类型字段使用时，不加引号。
+
+**示例:** 
+
+字段`phone`为字符串格式`varchar(11)`
+
+![image-20220721134824566](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/39c3111cb34ac17c3b47e1b8972c0255-826a805.png)
+
+- 参数带引号, 无格式转换, 索引生效
+
+  ```mysql
+  explain select * from tb_user where phone = '17799990015';
+  ```
+
+  ![image-20220721134941190](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1d47e0314a6cfcee966efdbfcdf47453-d63b585.png)
+
+- 参数不带引号, 发生隐式格式转换, 索引失效
+
+  ```mysql
+  explain select * from tb_user where phone = 17799990015;
+  ```
+
+  ![image-20220721135035956](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/08844d664b8d1fd4bfae15c40e445266-eaadd83.png)
+
+> 如果字符串不加单引号，对于查询结果没什么影响，但是数据库存在隐式类型转换，索引将失效。
+
+##### **模糊查询** 
+
+如果仅仅是尾部模糊匹配，索引不会失效。如果是头部模糊匹配，索引失效。
+
+- 尾部模糊匹配, 索引生效
+
+  ```mysql
+  explain select * from tb_user where profession like '软件%';
+  ```
+
+  ![image-20220721135455388](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/23bd1c6c306a9735484e04bdc64c91c8-0ab7119.png)
+
+- 头部模糊匹配, 索引失效
+
+  ```mysql
+  explain select * from tb_user where profession like '%工程';
+  ```
+
+  ![image-20220721135541859](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b02cdb1e4ae5feecebeb525bbb7681f2-4976945.png)
+
+- 首尾模糊匹配, 索引失效
+
+  ```mysql
+  explain select * from tb_user where profession like '%工%';
+  ```
+
+  ![image-20220721135614784](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b0e8c08b275123b0c3fce26b383a4978-5a9bb03.png)
+
+##### **or连接条件** 
+
+用or分割开的条件， 如果or前的条件中的列有索引，而后面的列中没有索引，那么涉及的索引都不会被用到。
+
+**示例:** 
+
+如在表`tb_user`中, 存在主键索引 `PRIMARY` :
+
+```mysql
+SHOW INDEX FROM tb_user;
+```
+
+![image-20220721135847472](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5a689b60e532d981a697fc3526c6f07c-7677cbd.png)
+
+- 条件涉及的列存在无索引列, 索引失效
+
+  ```mysql
+  explain select * from tb_user where id = 10 or age = 23;
+  ```
+
+  ![image-20220721140012154](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/73f338c256b0763e780de2119a501ca3-13b652c.png)
+
+- 涉及的列全部存在索引, 索引生效
+
+  ```mysql
+  -- 创建涉及字段索引
+  create index idx_user_age on tb_user(age);
+  show index from tb_user;
+  ```
+
+  ![image-20220721140219109](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a00d9b3bed121a0e08d12e3d73730277-c0806c1.png)
+
+  ```mysql
+  explain select * from tb_user where id = 10 or age = 23;
+  ```
+
+  ![image-20220721140256554](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1e040cc08d5ada788fce8bd0add3909b-6d32b24.png)
+
+##### **数据分布影响** 
+
+如果MySQL评估使用索引比全表更慢，则不使用索引。
+
+**示例:** 
+
+所有数据`profession`字段都有值不为`null`
+
+- 查询所有`profession`字段为空的数据, 使用索引
+
+    ```mysql
+    explain select * from tb_user where profession is null;
+    ```
+
+    ![image-20220721155959975](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bbe6ba567983815db5ca08b704a5a45a-c1ab9c7.png)
+
+- 查询所有`profession`字段不为空的数据, 不使用索引, 全表扫描
+
+  ```mysql
+  explain select * from tb_user where profession is not null;
+  ```
+
+  ![image-20220721160141808](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/db6f2928d4747d7c25bb41193a0f318f-7b226e6.png)
+
+### 索引设计原则
+
+- 针对于数据量较大，且查询比较频繁的表建立索引。
+- 针对于常作为查询 `条件（where）`、`排序（order by）`、`分组（group by）`操作的字段建立索引。
+- 尽量选择**区分度高**的列作为索引，尽量建立唯一索引，区分度越高，使用索引的效率越高。
+- 如果是**字符串**类型的字段，字段的长度较长，可以针对于字段的特点，建立**前缀索引**。
+- 尽量使用**联合索引**，减少**单列索引**，查询时，联合索引很多时候可以覆盖索引，节省存储空间，避免回表，提高查询效率。
+- 要控制索引的**数量**，索引并不是多多益善，索引越多，维护索引结构的代价也就越大，会影响增删改的效率。
+- 如果索引列不能存储`NULL`值，请在创建表时使用`NOT NULL`约束它。当优化器知道每列是否包含`NULL`值时，它可以更好地确定哪个索引最有效地用于查询。
+
+## SQL优化
+
+### 批量insert优化
+
+如果需要一次性往数据库表中插入多条记录，可以从以下三个方面进行优化:
+
+- 批量插入数据
+
+  ```mysql
+  Insert into tb_test values(1,'Tom'),(2,'Cat'),(3,'Jerry'); 
+  ```
+
+- 手动控制事务
+
+  ```mysql
+  start transaction;
+  insert into tb_test values(1,'Tom'),(2,'Cat'),(3,'Jerry');
+  insert into tb_test values(4,'Tom'),(5,'Cat'),(6,'Jerry');
+  insert into tb_test values(7,'Tom'),(8,'Cat'),(9,'Jerry');
+  commit;
+  ```
+
+- 主键顺序插入
+
+  主键顺序插入性能高于乱序插入
+
+  ```
+  主键乱序插入 : 8 1 9 21 88 2 4 15 89 5 7 3
+  主键顺序插入 : 1 2 3 4 5 7 8 9 15 21 88 89
+  ```
+
+**大批量插入数据**
+
+如果一次性需要插入大批量数据(比如: 几百万的记录)，使用`insert`语句插入性能较低，此时可以使用MySQL数据库提供的`load`指令进行插入。操作如下：
+
+![image-20220722155109029](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f1df6f8d1924e0bcb44a1bcf06f35bda-628de53.png)
+
+```mysql
+-- 客户端连接服务端时，加上参数 -–local-infile
+mysql –-local-infile -u root -p
+
+-- 设置全局参数local_infile为1，开启从本地加载文件导入数据的开关
+set global local_infile = 1;
+
+-- 执行load指令将准备好的数据，加载到表结构中
+load data local infile '/path/of/file/bigrecord.txt' into table tb_user fields terminated by ',' lines terminated by '\n' ;
+```
+
+### 主键优化
+
+#### 数据组织方式
+
+在**InnoDB**存储引擎中，表数据都是根据主键顺序组织存放的，这种存储方式的表称为**索引组织表**(`index organized table` `IOT`)。
+
+![image-20220722155346362](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/70cb8c9731267f7a96ee099dc20ac4b4-47c9f6c.png)
+
+行数据，都是存储在聚集索引的叶子节点上的。nnoDB的逻辑结构图如下：
+
+![image-20220722155410563](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9db61c29c9f209b925b0701b14a90774-8848286.png)
+
+在InnoDB引擎中，数据行是记录在逻辑结构 page 页中的，而每一个页的大小是固定的，默认16K。
+
+那也就意味着一个页中所存储的行也是有限的，如果插入的数据行row在该页存储不下，将会存储到下一个页中，页与页之间会通过指针连接。
+
+#### 页分裂
+
+页可以为空，也可以填充一半，也可以填充100%。每个页包含了2-N行数据(如果一行数据过大，会行溢出)，根据主键排列。
+
+- **主键顺序插入效果**
+
+  ①. 从磁盘中申请页空间， 主键顺序插入
+
+  ![image-20220722155558778](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/84f4249dc43d473c891da383a2643445-50a433f.png)
+
+  ②. 第一个页没有满，继续往第一页插入
+
+  ![image-20220722155613822](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eb4530353125130e9804d8e83f7d40fe-d084981.png)
+
+  ③. 当第一个页写满之后，再写入第二个页，页与页之间会通过指针连接
+
+  ![image-20220722155633307](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5eb57f71c8303d589762d5f0e538521e-b872536.png)
+
+  ④. 当第二页写满了，再往第三页写入
+
+  ![image-20220722155648842](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4cf5f0821c3462e0d110002546ba2195-acb0438.png)
+
+- **主键乱序插入效果**
+
+  ①. 现在`1#`,`2#`页都已经写满了，存放了如图所示的数据
+
+  ![image-20220722155722396](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f8601908fb23b8783a411351e6a86c61-18acda3.png)
+
+  ②. 此时再插入id为50的记录
+
+  索引结构的叶子节点是有顺序的。按照顺序，应该存储在47之后。但是47所在的`1#`页，已经写满了，存储不了50对应的数据了。 那么此时会开辟一个新的页 `3#`。
+
+  ![image-20220722155827798](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/6ca4dcede4697ff6d6f27c6eb551fe17-a766ffa.png)
+
+  但是并不会直接将50存入`3#`页，而是会将`1#`页后一半的数据，移动到`3#`页，然后在`3#`页，插入50。
+
+  ![image-20220722155920478](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f7719969b2dbf36cf79d1a049090524d-249e7c5.png)
+
+  ![image-20220722155924764](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9945f8e1da4aafd9da7727c3d878f71f-9a3759f.png)
+
+  移动数据，并插入id为50的数据之后，那么此时，这三个页之间的数据顺序是有问题的。 `1#`的下一个页，应该是`3#`， `3#`的下一个页是`2#`。 所以，此时，需要重新设置链表指针。
+
+  ![image-20220722155956105](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bf268a28510a4c10b50ac76733ef5b24-271ed6c.png)
+
+  上述的这种现象，称之为 **页分裂**，是比较耗费性能的操作。
+
+#### 页合并
+
+目前表中已有数据的索引结构(叶子节点)如下：
+
+![image-20220722160047317](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/88da958e1280a10aba08c5238a9b2d8a-ba63f06.png)
+
+当我们对已有数据进行删除时，具体的效果如下:
+
+①当删除一行记录时，实际上记录并没有被物理删除，只是记录被标记（flaged）为删除并且它的空间变得允许被其他记录声明使用。
+
+![image-20220722160112220](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/fe92c40488029f733cca6d50a978843c-fbd6a4d.png)
+
+②当我们继续删除2#的数据记录。当页中删除的记录达到 `MERGE_THRESHOLD`（默认为页的50%），InnoDB会开始寻找最靠近的页（前或后）看看是否可以将两个页合并以优化空间使用。
+
+![image-20220722160155705](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a705fde6786666c8380ac668dd44fbfd-258b17c.png)
+
+![image-20220722160207264](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4ed1995a5eda5dc878b37878e064e187-774229d.png)
+
+![image-20220722160214662](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/cc885c72259f3d6ea19831f7f0210de3-b62ba76.png)
+
+这里面所发生的合并页的这个现象，就称之为 **页合并**。
+
+> MERGE_THRESHOLD：合并页的阈值，可以自己设置，在创建表或者创建索引时指定。
+
+#### 主键索引设计原则
+
+- 满足业务需求的情况下，尽量**降低主键的长度**。
+- 插入数据时，尽量选择顺序插入，选择使用`AUTO_INCREMENT`自增主键。
+
+- 尽量不要使用UUID做主键或者是其他自然主键，如身份证号。
+- 业务操作时，避免对主键的修改。
+
+### order by优化
+
+MySQL的排序，有两种方式：
+
+- `Using filesort` : 通过表的索引或全表扫描，读取满足条件的数据行，然后在排序缓冲区`sort buffer`中完成排序操作，所有**不是通过索引直接返回排序结果的排序**都叫 FileSort 排序。
+- `Using index` : **通过有序索引顺序扫描直接返回有序数据**，这种情况即为 `using index`，不需要额外排序，操作效率高。
+
+对于以上的两种排序方式，`Using index`的性能**高**，而`Using filesort`的性能**低**，我们在优化排序操作时，尽量要优化为 `Using index`。
+
+**order by优化原则**:
+
+- 根据排序字段建立合适的索引，多字段排序时，也遵循最左前缀法则。
+- 尽量使用覆盖索引。
+- 多字段排序, 一个升序一个降序，此时需要注意联合索引在创建时的规则（`ASC/DESC`）。
+- 如果不可避免的出现filesort，大数据量排序时，可以适当增大排序缓冲区大小`sort_buffer_size`(默认256k)。
+
+### group by优化
+
+在分组操作中，我们需要通过以下两点进行优化，以提升性能：
+
+- 在分组操作时，可以通过索引来提高效率。
+- 分组操作时，索引的使用也是满足最左前缀法则的。
+
+### limit优化
+
+在数据量比较大时，如果进行limit分页查询，在查询时，越往后，分页查询效率越低。
+
+```mysql
+select * from tb_sku limit 2000000,10;
+```
+
+当在进行分页查询时，如果执行 `limit 2000000,10 `，此时需要MySQL排序前2000010 条记录，仅仅返回 2000000 - 2000010 的记录，其他记录丢弃，查询排序的代价非常大 。
+
+**优化思路**: 
+
+一般分页查询时，通过创建 **覆盖索引** 能够比较好地提高性能，可以通过**覆盖索引**加**子查询**形式进行优化。
+
+```mysql
+explain select * from tb_sku t , (select id from tb_sku order by id limit 2000000,10) a where t.id = a.id;
+```
+
+### count优化
+
+`count()`是一个聚合函数，对于返回的结果集，一行行地判断，如果 count 函数的参数不是NULL，累计值就加 1，否则不加，最后返回累计值。
+
+用法：count（*）、count（主键）、count（字段）、count（数字）
+
+| count用法 | 含义 |
+| --------- | ---- |
+|count(主键)|InnoDB 引擎会遍历整张表，把每一行的 主键id 值都取出来，返回给服务层。服务层拿到主键后，直接按行进行累加(主键不可能为null)|
+|count(字段)|没有`not null` 约束 : InnoDB 引擎会遍历整张表把每一行的字段值都取出来，返回给服务层，服务层判断是否为null，不为null，计数累加。<br />有`not null`约束：InnoDB 引擎会遍历整张表把每一行的字段值都取出来，返回给服务层，直接按行进行累加。|
+|count(数字)|InnoDB 引擎遍历整张表，但不取值。服务层对于返回的每一行，放一个数字“1”进去，直接按行进行累加。|
+|count(*)|InnoDB引擎并不会把全部字段取出来，而是专门做了优化，不取值，服务层直接按行进行累加。|
+
+> 按照效率排序，`count(字段) `<  `count(主键 id)` < `count(1)` ≈ `count(*)`，所以尽量使用 `count(*)`。
+
+### update优化
+
+注意一下update语句执行时的注意事项。
+
+```mysql
+update course set name = 'Tom' where id = 1 ;
+```
+
+当我们在执行上述的SQL语句时，会锁定id为1这一行的数据，然后事务提交之后，**行锁**释放。
+
+
+
+但是当我们在执行如下SQL时:
+
+```mysql
+update course set name = 'Tom' where name = 'Jerry' ; 
+```
+
+当我们开启多个事务，在执行上述的SQL时，我们发现行锁升级为了**表锁**。 导致该update语句的性能大大降低。
+
+> InnoDB的行锁是针对索引加的锁，不是针对记录加的锁 ,并且该索引不能失效，否则会从行锁升级为表锁 。
+
+## 锁
+
+锁是计算机协调多个进程或线程并发访问某一资源的机制。
+
+在数据库中，除传统的计算资源（CPU、RAM、I/O）的争用以外，数据也是一种供许多用户共享的资源。如何保证数据并发访问的一致性、有效性是所有数据库必须解决的一个问题，锁冲突也是影响数据库并发访问性能的一个重要因素。从这个角度来说，锁对数据库而言显得尤其重要，也更加复杂。
+
+MySQL中的锁，按照锁的粒度分，分为以下三类：
+
+- 全局锁：锁定数据库中的所有表。
+- 表级锁：每次操作锁住整张表。
+- 行级锁：每次操作锁住对应的行数据。
+
+### 全局锁
+
+全局锁就是对整个数据库实例加锁，加锁后整个实例就处于**只读**状态，后续的DML的写语句，DDL语句，已经更新操作的事务提交语句都将被**阻塞**。
+
+典型的使用场景是做**全库的逻辑备份**，对所有的表进行锁定，从而获取一致性视图，保证数据的完整性。
+
+![image-20220723162259552](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/54190529e26ebf76139ee6f4306118c3-0e43073.png)
+
+对数据库进行进行逻辑备份之前，先对整个数据库加上全局锁，一旦加了全局锁之后，其他的DDL、DML全部都处于阻塞状态，但是可以执行DQL语句，也就是处于只读状态，而数据备份就是查询操作。那么数据在进行逻辑备份的过程中，数据库中的数据就是不会发生变化的，这样就保证了数据的一致性和完整性。
+
+```mysql
+-- 语法
+-- 1). 加全局锁
+flush tables with read lock ; 
+
+-- 2). 数据备份
+$ mysqldump -uroot –pxxxxxx ni9nes_DB > backup.sql 
+
+-- 3). 释放锁
+unlock tables ;
+```
+
+**特点**
+
+数据库中加全局锁，存在以下问题：
+
+- 如果在主库上备份，那么在备份期间都不能执行更新，业务基本停摆。
+- 如果在从库上备份，那么在备份期间从库不能执行主库同步过来的二进制日志（binlog），会导致主从延迟。
+
+
+
+在InnoDB引擎中，我们可以在备份时加上参数 `--single-transaction` 参数来完成不加锁的一致性数据备份。
+
+```shell
+$ mysqldump --single-transaction -uroot –pxxxxxx ni9nes_DB > backup.sql 
+```
+
+### 表级锁
+
+表级锁，每次操作锁住整张表。锁定粒度大，发生锁冲突的概率最高，并发度最低。
+
+对于表级锁，主要分为以下三类：
+
+- **表锁 ** 
+- **元数据锁**（`meta data lock`，**MDL**）
+- **意向锁** 
+
+#### 表锁
+
+```mysql
+-- 语法：
+-- 加锁：
+lock tables 表名... read/write。
+-- 释放锁：
+unlock tables / 客户端断开连接 。
+```
+
+表锁分为两类：
+
+- 表共享读锁（`read lock`）
+
+  ![image-20220723170341400](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bb299ec662fe7adf011981a3c17ef53c-c38b9e5.png)
+
+  ![image-20220723172030003](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/88cca7f981fced1f979fb26d4b59ba8f-fdba107.png)
+
+> 左侧为客户端一，对指定表加了读锁，不会影响右侧客户端二的读，但是会阻塞右侧客户端的写。
+
+- 表独占写锁（`write lock`）
+
+  ![image-20220723172210146](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2b99c29792b8e7478ab7504c5dcf2150-75acf0a.png)
+
+  ![image-20220723172939442](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/476ba7accc09c1847b42724a2e774db1-2ac5376.png)
+
+  > 左侧为客户端一，对指定表加了写锁，不会影响左侧客户端一的读写，但是会阻塞右侧客户端二的读写。
+
+**结论**: 
+
+读锁不会阻塞其他客户端的读，但是会阻塞写。写锁既会阻塞其他客户端的读，又会阻塞其他客户端的写。
+
+#### 元数据锁
+
+**元数据锁 (`meta data lock`)**，简写**MDL**。
+
+MDL加锁过程是**系统自动控制**，无需显式使用，在访问一张表的时候会自动加上。MDL锁主要作用是**维护表元数据的数据一致性**，在表上有活动事务的时候，不可以对元数据(表结构)进行写入操作。避免DML与DDL冲突，保证读写的正确性。
+
+在MySQL5.5中引入了MDL，当对一张表进行增删改查的时候，加MDL读锁(共享)；当对表结构进行变更操作的时候，加MDL写锁(排他)。
+
+常见的SQL操作时，所添加的元数据锁：
+
+| 对应SQL | 锁类型 | 说明 |
+| ------- | ------ | ---- |
+|lock tables xxx read / write|SHARED_READ_ONLY / SHARED_NO_READ_WRITE||
+|select 、select ... lock in share mode|SHARED_READ|与SHARED_READ、SHARED_WRITE兼容，与EXCLUSIVE互斥|
+|insert 、update、delete、select ... for update|SHARED_WRITE|与SHARED_READ、SHARED_WRITE兼容，与EXCLUSIVE互斥|
+|alter table ... |EXCLUSIVE |与其他的MDL都互斥|
+
+- 当执行SELECT、INSERT、UPDATE、DELETE等语句时，添加的是元数据共享锁（SHARED_READ / SHARED_WRITE），之间是**兼容**的。
+
+  **加表锁** 
+
+  ![image-20220723175819441](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/101011e508bf63d311e82fc7ce963c6c-63b9d05.png)
+
+  **事务select** 
+
+  ![image-20220723180603661](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d5262f0aea7cac830bd016af35112ebb-f50afaf.png)
+
+  **事务update/insert** 
+
+  ![image-20220723181118939](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e37ea73b4548b0a54e73933fe76f2edb-16cc895.png)
+
+- 当执行SELECT语句时，添加的是元数据共享锁（`SHARED_READ`），会阻塞元数据排他锁（`EXCLUSIVE`），之间是**互斥**的。
+
+  ![image-20220723182042145](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/baecfeee3ae4f1421b96e13cbe3ea44f-72fd4d2.png)
+
+
+
+```mysql
+-- mysql默认没有开启查看MDL的表performance_schema.metadata_locks,执行以下命令开启记录
+SELECT * FROM performance_schema.setup_instruments;  
+
+UPDATE performance_schema.setup_consumers SET ENABLED = 'YES' WHERE NAME ='global_instrumentation';
+
+UPDATE performance_schema.setup_instruments SET ENABLED = 'YES' WHERE NAME ='wait/lock/metadata/sql/mdl';
+
+select * from performance_schema.metadata_locks;
+```
+
+#### 意向锁
+
+为了避免DML语句在执行时，加的行锁与表锁的冲突，在InnoDB中引入了意向锁，使得表锁不用检查每行数据是否加锁，使用意向锁来**减少表锁的检查**。
+
+```
+假如没有意向锁，客户端一对表加了行锁后，客户端二如何给表加表锁呢：
+- 首先客户端一，开启一个事务，然后执行DML操作，在执行DML语句时，会对涉及到的行加行锁。
+- 当客户端二，想对这张表加表锁时，会检查当前表是否有对应的行锁，如果没有，则添加表锁，此时就会从第一行数据，检查到最后一行数据，效率较低。
+
+有了意向锁之后:
+- 客户端一，在执行DML操作时，会对涉及的行加行锁，同时也会对该表加上意向锁。
+- 其他客户端在对这张表加表锁的时候，会根据该表上所加的意向锁来判定是否可以成功加表锁，而不用逐行判断行锁情况了。
+```
+
+意向锁分为以下两种:
+
+- **意向共享锁(IS)**: 
+
+  由语句`select ... lock in share mode`添加 。 与 表锁共享锁(read)兼容，与表锁排他锁(write)互斥。
+
+- **意向排他锁(IX)**: 
+
+  由`insert`、`update`、`delete`、`select...for update`添加 。与表锁共享读锁(read)及排他写锁(write)都互斥，意向锁之间不会互斥。
+
+> 一旦事务提交，意向共享锁(IS)、意向排他锁(IX)，都会自动释放。
+
+- 意向共享锁与表读锁是兼容的
+
+  ![image-20220724234304083](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2243e6e8adcbfe8fa5d06d1b9e03180b-d60a628.png)
+
+- 意向排他锁与表读锁、写锁都是互斥的
+
+  ![image-20220724234546059](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5bff05536f2c277a01444e2b5c4110f4-641b8fd.png)
+
+```mysql
+-- 可以通过以下SQL，查看意向锁及行锁的加锁情况：
+select object_schema,object_name,index_name,lock_type,lock_mode,lock_data from performance_schema.data_locks;
+```
+
+### 行级锁
+
+行级锁，每次操作锁住对应的行数据。锁定粒度最小，发生锁冲突的概率最低，并发度最高。应用在InnoDB存储引擎中。
+
+InnoDB的数据是基于索引组织的，行锁是通过对索引上的**索引项加锁**来实现的，而不是对记录加的锁。对于行级锁，主要分为以下三类：
+
+- **行锁**（`Record Lock`）：
+
+  锁定单个行记录的锁，防止其他事务对此行进行 `update` 和 `delete`。在`RC`、`RR`隔离级别下都支持。
+
+  ![image-20220724232422025](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/858d6d105b28007693bac6ea1ecace46-27f3df3.png)
+
+- **间隙锁**（`Gap Lock`）：
+
+  锁定索引记录间隙（不含该记录），确保索引记录间隙不变，防止其他事务在这个间隙进行 `insert` ，产生幻读。在`RR`隔离级别下都支持。
+
+  ![image-20220724232430145](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/497fe4ae08548510587c5119c3fe8367-16ce6ed.png)
+
+- **临键锁**（`Next-Key Lock`）：
+
+  行锁和间隙锁组合，同时锁住数据，并锁住数据前面的间隙Gap。在`RR`隔离级别下支持。
+
+  ![image-20220724232444047](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f91f8e16e2cd7e7fabdc608e47f1fdcf-4dda09b.png)
+
+#### 行锁 REC_NOT_GAP
+
+**InnoDB**实现了以下两种类型的行锁：
+
+- **共享锁（S）**：允许一个事务去读一行，阻止其他事务获得相同数据集的排它锁。
+- **排他锁（X）**：允许获取排他锁的事务更新数据，阻止其他事务获得相同数据集的共享锁和排他锁。
+
+![image-20220724232604995](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f113f83fcefba3fa475920d247498e10-d00a10d.png)
+
+常见的SQL语句，在执行时，所加的行锁如下：
+
+| SQL  | 行锁类型 | 说明 |
+| ---- | -------- | ---- |
+|INSERT ... |排他锁 |自动加锁|
+|UPDATE ... |排他锁 |自动加锁|
+|DELETE ... |排他锁 |自动加锁|
+|SELECT ...|不加任何锁||
+|SELECT ... LOCK IN SHARE MODE|共享锁|需要手动在SELECT之后加LOCK IN SHARE MODE|
+|SELECT ... FOR UPDATE |排他锁 |需要手动在SELECT之后加FOR UPDATE|
+
+```mysql
+-- 可以通过以下SQL，查看意向锁及行锁的加锁情况：
+select object_schema,object_name,index_name,lock_type,lock_mode,lock_data from performance_schema.data_locks;
+```
+
+默认情况下，**InnoDB**在 `REPEATABLE READ`事务隔离级别运行，**InnoDB**使用 `next-key` 锁进行搜索和索引扫描，以防止幻读。
+
+- 针对**唯一索引**进行检索时，对已存在的记录进行**等值匹配**时，将会自动优化为**行锁**。
+- InnoDB的行锁是针对于索引加的锁，**不通过索引条件**检索数据，那么InnoDB将对表中的所有记录加锁，此时 就会升级为**表锁**。
+
+**兼容情况**:
+
+- `select...lock in share mode` 加共享锁，共享锁与共享锁之间兼容。
+
+  ![image-20220724235441614](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/399871cad593b5fc0cd011fcf59c2d85-9bb0cc8.png)
+
+- 共享锁与排他锁之间互斥。
+
+  ![image-20220724235608802](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b2939baced9e166fe2fb1e7f749d8924-64fee2c.png)
+
+  
+
+  客户端一获取的是id为1这行的共享锁，客户端二是可以获取id为3这行的排它锁的，因为不是同一行数据。行锁类型为记录锁(`LOCK_REC_NOT_GAP`), 所以没有阻塞
+
+  ![image-20220724235744548](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/cfea49b8e7f7037e5102f37209ede343-38082a3.png)
+
+- 排它锁与排他锁之间互斥
+
+  ![image-20220725000054162](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/110ac73cbf2ff67ae2cabee766bac8bb-62e9a71.png)
+
+- 不通过索引条件检索数据,  无索引行锁升级为表锁
+
+  ![image-20220725000531033](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/023f8ad4f04398d077d30f15272d4661-c902691.png)
+
+  > 客户端一根据name字段进行更新时，name字段是没有索引的，如果没有索引，此时行锁会升级为表锁(因为行锁是对索引项加的锁，而name没有索引)。
+
+#### 间隙锁&临键锁
+
+默认情况下，**InnoDB**在 `REPEATABLE READ`事务隔离级别运行，**InnoDB**使用 `next-key` 锁进行搜索和索引扫描，以防止幻读。
+
+- 索引上的等值查询(唯一索引)，给不存在的记录加锁时, 优化为间隙锁 (**GAP**)。
+
+  ![image-20220725002728436](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a12cfa79e53f8b1242ce24b3bd572ac6-9ba63ea.png)
+
+- 索引上的等值查询(非唯一普通索引)，向右遍历时最后一个值不满足查询需求时，临键锁退化为间隙锁。
+
+  ![image-20220725030316992](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ee1bbe8d06bbeb7a58b1961476837efd-54e12bf.png)
+
+  ```
+  InnoDB的B+树索引，叶子节点是有序的双向链表。 
+  假如，要根据这个二级索引查询值为user6的数据，并加上共享锁，只锁定user6这一行就可以了吗？ 
+  并不是，因为是非唯一索引，这个结构中可能有多个user6的存在，所以，在加锁时会继续往后找，找到一个不满足条件的值（当前案例中也就是user7）。
+  此时会对user6加临键锁，并对user7之前的间隙加锁。
+  ```
+
+- 索引上的范围查询(唯一索引)，会访问到不满足条件的第一个值为止。
+
+  ![image-20220725031316490](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/28ef1457bc9068b3f9b0966fae45d74a-0fe4655.png)
+
+  ```
+  查询的条件为id>=6，并添加共享锁。 此时可以根据数据库表中现有的数据，将数据分为三个部分：
+  [7]
+  (7,15]
+  (15,+∞]
+  所以数据库数据在加锁是，就是将7加了行锁，15加了临键锁（包含15及15之前的间隙），正无穷加了临键锁(正无穷及之前的间隙)。
+  ```
+
+> 间隙锁唯一目的是**防止其他事务插入间隙**。间隙锁可以共存，一个事务采用的间隙锁不会阻止另一个事务在同一间隙上采用间隙锁。
+
+## InnoDB引擎
+
+### 逻辑存储结构
+
+InnoDB的逻辑存储结构如下图所示:
+
+![image-20220714154417247](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d42eda2e8c09a47742a9b5ed59977aab-da144d6.png)
+
+- **表空间**
+
+  表空间是InnoDB存储引擎逻辑结构的最高层， 如果用户启用了参数 `innodb_file_per_table`，则每张表都会有一个表空间（`xxx.ibd`），一个mysql实例可以对应多个表空间，用于存储记录、索引等数据。
+
+- **段**
+
+  段，分为**数据段**（`Leaf node segment`）、**索引段**（`Non-leaf node segment`）、**回滚段**（`Rollback segment`），
+
+  InnoDB是索引组织表，数据段就是B+树的叶子节点， 索引段即为B+树的非叶子节点。段用来管理多个区。
+
+- **区**
+
+  区，表空间的单元结构，每个区的大小为`1M`。 默认情况下， InnoDB存储引擎页大小为`16K`， 即一个区中一共有64个连续的页。
+
+- **页**
+
+  页，是InnoDB 存储引擎磁盘管理的最小单元，每个页的大小默认为 `16KB`。为了保证页的连续性，InnoDB 存储引擎每次从磁盘申请 4-5 个区。
+
+- **行**
+
+  InnoDB 存储引擎数据是按行进行存放的。
+
+  在行中，默认有两个隐藏字段：
+
+  - Trx_id：每次对某条记录进行改动时，都会把对应的**事务id**赋值给`trx_id`隐藏列。
+  - Roll_pointer：每次对某条引记录进行改动时，都会把旧的版本写入到**undo日志**中，然后这个隐藏列就相当于一个**指针**，可以通过它来找到该记录修改前的信息。
+
+### 系统架构
+
+#### 概述
+
+MySQL5.5 版本开始，默认使用InnoDB存储引擎，它擅长事务处理，具有崩溃恢复特性，在日常开发中使用非常广泛。下面是InnoDB架构图，左侧为内存结构，右侧为磁盘结构。
+
+![image-20220725165655143](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/fa12886b382396a7867b7b72858751d9-806ebe2.png)
+
+#### 内存结构
+
+在左侧的内存结构中，主要分为四块： **Buffer Pool**、**Change Buffer**、**Adaptive Hash Index**、**Log Buffer**。 接下来介绍一下这四个部分: 
+
+- **Buffer Pool 缓冲池** 
+
+  ```
+  InnoDB存储引擎基于磁盘文件存储，访问物理硬盘和在内存中进行访问，速度相差很大，为了尽可能弥补这两者之间的I/O效率的差值，就需要把经常使用的数据加载到缓冲池中，避免每次访问都进行磁盘I/O。
+  
+  在InnoDB的缓冲池中不仅缓存了索引页和数据页，还包含了undo页、插入缓存、自适应哈希索引以及InnoDB的锁信息等等。
+  ```
+
+  缓冲池 Buffer Pool，是**主内存**中的一个区域，里面可以**缓存**磁盘上经常操作的真实数据，在执行增删改查操作时，先**操作缓冲池中的数据**（若缓冲池没有数据，则从磁盘加载并缓存），然后再以一定频率**刷新到磁盘**，从而减少磁盘IO，加快处理速度。
+
+  缓冲池以**Page页**为单位，底层采用链表数据结构管理Page。根据状态，将Page分为三种类型：
+
+  - **free page**：空闲page，未被使用。
+  - **clean page**：被使用page，数据没有被修改过。
+  - **dirty page**：脏页，被使用page，数据被修改过，页中数据与磁盘的数据产生了不一致。
+
+  > 在专用服务器上，通常将多达80％的物理内存分配给缓冲池 。
+  >
+  > 参数设置： show variables like 'innodb_buffer_pool_size';
+
+- **Change Buffer/Insert Buffer 更改缓冲区**
+
+  Change Buffer，更改缓冲区（针对于**非唯一二级索引页**），在执行**DML**语句时，如果这些数据Page没有在**Buffer Pool**中，不会直接操作磁盘，而会将**数据变更**存在**更改缓冲区 Change Buffer**中，在未来数据被读取时，再将数据**合并恢复**到**Buffer Pool**中，再将合并后的数据刷新到磁盘中。
+
+  ```
+  Change Buffer的意义:
+  与聚集索引不同，二级索引通常是非唯一的，并且以相对随机的顺序插入二级索引。同样，删除和更新可能会影响索引树中不相邻的二级索引页，如果每一次都操作磁盘，会造成大量的磁盘IO。
+  有了ChangeBuffer之后，我们可以在缓冲池中进行合并处理，减少磁盘IO。
+  ```
+
+- **Adaptive Hash Index 自适应hash索引**
+
+  用于**优化对Buffer Pool数据的查询**。
+
+  MySQL的innoDB引擎中虽然没有直接支持hash索引，但是给我们提供了**自适应hash索引**。
+
+  hash索引在进行等值匹配时，一般性能是要高于B+树的，因为hash索引一般只需要一次IO即可，而B+树，可能需要几次匹配，所以hash索引的效率要高，但是hash索引又不适合做范围查询、模糊匹配等。
+
+  InnoDB存储引擎会监控对表上各索引页的查询，如果观察到在特定的条件下hash索引可以提升速度，则建立hash索引，称之为自适应hash索引。
+
+  > 自适应哈希索引，无需人工干预，是系统根据情况自动完成。
+  > 参数： show variables like 'adaptive_hash_index';
+
+- **Log Buffer 日志缓冲区** 
+
+  用来保存要写入到磁盘中的log日志数据（redo log 、undo log），默认大小为 16MB，日志缓冲区的日志会定期刷新到磁盘中。如果需要更新、插入或删除许多行的事务，增加日志缓冲区的大小可以节省磁盘 I/O。
+
+  ```
+  参数:
+  	innodb_log_buffer_size：缓冲区大小
+  	innodb_flush_log_at_trx_commit：日志刷新到磁盘时机，取值主要包含以下三个：
+  		1: 日志在每次事务提交时写入并刷新到磁盘，默认值。
+  		0: 每秒将日志写入并刷新到磁盘一次。
+  		2: 日志在每次事务提交后写入，并每秒刷新到磁盘一次。
+  ```
+
+#### 磁盘结构
+
+![image-20220725170906878](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2e7114c8b6ea35a2a51f5d3ed6d27af1-5767add.png)
+
+- **System Tablespace 系统表空间** 
+
+  系统表空间是更改缓冲区的存储区域。如果表是在系统表空间而不是每个表文件或通用表空间中创建的，它也可能包含表和索引数据(在MySQL5.x版本中还包含InnoDB数据字典、undolog等)。系统表空间默认的文件名叫 ` ibdata1`。
+
+  ```
+  参数：
+  	innodb_data_file_path
+  ```
+
+- **File-Per-Table Tablespaces** 
+
+  如果开启了`innodb_file_per_table`开关 ，则每个表的文件表空间包含单个InnoDB表的数据和索引 ，并存储在文件系统上的单个数据文件中。即每创建一个表，都会产生一个表空间文件。
+
+  ```
+  参数：
+  	innodb_file_per_table ，该参数默认开启。
+  ```
+
+- **General Tablespaces 通用表空间** 
+
+  通用表空间，需要通过 `CREATE TABLESPACE` 语法创建通用表空间，在创建表时，可以指定该表空间。
+
+  ```mysql
+  -- 创建表空间
+  CREATE TABLESPACE ts_name ADD DATAFILE 'file_name' ENGINE = engine_name; 
+  -- 创建表时指定表空间
+  CREATE TABLE xxx ... TABLESPACE ts_name; 
+  ```
+
+- **Undo Tablespaces 撤销表空间** 
+
+  撤销表空间，MySQL实例在初始化时会自动创建两个默认的undo表空间（初始大小16M），用于存储undo log日志。
+
+- **Temporary Tablespaces  临时表空间** 
+
+  InnoDB 使用会话临时表空间和全局临时表空间。存储用户创建的临时表等数据。
+
+- **Doublewrite Buffer Files 双写缓冲区**
+
+  双写缓冲区，innoDB引擎将数据页从Buffer Pool刷新到磁盘前，先将数据页写入双写缓冲区文件中，便于系统异常时恢复数据。
+
+- **Redo Log 重做日志** 
+
+  重做日志，是用来实现事务的持久性。该日志文件由两部分组成：重做日志缓冲（redo log buffer）以及重做日志文件（redo log）,前者是在内存中，后者在磁盘中。
+
+  当事务提交之后会把所有修改信息都会存到该日志中, 用于在刷新脏页到磁盘时,发生错误时, 进行数据恢复使用。以循环方式写入重做日志文件，涉及两个文件：
+
+  ```
+  ib_logfile0
+  ib_logfile1
+  ```
+
+#### 后台线程
+
+在InnoDB的后台线程中，分为4类，分别是：**Master Thread** 、**IO Thread**、**Purge Thread**、**Page Cleaner Thread**。
+
+- **Master Thread 核心后台线程** 
+
+  核心后台线程，负责调度其他线程，还负责将缓冲池中的数据异步刷新到磁盘中, 保持数据的一致性，还包括脏页的刷新、合并插入缓存、undo页的回收 。
+
+- **IO Thread** 
+
+  在InnoDB存储引擎中大量使用了异步IO(AIO)来处理IO请求, 这样可以极大地提高数据库的性能，而IO Thread主要负责这些IO请求的回调。
+
+  可以通过以下的这条指令，查看到InnoDB的状态信息，其中就包含IO Thread信息。
+
+  ```mysql
+  show engine innodb status \G; 
+  ```
+
+  ![image-20220725171925735](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/433b6b9a62b16fb0aeb8cab38b5aa506-3c762d4.png)
+
+  | 线程类型 | 默认个数 | 职责 |
+  | -------- | -------- | ---- |
+  |Read thread |4 |负责读操作|
+  |Write thread |4 |负责写操作|
+  |Log thread |1 |负责将日志缓冲区刷新到磁盘|
+  |Insert buffer thread |1 |负责将写缓冲区内容刷新到磁盘|
+
+- **Purge Thread** 
+
+  主要用于回收事务已经提交了的undo log，在事务提交之后，undo log可能不用了，就用它来回收。
+
+- **Page Cleaner Thread** 
+
+  协助 Master Thread 刷新脏页到磁盘的线程，可以减轻 Master Thread 的工作压力，减少阻塞。
+
+### 事务原理
+
+#### 事务基础
+
+1). 事务
+
+事务 是一组操作的集合，它是一个不可分割的工作单位，事务会把所有的操作作为一个整体一起向系统提交或撤销操作请求，即这些操作要么同时成功，要么同时失败。
+
+2). 特性
+
+- **原子性**（Atomicity）：事务是不可分割的最小操作单元，要么全部成功，要么全部失败。
+- **一致性**（Consistency）：事务完成时，必须使所有的数据都保持一致状态。
+- **隔离性**（Isolation）：数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行。
+- **持久性**（Durability）：事务一旦提交或回滚，它对数据库中的数据的改变就是永久的。
+
+对于这四大特性，实际上分为两个部分。 其中的**原子性、一致性、持久性**，实际上是由InnoDB中的两份日志来保证的，一份是**redo log**日志，一份是**undo log**日志。 而**隔离性**是通过数据库的锁，加上MVCC来保证的。
+
+![image-20220725172358339](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e4d30a0cbda9d1d32baf42c027631376-cda8a2d.png)
+
+#### redo log 重做日志
+
+重做日志，记录的是事务提交时数据页的物理修改，是用来实现事务的持久性。
+
+该日志文件由两部分组成：**重做日志缓冲（redo log buffer）**以及**重做日志文件（redo log file）**,前者是在内存中，后者在磁盘中。当事务提交之后会把所有修改信息都存到该日志文件中, 用于在刷新脏页到磁盘,发生错误时, 进行数据恢复使用。
+
+**redolog解决的问题:** 
+
+```
+在InnoDB引擎中的内存结构中，主要的内存区域就是缓冲池，在缓冲池中缓存了很多的数据页。 
+当我们在一个事务中，执行多个增删改的操作时，InnoDB引擎会先操作缓冲池中的数据，如果缓冲区没有对应的数据，会通过后台线程将磁盘中的数据加载出来，存放在缓冲区中，然后将缓冲池中的数据修改，修改后的数据页我们称为脏页。 
+而脏页则会在一定的时机，通过后台线程刷新到磁盘中，从而保证缓冲区与磁盘的数据一致。 而缓冲区的脏页数据并不是实时刷新的，而是一段时间之后将缓冲区的数据刷新到磁盘中，假如刷新到磁盘的过程出错了，而提示给用户事务提交成功，而数据却没有持久化下来。
+这就出现问题了，没有保证事务的持久性。
+```
+
+![image-20220725172726041](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/964777040df334057a5c7b728749bc5b-45438d9.png)
+
+```
+有了redo log之后，当对缓冲区的数据进行增删改之后，会首先将操作的数据页的变化，记录在redo log buffer中。在事务提交时，会将redo log buffer中的数据刷新到redo log磁盘文件中。
+过一段时间之后，如果刷新缓冲区的脏页到磁盘时，发生错误，此时就可以借助于redo log进行数据恢复，这样就保证了事务的持久性。 
+而如果脏页成功刷新到磁盘 或 或者涉及到的数据已经落盘，此时redolog就没有作用了，就可以删除了，所以存在的两个redolog文件是循环写的。
+```
+
+![image-20220725172834250](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d1510d86fdd4dfa67221676efa01f607-464287b.png)
+
+```
+那为什么每一次提交事务，要刷新redo log 到磁盘中呢，而不是直接将buffer pool中的脏页刷新到磁盘呢?
+
+因为在业务操作中，我们操作数据一般都是随机读写磁盘的，而不是顺序读写磁盘。 
+而redo log在往磁盘文件中写入数据，由于是日志文件，所以都是顺序写的。顺序写的效率，要远大于随机写。 
+这种先写日志的方式，称之为 WAL（Write-Ahead Logging）。
+```
+
+#### undo log 回滚日志
+
+回滚日志，用于记录数据被修改前的信息 , 作用包含 : **提供回滚**(保证事务的原子性) 和 **MVCC**(多版本并发控制) 。
+
+undo log和redo log记录物理日志不一样，它是**逻辑日志**。可以认为当delete一条记录时，undo log中会记录一条对应的insert记录，反之亦然，当update一条记录时，它记录一条对应相反的update记录。当执行rollback时，就可以从undo log中的逻辑记录读取到相应的内容并进行回滚。
+
+**Undo log销毁**：
+
+undo log在事务执行时产生，事务提交时，并不会立即删除undo log，因为这些日志可能还用于MVCC。
+
+**Undo log存储**：
+
+undo log采用段的方式进行管理和记录，存放在 rollback segment回滚段中，内部包含1024个undo log segment。
+
+### MVCC 
+
+#### 基本概念
+
+MVCC 全称 `Multi-Version Concurrency Control`，**多版本并发控制**。指维护一个数据的多个版本，使得读写操作没有冲突，快照读为MySQL实现MVCC提供了一个非阻塞读功能。
+
+MVCC的具体实现，还需要依赖于数据库记录中的**三个隐式字段**、**undo log日志**、**readView**。
+
+```
+- 当前读
+读取的是记录的最新版本，读取时还要保证其他并发事务不能修改当前记录，会对读取的记录进行加锁。
+对于我们日常的操作，如：select ... lock in share mode(共享锁)，select ...for update、update、insert、delete(排他锁)都是一种当前读。
+
+- 快照读
+简单的select（不加锁）就是快照读，快照读，读取的是记录数据的可见版本，有可能是历史数据，不加锁，是非阻塞读。
+• Read Committed：每次select，都生成一个快照读。
+• Repeatable Read：开启事务后第一个select语句才是快照读的地方。
+• Serializable：快照读会退化为当前读。
+```
+
+#### 隐藏字段
+
+InnoDB引擎中, 当创建一张表时，除了显式声明的字段以外，InnoDB还会自动添加三个隐藏字段:
+
+| 隐藏字段 | 含义 |
+| -------- | ---- |
+|**DB_TRX_ID** |最近修改事务ID，记录插入这条记录或最后一次修改该记录的事务ID。|
+|**DB_ROLL_PTR**|回滚指针，指向这条记录的上一个版本，用于配合undo log，指向上一个版本。|
+|**DB_ROW_ID** |隐藏主键，如果表结构没有指定主键，将会生成该隐藏字段。|
+
+> 前两个字段是肯定会添加的， 是否添加最后一个字段DB_ROW_ID，得看当前表有没有主键，如果有主键，则不会添加该隐藏字段。
+
+#### undolog 回滚日志
+
+回滚日志，在insert、update、delete的时候产生的便于数据回滚的日志。
+
+当insert的时候，产生的undo log日志只在回滚时需要，在事务提交后，可被立即删除。
+而update、delete的时候，产生的undo log日志不仅在回滚时需要，在快照读时也需要，不会立即被删除。
+
+**版本链** 
+
+有一张表原始数据为：
+
+![image-20220725173850252](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/483ffb8f04470fb15a0fc30636e950cd-df3b43a.png)
+
+> DB_TRX_ID : 代表最近修改事务ID，记录插入这条记录或最后一次修改该记录的事务ID，是自增的。
+> DB_ROLL_PTR ： 代表回滚指针, 由于这条数据是才插入的，没有被更新过，所以该字段值为null。
+
+然后，有四个并发事务同时在访问这张表。生成版本链
+
+![image-20220725173926748](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/227afff3f0435f60774ce9dcd001e27e-a62c0f3.png)
+
+![image-20220725173954540](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c7f59ef11d6d89d043935a2c1138fc8f-12271f1.png)
+
+> 不同事务或相同事务对同一条记录进行修改，会导致该记录的undolog生成一条记录版本链表，链表的头部是最新的旧记录，链表尾部是最早的旧记录。
+
+#### readview 读视图
+
+ReadView(读视图)是 快照读 SQL执行时MVCC提取数据的依据，记录并维护系统当前**活跃的事务(未提交的)id**。
+
+ReadView中包含了四个核心字段：
+
+| 字段 | 含义 |
+| ---- | ---- |
+|**m_ids** |当前活跃的事务ID集合|
+|**min_trx_id** |最小活跃事务ID|
+|**max_trx_id** |预分配事务ID，当前最大事务ID+1（因为事务ID是自增的）|
+|**creator_trx_id** |ReadView创建者的事务ID|
+
+在readview中规定了版本链数据的访问规则：
+
+- `trx_id == creator_trx_id` 可以访问该版本, 说明数据是当前这个事务更改的。
+- `trx_id < min_trx_id`  可以访问该版本 ，说明数据已经提交了。
+- `trx_id > max_trx_id` 不可以访问该版本，说明该事务是在ReadView生成后才开启。
+- `min_trx_id <= trx_id<= max_trx_id`  如果trx_id不在m_ids中，是可以访问该版本的，说明数据已经提交。
+
+> trx_id 代表当前undolog版本链对应事务ID。
+
+不同的隔离级别，生成ReadView的时机不同：
+
+- **READ COMMITTED** ：在事务中每一次执行快照读时生成ReadView。
+- **REPEATABLE READ**：仅在事务中第一次执行快照读时生成ReadView，后续复用该ReadView。
+
+#### 原理分析
+
+- **RC隔离级别** 
+
+  RC隔离级别下，在事务中每一次执行快照读时生成ReadView。
+
+  在事务5中，查询了两次id为30的记录，由于隔离级别为Read Committed，所以每一次进行快照读都会生成一个ReadView，那么两次生成的ReadView如下:
+
+  ![image-20220725175207478](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eeaae0a757f830f2e7ff00d7a1d49087-80f29d1.png)
+
+  那么这两次快照读在获取数据时，就需要根据所生成的ReadView以及ReadView的版本链访问规则，到undolog版本链中匹配数据，最终决定此次快照读返回的数据。
+
+  - **第一次快照读具体的读取过程**：
+
+    ![image-20220725175305169](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/44a985a568d82f339f6b817c5a5d51ad-b3301a6.png)
+
+    ![image-20220725175310951](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8159017fd5b2ac88b7c8b5fd9e069a76-da89c74.png)
+
+    在进行匹配时，会从undo log的版本链，从上到下进行挨个匹配：
+
+    1) . 先匹配 `30, 10, A3, 4, 0x0003`这条记录
+
+    这条记录对应的trx_id为4，也就是将4带入右侧的匹配规则中:  
+
+    ​		①不满足 ②不满足 ③不满足 ④也不满足 ，
+
+    都不满足，则继续匹配undo log版本链的下一条。
+
+    2) . 再匹配第二条` 0x0003| 30, 3, A3, 3, 0x0002` 
+
+    这条记录对应的trx_id为3，也就是将3带入右侧的匹配规则中:
+
+    ​		①不满足 ②不满足 ③不满足 ④也不满足 ，
+
+    都不满足，则继续匹配undo log版本链的下一条。
+    3) . 再匹配第三条 ` 0x0002| 30, 3, A30, 2, 0x0001` 
+
+    这条记录对应的trx_id为2，也就是将2带入右侧的匹配规则中:
+
+    ​		①不满足 ②满足 终止匹配，
+
+    此次快照读，返回的数据就是版本链中记录的这条数据。
+
+  - **第二次快照读具体的读取过程**:
+
+    ![image-20220725175825200](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2fc947d8a663570b6aad7bc2c60dfaf0-30fbaea.png)
+
+    ![image-20220725175829186](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c4e27df50bc8e1340b460bcd9620669e-5fba479.png)
+
+    在进行匹配时，会从undo log的版本链，从上到下进行挨个匹配：
+
+    1) . 先匹配 `30, 10, A3, 4, 0x0003`这条记录
+
+    这条记录对应的trx_id为4，也就是将4带入右侧的匹配规则中:  
+
+    ​		①不满足 ②不满足 ③不满足 ④也不满足 ，
+
+    都不满足，则继续匹配undo log版本链的下一条。
+
+    2) . 再匹配第二条` 0x0003| 30, 3, A3, 3, 0x0002` 
+
+    这条记录对应的trx_id为3，也就是将3带入右侧的匹配规则中:
+
+    ​		①不满足 ②满足 终止匹配，
+
+    此次快照读，返回的数据就是版本链中记录的这条数据。
+
+- **RC隔离级别**
+
+  RR隔离级别下，仅在事务中第一次执行快照读时生成ReadView，后续复用该ReadView。 而RR 是可重复读，在一个事务中，执行两次相同的select语句，查询到的结果是一样的。
+
+  ![image-20220725175956274](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ba909042ed2f328de0ca377b79e28fca-ebc8b9d.png)
+
+  在RR隔离级别下，只是在事务中第一次快照读时生成ReadView，后续都是复用该ReadView，那么既然ReadView都一样， ReadView的版本链匹配规则也一样， 那么最终快照读返回的结果也是一样的。
+
+> MVCC的实现原理就是通过 InnoDB表的隐藏字段、UndoLog 版本链、ReadView来实现的。
+> MVCC + 锁，则实现了事务的隔离性。 而一致性则是由redolog 与 undolog保证。
+
+## MySQL管理
+
+### 系统数据库
+
+Mysql数据库安装完成后，自带了一下四个数据库，具体作用如下：
+
+| 数据库 | 含义 |
+| ------ | ---- |
+|mysql |存储MySQL服务器正常运行所需要的各种信息 （时区、主从、用户、权限等）|
+|information_schema|提供了访问数据库元数据的各种表和视图，包含数据库、表、字段类型及访问权限等|
+|performance_schema|为MySQL服务器运行时状态提供了一个底层监控功能，主要用于收集数据库服务器性能参数|
+|sys|包含了一系列方便 DBA 和开发人员利用 performance_schema性能数据库进行性能调优和诊断的视图|
+
+### 常用工具
+
+#### mysql客户端工具
+
+```
+语法 ：
+	mysql [options] [database]
+选项 ：
+ -u, --user=name #指定用户名
+ -p, --password[=name] #指定密码
+ -h, --host=name #指定服务器IP或域名
+ -P, --port=port #指定连接端口
+ -e, --execute=name #执行SQL语句并退出
+```
+
+`-e`选项可以在Mysql客户端执行SQL语句，而不用连接到MySQL数据库再执行，对于一些批处理脚本，这种方式尤其方便。
+
+```shell
+$ mysql -uroot –p123456 ni9nes_DB -e "select * from stu"; 
+```
+
+#### mysqladmin
+
+mysqladmin 是一个执行管理操作的客户端程序。可以用它来检查服务器的配置和当前状态、创建并删除数据库等。
+
+```
+通过帮助文档查看选项：
+	mysqladmin --help
+	
+语法:
+	mysqladmin [options] command ...
+选项:
+ -u, --user=name #指定用户名
+ -p, --password[=name] #指定密码
+ -h, --host=name #指定服务器IP或域名
+ -P, --port=port #指定连接端口
+```
+
+```shell
+$ mysqladmin -uroot –p123456 drop 'test01';
+$ mysqladmin -uroot –p123456 version;
+```
+
+#### mysqlbinlog
+
+由于服务器生成的二进制日志文件以二进制格式保存，所以如果想要检查这些文本的文本格式，就会使用到**mysqlbinlog** 日志管理工具。
+
+```
+语法 ：
+	mysqlbinlog [options] log-files1 log-files2 ...
+选项 ：
+ -d, --database=name 指定数据库名称，只列出指定的数据库相关操作。
+ -o, --offset=# 忽略掉日志中的前n行命令。
+ -r,--result-file=name 将输出的文本格式日志输出到指定文件。
+ -s, --short-form 显示简单格式， 省略掉一些信息。
+ --start-datatime=date1 --stop-datetime=date2 指定日期间隔内的所有日志。
+ --start-position=pos1 --stop-position=pos2 指定位置间隔内的所有日志。
+```
+
+```shell
+$ sudo mysqlbinlog -s -d ni9nes_DB /var/lib/mysql/binlog.000002
+```
+
+
+
+#### mysqlshow
+
+mysqlshow 客户端对象查找工具，用来很快地查找存在哪些数据库、数据库中的表、表中的列或者索引。
+
+```
+语法 ：
+	mysqlshow [options] [db_name [table_name [col_name]]]
+选项 ：
+ --count 显示数据库及表的统计信息（数据库，表 均可以不指定）
+ -i 显示指定数据库或者指定表的状态信息
+```
+
+```shell
+#查询test库中每个表中的字段书，及行数
+$ mysqlshow -uroot -p2143 test --count
+#查询test库中book表的详细情况
+$ mysqlshow -uroot -p2143 test book --count
+```
+
+#### mysqldump
+
+mysqldump 客户端工具用来备份数据库或在不同数据库之间进行数据迁移。备份内容包含创建表，及插入表的SQL语句。
+
+```
+语法 ：
+	mysqldump [options] db_name [tables]
+	mysqldump [options] --database/-B db1 [db2 db3...]
+	mysqldump [options] --all-databases/-A
+连接选项 ：
+ -u, --user=name 指定用户名
+ -p, --password[=name] 指定密码
+ -h, --host=name 指定服务器ip或域名
+ -P, --port=# 指定连接端口
+输出选项：
+ --add-drop-database 在每个数据库创建语句前加上 drop database 语句
+ --add-drop-table 在每个表创建语句前加上 drop table 语句 , 默认开启 ; 不开启 (--skip-add-drop-table)
+ -n, --no-create-db 不包含数据库的创建语句
+ -t, --no-create-info 不包含数据表的创建语句
+ -d --no-data 不包含数据
+ -T, --tab=name 自动生成两个文件：一个.sql文件，创建表结构的语句；一个.txt文件，数据文件(并不是记录一条条的insert语句，而是按照一定的格式记录表结构中的数据)
+```
+
+```shell
+$ mysqldump -uroot -p1234 db01 > db01.sql
+```
+
+#### mysqlimport/source
+
+- mysqlimport
+
+  mysqlimport 是客户端数据导入工具，用来导入mysqldump 加 -T 参数后导出的文本文件。
+
+  ```
+  语法 ：
+  	mysqlimport [options] db_name textfile1 [textfile2...]
+  ```
+
+  ```shell
+  $ mysqlimport -uroot -p2143 test /tmp/city.txt
+  ```
+
+  
+
+- source
+
+  如果需要导入sql文件,可以使用mysql中的source 指令 :
+
+  ```
+  source /root/xxxxx.sql
+  ```
+
+## 视图/存储过程/触发器/函数
+
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
 </search>
