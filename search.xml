@@ -43000,34 +43000,6 @@ $result = $pdo_stmt->fetchAll();
 
 执行关键处理后, 可以向用户注册邮箱发送相关处理内容的通知, 让用户第一时间知情, 降低损害
 
-
-
-![image-20220907102354779](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/328a63fa24f412a96b28b834b403439a-5a51513.png)
-
-![image-20220907103556039](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b2afb282f2858018f2b14df3039376f8-88adc0d.png)
-
-![image-20220907105331970](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e34eb616c1d76ff51216bce014492c01-de36d7a.png)
-
-
-
-方式:
-
-![image-20220907111639726](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eb62cbdb2cbcc7351eb9f5295f853ad4-c050011.png)
-
-检查Referer
-
-![image-20220907111539038](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/07b0207e96cdca12ab1fa484c79b5dbb-0c30532.png)
-
-嵌入机密令牌(Token )
-
-![image-20220907110830638](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/307a2ad70df94ae2f31ccddf3e6e993b-d54d5c6.png)
-
-再次输入密码/短信确认信息
-
-(密码确认需要在最后一个执行确认节点, 否则还是存在CSRF漏洞)
-
-辅助对策: 执行关键处理后, 向注册邮箱发送通知
-
 ## 不完善的会话管理
 
 Web应用中经常使用会话管理机制来记忆认证结果等状态. 一般使用**Cookie**记忆当前**会话ID**, 因此, 会话ID的作用相当于获取服务器端信息的钥匙
@@ -43676,26 +43648,6 @@ allow_url_include = Off
 | 影响程度     | 大                                                           |
 | 用户参与程度 | 不需要                                                       |
 | 对策概要     | - 不使用eval或eval相当的功能<br />- 避免eval的参数包含外界传入的参数<br />- eval参数中包含外界传入参数时, 限定为仅含数字字母 |
-
-
-
-
-
-
-
-
-
-## 发送邮件问题
-
-```
-# Apache中编辑httpd.conf
-  <Directory  "D:/wamp64/www/test/WebSecure/web/">
-    Options +Includes +FollowSymLinks +MultiViews # 去掉+Indexes配置
-    AllowOverride All
-    Require all granted
-  </Directory>
-```
-
 ]]></content>
       <categories>
         <category>开发资料</category>
