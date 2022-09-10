@@ -22,31 +22,41 @@
   <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="MySQL 用户账号相关操作具体操作命令格式 以下为常用命令">
+<meta name="description" content="1.准备私钥文件: id_rsa_2048.pub">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MySQL- 用户账号相关操作">
-<meta property="og:url" content="https://ni9ne.github.io/2020/09/05/MySQL%20%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:title" content="Navicat通过ssh-秘钥方式登录">
+<meta property="og:url" content="https://ni9ne.github.io/2021/01/15/MySql/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/index.html">
 <meta property="og:site_name" content="NI9NE&#39;s Zone">
-<meta property="og:description" content="MySQL 用户账号相关操作具体操作命令格式 以下为常用命令">
+<meta property="og:description" content="1.准备私钥文件: id_rsa_2048.pub">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ni9ne.github.io/images/imgs/I3wLQVQjl9.png">
-<meta property="article:published_time" content="2020-09-05T12:11:02.000Z">
-<meta property="article:modified_time" content="2021-11-10T17:17:51.225Z">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767009388.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767129649.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767239840.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767321155.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767348706.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767449908.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767605626.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767822670.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767945543.png">
+<meta property="og:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596768055237.png">
+<meta property="article:published_time" content="2021-01-15T11:22:56.000Z">
+<meta property="article:modified_time" content="2021-11-12T20:13:18.582Z">
 <meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="MySQL">
 <meta property="article:tag" content="PHP">
-<meta property="article:tag" content="后端 - MySQL">
+<meta property="article:tag" content="后端">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ni9ne.github.io/images/imgs/I3wLQVQjl9.png">
+<meta name="twitter:image" content="https://ni9ne.github.io/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767009388.png">
 
 
-<link rel="canonical" href="https://ni9ne.github.io/2020/09/05/MySQL%20%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C/">
+<link rel="canonical" href="https://ni9ne.github.io/2021/01/15/MySql/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2020/09/05/MySQL%20%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C/","path":"2020/09/05/MySQL 用户账号相关操作/","title":"MySQL- 用户账号相关操作"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2021/01/15/MySql/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/","path":"2021/01/15/MySql/MySQL navicat通过ssh-秘钥方式登录/","title":"Navicat通过ssh-秘钥方式登录"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>MySQL- 用户账号相关操作 | NI9NE's Zone</title>
+<title>Navicat通过ssh-秘钥方式登录 | NI9NE's Zone</title>
   
 
 
@@ -94,7 +104,7 @@
         <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
         <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">53</span></a></li>
         <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
-        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">98</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">99</span></a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -151,7 +161,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">MySQL 用户账号相关操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E6%93%8D%E4%BD%9C%E5%91%BD%E4%BB%A4%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">具体操作命令格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%83%E9%99%90%E8%AE%BE%E5%AE%9A%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">1.2.</span> <span class="nav-text">权限设定关键字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%AF%86%E7%A0%81%E9%97%AE%E9%A2%98"><span class="nav-number">1.3.</span> <span class="nav-text">初始密码问题</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%87%86%E5%A4%87%E7%A7%81%E9%92%A5%E6%96%87%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">1.准备私钥文件:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BD%AC%E6%8D%A2-pub%E6%96%87%E4%BB%B6%E4%B8%BAPEM%E6%96%87%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">2.转换.pub文件为PEM文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E4%BD%BF%E7%94%A8xshell-%E6%89%93%E5%BC%80%E5%B7%A5%E5%85%B7-%E7%94%A8%E6%88%B7%E7%A7%98%E9%92%A5%E7%AE%A1%E7%90%86%E8%80%85"><span class="nav-number">2.1.</span> <span class="nav-text">2.1.使用xshell, 打开工具-用户秘钥管理者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-%E7%82%B9%E5%87%BB%E9%80%89%E4%B8%AD%E7%A7%98%E9%92%A5-%E7%82%B9%E5%87%BB%E5%AF%BC%E5%87%BA"><span class="nav-number">2.2.</span> <span class="nav-text">2.2.点击选中秘钥, 点击导出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-%E9%80%89%E6%8B%A9%E4%BF%9D%E5%AD%98%E7%9B%AE%E5%BD%95%E5%8F%8A%E6%96%87%E4%BB%B6%E5%90%8D-%E9%BB%98%E8%AE%A4%E4%B8%BAPEM%E6%A0%BC%E5%BC%8F-%E4%B8%8D%E7%94%A8%E4%BF%AE%E6%94%B9"><span class="nav-number">2.3.</span> <span class="nav-text">2.3.选择保存目录及文件名, 默认为PEM格式, 不用修改</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-%E8%BE%93%E5%85%A5%E5%AF%86%E7%A0%81-%E5%AF%BC%E5%87%BA%E5%AE%8C%E6%88%90-%E6%97%A0%E6%8F%90%E7%A4%BA"><span class="nav-number">2.4.</span> <span class="nav-text">2.4.输入密码, 导出完成(无提示)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8Navicat%E9%93%BE%E6%8E%A5%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">3.</span> <span class="nav-text">3.使用Navicat链接数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E6%89%93%E5%BC%80Navicat-%E9%80%89%E6%8B%A9%E6%96%B0%E5%BB%BA%E9%93%BE%E6%8E%A5"><span class="nav-number">3.1.</span> <span class="nav-text">3.1.打开Navicat, 选择新建链接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-%E5%A1%AB%E5%86%99%E5%B8%B8%E8%A7%84%E9%A1%B9"><span class="nav-number">3.2.</span> <span class="nav-text">3.2.填写常规项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-%E5%A1%AB%E5%86%99SSH%E9%A1%B9"><span class="nav-number">3.3.</span> <span class="nav-text">3.3.填写SSH项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-%E8%BE%93%E5%85%A5%E7%94%9F%E6%88%90%E5%85%AC%E9%92%A5%E6%97%B6%E7%9A%84%E5%AF%86%E7%A0%81-%E6%B5%8B%E8%AF%95%E8%BF%9E%E6%8E%A5"><span class="nav-number">3.4.</span> <span class="nav-text">3.5.输入生成公钥时的密码,测试连接</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -166,7 +176,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">98</span>
+          <span class="site-state-item-count">99</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -230,7 +240,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2020/09/05/MySQL%20%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C/">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2021/01/15/MySql/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
@@ -243,7 +253,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          MySQL- 用户账号相关操作
+          Navicat通过ssh-秘钥方式登录
         </h1>
 
         <div class="post-meta-container">
@@ -254,7 +264,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2020-09-05 20:11:02" itemprop="dateCreated datePublished" datetime="2020-09-05T20:11:02+08:00">2020-09-05</time>
+      <time title="创建时间：2021-01-15 19:22:56" itemprop="dateCreated datePublished" datetime="2021-01-15T19:22:56+08:00">2021-01-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -262,7 +272,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+          <a href="/categories/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">环境配置</span></a>
         </span>
     </span>
 
@@ -276,16 +286,25 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="MySQL-用户账号相关操作"><a href="#MySQL-用户账号相关操作" class="headerlink" title="MySQL 用户账号相关操作"></a>MySQL 用户账号相关操作</h2><h3 id="具体操作命令格式"><a href="#具体操作命令格式" class="headerlink" title="具体操作命令格式"></a>具体操作命令格式</h3><blockquote>
-<p>以下为常用命令</p>
+        <h3 id="1-准备私钥文件"><a href="#1-准备私钥文件" class="headerlink" title="1.准备私钥文件:"></a>1.准备私钥文件:</h3><p> <code>id_rsa_2048.pub</code></p>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767009388.png" alt="1596767009388"></p>
+<h3 id="2-转换-pub文件为PEM文件"><a href="#2-转换-pub文件为PEM文件" class="headerlink" title="2.转换.pub文件为PEM文件"></a>2.转换.pub文件为PEM文件</h3><h4 id="2-1-使用xshell-打开工具-用户秘钥管理者"><a href="#2-1-使用xshell-打开工具-用户秘钥管理者" class="headerlink" title="2.1.使用xshell, 打开工具-用户秘钥管理者"></a>2.1.使用<code>xshell</code>, 打开<code>工具</code>-<code>用户秘钥管理者</code></h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767129649.png" alt="1596767129649"></p>
+<h4 id="2-2-点击选中秘钥-点击导出"><a href="#2-2-点击选中秘钥-点击导出" class="headerlink" title="2.2.点击选中秘钥, 点击导出"></a>2.2.点击选中秘钥, 点击导出</h4><blockquote>
+<p>如果没有秘钥, 请手动生成并将其发给管理员, 供其写入服务器验证文件</p>
 </blockquote>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">-- 查询用户</span><br><span class="line">SELECT * FROM user;</span><br><span class="line">-- 创建用户, 仅可看information_schema库</span><br><span class="line">CREATE USER &#x27;naxx&#x27;@&#x27;%&#x27; IDENTIFIED BY &#x27;111111&#x27;;</span><br><span class="line">-- 添加该用户对某个库的查询,更新权限</span><br><span class="line">GRANT SELECT,UPDATE ON qjjfwpt_saas.* TO &#x27;naxx&#x27;@&#x27;%&#x27;;</span><br><span class="line">-- 添加该用户对某个库的删除,更新权限</span><br><span class="line">GRANT DELETE ON qjjfwpt_saas.* TO &#x27;naxx&#x27;@&#x27;%&#x27;;</span><br><span class="line">-- 添加该用户对某个库的视图查询权限</span><br><span class="line">GRANT SHOW VIEW ON qjjfwpt_saas.* TO &#x27;naxx&#x27;@&#x27;%&#x27;;</span><br><span class="line">-- 刷新权限</span><br><span class="line">FLUSH privileges;</span><br><span class="line">-- 显示该用户在所有IP下的权限</span><br><span class="line">SHOW GRANTS FOR &#x27;naxx&#x27;@&#x27;%&#x27;;</span><br><span class="line">-- 显示该用户在指定IP下的所有权限</span><br><span class="line">SHOW GRANTS FOR &#x27;naxx&#x27;@&#x27;127.0.0.1&#x27;;</span><br><span class="line">-- 删除查看视图权限</span><br><span class="line">REVOKE SHOW VIEW ON qjjfwpt_saas.* FROM &#x27;naxx&#x27;@&#x27;%&#x27;;</span><br><span class="line">-- 删除指定用户</span><br><span class="line">DROP USER &#x27;naxx&#x27;@&#x27;%&#x27;;</span><br><span class="line">-- 修改用户密码</span><br><span class="line">SET PASSWORD FOR &#x27;naxx&#x27;@&#x27;%&#x27;=PASSWORD(&#x27;123456789&#x27;);</span><br><span class="line">-- 密码过期(下次登录需要自行修改密码)</span><br><span class="line">ALTER USER &#x27;naxx&#x27;@&#x27;%&#x27; PASSWORD EXPIRE;</span><br><span class="line">-- 锁定用户</span><br><span class="line">ALTER USER &#x27;naxx&#x27;@&#x27;%&#x27; account lock;</span><br><span class="line">-- 解锁用户</span><br><span class="line">ALTER USER &#x27;naxx&#x27;@&#x27;%&#x27; account unlock;</span><br></pre></td></tr></table></figure>
-
-<h3 id="权限设定关键字"><a href="#权限设定关键字" class="headerlink" title="权限设定关键字"></a>权限设定关键字</h3><p><img src="/images/imgs/I3wLQVQjl9.png" alt="I3wLQVQjl9"></p>
-<h3 id="初始密码问题"><a href="#初始密码问题" class="headerlink" title="初始密码问题"></a>初始密码问题</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">刚安装好的mysql登录使用auth_socket</span><br><span class="line">获取root权限</span><br><span class="line"><span class="meta">	$</span><span class="bash"> su root</span></span><br><span class="line">登录mysql</span><br><span class="line"><span class="meta">	$</span><span class="bash"> mysql</span></span><br><span class="line">执行SQL</span><br><span class="line"><span class="meta">	mysql&gt;</span><span class="bash"> update mysql.user <span class="built_in">set</span> host=<span class="string">&#x27;%&#x27;</span>,plugin=<span class="string">&#x27;mysql_native_password&#x27;</span>,authentication_string=password(<span class="string">&#x27;123456789&#x27;</span>) <span class="built_in">where</span> user=<span class="string">&#x27;root&#x27;</span>;</span></span><br><span class="line"><span class="meta">	mysql&gt;</span><span class="bash"> flush privileges;</span></span><br><span class="line"><span class="meta">	mysql&gt;</span><span class="bash"> <span class="built_in">exit</span>;</span></span><br><span class="line">修改mysql配置</span><br><span class="line"><span class="meta">	$</span><span class="bash"> sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf</span></span><br><span class="line">注释以下行</span><br><span class="line"><span class="meta">	#</span><span class="bash"> bind-address          = 127.0.0.1</span></span><br><span class="line">重启mysql服务</span><br><span class="line"><span class="meta">	$</span><span class="bash"> sudo service mysql restart</span></span><br><span class="line">即可正常使用Navicat客户端连接数据库</span><br></pre></td></tr></table></figure>
-
-
-
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767239840.png" alt="1596767239840"></p>
+<h4 id="2-3-选择保存目录及文件名-默认为PEM格式-不用修改"><a href="#2-3-选择保存目录及文件名-默认为PEM格式-不用修改" class="headerlink" title="2.3.选择保存目录及文件名, 默认为PEM格式, 不用修改"></a>2.3.选择保存目录及文件名, 默认为PEM格式, 不用修改</h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767321155.png" alt="1596767321155"></p>
+<h4 id="2-4-输入密码-导出完成-无提示"><a href="#2-4-输入密码-导出完成-无提示" class="headerlink" title="2.4.输入密码, 导出完成(无提示)"></a>2.4.输入密码, 导出完成(无提示)</h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767348706.png" alt="1596767348706"></p>
+<h3 id="3-使用Navicat链接数据库"><a href="#3-使用Navicat链接数据库" class="headerlink" title="3.使用Navicat链接数据库"></a>3.使用<code>Navica</code>t链接数据库</h3><h4 id="3-1-打开Navicat-选择新建链接"><a href="#3-1-打开Navicat-选择新建链接" class="headerlink" title="3.1.打开Navicat, 选择新建链接"></a>3.1.打开Navicat, 选择新建链接</h4><blockquote>
+<p>不要在原有数据库链接上修改, 否则有可能报错: <code>connectiong has been used</code></p>
+</blockquote>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767449908.png" alt="1596767449908"></p>
+<h4 id="3-2-填写常规项"><a href="#3-2-填写常规项" class="headerlink" title="3.2.填写常规项"></a>3.2.填写常规项</h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767605626.png" alt="1596767605626"></p>
+<h4 id="3-3-填写SSH项"><a href="#3-3-填写SSH项" class="headerlink" title="3.3.填写SSH项"></a>3.3.填写SSH项</h4><p>勾选使用SSH通道, 填写内容, 选择验证方法为公钥</p>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767822670.png" alt="1596767822670"></p>
+<p>3.4.选择生成的PEM公钥文件</p>
+<p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596767945543.png" alt="1596767945543"></p>
+<h4 id="3-5-输入生成公钥时的密码-测试连接"><a href="#3-5-输入生成公钥时的密码-测试连接" class="headerlink" title="3.5.输入生成公钥时的密码,测试连接"></a>3.5.输入生成公钥时的密码,测试连接</h4><p><img src="/images/imgs/Navicat%E4%BD%BF%E7%94%A8/1596768055237.png" alt="1596768055237"></p>
 
     </div>
 
@@ -303,7 +322,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://ni9ne.github.io/2020/09/05/MySQL%20%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C/" title="MySQL- 用户账号相关操作">https://ni9ne.github.io/2020/09/05/MySQL 用户账号相关操作/</a>
+      <a href="https://ni9ne.github.io/2021/01/15/MySql/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/" title="Navicat通过ssh-秘钥方式登录">https://ni9ne.github.io/2021/01/15/MySql/MySQL navicat通过ssh-秘钥方式登录/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -312,21 +331,22 @@
 </div>
 
           <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
               <a href="/tags/PHP/" rel="tag"># PHP</a>
-              <a href="/tags/%E5%90%8E%E7%AB%AF-MySQL/" rel="tag"># 后端 - MySQL</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2020/05/22/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BA%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C/" rel="prev" title="导入导出系统使用手册">
-                  <i class="fa fa-chevron-left"></i> 导入导出系统使用手册
+                <a href="/2020/12/12/%E7%AE%97%E6%B3%95/%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0/" rel="prev" title="雪花算法实现">
+                  <i class="fa fa-chevron-left"></i> 雪花算法实现
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2020/09/22/Linux%E6%89%A9%E5%AE%B9%E5%8F%8A%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/" rel="next" title="Linux扩容及挂载硬盘">
-                  Linux扩容及挂载硬盘 <i class="fa fa-chevron-right"></i>
+                <a href="/2021/01/15/Libreoffice%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97/" rel="next" title="Libreoffice升级指南">
+                  Libreoffice升级指南 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>

