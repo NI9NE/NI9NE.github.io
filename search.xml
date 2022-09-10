@@ -42457,8 +42457,9 @@ ALTER USER 'naxx'@'%' account unlock;
         <category>学习笔记</category>
       </categories>
       <tags>
+        <tag>MySQL</tag>
         <tag>PHP</tag>
-        <tag>后端 - MySQL</tag>
+        <tag>后端</tag>
       </tags>
   </entry>
   <entry>
@@ -42536,8 +42537,9 @@ ALTER USER 'naxx'@'%' account unlock;
         <category>学习笔记</category>
       </categories>
       <tags>
+        <tag>MySQL</tag>
         <tag>PHP</tag>
-        <tag>后端 - MySQL</tag>
+        <tag>后端</tag>
       </tags>
   </entry>
   <entry>
