@@ -12796,11 +12796,11 @@ class wechatCallbackapiTest
                 $keyword = trim($postObj->Content);
                 $time = time();
                 $textTpl = "<xml>
-							<ToUserName><![CDATA[%s]]></ToUserName>
-							<FromUserName><![CDATA[%s]]></FromUserName>
+							<ToUserName><![ CDATA[%s] ]></ToUserName>
+							<FromUserName><![ CDATA[%s] ]></FromUserName>
 							<CreateTime>%s</CreateTime>
-							<MsgType><![CDATA[%s]]></MsgType>
-							<Content><![CDATA[%s]]></Content>
+							<MsgType><![ CDATA[%s] ]></MsgType>
+							<Content><![ CDATA[%s] ]></Content>
 							<FuncFlag>0</FuncFlag>
 							</xml>";             
 				if(!empty( $keyword ))
@@ -15126,7 +15126,9 @@ use qq\QC;
 
 #### 里氏代换原则
 
-> 子类应扩展父类的功能, 但不能重写 改变父类原有的功能
+一个抽象的任意实现都可以在声明该抽象的地方替换它。通俗点说就是：如果一个类使用了某个接口的实现，那么一定可以通过该接口的其它实现来替换它，不用做出任何修改。
+
+> 里氏替换原则规定对象可以被其子类的实例所替换，并且不会影响到程序的正确性。换言之, 子类应扩展父类的功能, 但不能重写 改变父类原有的功能
 
 #### 依赖倒置原则
 

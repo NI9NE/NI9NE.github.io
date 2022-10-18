@@ -31,7 +31,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://ni9ne.github.io/images/imgs/image-20211109223010611.png">
 <meta property="article:published_time" content="2020-01-07T10:33:12.000Z">
-<meta property="article:modified_time" content="2021-11-09T17:47:22.944Z">
+<meta property="article:modified_time" content="2022-09-12T12:22:39.266Z">
 <meta property="article:author" content="NI9NE">
 <meta property="article:tag" content="PHP">
 <meta property="article:tag" content="后端">
@@ -268,6 +268,13 @@
     </span>
 
   
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
 </div>
 
         </div>
@@ -294,8 +301,9 @@
 </blockquote>
 <p>当类存在多个职责时, 若其中一个职责需要变更修改, 可能导致其他职责功能受到影响, 从而出现故障风险</p>
 <p>使用单一职责设计可以<strong>降低类的复杂度, 可读性, 可维护性和变更引起的风险</strong> </p>
-<h4 id="里氏代换原则"><a href="#里氏代换原则" class="headerlink" title="里氏代换原则"></a>里氏代换原则</h4><blockquote>
-<p>子类应扩展父类的功能, 但不能重写 改变父类原有的功能</p>
+<h4 id="里氏代换原则"><a href="#里氏代换原则" class="headerlink" title="里氏代换原则"></a>里氏代换原则</h4><p>一个抽象的任意实现都可以在声明该抽象的地方替换它。通俗点说就是：如果一个类使用了某个接口的实现，那么一定可以通过该接口的其它实现来替换它，不用做出任何修改。</p>
+<blockquote>
+<p>里氏替换原则规定对象可以被其子类的实例所替换，并且不会影响到程序的正确性。换言之, 子类应扩展父类的功能, 但不能重写 改变父类原有的功能</p>
 </blockquote>
 <h4 id="依赖倒置原则"><a href="#依赖倒置原则" class="headerlink" title="依赖倒置原则"></a>依赖倒置原则</h4><blockquote>
 <p>高层模块不应依赖底层模块, 抽象不应依赖于细节, 都应依赖于抽象</p>
@@ -522,6 +530,24 @@
   </span>
   <span class="author" itemprop="copyrightHolder">NI9NE</span>
 </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
     </div>
   </footer>
@@ -544,6 +570,7 @@
 
 
   
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
 
