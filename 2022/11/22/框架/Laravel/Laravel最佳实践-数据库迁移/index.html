@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="数据库迁移 无符号整型 迁移顺序 带时区的迁移字段 数据库迁移字段类型 默认时间戳 迁移状态 创建带空格的迁移 在另一列的后面创建一列 为已经存在的表生成迁移文件 执行迁移前先输出 SQL 语句 匿名迁移 给迁移添加注释 表名表字段检测  无符号整型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laravel最佳实践-数据库迁移">
+<meta property="og:url" content="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="数据库迁移 无符号整型 迁移顺序 带时区的迁移字段 数据库迁移字段类型 默认时间戳 迁移状态 创建带空格的迁移 在另一列的后面创建一列 为已经存在的表生成迁移文件 执行迁移前先输出 SQL 语句 匿名迁移 给迁移添加注释 表名表字段检测  无符号整型">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-22T14:51:55.000Z">
+<meta property="article:modified_time" content="2023-10-26T03:06:14.195Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="框架开发">
+<meta property="article:tag" content="Laravel">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB/","path":"2022/11/22/框架/Laravel/Laravel最佳实践-数据库迁移/","title":"Laravel最佳实践-数据库迁移"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Laravel最佳实践-数据库迁移 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">52</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">106</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB"><span class="nav-number">1.</span> <span class="nav-text">数据库迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E7%AC%A6%E5%8F%B7%E6%95%B4%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">无符号整型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.2.</span> <span class="nav-text">迁移顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%A6%E6%97%B6%E5%8C%BA%E7%9A%84%E8%BF%81%E7%A7%BB%E5%AD%97%E6%AE%B5"><span class="nav-number">1.3.</span> <span class="nav-text">带时区的迁移字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB%E5%AD%97%E6%AE%B5%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.4.</span> <span class="nav-text">数据库迁移字段类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E6%97%B6%E9%97%B4%E6%88%B3"><span class="nav-number">1.5.</span> <span class="nav-text">默认时间戳</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E7%8A%B6%E6%80%81"><span class="nav-number">1.6.</span> <span class="nav-text">迁移状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%B8%A6%E7%A9%BA%E6%A0%BC%E7%9A%84%E8%BF%81%E7%A7%BB"><span class="nav-number">1.7.</span> <span class="nav-text">创建带空格的迁移</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E5%8F%A6%E4%B8%80%E5%88%97%E7%9A%84%E5%90%8E%E9%9D%A2%E5%88%9B%E5%BB%BA%E4%B8%80%E5%88%97"><span class="nav-number">1.8.</span> <span class="nav-text">在另一列的后面创建一列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E5%B7%B2%E7%BB%8F%E5%AD%98%E5%9C%A8%E7%9A%84%E8%A1%A8%E7%94%9F%E6%88%90%E8%BF%81%E7%A7%BB%E6%96%87%E4%BB%B6"><span class="nav-number">1.9.</span> <span class="nav-text">为已经存在的表生成迁移文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E8%BF%81%E7%A7%BB%E5%89%8D%E5%85%88%E8%BE%93%E5%87%BA-SQL-%E8%AF%AD%E5%8F%A5"><span class="nav-number">1.10.</span> <span class="nav-text">执行迁移前先输出 SQL 语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%BF%E5%90%8D%E8%BF%81%E7%A7%BB"><span class="nav-number">1.11.</span> <span class="nav-text">匿名迁移</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%99%E8%BF%81%E7%A7%BB%E6%B7%BB%E5%8A%A0%E6%B3%A8%E9%87%8A"><span class="nav-number">1.12.</span> <span class="nav-text">给迁移添加注释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A8%E5%90%8D%E8%A1%A8%E5%AD%97%E6%AE%B5%E6%A3%80%E6%B5%8B"><span class="nav-number">1.13.</span> <span class="nav-text">表名表字段检测</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">106</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Laravel最佳实践-数据库迁移
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-11-22 22:51:55" itemprop="dateCreated datePublished" datetime="2022-11-22T22:51:55+08:00">2022-11-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="数据库迁移"><a href="#数据库迁移" class="headerlink" title="数据库迁移"></a>数据库迁移</h2><ol>
+<li><a href="#%E6%97%A0%E7%AC%A6%E5%8F%B7%E6%95%B4%E5%9E%8B">无符号整型</a></li>
+<li><a href="#%E8%BF%81%E7%A7%BB%E9%A1%BA%E5%BA%8F">迁移顺序</a></li>
+<li><a href="#%E5%B8%A6%E6%97%B6%E5%8C%BA%E7%9A%84%E8%BF%81%E7%A7%BB%E5%AD%97%E6%AE%B5">带时区的迁移字段</a></li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB%E5%AD%97%E6%AE%B5%E7%B1%BB%E5%9E%8B">数据库迁移字段类型</a></li>
+<li><a href="#%E9%BB%98%E8%AE%A4%E6%97%B6%E9%97%B4%E6%88%B3">默认时间戳</a></li>
+<li><a href="#%E8%BF%81%E7%A7%BB%E7%8A%B6%E6%80%81">迁移状态</a></li>
+<li><a href="#%E5%88%9B%E5%BB%BA%E5%B8%A6%E7%A9%BA%E6%A0%BC%E7%9A%84%E8%BF%81%E7%A7%BB">创建带空格的迁移</a></li>
+<li><a href="#%E5%9C%A8%E5%8F%A6%E4%B8%80%E5%88%97%E7%9A%84%E5%90%8E%E9%9D%A2%E5%88%9B%E5%BB%BA%E4%B8%80%E5%88%97">在另一列的后面创建一列</a></li>
+<li><a href="#%E4%B8%BA%E5%B7%B2%E7%BB%8F%E5%AD%98%E5%9C%A8%E7%9A%84%E8%A1%A8%E7%94%9F%E6%88%90%E8%BF%81%E7%A7%BB%E6%96%87%E4%BB%B6">为已经存在的表生成迁移文件</a></li>
+<li><a href="#%E6%89%A7%E8%A1%8C%E8%BF%81%E7%A7%BB%E5%89%8D%E5%85%88%E8%BE%93%E5%87%BA-SQL-%E8%AF%AD%E5%8F%A5">执行迁移前先输出 SQL 语句</a></li>
+<li><a href="#%E5%8C%BF%E5%90%8D%E8%BF%81%E7%A7%BB">匿名迁移</a></li>
+<li><a href="#%E7%BB%99%E8%BF%81%E7%A7%BB%E6%B7%BB%E5%8A%A0%E6%B3%A8%E9%87%8A">给迁移添加注释</a></li>
+<li><a href="#%E8%A1%A8%E5%90%8D%E8%A1%A8%E5%AD%97%E6%AE%B5%E6%A3%80%E6%B5%8B">表名表字段检测</a></li>
+</ol>
+<h3 id="无符号整型"><a href="#无符号整型" class="headerlink" title="无符号整型"></a>无符号整型</h3><p>作为迁移的外键，请使用 <code>unsignedInteger()</code>  类型或 <code>integer()-&gt;unsigned()</code> 来替代 <code>integer()</code> ，否则你会得到 SQL 错误。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Schema::create(<span class="string">&#x27;employees&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Blueprint <span class="variable">$table</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$table</span>-&gt;unsignedInteger(<span class="string">&#x27;company_id&#x27;</span>);</span><br><span class="line">    <span class="variable">$table</span>-&gt;foreign(<span class="string">&#x27;company_id&#x27;</span>)-&gt;references(<span class="string">&#x27;id&#x27;</span>)-&gt;on(<span class="string">&#x27;companies&#x27;</span>);</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>同样，你可以用 <code>unsignedBigInteger()</code> 如果外键对应的是 <code>bigInteger()</code> 类型。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Schema::create(<span class="string">&#x27;employees&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Blueprint <span class="variable">$table</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$table</span>-&gt;unsignedBigInteger(<span class="string">&#x27;company_id&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="迁移顺序"><a href="#迁移顺序" class="headerlink" title="迁移顺序"></a>迁移顺序</h3><p>如果你想改变数据库迁移的顺序，只需要将文件按时间戳记命名， 就像 <code>2018_08_04_070443_create_posts_table.php</code> 改为 <code>2018_07_04_070443_create_posts_table.php</code> (从 <code>2018_08_04</code> 改成了 <code>2018_07_04</code>).</p>
+<p>迁移是以字母顺序执行。</p>
+<h3 id="带时区的迁移字段"><a href="#带时区的迁移字段" class="headerlink" title="带时区的迁移字段"></a>带时区的迁移字段</h3><p>你知不知道在迁移中不止有 <code>timestamps()</code> 还有带时区的 <code>timestampsTz()</code> 。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Schema::create(<span class="string">&#x27;employees&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Blueprint <span class="variable">$table</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$table</span>-&gt;increments(<span class="string">&#x27;id&#x27;</span>);</span><br><span class="line">    <span class="variable">$table</span>-&gt;string(<span class="string">&#x27;name&#x27;</span>);</span><br><span class="line">    <span class="variable">$table</span>-&gt;string(<span class="string">&#x27;email&#x27;</span>);</span><br><span class="line">    <span class="variable">$table</span>-&gt;timestampsTz();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>同样，还有这么些列 <code>dateTimeTz()</code> ，<code> timeTz()</code> ， <code>timestampTz()</code> ， <code>softDeletesTz()</code>。</p>
+<h3 id="数据库迁移字段类型"><a href="#数据库迁移字段类型" class="headerlink" title="数据库迁移字段类型"></a>数据库迁移字段类型</h3><p>迁移中有一些有趣的字段类型，下面是一些示例。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$table</span>-&gt;geometry(<span class="string">&#x27;positions&#x27;</span>);</span><br><span class="line"><span class="variable">$table</span>-&gt;ipAddress(<span class="string">&#x27;visitor&#x27;</span>);</span><br><span class="line"><span class="variable">$table</span>-&gt;macAddress(<span class="string">&#x27;device&#x27;</span>);</span><br><span class="line"><span class="variable">$table</span>-&gt;point(<span class="string">&#x27;position&#x27;</span>);</span><br><span class="line"><span class="variable">$table</span>-&gt;uuid(<span class="string">&#x27;id&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>在 <a target="_blank" rel="noopener" href="https://laravel.com/docs/master/migrations#creating-columns">官方文档</a> 中你可以找到全部的字段类型列表.</p>
+<h3 id="默认时间戳"><a href="#默认时间戳" class="headerlink" title="默认时间戳"></a>默认时间戳</h3><p>当创建迁移文件时，你可以使用带<br><code>useCurrent()</code> 和 <code>useCurrentOnUpdate()</code> 可选项的 <code>timestamp()</code> 类型，这将会设置使相应字段以 <code>CURRENT_TIMESTAMP</code> 作为默认值。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$table</span>-&gt;timestamp(<span class="string">&#x27;created_at&#x27;</span>)-&gt;useCurrent();</span><br><span class="line"><span class="variable">$table</span>-&gt;timestamp(<span class="string">&#x27;updated_at&#x27;</span>)-&gt;useCurrentOnUpdate();</span><br></pre></td></tr></table></figure>
+
+<h3 id="迁移状态"><a href="#迁移状态" class="headerlink" title="迁移状态"></a>迁移状态</h3><p>如果你想知道迁移是不是已经运行过了，不需要查看 “migrations” 表，你可以运行 <code>php artisan migrate:status</code> 命令来查看。</p>
+<p>结果示例:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+------+------------------------------------------------+-------+</span><br><span class="line">| Ran? | Migration                                      | Batch |</span><br><span class="line">+------+------------------------------------------------+-------+</span><br><span class="line">| Yes  | 2014_10_12_000000_create_users_table           | 1     |</span><br><span class="line">| Yes  | 2014_10_12_100000_create_password_resets_table | 1     |</span><br><span class="line">| No   | 2019_08_19_000000_create_failed_jobs_table     |       |</span><br><span class="line">+------+------------------------------------------------+-------+</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建带空格的迁移"><a href="#创建带空格的迁移" class="headerlink" title="创建带空格的迁移"></a>创建带空格的迁移</h3><p>当你打入 <code>make:migration</code> 命令，你不 “必须” 在不同部分间使用下划线 _ 进行分隔，比如 <code>create_transactions_table</code> 。你可以把名字用引号引起来并把下划线换成空格。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// This works</span></span><br><span class="line">php artisan make:migration create_transactions_table</span><br><span class="line"></span><br><span class="line"><span class="comment">// But this works too</span></span><br><span class="line">php artisan make:migration <span class="string">&quot;create transactions table&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>Source: <a target="_blank" rel="noopener" href="https://twitter.com/stephenoldham/status/1353647972991578120">Steve O on Twitter</a></p>
+<h3 id="在另一列的后面创建一列"><a href="#在另一列的后面创建一列" class="headerlink" title="在另一列的后面创建一列"></a>在另一列的后面创建一列</h3><p>注意： 仅 MySQL 可用<br>如果你要在已经存在的表里增加一个新列，这个列不 “必须” 成为最后一列，你可以指定这个列创建在哪个列的后面</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Schema::table(<span class="string">&#x27;users&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Blueprint <span class="variable">$table</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$table</span>-&gt;string(<span class="string">&#x27;phone&#x27;</span>)-&gt;after(<span class="string">&#x27;email&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>如果你要在已经存在的表里增加一个新列，这个列不 “必须” 成为最后一列，你也可以指定这个列创建在哪个列的前面：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Schema::table(<span class="string">&#x27;users&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Blueprint <span class="variable">$table</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$table</span>-&gt;string(<span class="string">&#x27;phone&#x27;</span>)-&gt;before(<span class="string">&#x27;created_at&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>如果你让创建的列排在表中的第一个，那么可以使用 <code>first</code> 方法。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Schema::table(<span class="string">&#x27;users&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Blueprint <span class="variable">$table</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$table</span>-&gt;string(<span class="string">&#x27;uuid&#x27;</span>)-&gt;first();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="为已经存在的表生成迁移文件"><a href="#为已经存在的表生成迁移文件" class="headerlink" title="为已经存在的表生成迁移文件"></a>为已经存在的表生成迁移文件</h3><p>如果你要为已经存的表生成迁移文件，而且你想让 Lavarel 来为你生成 Schema::table ()  代码，那么，在命令后面加入  “_in_xxxxx_table” 或”_to_xxxxx_table”，或者指明 “–table” 参数。<br><code>php artisan make:migration change_fields_products_table</code> generates empty class</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChangeFieldsProductsTable</span> <span class="keyword">extends</span> <span class="title">Migration</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">up</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是，加入 <code>in_xxxxx_table</code> <code>php artisan make:migration change_fields_in_products_table</code> 生成了填好了 <code>Schemma::table()</code> 的类。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChangeFieldsProductsTable</span> <span class="keyword">extends</span> <span class="title">Migration</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">up</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        Schema::table(<span class="string">&#x27;products&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Blueprint <span class="variable">$table</span></span>) </span>&#123;</span><br><span class="line">            <span class="comment">//</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样，你可以指明 <code>--table</code> 参数 <code>php artisan make:migration whatever_you_want --table=products</code></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WhateverYouWant</span> <span class="keyword">extends</span> <span class="title">Migration</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">up</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        Schema::table(<span class="string">&#x27;products&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Blueprint <span class="variable">$table</span></span>) </span>&#123;</span><br><span class="line">            <span class="comment">//</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="执行迁移前先输出-SQL-语句"><a href="#执行迁移前先输出-SQL-语句" class="headerlink" title="执行迁移前先输出 SQL 语句"></a>执行迁移前先输出 SQL 语句</h3><p>当输入 migrate –pretend 命令，你可以得到将在终端中执行的 SQL 查询。如果有需要的话调试 SQL 的方法，这是个很有趣的方法。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Artisan command</span></span><br><span class="line">php artisan migrate --pretend</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="匿名迁移"><a href="#匿名迁移" class="headerlink" title="匿名迁移"></a>匿名迁移</h3><p><code>Laravel</code>团队发布了<code>Laravel 8.37</code>版本 支持匿名迁移，解决了迁移命名冲突的问题。</p>
+<p>这个问题的核心是 如果多个迁移有相同的类名 当尝试重新创建数据库时可能会导致问题</p>
+<p>以下是一个来自 <code>pr </code>的例子</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Database</span>\<span class="title">Migrations</span>\<span class="title">Migration</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Database</span>\<span class="title">Schema</span>\<span class="title">Blueprint</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Support</span>\<span class="title">Facades</span>\<span class="title">Schema</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="keyword">new</span> <span class="class"><span class="keyword">class</span> <span class="keyword">extends</span> <span class="title">Migration</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">up</span>(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">    &#123;</span></span></span><br><span class="line"><span class="params"><span class="function">        Schema::table(<span class="params"><span class="string">&#x27;people&#x27;</span>, function (<span class="params">Blueprint <span class="variable">$table</span></span>) &#123;</span></span></span></span><br><span class="line"><span class="params"><span class="params"><span class="function">            <span class="variable">$table</span>-&gt;<span class="keyword">string</span>(<span class="params"><span class="string">&#x27;first_name&#x27;</span></span>)-&gt;nullable(<span class="params"></span>);</span></span></span></span><br><span class="line"><span class="params"><span class="params"><span class="function">        &#125;</span>);</span></span></span><br><span class="line"><span class="params"><span class="function">    &#125;</span></span></span><br><span class="line"><span class="params"><span class="function"></span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="keyword">public</span> function down(<span class="params"></span>)</span></span></span><br><span class="line"><span class="params"><span class="function">    &#123;</span></span></span><br><span class="line"><span class="params"><span class="function">        Schema::table(<span class="params"><span class="string">&#x27;people&#x27;</span>, function (<span class="params">Blueprint <span class="variable">$table</span></span>) &#123;</span></span></span></span><br><span class="line"><span class="params"><span class="params"><span class="function">            <span class="variable">$table</span>-&gt;dropColumn(<span class="params"><span class="string">&#x27;first_name&#x27;</span></span>);</span></span></span></span><br><span class="line"><span class="params"><span class="params"><span class="function">        &#125;</span>);</span></span></span><br><span class="line"><span class="params"><span class="function">    &#125;</span></span></span><br><span class="line"><span class="params"><span class="function">&#125;;</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="给迁移添加注释"><a href="#给迁移添加注释" class="headerlink" title="给迁移添加注释"></a>给迁移添加注释</h3><p>在迁移中你可以给字段添加 <code>comment</code> 提供有用的信息。</p>
+<p>如果数据库被其他开发者管理,他们在任何操作之前可以看这些表结构的注释。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$table</span>-&gt;unsignedInteger(<span class="string">&#x27;interval&#x27;</span>)</span><br><span class="line">    -&gt;index()</span><br><span class="line">    -&gt;comment(<span class="string">&#x27;This column is used for indexing.&#x27;</span>)   </span><br></pre></td></tr></table></figure>
+
+<h3 id="表名表字段检测"><a href="#表名表字段检测" class="headerlink" title="表名表字段检测"></a>表名表字段检测</h3><p>你可以使用 <code>hasTable</code> 和 <code>hasColumn</code> 方法检测表或字段是否存在。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Schema::hasTable(<span class="string">&#x27;users&#x27;</span>)) &#123;</span><br><span class="line">    <span class="comment">// The &quot;users&quot; table exists...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (Schema::hasColumn(<span class="string">&#x27;users&#x27;</span>, <span class="string">&#x27;email&#x27;</span>)) &#123;</span><br><span class="line">    <span class="comment">// The &quot;users&quot; table exists and has an &quot;email&quot; column...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB/" title="Laravel最佳实践-数据库迁移">https://ni9ne.github.io/2022/11/22/框架/Laravel/Laravel最佳实践-数据库迁移/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91/" rel="tag"># 框架开发</a>
+              <a href="/tags/Laravel/" rel="tag"># Laravel</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%A8%A1%E5%9E%8B%E4%B8%8EEloquent/" rel="prev" title="Laravel最佳实践-模型与Eloquent">
+                  <i class="fa fa-chevron-left"></i> Laravel最佳实践-模型与Eloquent
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%A8%A1%E5%9E%8B%E5%85%B3%E8%81%94/" rel="next" title="Laravel最佳实践-模型关联">
+                  Laravel最佳实践-模型关联 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

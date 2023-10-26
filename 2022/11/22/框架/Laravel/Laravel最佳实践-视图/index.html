@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="视图 foreach 语句中的 $loop 变量 视图是否存在 错误代码视图页面 脱离控制器的视图 Blade @auth 指令 Blade 视图中的二级 $loop 变量 创建你自己的 Blade 指令 视图指令IncludeIf IncludeWhen IncludeFirst 使用Laravel Blade-X 变量绑定节省更多空间 Blade 组件属性 Blade类型提示 组件语法提示 自">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laravel最佳实践-视图">
+<meta property="og:url" content="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E8%A7%86%E5%9B%BE/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="视图 foreach 语句中的 $loop 变量 视图是否存在 错误代码视图页面 脱离控制器的视图 Blade @auth 指令 Blade 视图中的二级 $loop 变量 创建你自己的 Blade 指令 视图指令IncludeIf IncludeWhen IncludeFirst 使用Laravel Blade-X 变量绑定节省更多空间 Blade 组件属性 Blade类型提示 组件语法提示 自">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-22T14:54:21.000Z">
+<meta property="article:modified_time" content="2023-10-26T03:06:14.195Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="框架开发">
+<meta property="article:tag" content="Laravel">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E8%A7%86%E5%9B%BE/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E8%A7%86%E5%9B%BE/","path":"2022/11/22/框架/Laravel/Laravel最佳实践-视图/","title":"Laravel最佳实践-视图"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Laravel最佳实践-视图 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">52</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">106</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE"><span class="nav-number">1.</span> <span class="nav-text">视图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#foreach-%E8%AF%AD%E5%8F%A5%E4%B8%AD%E7%9A%84-loop-%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">foreach 语句中的 $loop 变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8"><span class="nav-number">1.2.</span> <span class="nav-text">视图是否存在</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E4%BB%A3%E7%A0%81%E8%A7%86%E5%9B%BE%E9%A1%B5%E9%9D%A2"><span class="nav-number">1.3.</span> <span class="nav-text">错误代码视图页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%84%B1%E7%A6%BB%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E8%A7%86%E5%9B%BE"><span class="nav-number">1.4.</span> <span class="nav-text">脱离控制器的视图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blade-auth-%E6%8C%87%E4%BB%A4"><span class="nav-number">1.5.</span> <span class="nav-text">Blade @auth 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blade-%E8%A7%86%E5%9B%BE%E4%B8%AD%E7%9A%84%E4%BA%8C%E7%BA%A7-loop-%E5%8F%98%E9%87%8F"><span class="nav-number">1.6.</span> <span class="nav-text">Blade 视图中的二级 $loop 变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%BD%A0%E8%87%AA%E5%B7%B1%E7%9A%84-Blade-%E6%8C%87%E4%BB%A4"><span class="nav-number">1.7.</span> <span class="nav-text">创建你自己的 Blade 指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE%E6%8C%87%E4%BB%A4IncludeIf-IncludeWhen-IncludeFirst"><span class="nav-number">1.8.</span> <span class="nav-text">视图指令IncludeIf IncludeWhen IncludeFirst</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Laravel-Blade-X-%E5%8F%98%E9%87%8F%E7%BB%91%E5%AE%9A%E8%8A%82%E7%9C%81%E6%9B%B4%E5%A4%9A%E7%A9%BA%E9%97%B4"><span class="nav-number">1.9.</span> <span class="nav-text">使用Laravel Blade-X 变量绑定节省更多空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blade-%E7%BB%84%E4%BB%B6%E5%B1%9E%E6%80%A7"><span class="nav-number">1.10.</span> <span class="nav-text">Blade 组件属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blade%E7%B1%BB%E5%9E%8B%E6%8F%90%E7%A4%BA"><span class="nav-number">1.11.</span> <span class="nav-text">Blade类型提示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E8%AF%AD%E6%B3%95%E6%8F%90%E7%A4%BA"><span class="nav-number">1.12.</span> <span class="nav-text">组件语法提示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E9%AB%98%E4%BA%AE%E5%AF%BC%E8%88%AA%E9%93%BE%E6%8E%A5"><span class="nav-number">1.13.</span> <span class="nav-text">自动高亮导航链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8C%96%E5%BE%AA%E7%8E%AF"><span class="nav-number">1.14.</span> <span class="nav-text">简化循环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E7%90%86blade%E8%A7%86%E5%9B%BE%E7%9A%84%E7%AE%80%E5%8D%95%E6%96%B9%E6%B3%95"><span class="nav-number">1.15.</span> <span class="nav-text">整理blade视图的简单方法</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">106</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E8%A7%86%E5%9B%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Laravel最佳实践-视图
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-11-22 22:54:21" itemprop="dateCreated datePublished" datetime="2022-11-22T22:54:21+08:00">2022-11-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h2><ol>
+<li><a href="#foreach-%E8%AF%AD%E5%8F%A5%E4%B8%AD%E7%9A%84-$loop-%E5%8F%98%E9%87%8F">foreach 语句中的 $loop 变量</a></li>
+<li><a href="#%E8%A7%86%E5%9B%BE%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8">视图是否存在</a></li>
+<li><a href="#%E9%94%99%E8%AF%AF%E4%BB%A3%E7%A0%81%E8%A7%86%E5%9B%BE%E9%A1%B5%E9%9D%A2">错误代码视图页面</a></li>
+<li><a href="#%E8%84%B1%E7%A6%BB%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E8%A7%86%E5%9B%BE">脱离控制器的视图</a></li>
+<li><a href="#Blade-@auth-%E6%8C%87%E4%BB%A4">Blade @auth 指令</a></li>
+<li><a href="#Blade-%E8%A7%86%E5%9B%BE%E4%B8%AD%E7%9A%84%E4%BA%8C%E7%BA%A7-$loop-%E5%8F%98%E9%87%8F">Blade 视图中的二级 $loop 变量</a></li>
+<li><a href="#%E5%88%9B%E5%BB%BA%E4%BD%A0%E8%87%AA%E5%B7%B1%E7%9A%84-Blade-%E6%8C%87%E4%BB%A4">创建你自己的 Blade 指令</a></li>
+<li><a href="#%E8%A7%86%E5%9B%BE%E6%8C%87%E4%BB%A4IncludeIf-IncludeWhen-IncludeFirst">视图指令IncludeIf IncludeWhen IncludeFirst</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8Laravel-Blade-X-%E5%8F%98%E9%87%8F%E7%BB%91%E5%AE%9A%E8%8A%82%E7%9C%81%E6%9B%B4%E5%A4%9A%E7%A9%BA%E9%97%B4">使用Laravel Blade-X 变量绑定节省更多空间</a></li>
+<li><a href="#Blade-%E7%BB%84%E4%BB%B6%E5%B1%9E%E6%80%A7">Blade 组件属性</a></li>
+<li><a href="#Blade%E7%B1%BB%E5%9E%8B%E6%8F%90%E7%A4%BA">Blade类型提示</a></li>
+<li><a href="#%E7%BB%84%E4%BB%B6%E8%AF%AD%E6%B3%95%E6%8F%90%E7%A4%BA">组件语法提示</a></li>
+<li><a href="#%E8%87%AA%E5%8A%A8%E9%AB%98%E4%BA%AE%E5%AF%BC%E8%88%AA%E9%93%BE%E6%8E%A5">自动高亮导航链接</a></li>
+<li><a href="#%E7%AE%80%E5%8C%96%E5%BE%AA%E7%8E%AF">简化循环</a></li>
+<li><a href="#%E6%95%B4%E7%90%86blade%E8%A7%86%E5%9B%BE%E7%9A%84%E7%AE%80%E5%8D%95%E6%96%B9%E6%B3%95">整理blade视图的简单方法</a></li>
+</ol>
+<h3 id="foreach-语句中的-loop-变量"><a href="#foreach-语句中的-loop-变量" class="headerlink" title="foreach 语句中的 $loop 变量"></a>foreach 语句中的 $loop 变量</h3><p>在 <code>foreach</code> 循环中，使用 <code>$loop</code> 变量来查看当前是否是第一次 / 最后一次循环。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@foreach ($users as $user)</span><br><span class="line">     @if ($loop-&gt;first)</span><br><span class="line">        This is the first iteration.</span><br><span class="line">     @endif</span><br><span class="line"></span><br><span class="line">     @if ($loop-&gt;last)</span><br><span class="line">        This is the last iteration.</span><br><span class="line">     @endif</span><br><span class="line"></span><br><span class="line">     &lt;p&gt;This is user &#123;&#123; $user-&gt;id &#125;&#125;&lt;/p&gt;</span><br><span class="line">@endforeach</span><br></pre></td></tr></table></figure>
+
+<p>同样也有诸如 <code>$loop-&gt;iteration</code> 或 <code>$loop-&gt;count</code> 等属性。可以在 <a target="_blank" rel="noopener" href="https://laravel.com/docs/master/blade#the-loop-variable">官方文档</a>中查看更多相关内容。</p>
+<h3 id="视图是否存在"><a href="#视图是否存在" class="headerlink" title="视图是否存在"></a>视图是否存在</h3><p>你可以在视图实际加载之前确认该视图文件是否存在。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (view()-&gt;exists(<span class="string">&#x27;custom.page&#x27;</span>)) &#123;</span><br><span class="line"> <span class="comment">// Load the view</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你甚至可以使用一个数组来加载视图，这样只有第一个视图文件确实存在的视图会被加载。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> view()-&gt;first([<span class="string">&#x27;custom.dashboard&#x27;</span>, <span class="string">&#x27;dashboard&#x27;</span>], <span class="variable">$data</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="错误代码视图页面"><a href="#错误代码视图页面" class="headerlink" title="错误代码视图页面"></a>错误代码视图页面</h3><p>如果你想为一些特殊的 HTTP 返回码建立特定的错误页面，比如 <code>500</code> —— 只需要使用该码值创建视图文件，比如  <code>resources/views/errors/500.blade.php</code> ，或者是 <code>403.blade.php</code> 等等，这些视图会在对应的错误码出现时自动被加载。</p>
+<h3 id="脱离控制器的视图"><a href="#脱离控制器的视图" class="headerlink" title="脱离控制器的视图"></a>脱离控制器的视图</h3><p>如果你想让一个路由仅仅显示某个视图，不需要创建控制器，只需要使用 Route::view() 方法即可。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Instead of this</span></span><br><span class="line">Route::get(<span class="string">&#x27;about&#x27;</span>, <span class="string">&#x27;TextsController@about&#x27;</span>);</span><br><span class="line"><span class="comment">// And this</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TextsController</span> <span class="keyword">extends</span> <span class="title">Controller</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">about</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> view(<span class="string">&#x27;texts.about&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Do this</span></span><br><span class="line">Route::view(<span class="string">&#x27;about&#x27;</span>, <span class="string">&#x27;texts.about&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Blade-auth-指令"><a href="#Blade-auth-指令" class="headerlink" title="Blade @auth 指令"></a>Blade @auth 指令</h3><p>不需要使用 if 来检查用户是否登录，使用 @auth 指令即可。</p>
+<p>比较典型的方式是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@if(auth()-&gt;user())</span><br><span class="line">    // The user is authenticated.</span><br><span class="line">@endif</span><br></pre></td></tr></table></figure>
+
+<p>更短的用法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@auth</span><br><span class="line">    // The user is authenticated.</span><br><span class="line">@endauth</span><br></pre></td></tr></table></figure>
+
+<p>与 @auth 相对的是 @guest 指令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@guest</span><br><span class="line">    // The user is not authenticated.</span><br><span class="line">@endguest</span><br></pre></td></tr></table></figure>
+
+<h3 id="Blade-视图中的二级-loop-变量"><a href="#Blade-视图中的二级-loop-变量" class="headerlink" title="Blade 视图中的二级 $loop 变量"></a>Blade 视图中的二级 $loop 变量</h3><p>你甚至可以在 <code>Blade</code> 视图的二级 <code>foreach</code> 循环中使用 <code>$loop</code> 变量来表示外层的循环变量。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@foreach ($users as $user)</span><br><span class="line">    @foreach ($user-&gt;posts as $post)</span><br><span class="line">        @if ($loop-&gt;parent-&gt;first)</span><br><span class="line">            This is first iteration of the parent loop.</span><br><span class="line">        @endif</span><br><span class="line">    @endforeach</span><br><span class="line">@endforeach</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建你自己的-Blade-指令"><a href="#创建你自己的-Blade-指令" class="headerlink" title="创建你自己的 Blade 指令"></a>创建你自己的 Blade 指令</h3><p>你只需要在 <code>app/Providers/AppServiceProvider.php</code> 中添加你自己的方法。举个例子，如果你需要将 <code>&lt;br&gt;</code> 标签替换为换行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;textarea&gt;@br2nl($post-&gt;post_text)&lt;/textarea&gt;</span><br></pre></td></tr></table></figure>
+
+<p>然后将这个指令添加到 <code>AppServiceProvider</code> 的 <code>boot()</code> 方法中：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">boot</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Blade::directive(<span class="string">&#x27;br2nl&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params"><span class="variable">$string</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&lt;?php echo preg_replace(&#x27;/\&lt;br(\s*)?\/?\&gt;/i&#x27;, \&quot;\n\&quot;, <span class="subst">$string</span>); ?&gt;&quot;</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="视图指令IncludeIf-IncludeWhen-IncludeFirst"><a href="#视图指令IncludeIf-IncludeWhen-IncludeFirst" class="headerlink" title="视图指令IncludeIf IncludeWhen IncludeFirst"></a>视图指令IncludeIf IncludeWhen IncludeFirst</h3><p>如果你不确定 Blade 文件是否存在，你可以使用这些条件指令。<br>仅当 Blade 文件存在时载入 header：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@includeIf(&#x27;partials.header&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p>仅当用户的 role_id == 1 的时候载入 header：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@includeWhen(auth()-&gt;user()-&gt;role_id == 1, &#x27;partials.header&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p>尝试加载 adminlte.header ，如果不存在，则加载 default.header：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@includeFirst(&#x27;adminlte.header&#x27;, &#x27;default.header&#x27;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用Laravel-Blade-X-变量绑定节省更多空间"><a href="#使用Laravel-Blade-X-变量绑定节省更多空间" class="headerlink" title="使用Laravel Blade-X 变量绑定节省更多空间"></a>使用Laravel Blade-X 变量绑定节省更多空间</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Using include, the old way</span></span><br><span class="line">@<span class="keyword">include</span>(<span class="string">&quot;components.post&quot;</span>, [<span class="string">&quot;title&quot;</span> =&gt; <span class="variable">$post</span>-&gt;title])</span><br><span class="line"></span><br><span class="line"><span class="comment">// Using Blade-X</span></span><br><span class="line">&lt;x-post link=<span class="string">&quot;&#123;&#123; <span class="subst">$post</span>-&gt;title &#125;&#125;&quot;</span> /&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Using Blade-X variable binding</span></span><br><span class="line">&lt;x-post :link=<span class="string">&quot;<span class="subst">$post</span>-&gt;title&quot;</span> /&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Blade-组件属性"><a href="#Blade-组件属性" class="headerlink" title="Blade 组件属性"></a>Blade 组件属性</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// button.blade.php</span></span><br><span class="line">@props([<span class="string">&#x27;rounded&#x27;</span> =&gt; <span class="literal">false</span>])</span><br><span class="line"></span><br><span class="line">&lt;button &#123;&#123; <span class="variable">$attributes</span>-&gt;class([</span><br><span class="line">    <span class="string">&#x27;bg-red-100 text-red-800&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;rounded&#x27;</span> =&gt; <span class="variable">$rounded</span></span><br><span class="line">    ]) &#125;&#125;&gt;</span><br><span class="line">    &#123;&#123; <span class="variable">$slot</span> &#125;&#125;</span><br><span class="line">&lt;/button&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// view.blade.php</span></span><br><span class="line"><span class="comment">// Non-rounded:</span></span><br><span class="line">&lt;x-button&gt;Submit&lt;/x-button&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Rounded:</span></span><br><span class="line">&lt;x-button rounded&gt;Submit&lt;/x-button&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Blade类型提示"><a href="#Blade类型提示" class="headerlink" title="Blade类型提示"></a>Blade类型提示</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@php</span><br><span class="line">    <span class="comment">/* <span class="doctag">@var</span> App\Models\User $user */</span></span><br><span class="line">@endphp</span><br><span class="line">&lt;div&gt;</span><br><span class="line">    <span class="comment">// your ide will typehint the property for you </span></span><br><span class="line">    &#123;&#123;<span class="variable">$user</span>-&gt;email&#125;&#125;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="组件语法提示"><a href="#组件语法提示" class="headerlink" title="组件语法提示"></a>组件语法提示</h3><p>在组件参数之前传入 <code>:</code> 你可以直接传入变量而不需要使用 <code>&#123;&#123;&#125;&#125;</code>表达式</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;x-navbar title=<span class="string">&quot;&#123;&#123; <span class="subst">$title</span> &#125;&#125;&quot;</span>/&gt;</span><br><span class="line"><span class="comment">// you can do instead</span></span><br><span class="line">&lt;x-navbar :title=<span class="string">&quot;<span class="subst">$title</span>&quot;</span>/&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自动高亮导航链接"><a href="#自动高亮导航链接" class="headerlink" title="自动高亮导航链接"></a>自动高亮导航链接</h3><p>当精确的URL匹配或传递路径或路由名称模式时，自动突出显示导航链接</p>
+<p>带有请求和CSS类助手的 <code>blade</code> 组件使显示活动/非活动状态变得非常简单。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NavLink</span> <span class="keyword">extends</span> <span class="title">Component</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"><span class="variable">$href</span>, <span class="variable">$active</span> = <span class="literal">null</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;href = <span class="variable">$href</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;active = <span class="variable">$active</span> ?? <span class="variable">$href</span>;        </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">render</span>(<span class="params"></span>): <span class="title">View</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="variable">$classes</span> = [<span class="string">&#x27;font-medium&#x27;</span>, <span class="string">&#x27;py-2&#x27;</span>, <span class="string">&#x27;text-primary&#x27;</span> =&gt; <span class="keyword">$this</span>-&gt;isActive()];</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> view(<span class="string">&#x27;components.nav-link&#x27;</span>, [</span><br><span class="line">            <span class="string">&#x27;class&#x27;</span> =&gt; Arr::toCssClasses(<span class="variable">$classes</span>);</span><br><span class="line">        ]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">isActive</span>(<span class="params"></span>): <span class="title">bool</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (is_bool(<span class="keyword">$this</span>-&gt;active)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;active;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (request()-&gt;is(<span class="keyword">$this</span>-&gt;active)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (request()-&gt;fullUrlIs(<span class="keyword">$this</span>-&gt;active)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> request()-&gt;routeIs(<span class="keyword">$this</span>-&gt;active);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;a href=&quot;&#123;&#123; $href &#125;&#125;&quot; &#123;&#123; $attributes-&gt;class($class) &#125;&#125;&gt;</span><br><span class="line">    &#123;&#123; $slot &#125;&#125;</span><br><span class="line">&lt;/a&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;x-nav-link :href=&quot;route(&#x27;projects.index&#x27;)&quot;&gt;Projects&lt;/x-nav-link&gt;</span><br><span class="line">&lt;x-nav-link :href=&quot;route(&#x27;projects.index&#x27;)&quot; active=&quot;projects.*&quot;&gt;Projects&lt;/x-nav-link&gt;</span><br><span class="line">&lt;x-nav-link :href=&quot;route(&#x27;projects.index&#x27;)&quot; active=&quot;projects/*&quot;&gt;Projects&lt;/x-nav-link&gt;</span><br><span class="line">&lt;x-nav-link :href=&quot;route(&#x27;projects.index&#x27;)&quot; :active=&quot;$tab = &#x27;projects&#x27;&quot;&gt;Projects&lt;/x-nav-link&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="简化循环"><a href="#简化循环" class="headerlink" title="简化循环"></a>简化循环</h3><p>你知道Blade<code>@each</code>指令可以帮助清理模板中的循环吗？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// good</span><br><span class="line">@foreach($item in $items)</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;p&gt;Name: &#123;&#123; $item-&gt;name &#125;&#125;</span><br><span class="line">        &lt;p&gt;Price: &#123;&#123; $item-&gt;price &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">@endforeach</span><br><span class="line">// better (HTML extracted into partial)</span><br><span class="line">@each(&#x27;partials.item&#x27;, $items, &#x27;item&#x27;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="整理blade视图的简单方法"><a href="#整理blade视图的简单方法" class="headerlink" title="整理blade视图的简单方法"></a>整理blade视图的简单方法</h3><p>整理刀片视图的简单方法<br></p>
+<p>使用<code>forelse·，而不是嵌套在</code>if<code>语句中的</code>foreach`</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- if/loop combination --&gt;</span><br><span class="line">@if ($orders-&gt;count())</span><br><span class="line">    @foreach($orders as $order)</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">            &#123;&#123; $order-&gt;id &#125;&#125;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    @endforeach</span><br><span class="line">@else</span><br><span class="line">    &lt;p&gt;You haven&#x27;t placed any orders yet.&lt;/p&gt;</span><br><span class="line">@endif</span><br><span class="line">&lt;!-- Forelse alternative --&gt;</span><br><span class="line">@forelse($orders as $order)</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &#123;&#123; $order-&gt;id &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">@empty</span><br><span class="line">    &lt;p&gt;You haven&#x27;t placed any orders yet.&lt;/p&gt;</span><br><span class="line">@endforelse</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E8%A7%86%E5%9B%BE/" title="Laravel最佳实践-视图">https://ni9ne.github.io/2022/11/22/框架/Laravel/Laravel最佳实践-视图/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91/" rel="tag"># 框架开发</a>
+              <a href="/tags/Laravel/" rel="tag"># Laravel</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%A8%A1%E5%9E%8B%E5%85%B3%E8%81%94/" rel="prev" title="Laravel最佳实践-模型关联">
+                  <i class="fa fa-chevron-left"></i> Laravel最佳实践-模型关联
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E8%B7%AF%E7%94%B1/" rel="next" title="Laravel最佳实践-路由">
+                  Laravel最佳实践-路由 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

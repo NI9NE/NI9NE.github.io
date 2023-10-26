@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="验证 图片验证 自定义验证错误的信息 用now或yesterday来验证日期 具有某些条件的验证规则 更改默认验证消息 预验证 第一次验证错误时停止 不使用validate或者FormRequest就抛出422 规则取决于其他条件 使用属性设置首次验证失败时停止 unique规则在软删除全局作用域中无效 sometimes方法允许你定义验证器在什么时候被应用 提交自定义验证规则 数组元素验证 Pa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laravel最佳实践-验证">
+<meta property="og:url" content="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E9%AA%8C%E8%AF%81/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="验证 图片验证 自定义验证错误的信息 用now或yesterday来验证日期 具有某些条件的验证规则 更改默认验证消息 预验证 第一次验证错误时停止 不使用validate或者FormRequest就抛出422 规则取决于其他条件 使用属性设置首次验证失败时停止 unique规则在软删除全局作用域中无效 sometimes方法允许你定义验证器在什么时候被应用 提交自定义验证规则 数组元素验证 Pa">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-22T14:55:23.000Z">
+<meta property="article:modified_time" content="2023-10-26T03:06:14.195Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="框架开发">
+<meta property="article:tag" content="Laravel">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E9%AA%8C%E8%AF%81/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E9%AA%8C%E8%AF%81/","path":"2022/11/22/框架/Laravel/Laravel最佳实践-验证/","title":"Laravel最佳实践-验证"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Laravel最佳实践-验证 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">52</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">106</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81"><span class="nav-number">1.</span> <span class="nav-text">验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81"><span class="nav-number">1.1.</span> <span class="nav-text">图片验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E9%94%99%E8%AF%AF%E7%9A%84%E4%BF%A1%E6%81%AF"><span class="nav-number">1.2.</span> <span class="nav-text">自定义验证错误的信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8now%E6%88%96yesterday%E6%9D%A5%E9%AA%8C%E8%AF%81%E6%97%A5%E6%9C%9F"><span class="nav-number">1.3.</span> <span class="nav-text">用now或yesterday来验证日期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E6%9C%89%E6%9F%90%E4%BA%9B%E6%9D%A1%E4%BB%B6%E7%9A%84%E9%AA%8C%E8%AF%81%E8%A7%84%E5%88%99"><span class="nav-number">1.4.</span> <span class="nav-text">具有某些条件的验证规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%94%B9%E9%BB%98%E8%AE%A4%E9%AA%8C%E8%AF%81%E6%B6%88%E6%81%AF"><span class="nav-number">1.5.</span> <span class="nav-text">更改默认验证消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E9%AA%8C%E8%AF%81"><span class="nav-number">1.6.</span> <span class="nav-text">预验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E9%AA%8C%E8%AF%81%E9%94%99%E8%AF%AF%E6%97%B6%E5%81%9C%E6%AD%A2"><span class="nav-number">1.7.</span> <span class="nav-text">第一次验证错误时停止</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E4%BD%BF%E7%94%A8validate%E6%88%96%E8%80%85FormRequest%E5%B0%B1%E6%8A%9B%E5%87%BA422"><span class="nav-number">1.8.</span> <span class="nav-text">不使用validate或者FormRequest就抛出422</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%84%E5%88%99%E5%8F%96%E5%86%B3%E4%BA%8E%E5%85%B6%E4%BB%96%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.9.</span> <span class="nav-text">规则取决于其他条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%B1%9E%E6%80%A7%E8%AE%BE%E7%BD%AE%E9%A6%96%E6%AC%A1%E9%AA%8C%E8%AF%81%E5%A4%B1%E8%B4%A5%E6%97%B6%E5%81%9C%E6%AD%A2"><span class="nav-number">1.10.</span> <span class="nav-text">使用属性设置首次验证失败时停止</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unique%E8%A7%84%E5%88%99%E5%9C%A8%E8%BD%AF%E5%88%A0%E9%99%A4%E5%85%A8%E5%B1%80%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%AD%E6%97%A0%E6%95%88"><span class="nav-number">1.11.</span> <span class="nav-text">unique规则在软删除全局作用域中无效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sometimes%E6%96%B9%E6%B3%95%E5%85%81%E8%AE%B8%E4%BD%A0%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E5%99%A8%E5%9C%A8%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E8%A2%AB%E5%BA%94%E7%94%A8"><span class="nav-number">1.12.</span> <span class="nav-text">sometimes方法允许你定义验证器在什么时候被应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0%E9%AA%8C%E8%AF%81"><span class="nav-number">1.13.</span> <span class="nav-text">数组元素验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4%E8%87%AA%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E8%A7%84%E5%88%99"><span class="nav-number">1.14.</span> <span class="nav-text">提交自定义验证规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Password%E7%9A%84defaults%E6%96%B9%E6%B3%95"><span class="nav-number">1.15.</span> <span class="nav-text">Password的defaults方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A8%E5%8D%95%E9%AA%8C%E8%AF%81%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82"><span class="nav-number">1.16.</span> <span class="nav-text">表单验证重定向请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mac%E9%AA%8C%E8%AF%81%E8%A7%84%E5%88%99"><span class="nav-number">1.17.</span> <span class="nav-text">Mac验证规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E9%A1%B6%E7%BA%A7%E5%9F%9F%E5%90%8D%E9%82%AE%E7%AE%B1"><span class="nav-number">1.18.</span> <span class="nav-text">验证顶级域名邮箱</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">106</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E9%AA%8C%E8%AF%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Laravel最佳实践-验证
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-11-22 22:55:23" itemprop="dateCreated datePublished" datetime="2022-11-22T22:55:23+08:00">2022-11-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><ol>
+<li><a href="#%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81">图片验证</a></li>
+<li><a href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E9%94%99%E8%AF%AF%E7%9A%84%E4%BF%A1%E6%81%AF">自定义验证错误的信息</a></li>
+<li><a href="#%E7%94%A8now%E6%88%96yesterday%E6%9D%A5%E9%AA%8C%E8%AF%81%E6%97%A5%E6%9C%9F">用now或yesterday来验证日期</a></li>
+<li><a href="#%E5%85%B7%E6%9C%89%E6%9F%90%E4%BA%9B%E6%9D%A1%E4%BB%B6%E7%9A%84%E9%AA%8C%E8%AF%81%E8%A7%84%E5%88%99">具有某些条件的验证规则</a></li>
+<li><a href="#%E6%9B%B4%E6%94%B9%E9%BB%98%E8%AE%A4%E9%AA%8C%E8%AF%81%E6%B6%88%E6%81%AF">更改默认验证消息</a></li>
+<li><a href="#%E9%A2%84%E9%AA%8C%E8%AF%81">预验证</a></li>
+<li><a href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E9%AA%8C%E8%AF%81%E9%94%99%E8%AF%AF%E6%97%B6%E5%81%9C%E6%AD%A2">第一次验证错误时停止</a></li>
+<li><a href="#%E4%B8%8D%E4%BD%BF%E7%94%A8validate%E6%88%96%E8%80%85FormRequest%E5%B0%B1%E6%8A%9B%E5%87%BA422">不使用validate或者FormRequest就抛出422</a></li>
+<li><a href="#%E8%A7%84%E5%88%99%E5%8F%96%E5%86%B3%E4%BA%8E%E5%85%B6%E4%BB%96%E6%9D%A1%E4%BB%B6">规则取决于其他条件</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E5%B1%9E%E6%80%A7%E8%AE%BE%E7%BD%AE%E9%A6%96%E6%AC%A1%E9%AA%8C%E8%AF%81%E5%A4%B1%E8%B4%A5%E6%97%B6%E5%81%9C%E6%AD%A2">使用属性设置首次验证失败时停止</a></li>
+<li><a href="#unique%E8%A7%84%E5%88%99%E5%9C%A8%E8%BD%AF%E5%88%A0%E9%99%A4%E5%85%A8%E5%B1%80%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%AD%E6%97%A0%E6%95%88">unique规则在软删除全局作用域中无效</a></li>
+<li><a href="#sometimes%E6%96%B9%E6%B3%95%E5%85%81%E8%AE%B8%E4%BD%A0%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E5%99%A8%E5%9C%A8%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E8%A2%AB%E5%BA%94%E7%94%A8">sometimes方法允许你定义验证器在什么时候被应用</a></li>
+<li><a href="#%E6%8F%90%E4%BA%A4%E8%87%AA%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E8%A7%84%E5%88%99">提交自定义验证规则</a></li>
+<li><a href="#%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0%E9%AA%8C%E8%AF%81">数组元素验证</a></li>
+<li><a href="#Password%E7%9A%84defaults%E6%96%B9%E6%B3%95">Password的defaults方法</a></li>
+<li><a href="#%E8%A1%A8%E5%8D%95%E9%AA%8C%E8%AF%81%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82">表单验证重定向请求</a></li>
+<li><a href="#Mac%E9%AA%8C%E8%AF%81%E8%A7%84%E5%88%99">Mac验证规则</a></li>
+<li><a href="#%E9%AA%8C%E8%AF%81%E9%A1%B6%E7%BA%A7%E5%9F%9F%E5%90%8D%E9%82%AE%E7%AE%B1">验证顶级域名邮箱</a></li>
+</ol>
+<h3 id="图片验证"><a href="#图片验证" class="headerlink" title="图片验证"></a>图片验证</h3><p>在验证上传的图片时，可以指定所需的尺寸</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">&#x27;photo&#x27;</span> =&gt; <span class="string">&#x27;dimensions:max_width=4096,max_height=4096&#x27;</span>]</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义验证错误的信息"><a href="#自定义验证错误的信息" class="headerlink" title="自定义验证错误的信息"></a>自定义验证错误的信息</h3><p>只需在 <code>resources/lang/xx/validation.php</code> 文件创建适当的数组结构，就可以定义定每个 字段、规则和语言的验证错误消息。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;custom&#x27;</span> =&gt; [</span><br><span class="line">     <span class="string">&#x27;email&#x27;</span> =&gt; [</span><br><span class="line">        <span class="string">&#x27;required&#x27;</span> =&gt; <span class="string">&#x27;We need to know your e-mail address!&#x27;</span>,</span><br><span class="line">     ],</span><br><span class="line">],</span><br></pre></td></tr></table></figure>
+
+<h3 id="用now或yesterday来验证日期"><a href="#用now或yesterday来验证日期" class="headerlink" title="用now或yesterday来验证日期"></a>用now或yesterday来验证日期</h3><p>您可以使用 <code>before/after</code> 的规则验证日期，并将各种字符串作为参数传递，比如: <code>tomorrow</code>, <code>now</code>, <code>yesterday</code>。例如: <code>&#39;start_date&#39; =&gt; &#39;after:now&#39;</code>。它在底层下使用 <code>strtotime ()</code>。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$rules</span> = [</span><br><span class="line">    <span class="string">&#x27;start_date&#x27;</span> =&gt; <span class="string">&#x27;after:tomorrow&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;end_date&#x27;</span> =&gt; <span class="string">&#x27;after:start_date&#x27;</span></span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+
+<h3 id="具有某些条件的验证规则"><a href="#具有某些条件的验证规则" class="headerlink" title="具有某些条件的验证规则"></a>具有某些条件的验证规则</h3><p>如果验证规则依赖于某些条件，则可以通过将 <code>withValidator()</code> 添加到 <code>FormRequest</code> 类中来修改规则，并在那里指定自定义逻辑。例如，如果您只想为某些用户角色添加验证规则。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Validation</span>\<span class="title">Validator</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StoreBlogCategoryRequest</span> <span class="keyword">extends</span> <span class="title">FormRequest</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">withValidator</span>(<span class="params">Validator <span class="variable">$validator</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (auth()-&gt;user()-&gt;is_admin) &#123;</span><br><span class="line">            <span class="variable">$validator</span>-&gt;addRules([<span class="string">&#x27;some_secret_password&#x27;</span> =&gt; <span class="string">&#x27;required&#x27;</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="更改默认验证消息"><a href="#更改默认验证消息" class="headerlink" title="更改默认验证消息"></a>更改默认验证消息</h3><p>如果要更改特定字段和特定验证规则的默认验证错误消息，只需将 <code>messages()</code> 方法添加到<code>FormRequest</code>类中。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StoreUserRequest</span> <span class="keyword">extends</span> <span class="title">FormRequest</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">rules</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> [<span class="string">&#x27;name&#x27;</span> =&gt; <span class="string">&#x27;required&#x27;</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">messages</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> [<span class="string">&#x27;name.required&#x27;</span> =&gt; <span class="string">&#x27;User name should be real name&#x27;</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="预验证"><a href="#预验证" class="headerlink" title="预验证"></a>预验证</h3><p>如果你想在默认的<code>Laravel</code>验证之前修改某个字段，或者，换句话说，“准备” 那个字段， <code>FormRequest </code>类中有一个方法 <code>prepareForValidation () </code></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">prepareForValidation</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;merge([</span><br><span class="line">        <span class="string">&#x27;slug&#x27;</span> =&gt; Illuminate\Support\Str::slug(<span class="keyword">$this</span>-&gt;slug),</span><br><span class="line">    ]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="第一次验证错误时停止"><a href="#第一次验证错误时停止" class="headerlink" title="第一次验证错误时停止"></a>第一次验证错误时停止</h3><p>默认情况下，将在列表中返回 Laravel 验证错误，检查所有验证规则。但是如果你想要在第一个错误之后停止这个过程，使用验证规则叫做 bail:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$request</span>-&gt;validate([</span><br><span class="line">    <span class="string">&#x27;title&#x27;</span> =&gt; <span class="string">&#x27;bail|required|unique:posts|max:255&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;body&#x27;</span> =&gt; <span class="string">&#x27;required&#x27;</span>,</span><br><span class="line">]);</span><br></pre></td></tr></table></figure>
+
+<p>如果你需要停止首次错误验证，可以设置<code>FormRequest</code> 类中<code>$stopOnFirstFailure</code>为<code>true</code>:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="variable">$stopOnFirstFailure</span> = <span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="不使用validate或者FormRequest就抛出422"><a href="#不使用validate或者FormRequest就抛出422" class="headerlink" title="不使用validate或者FormRequest就抛出422"></a>不使用validate或者FormRequest就抛出422</h3><p>如果您不使用 <code>validate()</code> 或 <code>Form Request</code>，但仍然需要使用相同的 <code>422</code> 状态码和错误结构抛出错误，那么可以手动抛出 <code>throw ValidationException::withMessages()</code></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (! <span class="variable">$user</span> || ! Hash::check(<span class="variable">$request</span>-&gt;password, <span class="variable">$user</span>-&gt;password)) &#123;</span><br><span class="line">    <span class="keyword">throw</span> ValidationException::withMessages([</span><br><span class="line">        <span class="string">&#x27;email&#x27;</span> =&gt; [<span class="string">&#x27;The provided credentials are incorrect.&#x27;</span>],</span><br><span class="line">    ]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="规则取决于其他条件"><a href="#规则取决于其他条件" class="headerlink" title="规则取决于其他条件"></a>规则取决于其他条件</h3><p>如果您的规则是动态的并且依赖于其他条件，那么您可以动态地创建该规则数组</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">store</span>(<span class="params">Request <span class="variable">$request</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$validationArray</span> = [</span><br><span class="line">        <span class="string">&#x27;title&#x27;</span> =&gt; <span class="string">&#x27;required&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;company&#x27;</span> =&gt; <span class="string">&#x27;required&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;logo&#x27;</span> =&gt; <span class="string">&#x27;file|max:2048&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;location&#x27;</span> =&gt; <span class="string">&#x27;required&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;apply_link&#x27;</span> =&gt; <span class="string">&#x27;required|url&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;content&#x27;</span> =&gt; <span class="string">&#x27;required&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;payment_method_id&#x27;</span> =&gt; <span class="string">&#x27;required&#x27;</span></span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!Auth::check()) &#123;</span><br><span class="line">        <span class="variable">$validationArray</span> = array_merge(<span class="variable">$validationArray</span>, [</span><br><span class="line">            <span class="string">&#x27;email&#x27;</span> =&gt; <span class="string">&#x27;required|email|unique:users&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;password&#x27;</span> =&gt; <span class="string">&#x27;required|confirmed|min:5&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;name&#x27;</span> =&gt; <span class="string">&#x27;required&#x27;</span></span><br><span class="line">        ]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用属性设置首次验证失败时停止"><a href="#使用属性设置首次验证失败时停止" class="headerlink" title="使用属性设置首次验证失败时停止"></a>使用属性设置首次验证失败时停止</h3><p>在<code>request</code>类中使用这个属性设置首次验证失败时停止。</p>
+<p>注意 这个跟 <code>Bail</code>规则不一样 只在单个规则失败时就停止</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Indicated if the validator should stop</span></span><br><span class="line"><span class="comment"> * the entire validation once a single</span></span><br><span class="line"><span class="comment"> * rule failure has occurred.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">protected</span> <span class="variable">$stopOnFirstFailure</span> = <span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="unique规则在软删除全局作用域中无效"><a href="#unique规则在软删除全局作用域中无效" class="headerlink" title="unique规则在软删除全局作用域中无效"></a>unique规则在软删除全局作用域中无效</h3><p><code>Rule::unique</code> 默认不在软删除的全局范围内。但是<code>使用</code>withoutTrashed` 时可用。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Rule::unique(<span class="string">&#x27;users&#x27;</span>, <span class="string">&#x27;email&#x27;</span>)-&gt;withoutTrashed();</span><br></pre></td></tr></table></figure>
+
+<h3 id="sometimes方法允许你定义验证器在什么时候被应用"><a href="#sometimes方法允许你定义验证器在什么时候被应用" class="headerlink" title="sometimes方法允许你定义验证器在什么时候被应用"></a>sometimes方法允许你定义验证器在什么时候被应用</h3><p><code>Validator::sometimes</code> 方法允许你定义验证器在什么时候被应用，基于提供的输入。<br>这个片段展示了如果购买的物品数量不够，如何禁止使用优惠券。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$data</span> = [</span><br><span class="line">    <span class="string">&#x27;coupon&#x27;</span> =&gt; <span class="string">&#x27;PIZZA_PARTY&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;items&#x27;</span> =&gt; [</span><br><span class="line">        [</span><br><span class="line">            <span class="string">&#x27;id&#x27;</span> =&gt; <span class="number">1</span>,</span><br><span class="line">            <span class="string">&#x27;quantity&#x27;</span> =&gt; <span class="number">2</span></span><br><span class="line">        ],</span><br><span class="line">        [</span><br><span class="line">            <span class="string">&#x27;id&#x27;</span> =&gt; <span class="number">2</span>,</span><br><span class="line">            <span class="string">&#x27;quantity&#x27;</span> =&gt; <span class="number">2</span>,</span><br><span class="line">        ],</span><br><span class="line">    ],</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="variable">$validator</span> = Validator::make(<span class="variable">$data</span>, [</span><br><span class="line">    <span class="string">&#x27;coupon&#x27;</span> =&gt; <span class="string">&#x27;exists:coupons,name&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;items&#x27;</span> =&gt; <span class="string">&#x27;required|array&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;items.*.id&#x27;</span> =&gt; <span class="string">&#x27;required|int&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;items.*.quantity&#x27;</span> =&gt; <span class="string">&#x27;required|int&#x27;</span>,</span><br><span class="line">]);</span><br><span class="line"></span><br><span class="line"><span class="variable">$validator</span>-&gt;sometimes(<span class="string">&#x27;coupon&#x27;</span>, <span class="string">&#x27;prohibited&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Fluent <span class="variable">$data</span></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> collect(<span class="variable">$data</span>-&gt;items)-&gt;sum(<span class="string">&#x27;quantity&#x27;</span>) &lt; <span class="number">5</span>;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// throws a ValidationException as the quantity provided is not enough</span></span><br><span class="line"><span class="variable">$validator</span>-&gt;validate();</span><br></pre></td></tr></table></figure>
+
+<h3 id="数组元素验证"><a href="#数组元素验证" class="headerlink" title="数组元素验证"></a>数组元素验证</h3><p>如果你想要验证提交的数组元素，使用带<code>*</code>号的点符号。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// say you have this array</span></span><br><span class="line"><span class="comment">// array in request &#x27;user_info&#x27;</span></span><br><span class="line"><span class="variable">$request</span>-&gt;validated()-&gt;user_info = [</span><br><span class="line">    [</span><br><span class="line">        <span class="string">&#x27;name&#x27;</span> =&gt; <span class="string">&#x27;Qasim&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;age&#x27;</span> =&gt; <span class="number">26</span>,</span><br><span class="line">    ],</span><br><span class="line">    [</span><br><span class="line">        <span class="string">&#x27;name&#x27;</span> =&gt; <span class="string">&#x27;Ahmed&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;age&#x27;</span> =&gt; <span class="number">23</span>,</span><br><span class="line">    ],</span><br><span class="line">];</span><br><span class="line"><span class="comment">// Rule</span></span><br><span class="line"><span class="variable">$rules</span> = [</span><br><span class="line">    <span class="string">&#x27;user_info.*.name&#x27;</span> =&gt; [<span class="string">&#x27;required&#x27;</span>, <span class="string">&#x27;alpha&#x27;</span>],</span><br><span class="line">    <span class="string">&#x27;user_info.*.age&#x27;</span> =&gt; [<span class="string">&#x27;required&#x27;</span>, <span class="string">&#x27;numeric&#x27;</span>],</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+
+<p>由<a target="_blank" rel="noopener" href="https://github.com/HydroMoon">HydroMoon</a>提供</p>
+<h3 id="提交自定义验证规则"><a href="#提交自定义验证规则" class="headerlink" title="提交自定义验证规则"></a>提交自定义验证规则</h3><p>感谢<code>Rule::when</code> 我们可以指定提交验证规则。</p>
+<p>下面例子我们可以验证用户是否真的可以对文章点赞。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Validation</span>\<span class="title">Rule</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">rules</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> [</span><br><span class="line">        <span class="string">&#x27;vote&#x27;</span> =&gt; Rule::when(<span class="variable">$user</span>-&gt;can(<span class="string">&#x27;vote&#x27;</span>, <span class="variable">$post</span>), <span class="string">&#x27;required|int|between:1,5&#x27;</span>),</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Password的defaults方法"><a href="#Password的defaults方法" class="headerlink" title="Password的defaults方法"></a>Password的defaults方法</h3><p>使用<code>Password::defaults</code>方法验证用户提供的密码时，可以强制执行特定规则。它包括要求字母、数字、符号等的选项。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppServiceProvider</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">boot</span>(<span class="params"></span>): <span class="title">void</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        Password::defaults(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> Password::min(<span class="number">12</span>)</span><br><span class="line">                -&gt;letters()</span><br><span class="line">                -&gt;numbers()</span><br><span class="line">                -&gt;symbols()</span><br><span class="line">                -&gt;mixedCase()</span><br><span class="line">                -&gt;uncompromised();</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">request()-&gt;validate([</span><br><span class="line">    [<span class="string">&#x27;password&#x27;</span> =&gt; [<span class="string">&#x27;required&#x27;</span>, Password::defaults()]]</span><br><span class="line">])</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="表单验证重定向请求"><a href="#表单验证重定向请求" class="headerlink" title="表单验证重定向请求"></a>表单验证重定向请求</h3><p>使用表单请求进行验证时，默认情况下，验证错误将重定向回上一页，但您可以覆盖它</p>
+<p>只需定义<code>$redirect</code>或<code>redirectRoute</code>的属性即可</p>
+<p><a target="_blank" rel="noopener" href="https://laravel.com/docs/8.x/validation#customizing-the-redirect-location">Link to docs</a></p>
+<h3 id="Mac验证规则"><a href="#Mac验证规则" class="headerlink" title="Mac验证规则"></a>Mac验证规则</h3><p><code>Laravel 8.77</code>添加了新的<code>mac_address</code>规则</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$trans</span> = <span class="keyword">$this</span>-&gt;getIlluminateArrayTranslator();</span><br><span class="line"><span class="variable">$validator</span> = <span class="keyword">new</span> Validator(<span class="variable">$trans</span>, [<span class="string">&#x27;mac&#x27;</span> =&gt; <span class="string">&#x27;01-23-45-67-89-ab&#x27;</span>], [<span class="string">&#x27;mac&#x27;</span> =&gt; <span class="string">&#x27;mac_address&#x27;</span>]);</span><br><span class="line"><span class="keyword">$this</span>-&gt;assertTrue(<span class="variable">$validator</span>-&gt;passes());</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="验证顶级域名邮箱"><a href="#验证顶级域名邮箱" class="headerlink" title="验证顶级域名邮箱"></a>验证顶级域名邮箱</h3><p><code>email</code>验证规则将接受一个非顶级域名邮箱 (例子:<code>taylor@laravel</code>, <code>povilas@ldaily</code>)</p>
+<p>但是你如果想确保邮箱必须有一个顶级域名 (例子:<code>taylor@laravel.com</code>, <code>povilas@ldaily.com</code>) 使用<code>email:filter</code>规则</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    <span class="string">&#x27;email&#x27;</span> =&gt; <span class="string">&#x27;required|email&#x27;</span>, <span class="comment">// before</span></span><br><span class="line">    <span class="string">&#x27;email&#x27;</span> =&gt; <span class="string">&#x27;required|email:filter&#x27;</span>, <span class="comment">// after</span></span><br><span class="line">],</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E9%AA%8C%E8%AF%81/" title="Laravel最佳实践-验证">https://ni9ne.github.io/2022/11/22/框架/Laravel/Laravel最佳实践-验证/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91/" rel="tag"># 框架开发</a>
+              <a href="/tags/Laravel/" rel="tag"># Laravel</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E8%B7%AF%E7%94%B1/" rel="prev" title="Laravel最佳实践-路由">
+                  <i class="fa fa-chevron-left"></i> Laravel最佳实践-路由
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E5%85%B6%E4%BB%96/" rel="next" title="Laravel最佳实践-其他">
+                  Laravel最佳实践-其他 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
