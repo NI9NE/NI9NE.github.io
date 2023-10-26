@@ -22,15 +22,15 @@
   <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="验证 图片验证 自定义验证错误的信息 用now或yesterday来验证日期 具有某些条件的验证规则 更改默认验证消息 预验证 第一次验证错误时停止 不使用validate或者FormRequest就抛出422 规则取决于其他条件 使用属性设置首次验证失败时停止 unique规则在软删除全局作用域中无效 sometimes方法允许你定义验证器在什么时候被应用 提交自定义验证规则 数组元素验证 Pa">
+<meta name="description" content="验证图片验证在验证上传的图片时，可以指定所需的尺寸">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Laravel最佳实践-验证">
 <meta property="og:url" content="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E9%AA%8C%E8%AF%81/index.html">
 <meta property="og:site_name" content="NI9NE&#39;s Zone">
-<meta property="og:description" content="验证 图片验证 自定义验证错误的信息 用now或yesterday来验证日期 具有某些条件的验证规则 更改默认验证消息 预验证 第一次验证错误时停止 不使用validate或者FormRequest就抛出422 规则取决于其他条件 使用属性设置首次验证失败时停止 unique规则在软删除全局作用域中无效 sometimes方法允许你定义验证器在什么时候被应用 提交自定义验证规则 数组元素验证 Pa">
+<meta property="og:description" content="验证图片验证在验证上传的图片时，可以指定所需的尺寸">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-11-22T14:55:23.000Z">
-<meta property="article:modified_time" content="2023-10-26T03:06:14.195Z">
+<meta property="article:modified_time" content="2023-10-26T03:25:37.546Z">
 <meta property="article:author" content="NI9NE">
 <meta property="article:tag" content="框架开发">
 <meta property="article:tag" content="Laravel">
@@ -281,27 +281,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><ol>
-<li><a href="#%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81">图片验证</a></li>
-<li><a href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E9%94%99%E8%AF%AF%E7%9A%84%E4%BF%A1%E6%81%AF">自定义验证错误的信息</a></li>
-<li><a href="#%E7%94%A8now%E6%88%96yesterday%E6%9D%A5%E9%AA%8C%E8%AF%81%E6%97%A5%E6%9C%9F">用now或yesterday来验证日期</a></li>
-<li><a href="#%E5%85%B7%E6%9C%89%E6%9F%90%E4%BA%9B%E6%9D%A1%E4%BB%B6%E7%9A%84%E9%AA%8C%E8%AF%81%E8%A7%84%E5%88%99">具有某些条件的验证规则</a></li>
-<li><a href="#%E6%9B%B4%E6%94%B9%E9%BB%98%E8%AE%A4%E9%AA%8C%E8%AF%81%E6%B6%88%E6%81%AF">更改默认验证消息</a></li>
-<li><a href="#%E9%A2%84%E9%AA%8C%E8%AF%81">预验证</a></li>
-<li><a href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E9%AA%8C%E8%AF%81%E9%94%99%E8%AF%AF%E6%97%B6%E5%81%9C%E6%AD%A2">第一次验证错误时停止</a></li>
-<li><a href="#%E4%B8%8D%E4%BD%BF%E7%94%A8validate%E6%88%96%E8%80%85FormRequest%E5%B0%B1%E6%8A%9B%E5%87%BA422">不使用validate或者FormRequest就抛出422</a></li>
-<li><a href="#%E8%A7%84%E5%88%99%E5%8F%96%E5%86%B3%E4%BA%8E%E5%85%B6%E4%BB%96%E6%9D%A1%E4%BB%B6">规则取决于其他条件</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%B1%9E%E6%80%A7%E8%AE%BE%E7%BD%AE%E9%A6%96%E6%AC%A1%E9%AA%8C%E8%AF%81%E5%A4%B1%E8%B4%A5%E6%97%B6%E5%81%9C%E6%AD%A2">使用属性设置首次验证失败时停止</a></li>
-<li><a href="#unique%E8%A7%84%E5%88%99%E5%9C%A8%E8%BD%AF%E5%88%A0%E9%99%A4%E5%85%A8%E5%B1%80%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%AD%E6%97%A0%E6%95%88">unique规则在软删除全局作用域中无效</a></li>
-<li><a href="#sometimes%E6%96%B9%E6%B3%95%E5%85%81%E8%AE%B8%E4%BD%A0%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E5%99%A8%E5%9C%A8%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E8%A2%AB%E5%BA%94%E7%94%A8">sometimes方法允许你定义验证器在什么时候被应用</a></li>
-<li><a href="#%E6%8F%90%E4%BA%A4%E8%87%AA%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E8%A7%84%E5%88%99">提交自定义验证规则</a></li>
-<li><a href="#%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0%E9%AA%8C%E8%AF%81">数组元素验证</a></li>
-<li><a href="#Password%E7%9A%84defaults%E6%96%B9%E6%B3%95">Password的defaults方法</a></li>
-<li><a href="#%E8%A1%A8%E5%8D%95%E9%AA%8C%E8%AF%81%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82">表单验证重定向请求</a></li>
-<li><a href="#Mac%E9%AA%8C%E8%AF%81%E8%A7%84%E5%88%99">Mac验证规则</a></li>
-<li><a href="#%E9%AA%8C%E8%AF%81%E9%A1%B6%E7%BA%A7%E5%9F%9F%E5%90%8D%E9%82%AE%E7%AE%B1">验证顶级域名邮箱</a></li>
-</ol>
-<h3 id="图片验证"><a href="#图片验证" class="headerlink" title="图片验证"></a>图片验证</h3><p>在验证上传的图片时，可以指定所需的尺寸</p>
+        <h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><h3 id="图片验证"><a href="#图片验证" class="headerlink" title="图片验证"></a>图片验证</h3><p>在验证上传的图片时，可以指定所需的尺寸</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">&#x27;photo&#x27;</span> =&gt; <span class="string">&#x27;dimensions:max_width=4096,max_height=4096&#x27;</span>]</span><br></pre></td></tr></table></figure>
 
 <h3 id="自定义验证错误的信息"><a href="#自定义验证错误的信息" class="headerlink" title="自定义验证错误的信息"></a>自定义验证错误的信息</h3><p>只需在 <code>resources/lang/xx/validation.php</code> 文件创建适当的数组结构，就可以定义定每个 字段、规则和语言的验证错误消息。</p>

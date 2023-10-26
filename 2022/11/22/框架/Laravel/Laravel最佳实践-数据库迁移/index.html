@@ -22,15 +22,15 @@
   <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="数据库迁移 无符号整型 迁移顺序 带时区的迁移字段 数据库迁移字段类型 默认时间戳 迁移状态 创建带空格的迁移 在另一列的后面创建一列 为已经存在的表生成迁移文件 执行迁移前先输出 SQL 语句 匿名迁移 给迁移添加注释 表名表字段检测  无符号整型">
+<meta name="description" content="数据库迁移无符号整型作为迁移的外键，请使用 unsignedInteger()  类型或 integer()-&gt;unsigned() 来替代 integer() ，否则你会得到 SQL 错误。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Laravel最佳实践-数据库迁移">
 <meta property="og:url" content="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB/index.html">
 <meta property="og:site_name" content="NI9NE&#39;s Zone">
-<meta property="og:description" content="数据库迁移 无符号整型 迁移顺序 带时区的迁移字段 数据库迁移字段类型 默认时间戳 迁移状态 创建带空格的迁移 在另一列的后面创建一列 为已经存在的表生成迁移文件 执行迁移前先输出 SQL 语句 匿名迁移 给迁移添加注释 表名表字段检测  无符号整型">
+<meta property="og:description" content="数据库迁移无符号整型作为迁移的外键，请使用 unsignedInteger()  类型或 integer()-&gt;unsigned() 来替代 integer() ，否则你会得到 SQL 错误。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-11-22T14:51:55.000Z">
-<meta property="article:modified_time" content="2023-10-26T03:06:14.195Z">
+<meta property="article:modified_time" content="2023-10-26T03:25:23.934Z">
 <meta property="article:author" content="NI9NE">
 <meta property="article:tag" content="框架开发">
 <meta property="article:tag" content="Laravel">
@@ -281,22 +281,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="数据库迁移"><a href="#数据库迁移" class="headerlink" title="数据库迁移"></a>数据库迁移</h2><ol>
-<li><a href="#%E6%97%A0%E7%AC%A6%E5%8F%B7%E6%95%B4%E5%9E%8B">无符号整型</a></li>
-<li><a href="#%E8%BF%81%E7%A7%BB%E9%A1%BA%E5%BA%8F">迁移顺序</a></li>
-<li><a href="#%E5%B8%A6%E6%97%B6%E5%8C%BA%E7%9A%84%E8%BF%81%E7%A7%BB%E5%AD%97%E6%AE%B5">带时区的迁移字段</a></li>
-<li><a href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB%E5%AD%97%E6%AE%B5%E7%B1%BB%E5%9E%8B">数据库迁移字段类型</a></li>
-<li><a href="#%E9%BB%98%E8%AE%A4%E6%97%B6%E9%97%B4%E6%88%B3">默认时间戳</a></li>
-<li><a href="#%E8%BF%81%E7%A7%BB%E7%8A%B6%E6%80%81">迁移状态</a></li>
-<li><a href="#%E5%88%9B%E5%BB%BA%E5%B8%A6%E7%A9%BA%E6%A0%BC%E7%9A%84%E8%BF%81%E7%A7%BB">创建带空格的迁移</a></li>
-<li><a href="#%E5%9C%A8%E5%8F%A6%E4%B8%80%E5%88%97%E7%9A%84%E5%90%8E%E9%9D%A2%E5%88%9B%E5%BB%BA%E4%B8%80%E5%88%97">在另一列的后面创建一列</a></li>
-<li><a href="#%E4%B8%BA%E5%B7%B2%E7%BB%8F%E5%AD%98%E5%9C%A8%E7%9A%84%E8%A1%A8%E7%94%9F%E6%88%90%E8%BF%81%E7%A7%BB%E6%96%87%E4%BB%B6">为已经存在的表生成迁移文件</a></li>
-<li><a href="#%E6%89%A7%E8%A1%8C%E8%BF%81%E7%A7%BB%E5%89%8D%E5%85%88%E8%BE%93%E5%87%BA-SQL-%E8%AF%AD%E5%8F%A5">执行迁移前先输出 SQL 语句</a></li>
-<li><a href="#%E5%8C%BF%E5%90%8D%E8%BF%81%E7%A7%BB">匿名迁移</a></li>
-<li><a href="#%E7%BB%99%E8%BF%81%E7%A7%BB%E6%B7%BB%E5%8A%A0%E6%B3%A8%E9%87%8A">给迁移添加注释</a></li>
-<li><a href="#%E8%A1%A8%E5%90%8D%E8%A1%A8%E5%AD%97%E6%AE%B5%E6%A3%80%E6%B5%8B">表名表字段检测</a></li>
-</ol>
-<h3 id="无符号整型"><a href="#无符号整型" class="headerlink" title="无符号整型"></a>无符号整型</h3><p>作为迁移的外键，请使用 <code>unsignedInteger()</code>  类型或 <code>integer()-&gt;unsigned()</code> 来替代 <code>integer()</code> ，否则你会得到 SQL 错误。</p>
+        <h2 id="数据库迁移"><a href="#数据库迁移" class="headerlink" title="数据库迁移"></a>数据库迁移</h2><h3 id="无符号整型"><a href="#无符号整型" class="headerlink" title="无符号整型"></a>无符号整型</h3><p>作为迁移的外键，请使用 <code>unsignedInteger()</code>  类型或 <code>integer()-&gt;unsigned()</code> 来替代 <code>integer()</code> ，否则你会得到 SQL 错误。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Schema::create(<span class="string">&#x27;employees&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">Blueprint <span class="variable">$table</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$table</span>-&gt;unsignedInteger(<span class="string">&#x27;company_id&#x27;</span>);</span><br><span class="line">    <span class="variable">$table</span>-&gt;foreign(<span class="string">&#x27;company_id&#x27;</span>)-&gt;references(<span class="string">&#x27;id&#x27;</span>)-&gt;on(<span class="string">&#x27;companies&#x27;</span>);</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
 <p>同样，你可以用 <code>unsignedBigInteger()</code> 如果外键对应的是 <code>bigInteger()</code> 类型。</p>

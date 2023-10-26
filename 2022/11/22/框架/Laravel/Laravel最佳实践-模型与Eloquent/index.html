@@ -22,15 +22,15 @@
   <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="数据库模型与 Eloquent 复用或克隆query Eloquent where 日期方法 增量和减量 禁止 timestamp 列 软删除: 多行恢复 Model all: columns To Fail or not to Fail 列名修改 过滤结果集合 修改默认的Timestamp 字段 按照created_at快速排序 当创建记录时自动修改某些列的值 数据库原始查询计算运行得更快 不止">
+<meta name="description" content="数据库模型与 Eloquent复用或克隆query通常，我们需要从过滤后的查询中进行更多次查询。因此，大多数时候我们使用 query() 方法，让我们编写一个查询来获取今天创建的可用和不可用的产品">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Laravel最佳实践-模型与Eloquent">
 <meta property="og:url" content="https://ni9ne.github.io/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E6%A8%A1%E5%9E%8B%E4%B8%8EEloquent/index.html">
 <meta property="og:site_name" content="NI9NE&#39;s Zone">
-<meta property="og:description" content="数据库模型与 Eloquent 复用或克隆query Eloquent where 日期方法 增量和减量 禁止 timestamp 列 软删除: 多行恢复 Model all: columns To Fail or not to Fail 列名修改 过滤结果集合 修改默认的Timestamp 字段 按照created_at快速排序 当创建记录时自动修改某些列的值 数据库原始查询计算运行得更快 不止">
+<meta property="og:description" content="数据库模型与 Eloquent复用或克隆query通常，我们需要从过滤后的查询中进行更多次查询。因此，大多数时候我们使用 query() 方法，让我们编写一个查询来获取今天创建的可用和不可用的产品">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-11-22T14:51:11.000Z">
-<meta property="article:modified_time" content="2023-10-26T03:06:14.195Z">
+<meta property="article:modified_time" content="2023-10-26T03:24:42.076Z">
 <meta property="article:author" content="NI9NE">
 <meta property="article:tag" content="框架开发">
 <meta property="article:tag" content="Laravel">
@@ -281,80 +281,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="数据库模型与-Eloquent"><a href="#数据库模型与-Eloquent" class="headerlink" title="数据库模型与 Eloquent"></a>数据库模型与 Eloquent</h2><ol>
-<li><a href="#%E5%A4%8D%E7%94%A8%E6%88%96%E5%85%8B%E9%9A%86query">复用或克隆query</a></li>
-<li><a href="#Eloquent-where%E6%97%A5%E6%9C%9F%E6%96%B9%E6%B3%95">Eloquent where 日期方法</a></li>
-<li><a href="#%E5%A2%9E%E9%87%8F%E5%92%8C%E5%87%8F%E9%87%8F">增量和减量</a></li>
-<li><a href="#%E7%A6%81%E6%AD%A2-timestamp-%E5%88%97">禁止 timestamp 列</a></li>
-<li><a href="#%E8%BD%AF%E5%88%A0%E9%99%A4-%E5%A4%9A%E8%A1%8C%E6%81%A2%E5%A4%8D">软删除: 多行恢复</a></li>
-<li><a href="#Model-all-columns">Model all: columns</a></li>
-<li><a href="#To-Fail-or-not-to-Fail">To Fail or not to Fail</a></li>
-<li><a href="#%E5%88%97%E5%90%8D%E4%BF%AE%E6%94%B9">列名修改</a></li>
-<li><a href="#%E8%BF%87%E6%BB%A4%E7%BB%93%E6%9E%9C%E9%9B%86%E5%90%88">过滤结果集合</a></li>
-<li><a href="#%E4%BF%AE%E6%94%B9%E9%BB%98%E8%AE%A4%E7%9A%84-Timestamp-%E5%AD%97%E6%AE%B5">修改默认的Timestamp 字段</a></li>
-<li><a href="#%E6%8C%89%E7%85%A7created_at%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F">按照created_at快速排序</a></li>
-<li><a href="#%E5%BD%93%E5%88%9B%E5%BB%BA%E8%AE%B0%E5%BD%95%E6%97%B6%E8%87%AA%E5%8A%A8%E4%BF%AE%E6%94%B9%E6%9F%90%E4%BA%9B%E5%88%97%E7%9A%84%E5%80%BC">当创建记录时自动修改某些列的值</a></li>
-<li><a href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8E%9F%E5%A7%8B%E6%9F%A5%E8%AF%A2%E8%AE%A1%E7%AE%97%E8%BF%90%E8%A1%8C%E5%BE%97%E6%9B%B4%E5%BF%AB">数据库原始查询计算运行得更快</a></li>
-<li><a href="#%E4%B8%8D%E6%AD%A2%E4%B8%80%E4%B8%AA%E8%8C%83%E5%9B%B4">不止一个范围</a></li>
-<li><a href="#%E6%97%A0%E9%9C%80%E8%BD%AC%E6%8D%A2-Carbon">无需转换 Carbon</a></li>
-<li><a href="#%E6%A0%B9%E6%8D%AE%E9%A6%96%E5%AD%97%E6%AF%8D%E5%88%86%E7%BB%84">根据首字母分组</a></li>
-<li><a href="#%E6%B0%B8%E4%B8%8D%E6%9B%B4%E6%96%B0%E6%9F%90%E4%B8%AA%E5%AD%97%E6%AE%B5">永不更新某个字段</a></li>
-<li><a href="#find-()-%E6%9F%A5%E8%AF%A2%E5%A4%9A%E6%9D%A1%E6%95%B0%E6%8D%AE">find () 查询多条数据</a></li>
-<li><a href="#find%E5%A4%9A%E4%B8%AA%E6%A8%A1%E5%9E%8B%E5%B9%B6%E8%BF%94%E5%9B%9E%E5%A4%9A%E5%88%97">find多个模型并返回多列</a></li>
-<li><a href="#%E6%8C%89%E7%85%A7%E9%94%AE%E6%9F%A5%E6%89%BE">按照键查找</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8UUID%E6%9B%BF%E6%8D%A2auto-increment">使用UUID替换auto-increment</a></li>
-<li><a href="#Laravel-%E4%B8%AD%E7%9A%84%E5%AD%90%E6%9F%A5%E8%AF%A2">Laravel 中的子查询</a></li>
-<li><a href="#%E9%9A%90%E8%97%8F%E6%9F%90%E4%BA%9B%E5%88%97">隐藏某些列</a></li>
-<li><a href="#%E7%A1%AE%E5%AE%9ADB%E6%8A%A5%E9%94%99">确定DB报错</a></li>
-<li><a href="#%E8%BD%AF%E5%88%A0%E9%99%A4%E4%B8%8E%E6%9F%A5%E8%AF%A2%E6%9E%84%E9%80%A0%E5%99%A8">软删除与查询构造器</a></li>
-<li><a href="#SQL%E5%A3%B0%E6%98%8E">SQL声明</a></li>
-<li><a href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1">数据库事务</a></li>
-<li><a href="#%E6%9B%B4%E6%96%B0%E6%88%96%E5%88%9B%E5%BB%BA">更新或创建</a></li>
-<li><a href="#%E4%BF%9D%E5%AD%98%E6%97%B6%E7%A7%BB%E9%99%A4%E7%BC%93%E5%AD%98">保存时移除缓存</a></li>
-<li><a href="#%E4%BF%AE%E6%94%B9Created_at%E5%92%8CUpdated_at%E7%9A%84%E6%A0%BC%E5%BC%8F">修改Created_at和Updated_at的格式</a></li>
-<li><a href="#%E6%95%B0%E7%BB%84%E7%B1%BB%E5%9E%8B%E5%AD%98%E5%82%A8%E5%88%B0-JSON-%E4%B8%AD">数组类型存储到 JSON 中</a></li>
-<li><a href="#%E5%A4%8D%E5%88%B6%E4%B8%80%E4%B8%AA%E6%A8%A1%E5%9E%8B">复制一个模型</a></li>
-<li><a href="#%E9%99%8D%E4%BD%8E%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8">降低内存占用</a></li>
-<li><a href="#%E5%BF%BD%E7%95%A5-$fillable/$guarded-%E5%B9%B6%E5%BC%BA%E5%88%B6%E6%89%A7%E8%A1%8C">忽略 $fillable/$guarded 并强制执行</a></li>
-<li><a href="#3%E5%B1%82%E7%88%B6%E5%AD%90%E7%BA%A7%E7%BB%93%E6%9E%84">3层父子级结构</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8-find()-%E6%9D%A5%E6%90%9C%E7%B4%A2%E6%9B%B4%E5%A4%9A%E7%9A%84%E8%AE%B0%E5%BD%95">使用 find() 来搜索更多的记录</a></li>
-<li><a href="#%E5%A4%B1%E8%B4%A5%E6%97%B6%E6%89%A7%E8%A1%8C%E4%BB%BB%E4%BD%95%E6%93%8D%E4%BD%9C">失败时执行任何操作</a></li>
-<li><a href="#%E6%A3%80%E6%9F%A5%E8%AE%B0%E5%BD%95%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%E5%90%A6%E5%88%99%E6%98%BE%E7%A4%BA-404">检查记录是否存在否则显示 404</a></li>
-<li><a href="#%E6%9D%A1%E4%BB%B6%E8%AF%AD%E5%8F%A5%E4%B8%BA%E5%90%A6%E6%97%B6%E4%B8%AD%E6%AD%A2">条件语句为否时中止</a></li>
-<li><a href="#%E5%9C%A8%E5%88%A0%E9%99%A4%E6%A8%A1%E5%9E%8B%E4%B9%8B%E5%89%8D%E6%89%A7%E8%A1%8C%E4%BB%BB%E4%BD%95%E9%A2%9D%E5%A4%96%E7%9A%84%E6%93%8D%E4%BD%9C">在删除模型之前执行任何额外的操作</a></li>
-<li><a href="#%E5%BD%93%E4%BD%A0%E9%9C%80%E8%A6%81%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%95%B0%E6%8D%AE%E5%88%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E6%97%B6%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E4%B8%80%E4%B8%AA%E5%AD%97%E6%AE%B5">当你需要在保存数据到数据库时自动填充一个字段</a></li>
-<li><a href="#%E8%8E%B7%E5%8F%96%E6%9F%A5%E8%AF%A2%E8%AF%AD%E5%8F%A5%E7%9A%84%E9%A2%9D%E5%A4%96%E4%BF%A1%E6%81%AF">获取查询语句的额外信息</a></li>
-<li><a href="#%E5%9C%A8-Laravel-%E4%B8%AD%E4%BD%BF%E7%94%A8doesntExist()%E6%96%B9%E6%B3%95">在 Laravel 中使用doesntExist()方法</a></li>
-<li><a href="#%E5%9C%A8%E4%B8%80%E4%BA%9B%E6%A8%A1%E5%9E%8B%E7%9A%84-boot-()-%E6%96%B9%E6%B3%95%E4%B8%AD%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E4%B8%80%E4%B8%AA%E7%89%B9%E6%80%A7">在一些模型的 boot () 方法中自动调用一个特性</a></li>
-<li><a href="#%E5%9C%A8-Laravel-%E4%B8%AD%E6%9C%89%E4%B8%A4%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%E6%96%B9%E6%B3%95%E6%9D%A5%E7%A1%AE%E5%AE%9A%E4%B8%80%E4%B8%AA%E8%A1%A8%E6%98%AF%E5%90%A6%E4%B8%BA%E7%A9%BA%E8%A1%A8">在 Laravel 中有两种常见的方法来确定一个表是否为空表</a></li>
-<li><a href="#%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D-property-of-non-object-%E9%94%99%E8%AF%AF">如何避免 property of non-object 错误</a></li>
-<li><a href="#Eloquent-%E6%95%B0%E6%8D%AE%E6%94%B9%E5%8F%98%E5%90%8E%E8%8E%B7%E5%8F%96%E5%8E%9F%E5%A7%8B%E6%95%B0%E6%8D%AE">Eloquent 数据改变后获取原始数据</a></li>
-<li><a href="#%E4%B8%80%E7%A7%8D%E6%9B%B4%E7%AE%80%E5%8D%95%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E6%96%B9%E6%B3%95">一种更简单创建数据库的方法</a></li>
-<li><a href="#Query%E6%9E%84%E9%80%A0%E5%99%A8%E7%9A%84crossJoinSub%E6%96%B9%E6%B3%95">Query构造器的crossJoinSub方法</a></li>
-<li><a href="#belongsToMany%E7%9A%84%E4%B8%AD%E9%97%B4%E8%A1%A8%E5%91%BD%E5%90%8D">belongsToMany的中间表命名</a></li>
-<li><a href="#%E6%A0%B9%E6%8D%AEPivot%E5%AD%97%E6%AE%B5%E6%8E%92%E5%BA%8F">根据Pivot字段排序</a></li>
-<li><a href="#%E4%BB%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E6%9F%A5%E8%AF%A2%E4%B8%80%E6%9D%A1%E8%AE%B0%E5%BD%95">从数据库中查询一条记录</a></li>
-<li><a href="#%E8%AE%B0%E5%BD%95%E8%87%AA%E5%8A%A8%E5%88%86%E5%9D%97">记录自动分块</a></li>
-<li><a href="#%E5%AE%9A%E6%97%B6%E6%B8%85%E7%90%86%E8%BF%87%E6%9C%9F%E8%AE%B0%E5%BD%95%E4%B8%AD%E7%9A%84%E6%A8%A1%E5%9E%8B">定时清理过期记录中的模型</a></li>
-<li><a href="#%E4%B8%8D%E5%8F%98%E7%9A%84%E6%97%A5%E6%9C%9F%E5%92%8C%E5%AF%B9%E5%AE%83%E4%BB%AC%E7%9A%84%E5%BC%BA%E5%88%B6%E8%BD%AC%E6%8D%A2">不变的日期和对它们的强制转换</a></li>
-<li><a href="#findorfail%E6%96%B9%E6%B3%95%E4%B9%9F%E6%8E%A5%E6%94%B6ids%E6%95%B0%E7%BB%84">findorfail方法也接收ids数组</a></li>
-<li><a href="#%E4%BB%8E%E4%BD%A0%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E8%87%AA%E5%8A%A8%E7%A7%BB%E9%99%A4%E6%A8%A1%E5%9E%8BprunableTrait">从你的数据库中自动移除模型prunableTrait</a></li>
-<li><a href="#%E6%97%A5%E6%9C%9F%E8%BD%AC%E6%8D%A2">日期转换</a></li>
-<li><a href="#%E5%A4%9A%E6%A8%A1%E5%9E%8B%E6%9B%B4%E6%96%B0%E6%8F%92%E5%85%A5">多模型更新/插入</a></li>
-<li><a href="#%E8%BF%87%E6%BB%A4%E7%BB%93%E6%9E%9C%E9%9B%86%E4%B9%8B%E5%90%8E%E8%8E%B7%E5%8F%96%E6%9F%A5%E8%AF%A2%E6%9E%84%E9%80%A0%E5%99%A8">过滤结果集之后获取查询构造器</a></li>
-<li><a href="#%E9%80%89%E6%8B%A9%E8%81%9A%E5%90%88%E8%AE%A1%E7%AE%97%E7%9B%B8%E5%85%B3%E6%A8%A1%E5%9E%8B">选择聚合计算相关模型</a></li>
-<li><a href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%BC%BA%E5%88%B6%E8%BD%AC%E6%8D%A2">自定义强制转换</a></li>
-<li><a href="#%E4%BF%9D%E5%AD%98%E4%B8%AD%E4%B8%8D%E8%A6%81%E8%A7%A6%E5%8F%91%E4%BA%8B%E4%BB%B6">保存中不要触发事件</a></li>
-<li><a href="#%E5%9F%BA%E4%BA%8E%E7%9B%B8%E5%85%B3%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%B9%B3%E5%9D%87%E5%80%BC%E6%88%96%E6%80%BB%E6%95%B0%E6%8E%92%E5%BA%8F">基于相关模型的平均值或总数排序</a></li>
-<li><a href="#%E8%BF%94%E5%9B%9E%E4%BA%8B%E5%8A%A1%E7%BB%93%E6%9E%9C">返回事务结果</a></li>
-<li><a href="#%E4%BB%8Equery%E4%B8%AD%E7%A7%BB%E9%99%A4%E5%A4%9A%E4%B8%AA%E5%85%AC%E5%85%B1scope">从query中移除多个公共scope</a></li>
-<li><a href="#JSON%E5%88%97%E5%B1%9E%E6%80%A7%E6%8E%92%E5%BA%8F">JSON列属性排序</a></li>
-<li><a href="#%E4%BB%8E%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%BB%93%E6%9E%9C%E4%B8%AD%E8%8E%B7%E5%8F%96%E5%8D%95%E5%88%97%E7%9A%84%E5%80%BC">从第一个结果中获取单列的值</a></li>
-<li><a href="#%E6%A3%80%E6%B5%8B%E6%A8%A1%E5%9E%8B%E5%B1%9E%E6%80%A7%E6%98%AF%E5%90%A6%E8%A2%AB%E4%BF%AE%E6%94%B9">检测模型属性是否被修改</a></li>
-<li><a href="#%E5%AE%9A%E4%B9%89%E8%AE%BF%E9%97%AE%E5%99%A8%E4%B8%8E%E4%BF%AE%E6%94%B9%E5%99%A8%E7%9A%84%E6%96%B0%E6%96%B9%E6%B3%95">定义访问器与修改器的新方法</a></li>
-<li><a href="#%E5%8F%A6%E5%A4%96%E4%B8%80%E7%A7%8D%E5%AE%9A%E4%B9%89%E8%AE%BF%E9%97%AE%E5%99%A8%E4%B8%8E%E4%BF%AE%E6%94%B9%E5%99%A8%E7%9A%84%E6%96%B9%E6%B3%95">另外一种定义访问器与修改器的方法</a></li>
-</ol>
-<h3 id="复用或克隆query"><a href="#复用或克隆query" class="headerlink" title="复用或克隆query"></a>复用或克隆query</h3><p>通常，我们需要从过滤后的查询中进行更多次查询。因此，大多数时候我们使用 query() 方法，<br>让我们编写一个查询来获取今天创建的可用和不可用的产品</p>
+        <h2 id="数据库模型与-Eloquent"><a href="#数据库模型与-Eloquent" class="headerlink" title="数据库模型与 Eloquent"></a>数据库模型与 Eloquent</h2><h3 id="复用或克隆query"><a href="#复用或克隆query" class="headerlink" title="复用或克隆query"></a>复用或克隆query</h3><p>通常，我们需要从过滤后的查询中进行更多次查询。因此，大多数时候我们使用 query() 方法，<br>让我们编写一个查询来获取今天创建的可用和不可用的产品</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$query</span> = Product::query();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="variable">$today</span> = request()-&gt;q_date ?? today();</span><br><span class="line"><span class="keyword">if</span>(<span class="variable">$today</span>)&#123;</span><br><span class="line">    <span class="variable">$query</span>-&gt;where(<span class="string">&#x27;created_at&#x27;</span>, <span class="variable">$today</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 让我们获取可用和不可用的产品</span></span><br><span class="line"><span class="variable">$active_products</span> = <span class="variable">$query</span>-&gt;where(<span class="string">&#x27;status&#x27;</span>, <span class="number">1</span>)-&gt;get(); <span class="comment">// 这一行 修改了$query 对象变量</span></span><br><span class="line"><span class="variable">$inactive_products</span> = <span class="variable">$query</span>-&gt;where(<span class="string">&#x27;status&#x27;</span>, <span class="number">0</span>)-&gt;get(); <span class="comment">// 所以这里我们将获取不到任何不可用产品</span></span><br></pre></td></tr></table></figure>
 
 <p>但是，在获得 <code>$active products</code> 后，<code>$query</code> 会被修改。因此 <code>$inactive_products</code> 不会从 <code>$query</code> 中获取到不可用产品，并且每次都返回空集合。因为，它尝试从 <code>$active_products</code> 中查找不可用产品（<code>$query</code> 仅返回可用产品）。</p>
