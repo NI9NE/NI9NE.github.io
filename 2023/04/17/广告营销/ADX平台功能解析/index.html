@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="#ADX平台功能解析 新增下游对接123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354551.下游管理-&gt;下游列表 新增该下游媒体		[t_downstream]为了录入下游基础信息, 关联上游订单&#x2F;流量目标, 需要我们为可提供的广告位创建所属目标">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ADX平台功能解析">
+<meta property="og:url" content="https://ni9ne.github.io/2023/04/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/ADX%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="#ADX平台功能解析 新增下游对接123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354551.下游管理-&gt;下游列表 新增该下游媒体		[t_downstream]为了录入下游基础信息, 关联上游订单&#x2F;流量目标, 需要我们为可提供的广告位创建所属目标">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3c5c3c6c21536db27bc1e04191c6cef7-5b04f08.png">
+<meta property="article:published_time" content="2023-04-17T14:19:12.000Z">
+<meta property="article:modified_time" content="2023-10-26T04:15:33.055Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="广告营销">
+<meta property="article:tag" content="业务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3c5c3c6c21536db27bc1e04191c6cef7-5b04f08.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2023/04/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/ADX%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2023/04/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/ADX%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/","path":"2023/04/17/广告营销/ADX平台功能解析/","title":"ADX平台功能解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ADX平台功能解析 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">54</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">7</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">112</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E4%B8%8B%E6%B8%B8%E5%AF%B9%E6%8E%A5"><span class="nav-number">1.</span> <span class="nav-text">新增下游对接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E4%B8%8A%E6%B8%B8%E5%AF%B9%E6%8E%A5"><span class="nav-number">2.</span> <span class="nav-text">新增上游对接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E7%AE%97%E5%B9%B3%E5%8F%B0%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">预算平台资源管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">流量管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A2%E5%8D%95%E7%AE%A1%E7%90%86"><span class="nav-number">5.</span> <span class="nav-text">订单管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E5%A4%84%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">流量处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%8A%A5%E8%A1%A8"><span class="nav-number">7.</span> <span class="nav-text">数据报表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%91%E6%B5%8B%E9%93%BE%E6%8E%A5%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F"><span class="nav-number">8.</span> <span class="nav-text">监测链接处理方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%85%A5%E6%96%B9%E5%90%91"><span class="nav-number">9.</span> <span class="nav-text">深入方向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ADX%E9%80%BB%E8%BE%91%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="nav-number">10.</span> <span class="nav-text">ADX逻辑架构图</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">112</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2023/04/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/ADX%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ADX平台功能解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-04-17 22:19:12" itemprop="dateCreated datePublished" datetime="2023-04-17T22:19:12+08:00">2023-04-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%B8%9A%E5%8A%A1%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">业务笔记</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>#ADX平台功能解析</p>
+<h3 id="新增下游对接"><a href="#新增下游对接" class="headerlink" title="新增下游对接"></a>新增下游对接</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">1.下游管理-&gt;下游列表 新增该下游媒体		[t_downstream]</span><br><span class="line">为了录入下游基础信息, 关联上游订单/流量目标, 需要我们为可提供的广告位创建所属目标. 即下游渠道</span><br><span class="line">	录入信息: </span><br><span class="line">      必填: 下游名称, 下游类型(adx/ssp), 是否需要审核广告主/创意等, 自动生成秘钥/校验码</span><br><span class="line">      非必填: 媒体邮箱</span><br><span class="line">    &gt; adx/ssp类型有什么区别? 无用</span><br><span class="line">    &gt; 下游秘钥/校验码是否是用于加密下游价格? 下游加密, 触发监控链接, 我们解密</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2.媒体管理-&gt;应用列表 创建该下游下属应用		[t_app]</span><br><span class="line">指定该应用支持的广告位交互类型和操作系统类型</span><br><span class="line">	录入信息: </span><br><span class="line">      必填: 应用名称,所属媒体,应用分类/二级分类,指定该应用类型(PC/Android/IOS), 交互类型(链接/下载/跳转) </span><br><span class="line">      非必填: 应用包名</span><br><span class="line">	&gt; 媒体分类用途?</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">3.媒体管理-&gt;广告位列表 创建广告位		[t_ad_position]</span><br><span class="line">指定该平台各个广告位支持的操作系统类型及下游请求过来的流量识别ID</span><br><span class="line"> - 前提1: 在下游广告形式模块中, 查询是否存在该广告位形式(banner/开屏/贴片), 不存在先创建		[t_adx_adtype]</span><br><span class="line"> 	&gt; 上述有误. 广告位信息中的广告位形式与下游广告位形式不匹配, 后台代码中是以配置方式存在的.</span><br><span class="line"> - 前提2: 在模板列表模块中, 创建该广告位支持的广告模板, 填写广告位形式/投放类型/素材宽高等信息		[t_ad_template]</span><br><span class="line"> 	录入信息: 该广告位名称, 所属应用, 所属媒体, 广告位类型(前提1), 广告位模板(前提2), 投放平台/系统/类型, 广告位底价/建议价, 下游请求广告位ID/标识, 绑定系统广告位ID</span><br><span class="line"> 	&gt; 投放类型字段有何用处? 可以用于筛选匹配模板(并不是)</span><br><span class="line"> 	&gt; 广告位和模板都有投放类型字段记录, 是否存在广告位投放类型与广告模板投放类型不一致的情况, 如何处理</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- 广告位模板介绍</span><br><span class="line">    下游模板仅在媒体管理中存在, 包含信息有名称, 广告位形式(banner/信息流), 投放类型(RTB/PD), 创意尺寸/字数要求等</span><br><span class="line">    广告位模板可以用于绑定媒体广告位, 也可以绑定系统广告位. 同时使用同一个模板是双方建立关联关系的前提</span><br><span class="line">    为了在下游流量请求过来时, 判断广告位的各种尺寸/创意要求, 要么下游请求中包含模板ID, 要么需要某种方式匹配到该模板(如广告位ID+尺寸). 后一种方法可以使用[映射下游模板ID]功能达成.</span><br><span class="line"> 	</span><br><span class="line"> 	</span><br><span class="line">4.系统媒体管理-&gt;应用列表 创建系统应用(对上游)		[t_system_app]</span><br><span class="line">将下游各应用的广告位来源汇总, 成为对上游来说一致的流量来源应用. 如本系统中存在多个下游, 他们各自都代理爱奇艺的一部分广告位, 交集差集都不为空, 此时, 这些广告位对上游来说, 应该属于统一的应用-爱奇艺</span><br><span class="line">	查询是否存在该应用, 不存在, 对照媒体应用录入系统应用数据以创建</span><br><span class="line">	录入信息:(除没有所属渠道外,和媒体应用基本相同)</span><br><span class="line">      交互类型/系统类型/媒体分类/是否自定义应用信息/应用信息(自定义APP名称/包名)</span><br><span class="line">	&gt; 同样包含媒体分类</span><br><span class="line">	&gt; 是否存在下面的情况: 系统媒体应用支持多种交互类型, 其中某个媒体应用仅支持一种交互类型</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">5.系统媒体管理-&gt;广告位列表  创建系统广告位(对上游)		[t_system_adslot]</span><br><span class="line">用于向上游发送竞价请求时, 统一下游广告位流量形式.</span><br><span class="line">	录入信息: 广告位名称, 所属系统应用, 广告位形式, 广告位模板, 投放平台/系统/类型, 上游底价</span><br><span class="line">	绑定关系: 一对多, 系统广告位可包含多个媒体广告位, 并在媒体广告位对应字段记录所属系统广告位对应关系		[f_sys_adslot_id]</span><br><span class="line">	设置价格: 该广告位媒体底价和上游底价</span><br><span class="line">	设置上游底价, 每关联一个新的媒体广告位, 将在价格表(t_ad_price/t_adslot_price)中修改价格并记录</span><br><span class="line">	&gt; ? 列表页中的DSP底价和编辑上游价格中的价格什么关系   </span><br><span class="line">	&gt; ! DSP底价和上游价格都是在请求上游时使用的底价. 但DSP底价关联系统广告位, 属于基础默认价格, 关联媒体广告位时会自动生成该价格的上游价格. 上游价格关联系统+媒体广告位的关联关系, 属于该媒体广告位自定义的底价, 可以低于DSP底价, 但不能低于该媒体广告位底价</span><br><span class="line"></span><br><span class="line">6.绑定媒体广告位到对应的系统广告位上</span><br><span class="line">	支持在系统广告位中绑定媒体广告位(一对多), 也支持在媒体广告位上绑定系统广告位(一对一)</span><br><span class="line">	该绑定关系在后台无法取消, 据说是为了避免误操作,导致使用的关联关系失效</span><br></pre></td></tr></table></figure>
+
+<h3 id="新增上游对接"><a href="#新增上游对接" class="headerlink" title="新增上游对接"></a>新增上游对接</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">1. 上游平台管理-&gt;基本信息  新增上游信息		[t_dsp_members]</span><br><span class="line">该模块主要用于存储上游平台信息, 用于在流量请求过来时, 指定需要分发竞价请求的目标本体.包括用于展示的信息 和引擎需要的配置参数(isdsp-上游类型 / is_ext-是否执行扩展程序代码)</span><br><span class="line">	录入信息: </span><br><span class="line">      展示信息:上游名称, 账户/密码, 公司信息, 对接人, 邮箱配置等</span><br><span class="line">      引擎配置: 平台类型, 是否使用扩展代码</span><br><span class="line">	&gt; 是否为DSP平台有什么用? </span><br><span class="line">		一般DSP平台是由上游对接我们, 我们提供竞价请求/响应接口格式, 他们做适配开发.</span><br><span class="line">        而非DSP平台一般是我们对接他们, 需提供个性化接口处理请求响应数据格式(引擎dsp文件夹内容), 有些还需要在预算平台注册资源</span><br><span class="line">	&gt; 扩展代码的作用是什么? 主要用于为某些上游提供定向流量功能, 参考SPLITFlow + 引擎common/config中的逻辑</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line">2. 上游平台管理-&gt;配置信息  配置上游DSP对接信息		[t_dsp_config]</span><br><span class="line">上游平台用于流量分发时的引擎配置信息, 一般直接存储在广告位对应的缓存中</span><br><span class="line">	录入信息: 竞价URL, QPS, 是否需要审批创意, 接口配置(方式/超时/IP白名单/加密秘钥)</span><br><span class="line">	&gt; ? 为何不将上游信息单独存储, 而是放在下游平台:下游广告位ID的dspIds中?耗费内存不说, 若上游平台有修改,所有相关广告位缓存信息都需要更新</span><br><span class="line">	&gt; ! 可能是以空间换时间,优先保证请求时间. 有时间可以测试下两种方式的耗时区别</span><br><span class="line">	</span><br><span class="line">3. 广告主管理  新建广告主		[t_advertisers]</span><br><span class="line">主要用于审核上游广告创意所属广告主资质信息, 同时也支持向下游传递该广告主信息, 供下游审核</span><br><span class="line">	录入信息: 所属上游平台ID, 广告主信息(名称/营业执照/资质/行业信息)</span><br><span class="line">	广告主开通: 传递给下游审核, 通过接口/运营手动传输给下游, 审核该广告主资质/行业信息		[t_advertisers_audit]</span><br><span class="line">	&gt; 广告主创建来源? 接口创建? 谁触发,谁填写(本平台运营/上游平台)</span><br><span class="line">	&gt; 为何会有上游广告主ID? 从哪儿获得, 有什么用</span><br><span class="line">	</span><br><span class="line">4. 创意管理  同步DSP创意到ADX		[t_creatives]</span><br><span class="line">用于审核上游创意素材信息, 同时支持向下游传递创意信息, 供下游审核</span><br><span class="line">	录入信息: </span><br><span class="line">      关联关系: 该创意所属上游, 上游创意ID, 所属广告主, 广告主所属行业, 订单ID</span><br><span class="line">      素材属性: 投放时段, 创意交互类型(落地页/下载/跳转), 广告形式, 广告模板</span><br><span class="line">      素材内容: 创意素材信息, 落地页, 监测链接(点击/曝光), 竞价成功通知链接等</span><br><span class="line">	&gt; 录入创意是否是用于先审后投, 竞价成功所用创意优先用哪个, 如何保证竞价成功响应素材和审核素材一致</span><br><span class="line">	(拉取上游素材到本地, 投放时可以使用本地素材, 以避免上游链接所在素材被替换)</span><br><span class="line">	</span><br><span class="line">	创意开通: 传递给下游审核, 通过接口/运营传输给下游, 下游审核该创意是否合规		[t_creative_audit]</span><br><span class="line">	创意操作日志: 记录创意操作的数据变动		[t_creatives_handle_log]</span><br><span class="line">	</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">上下游管理中</span><br><span class="line">下游对外使用媒体管理, 配置内容主要是下游媒体需要填写的内容.</span><br><span class="line">对内使用系统媒体管理, 将下游媒体广告位整合成为本系统的广告位</span><br><span class="line"></span><br><span class="line">上游对外需要在其他平台注册我们自己的广告位</span><br><span class="line">对内需要整合其他上游, 做好区分, 整理为自己的预算集合</span><br><span class="line"></span><br><span class="line">那是否可以开放对下游媒体的操作, 由下游自己创建应用/广告位, 通过接口/脚本在媒体广告位进行增删改时, 同步信息到系统广告位清单, 在此过程中, 可以做广告位合并, 清退, 去重等操作</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="预算平台资源管理"><a href="#预算平台资源管理" class="headerlink" title="预算平台资源管理"></a>预算平台资源管理</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">某些业务流程中, 本ADX平台对于上游平台来说, 是类似于ssp下游平台的存在.</span><br><span class="line"></span><br><span class="line">1.预算平台应用		[t_third_app]</span><br><span class="line">	从后台看, 预算平台应用创建需要将【上游平台管理】中的上游ID 与【系统媒体管理】中的下游应用ID 关联, 生成应用记录</span><br><span class="line">	应该是我们作为ssp, 需要在上游adx(上游ID)中创建应用(下游应用ID), 返回adx应用ID</span><br><span class="line">	&gt; ? 应用ID存哪儿了 预算平台管理-&gt;配置信息 t_dsp_config-&gt;f_media_id</span><br><span class="line">	&gt; ? 为什么不在预算平台资源管理中记录应用ID  	</span><br><span class="line">	&gt; ! 对上游来说我们是一个整体, 上游不关心这个流量来自哪个下游, 也就不用每个下游在上游资源管理中新建一个应用, 并区分请求来源</span><br><span class="line">	</span><br><span class="line">2. 预算平台模板		[t_third_template]</span><br><span class="line">	从后台看, 预算平台模板创建是将【上游平台管理】中的上游应用ID 与【媒体管理】中的模板ID 关联,加上注册在上游平台返回的模板ID/名称,生成模板记录</span><br><span class="line">	- 我们作为ssp需要创建广告位, 先得创建模板, 记录广告位投放类型, 素材宽高等信息</span><br><span class="line">	我们需要在上游预算平台(上游ID)创建模板(下游模板ID). 登记我们【媒体管理】中的对应模板数据, 获取上游返回的模板ID/名称</span><br><span class="line">	&gt; 为何会有广告位形式? 也是在绑定广告位时做筛选的么? 实验后发现没有筛选关系</span><br><span class="line">	</span><br><span class="line">3. 预算平台广告位		[t_third_adslot]</span><br><span class="line">	从后台看, 预算平台广告位创建是将【上游平台管理】中的上游ID, 第一步创建的应用, 第二步创建的模板,【系统媒体管理】中的广告位ID 关联起来, 生成广告位记录</span><br><span class="line">	- ssp创建广告位, 需要提供所属应用/模板ID</span><br><span class="line">	我们需要在上游预算平台创建广告位,登记我们【系统媒体管理】中的对应广告位数据, 使用的应用/模板信息等, 返回广告位ID/名称</span><br><span class="line">	在本系统中记录该广告位的预算平台信息, 所属应用/模板,登记广告位ID/名称</span><br><span class="line"></span><br><span class="line">这也是为何【上游平台管理】列表数据中, 存在字段 是否为DSP平台 的原因</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="流量管理"><a href="#流量管理" class="headerlink" title="流量管理"></a>流量管理</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">分为两种方式: 模板维度/广告位维度</span><br><span class="line">- 模板维度		[t_flow_new / t_flow_adslot_relation]</span><br><span class="line">	列表显示所有媒体广告位模板, 依照媒体/应用/广告形式/模板ID 逐层筛选流量</span><br><span class="line">	点击分配后显示可用上游平台, 确认关联关系分配流量</span><br><span class="line">- 广告位维度		[t_flow_adslot_dsp_relation]</span><br><span class="line">	列表显示所有媒体广告位, 依照媒体/应用/广告形式/广告位ID 逐层筛选流量</span><br><span class="line">	点击分配后显示可用上游平台, 确认关联关系分配流量</span><br><span class="line"></span><br><span class="line">&gt; 该关联关系用于下游流量进来后, 获取分发竞价请求目标 ? RTB/ PD PDB</span><br><span class="line">模板和广告位是一对多的关系</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="订单管理"><a href="#订单管理" class="headerlink" title="订单管理"></a>订单管理</h3><blockquote>
+<p>? 是否仅服务于PD/PDB形式的流量交易</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">下游订单管理 - 下游录入各种基础信息后, 流量送达的合同记录		[t_adx_order]</span><br><span class="line"></span><br><span class="line">	录入信息: 时间区段, 订单名称, 订单价格(单价?总价?), 下游交易ID,</span><br><span class="line">			下游平台(下游管理列表中的媒体ID), 应用(?媒体管理应用列表中的应用ID), 广告位(?媒体管理广告位列表中的广告位ID),</span><br><span class="line">			?预算平台(上游平台管理中的平台ID), ?广告主(广告主管理中的广告主ID), 上游订单(非必填), 订单价格(下游设定底价?),</span><br><span class="line">	绑定关系:关联上游订单信息?			[t_dsp_adx_order_relation]</span><br><span class="line">	</span><br><span class="line">	&gt; 下游订单应该是adx/ssp之间的合同, 为何会有上游平台字段+广告主, 还是必填</span><br><span class="line">	下游订单创建时需要明确该下游平台流量需要分配给哪些上游预算平台,投放哪个广告主的素材</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">上游订单管理 - 上游对于某个广告位的合同记录			[t_dsp_order]</span><br><span class="line">	</span><br><span class="line">	录入信息: 时间区段, 订单名称, 订单价格(单价?总价?),</span><br><span class="line">			预算平台(上游管理列表中的平台ID), 活动(上游活动ID,内含投放量级,频控等数据),广告主(广告主管理中的广告主ID),</span><br><span class="line">			应用(系统媒体管理应用列表中的应用ID),广告位(系统媒体管理广告位列表中的广告位ID)</span><br><span class="line">	绑定关系:关联下游订单信息			[t_dsporder_adslot_relation]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">合约广告不仅是adx和上游签订订单, 还会涉及到下游, 下游发送流量时会标识该流量的</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">该模块从创建优先级别来说, 应该是先创建上游活动, 在创建上游订单, 最后创建下游订单 </span><br><span class="line">因为创建下游订单数据时, 需要绑定上游订单, 而创建上游订单时, 需要选择上游活动</span><br><span class="line"></span><br><span class="line">当上游平台类型为DSP平台时, 不需要在预算平台资源管理中注册应用/广告位. 如果是SSP平台, 则需要注册,并在上游订单中绑定上游广告位信息</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="流量处理"><a href="#流量处理" class="headerlink" title="流量处理"></a>流量处理</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">媒体发起流量请求, 请求需携带ADX中已注册的广告位下游ID		t_flow_adslot_dsp_relation</span><br><span class="line"></span><br><span class="line">ADX系统通过广告位ID定位【媒体管理-&gt;广告位列表】数据, 从而获取到该请求所属媒体/应用/模板/投放类型等数据</span><br><span class="line">  先处理PD/PDB</span><br><span class="line">	- 通过订单获取上游订单</span><br><span class="line">		查询【订单管理-&gt;下游订单】数据, 是否存在包含该广告位的下游订单</span><br><span class="line">		若存在该下游订单, 查询是否存在上游订单关联关系, 进而获取【订单管理-&gt;上游订单】中的上游订单数据</span><br><span class="line">		通过上游订单获取到需要该广告位的上游平台及其应用/广告主/系统代码位/价格</span><br><span class="line">	- 通过广告位获取上游订单</span><br><span class="line">		查询【系统媒体管理-&gt;广告位列表】数据, 获取该媒体广告位对应的系统广告位</span><br><span class="line">		若存在该系统广告位, 再从【订单管理-&gt;上游订单】中获取该系统广告位是否存在上游订单数据</span><br><span class="line">		若存在该上游订单, 通过上游订单获取到需要该广告位的上游平台及其应用/广告主/系统代码位/价格</span><br><span class="line">  再处理RTB</span><br><span class="line">	- 获取上游</span><br><span class="line">      - 通过模板获取分配上游</span><br><span class="line">          查询【流量管理-&gt;流量分配】数据, 获取该媒体广告位对应的模板的分配上游DSP平台</span><br><span class="line">      - 通过广告位获取分配上游</span><br><span class="line">		  查询【流量管理-&gt;流量分配(广告位维度)】数据, 获取该媒体广告位对应的模板的分配上游DSP平台</span><br><span class="line">	- 获取上游配置</span><br><span class="line">		查询【上游平台管理-&gt;配置信息】数据, 获取上一步获取到的上游对应配置信息</span><br><span class="line">	- 竞价</span><br><span class="line">		验证token/IP白名单/超时时间</span><br><span class="line">		依据每个上游不同的流量接收地址, 发起竞价请求, 取胜者, 通知上游竞价成功</span><br><span class="line"></span><br><span class="line">  PD/PDB/RTB请求可以同步发出, 依照优先级由低到高处理响应, 返回媒体最终展示的创意结果</span><br><span class="line"> 	  PD/PDB若返回创意,则舍弃RTB胜者广告素材, 若PD/PDB没有返回创意, 使用RTB胜者素材</span><br><span class="line"></span><br><span class="line">&gt; 流量分配完成后在流量分配缓存标识表(t_flow_new)中设置缓存标识</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据报表"><a href="#数据报表" class="headerlink" title="数据报表"></a>数据报表</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">上游数据报表</span><br><span class="line">单日数据(小时): t_dsp_chain_statistics_202304</span><br><span class="line">非单日数据: t_dsp_chain_statistics_day</span><br><span class="line"></span><br><span class="line">下游数据报表</span><br><span class="line">单日数据(小时): t_adx_chain_statistics_202206</span><br><span class="line">非单日数据: t_adx_chain_statistics_day</span><br><span class="line"></span><br><span class="line">上游订单数据报表: </span><br><span class="line">单日数据(小时): t_dsp_chain_statistics_pd_202206</span><br><span class="line">非单日数据: t_dsp_chain_statistics_pd_day</span><br><span class="line"></span><br><span class="line">下游订单数据报表:</span><br><span class="line">单日数据(小时): t_adx_chain_statistics_pd_202206</span><br><span class="line">非单日数据: t_adx_chain_statistics_pd_day</span><br><span class="line"></span><br><span class="line">上游活动报表:</span><br><span class="line">dsp_chain_statistics_pd_day</span><br></pre></td></tr></table></figure>
+
+<h3 id="监测链接处理方式"><a href="#监测链接处理方式" class="headerlink" title="监测链接处理方式"></a>监测链接处理方式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">包括曝光/点击/竞胜等</span><br><span class="line">上游提供给我们的监测链接, 需要我们提供价格加密替换(使用上游秘钥), 再直接请求(仅竞胜)或传递给下游, 由下游触发</span><br><span class="line">我们自己的监测链接, 需要下游提供价格加密替换(使用下游秘钥), 再由下游触发</span><br></pre></td></tr></table></figure>
+
+<p>其他问题:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- 下游平台可能设置某些行业黑名单, 没发现有地方配置</span><br><span class="line">提前商务沟通避免投这些行业, 且下游也会自己审核创意</span><br></pre></td></tr></table></figure>
+
+<h3 id="深入方向"><a href="#深入方向" class="headerlink" title="深入方向"></a>深入方向</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">如何从0搭建一套ADX系统</span><br><span class="line"> (核心功能为流量转发, 需要处理上下游大量请求, 所以在搭建之初需要考虑负载均衡及缓存配置)</span><br><span class="line">1. 需要商务对接下游, 获取流量. 进而通过提供广告位清单的形式在adx中注册</span><br><span class="line">	- 需要下游提供投放黑白名单, 广告位清单(含类型/支持素材格式/宽高等信息), 底价等</span><br><span class="line">	</span><br><span class="line">2.获取到流量后, 需要商务获取预算方, 支持合约和竞价两种交易形式.</span><br><span class="line">	- 合约形式, 需要指定上游想要投放的下游广告位, PDB(保价保量)/PD(报价不保量)</span><br><span class="line">	- 竞价形式, 需要为其分配支持其投放类型的下游订单/广告位/模板, 并按照需要开通下游</span><br><span class="line"> 为上游预算方做进一步支持, 如上传审核上游广告主, 开通下游广告主, 审核素材, 开通下游素材, 设定请求参数配置(URL/QPS)等</span><br><span class="line">(审核广告主一方面是为符合广告法要求, 避免虚假宣传, 一方面是筛选黑五类广告, 避免影响下游平台)</span><br><span class="line">(考虑大量广告素材数据的存储)</span><br><span class="line"></span><br><span class="line">3.有了上下游配置后, 就需要考虑下游流量请求ADX后, 如何分发的问题</span><br><span class="line">首先需要将广告预算分发至各匹配计价模式的下游广告位上.用于下游请求流量到来时做分发</span><br><span class="line">其次对合约形式广告流量, 需要在系统中生成订单数据, 记录订单ID, 投放时段, 下游目标, 投放价格等数据</span><br><span class="line">&gt; 上下游订单生成的先后问题</span><br><span class="line">(为避免转发请求中包含过多判断逻辑, 可以通过后台在缓存中维护分配目标集合, 不涉及数据库查询及交并计算)</span><br><span class="line">(一般要将adx响应时间尽量压缩, 分发流量后的响应也需要配置响应时间, 超时响应主动丢弃) 100-150ms</span><br><span class="line"></span><br><span class="line">ADX获取到下游流量请求后, 需要通过适配器, 依据来源将其转化为标准格式, 依据流量类型(合约/竞价), 转发至上游并记录请求日志</span><br><span class="line">- 合约. 获取合约上游配置,与其他关联上游一起, 发起竞价请求. 若合约目标返回填充, 使用填充内容响应下游;若合约目标响应无填充, 使用其他上游竞价优胜者填充响应下游</span><br><span class="line">- 竞价. 获取绑定上游配置, 发起竞价请求. 获取竞价优胜者填充, 响应下游</span><br><span class="line">(为加快响应时间, 上下游绑定关系及上下游信息应该记录在缓存中. 有数据变动时, 先更新数据库, 再更新缓存)</span><br><span class="line"></span><br><span class="line">4.向优胜者发送竞胜通知并记录日志</span><br><span class="line"></span><br><span class="line">5.分发完成后, 需要考虑报表统计计算问题, 为上游生成多种维度的报表数据</span><br><span class="line"></span><br><span class="line">6. 计费平台/充值管理的实时扣费问题</span><br><span class="line">(CPT/CPM多种结算方式, 反作弊, 余额撞线, 扣费摊销/对账)</span><br><span class="line"></span><br><span class="line">其他问题:</span><br><span class="line">流量均衡 - 如何保持流量请求按照设定QPS, 分发给上游平台</span><br><span class="line">资金策略 - 如何合理使用资金</span><br><span class="line">预警 </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">ADX报表关注指标</span><br><span class="line">针对DSP平台而言，主要关心的是广告效果指标，例如竞赢率、点击率、点击成本、激活成本等。</span><br><span class="line"> </span><br><span class="line">竞赢率 = 竞赢量/竞价量</span><br><span class="line">点击率 = 点击数/曝光数</span><br><span class="line">点击成本 = 广告消耗（花费）/点击数</span><br><span class="line">激活成本 = 广告消耗（花费）/激活数</span><br><span class="line">  </span><br><span class="line">针对SSP平台而言，主要关心广告的价值eCPM、广告填充率、广告点击率等。</span><br><span class="line"> </span><br><span class="line">eCPM：广告千次展示收入（预估值）</span><br><span class="line">广告填充率 = 广告返回量/广告请求量</span><br><span class="line">广告点击率 = 广告点击数/广告曝光数</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ADX基础功能:</span><br><span class="line"> - 转发流量的功能</span><br><span class="line"> - 报表API和数据分析可视化报表后台</span><br><span class="line"> - 按照基础维度筛选流量（buyer和seller的黑白名单，广告形式和广告尺寸，国家和地区，网络环境和OS）；</span><br><span class="line"> - 高级优化设置，比如TMAX和底价范围值请求的屏蔽（即不转发某个条件或维度的请求）；http和https（secure的屏蔽），porn content的屏蔽，IP和bundle mismatch的屏蔽。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ADX理解:</span><br><span class="line">中立的竞价平台 -&gt; 分发处理(管理/变现)流量(自有流量/外购流量)的平台</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">广告投放合同约定内容:</span><br><span class="line">发布概况: 内容, 形式, 素材, 发布地址/位置, 媒体规格, 数量</span><br><span class="line">款项/支付方式: 合统款项, 支付日期, 支付批次, 支付方式</span><br><span class="line">双方权利/义务: </span><br><span class="line">	广告主: 营业资质证明, 广告商品质量证明, 广告真实性证明, 代理委托证明, 广告素材</span><br><span class="line">	媒体: 广告发布资格证明, 维护发布设施正常运行, 提供发布数据</span><br><span class="line">违约责任:</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ADX逻辑架构图"><a href="#ADX逻辑架构图" class="headerlink" title="ADX逻辑架构图"></a>ADX逻辑架构图</h3><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3c5c3c6c21536db27bc1e04191c6cef7-5b04f08.png" alt="1684918647375"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">答疑:</span><br><span class="line">流量分配和订单管理之间的关系是什么, 是现有订单才去配置流量分发逻辑/还是先配置流量再有订单拆分添加流量分发</span><br><span class="line">没有关系, 流量分配只是关联了上游和下游之间的流量分发逻辑. 但还需要通过订单去判断该次流量分发是通过什么交易方式结算的.</span><br><span class="line">- 若下游流量请求包含dealId, 且该合约ID存在于订单系统中, 证明该次请求是使用PD/PDB模式的合约请求</span><br><span class="line">- 若下游流量dealId不存在, 则使用RTB方式竞价分发</span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2023/04/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/ADX%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/" title="ADX平台功能解析">https://ni9ne.github.io/2023/04/17/广告营销/ADX平台功能解析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/" rel="tag"># 广告营销</a>
+              <a href="/tags/%E4%B8%9A%E5%8A%A1/" rel="tag"># 业务</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/02/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/SSP%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/" rel="prev" title="SSP平台功能解析">
+                  <i class="fa fa-chevron-left"></i> SSP平台功能解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/04/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/ADX%E9%A1%B9%E7%9B%AE%E5%B9%B3%E5%8F%B0%E8%B0%83%E6%9F%A5/" rel="next" title="ADX项目平台调查">
+                  ADX项目平台调查 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

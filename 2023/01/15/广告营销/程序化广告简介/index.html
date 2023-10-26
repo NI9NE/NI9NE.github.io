@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="程序化广告简介平台DSP(Demand-Side Platform) 需求方平台, 沟通代理商和广告主, 为广告主服务的平台">
+<meta property="og:type" content="article">
+<meta property="og:title" content="程序化广告简介">
+<meta property="og:url" content="https://ni9ne.github.io/2023/01/15/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/%E7%A8%8B%E5%BA%8F%E5%8C%96%E5%B9%BF%E5%91%8A%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="程序化广告简介平台DSP(Demand-Side Platform) 需求方平台, 沟通代理商和广告主, 为广告主服务的平台">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eabc50f9da60490b42aa5a05a48d6bc4-e87ea49.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b1a211d2cf7efd418967101eda5ca853-44518c9.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b7c4c18b9b019696d7566b5ae44832de-b81ac5b.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b8abf45c00400c10b71b7f20f66c22e7-81470b0.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8d39c5bb9240926659274f2980ad5fd2-6754c6b.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/961be23f675ee902522d1512226033e6-b1c799f.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d3b50682e38d3e2b6aa3d61bc1ccf80c-ca9a3e8.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dbe58f5be8de8fb2ce4f43bfe2d3f360-5fee456.webp">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f35b82cad24216129ba20432a69c64c7-8f9bd46.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4e18436137ed6c5d5b4bf2ece5032bf5-a5995c4.webp">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d8b49541af2610de845f6e2af7a3f3c4-817ca76.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/81bf9c859e190dd545845458ab0a3164-afb0f30.png">
+<meta property="article:published_time" content="2023-01-15T13:25:14.000Z">
+<meta property="article:modified_time" content="2023-10-26T03:56:45.548Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="广告营销">
+<meta property="article:tag" content="业务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eabc50f9da60490b42aa5a05a48d6bc4-e87ea49.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2023/01/15/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/%E7%A8%8B%E5%BA%8F%E5%8C%96%E5%B9%BF%E5%91%8A%E7%AE%80%E4%BB%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2023/01/15/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/%E7%A8%8B%E5%BA%8F%E5%8C%96%E5%B9%BF%E5%91%8A%E7%AE%80%E4%BB%8B/","path":"2023/01/15/广告营销/程序化广告简介/","title":"程序化广告简介"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>程序化广告简介 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">54</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">7</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">112</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E5%8C%96%E5%B9%BF%E5%91%8A%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">程序化广告简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B3%E5%8F%B0"><span class="nav-number">1.1.</span> <span class="nav-text">平台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A4%E6%98%93%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">交易模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GD-%E5%90%88%E7%BA%A6%E5%B9%BF%E5%91%8A"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">GD 合约广告</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PDB-%E7%A8%8B%E5%BA%8F%E5%8C%96%E7%9B%B4%E6%8E%A5%E8%B4%AD%E4%B9%B0"><span class="nav-number">1.2.0.2.</span> <span class="nav-text">PDB 程序化直接购买</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PD-%E4%BC%98%E5%85%88%E4%BA%A4%E6%98%93"><span class="nav-number">1.2.0.3.</span> <span class="nav-text">PD 优先交易</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PMP-%E7%A7%81%E6%9C%89%E4%BA%A4%E6%98%93%E5%B8%82%E5%9C%BA"><span class="nav-number">1.2.0.4.</span> <span class="nav-text">PMP 私有交易市场</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RTB-%E5%AE%9E%E6%97%B6%E7%AB%9E%E4%BB%B7"><span class="nav-number">1.2.0.5.</span> <span class="nav-text">RTB 实时竞价</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RTA-%E5%AE%9E%E6%97%B6API"><span class="nav-number">1.2.0.6.</span> <span class="nav-text">RTA 实时API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PA-%E7%A7%81%E6%9C%89%E7%AB%9E%E4%BB%B7"><span class="nav-number">1.2.0.7.</span> <span class="nav-text">PA 私有竞价</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%B4%E9%83%A8%E7%AB%9E%E4%BB%B7-Header-Bidding"><span class="nav-number">1.2.0.8.</span> <span class="nav-text">头部竞价 Header Bidding</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%A4%E6%98%93%E6%A8%A1%E5%BC%8F%E5%9B%BE"><span class="nav-number">1.2.0.9.</span> <span class="nav-text">交易模式图</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E4%B8%8E%E8%80%85"><span class="nav-number">1.3.</span> <span class="nav-text">参与者</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E6%96%B9-%E5%B9%BF%E5%91%8A%E4%B8%BB%EF%BC%88Advertiser%EF%BC%89-%E4%BB%A3%E7%90%86%E5%95%86%EF%BC%88Agency%EF%BC%89"><span class="nav-number">1.3.0.1.</span> <span class="nav-text">需求方&#x2F;广告主（Advertiser）&#x2F;代理商（Agency）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E6%96%B9%E5%B9%B3%E5%8F%B0-DSP"><span class="nav-number">1.3.0.2.</span> <span class="nav-text">需求方平台(DSP)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%87%E8%B4%AD%E4%BA%A4%E6%98%93%E5%B9%B3%E5%8F%B0-TD"><span class="nav-number">1.3.0.3.</span> <span class="nav-text">采购交易平台(TD)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E4%BE%9B%E5%BA%94%E6%96%B9"><span class="nav-number">1.3.0.4.</span> <span class="nav-text">流量供应方</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E6%96%B9%E6%9C%8D%E5%8A%A1-SSP"><span class="nav-number">1.3.0.5.</span> <span class="nav-text">流量方服务(SSP)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%BF%E5%91%8A%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%EF%BC%88Ad-Serving%EF%BC%89"><span class="nav-number">1.3.0.6.</span> <span class="nav-text">广告服务与数据管理（Ad Serving）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E7%AE%97%E6%96%B9%E5%BC%8F"><span class="nav-number">1.4.</span> <span class="nav-text">结算方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%93%E7%AE%97%E6%A8%A1%E5%BC%8F%E5%AF%B9%E6%AF%94"><span class="nav-number">1.4.0.1.</span> <span class="nav-text">结算模式对比</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%95%E6%94%BE%E8%BD%AC%E5%8C%96%E5%8F%82%E6%95%B0"><span class="nav-number">1.5.</span> <span class="nav-text">投放转化参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%BF%E5%91%8A%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.6.</span> <span class="nav-text">广告类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">1.7.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RTB%E4%BA%A4%E6%98%93"><span class="nav-number">1.8.</span> <span class="nav-text">RTB交易</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDB%E4%BA%A4%E6%98%93"><span class="nav-number">1.9.</span> <span class="nav-text">PDB交易</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">1.10.</span> <span class="nav-text">参考资料:</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">112</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2023/01/15/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/%E7%A8%8B%E5%BA%8F%E5%8C%96%E5%B9%BF%E5%91%8A%E7%AE%80%E4%BB%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          程序化广告简介
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-01-15 21:25:14" itemprop="dateCreated datePublished" datetime="2023-01-15T21:25:14+08:00">2023-01-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%B8%9A%E5%8A%A1%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">业务笔记</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="程序化广告简介"><a href="#程序化广告简介" class="headerlink" title="程序化广告简介"></a>程序化广告简介</h1><h2 id="平台"><a href="#平台" class="headerlink" title="平台"></a>平台</h2><p><strong>DSP(Demand-Side Platform) 需求方平台</strong>, 沟通代理商和广告主, 为广告主服务的平台</p>
+<p><strong>SSP(Sell-Side Platform) 供应方平台</strong>, 媒体供应商提供流量的平台</p>
+<p><strong>ADX(advertising exchange) 广告交易平台</strong>, 联系DSP(买方平台)和SSP(卖方平台)</p>
+<p><strong>DMP(Date Management Platform) 数据管理平台</strong></p>
+<h2 id="交易模式"><a href="#交易模式" class="headerlink" title="交易模式"></a>交易模式</h2><h4 id="GD-合约广告"><a href="#GD-合约广告" class="headerlink" title="GD 合约广告"></a>GD 合约广告</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">（Guaranteed Delivery）广告主与媒体约定针对某种受众的展示量，按展示量定价。简单来说GD合约广告是一种以展示为主的推广模式，保证广告主的展示量。属于直投模式. </span><br></pre></td></tr></table></figure>
+
+<h4 id="PDB-程序化直接购买"><a href="#PDB-程序化直接购买" class="headerlink" title="PDB 程序化直接购买"></a>PDB 程序化直接购买</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">（Programmatic Direct Buying）保价保量. 品牌主事先与媒体确定好位置和价格后, 把适当的产品提供给适当的用户进行投放(需求方通过ADX筛选流量), 保障了投放效果。算是GD的一种.</span><br></pre></td></tr></table></figure>
+
+<h4 id="PD-优先交易"><a href="#PD-优先交易" class="headerlink" title="PD 优先交易"></a>PD 优先交易</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">（Preferred Deals）保价不保量. 预先谈好资源位价格, 不保证曝光量. 当用户访问媒体时，ADX将广告请求发送给需求方（广告主、DSP），需求方会根据用户标签进行选择是否向该用户展示自己的产品，如果该用户不符合产品定位，可以选择不投放，避免了因投放过多而造成的浪费。</span><br></pre></td></tr></table></figure>
+
+<h4 id="PMP-私有交易市场"><a href="#PMP-私有交易市场" class="headerlink" title="PMP 私有交易市场"></a>PMP 私有交易市场</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">（Private Market Place）私有交易市场，私有化购买, 买家有优先交易权. 意味着这里的资源位都是私有的，已经被品牌主预定的。相当于买断资源，无需再与其他品牌主共享同个资源位。品牌主可以自主管理所购买的资源位，当一个用户访问媒体时，品牌主可根据不同的用户去有针对性的选择投放自己不同的产品。</span><br></pre></td></tr></table></figure>
+
+<h4 id="RTB-实时竞价"><a href="#RTB-实时竞价" class="headerlink" title="RTB 实时竞价"></a>RTB 实时竞价</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">（Real Time Bidding）最早的程序化投放模式，采用了实时竞价的购买方式。当某用户访问到一个媒体网站时，各品牌主评估自己产品与该用户标签是否相符后进行竞价。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>公开竞价 广告主可以在公开交易市场进行实时竞价购买剩余流量</li>
+<li>私有竞价</li>
+</ul>
+<h4 id="RTA-实时API"><a href="#RTA-实时API" class="headerlink" title="RTA 实时API"></a>RTA 实时API</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(Real-Time API)  广告主不希望将自己的人群包上传到DMP平台, 希望既可以使用自己的数据及能力进行更精准的用户识别及实时流量筛选，同时又能利用DSP平台的优势(丰富的数据优势以及能力), 对每次请求，ADX都通过实时API询问广告主是否参竞，对于广告主选中的请求，再进行后续的广告优选及出价流程。</span><br></pre></td></tr></table></figure>
+
+<h4 id="PA-私有竞价"><a href="#PA-私有竞价" class="headerlink" title="PA 私有竞价"></a>PA 私有竞价</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(Private Auction) 指将较优质的固定广告位资源专门拿出来，放在一个半公开市场中，仅由进入白名单的买方进行竞价，价高者得。因此，广告位可以锁定，但采买价格和是否最终获得曝光都不能预先保证。</span><br></pre></td></tr></table></figure>
+
+<h4 id="头部竞价-Header-Bidding"><a href="#头部竞价-Header-Bidding" class="headerlink" title="头部竞价 Header Bidding"></a>头部竞价 Header Bidding</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">一套广告主与媒体流量方的对接协议，让每次的广告的请求优先请求支持Header Bidding的广告主或者DSP。</span><br><span class="line">媒体流量方获取广告返回之后，又用Header Bidding返回的广告的价格作为底价去请求DFP等其他广告联盟平台。</span><br><span class="line">若其他广告网络无高于此价格的广告返回，则曝光Header Bidding 的广告，若有返回高于此价格的广告，则曝光DFP等广告联盟的广告。</span><br><span class="line">意味着支持Header Bidding的广告主有优先选择流量,优先出价的权利</span><br><span class="line">广告主绕过交易平台, 通过在媒体网站/APP插入JS SDK直接展示广告. 媒体加载时优先请求广告主获取物料, 其余流量才会进入广告交易平台. 安全性上有一定风险</span><br><span class="line">与RTB类似, 需要携带eCPM价格参加竞价. 核心思想就是提高流量填充率和更高的广告价值.</span><br><span class="line">但在广告相关链路中, 基于SDK, 控制能力比RTB高.(曝光/点击/落地页加载/转化)</span><br><span class="line">产品定位方面, 相对于RTB面向头部中大体量广告主, OpenBidding对中小流量媒体更加友好</span><br><span class="line">主被动方面, 相比于RTB的媒体主动+广告主被动, OpenBidding要求媒体配合逻辑调整, 广告数据上报</span><br></pre></td></tr></table></figure>
+
+<h4 id="交易模式图"><a href="#交易模式图" class="headerlink" title="交易模式图"></a>交易模式图</h4><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/eabc50f9da60490b42aa5a05a48d6bc4-e87ea49.png" alt="1667555492756"></p>
+<h2 id="参与者"><a href="#参与者" class="headerlink" title="参与者"></a>参与者</h2><h4 id="需求方-广告主（Advertiser）-代理商（Agency）"><a href="#需求方-广告主（Advertiser）-代理商（Agency）" class="headerlink" title="需求方/广告主（Advertiser）/代理商（Agency）"></a>需求方/广告主（Advertiser）/代理商（Agency）</h4><ul>
+<li><strong>效果类需求方</strong> 的广告投放需求以提升直接转化效果为主，并附带额外的品牌宣传。</li>
+<li><strong>品牌类需求方</strong> 注重品牌价值观的传递，通过品牌占领用户心智，投放渠道有品牌宣传片、综合节目等。</li>
+</ul>
+<h4 id="需求方平台-DSP"><a href="#需求方平台-DSP" class="headerlink" title="需求方平台(DSP)"></a>需求方平台(DSP)</h4><p>DSP为需求方（即广告主或代理商）提供实时竞价投放平台。需求方可以在平台上管理广告活动及其投放策略，包括设置目标受众的定向条件、预算、出价、创意等。DSP通过技术和算法自动优化投放效果并提供数据报告。</p>
+<ul>
+<li><p><strong>SaaS服务平台</strong></p>
+<p>需求方在供应商提供的平台上发布投放广告</p>
+</li>
+<li><p><strong>PaaS服务平台</strong></p>
+<p>需求方通过API调用供应商平台接口构建自己的广告投放产品</p>
+</li>
+<li><p><strong>IaaS服务</strong></p>
+<p>供应商提供基础设施搭建, 在需求方本地部署广告投放软件, 供需求方使用或二次开发</p>
+</li>
+</ul>
+<h4 id="采购交易平台-TD"><a href="#采购交易平台-TD" class="headerlink" title="采购交易平台(TD)"></a>采购交易平台(TD)</h4><p>TD为需求方提供整合多个DSP平台的技术解决方案，需求方可以在TD上统一管理多个DSP平台的投放，包括分配投放预算、制定和调整投放策略、查看数据报告等。TD平台的基础是通过API接口与DSP对接，广告主/代理可直接在TD上进行多平台的广告投放并获取相应的数据报告。</p>
+<ul>
+<li><p>代理商采购交易平台(ATD - Agency Trading Desk)</p>
+<p>4A代理公司服务多个品牌广告主的采购交易平台</p>
+</li>
+<li><p>独立采购交易平台(ITD - Independency Trading Desk)</p>
+<p>服务多家广告代理公司或者直客。部分ITD供应商是提供广告投放产品; 有些是纯提供广告技术服务，只收取技术服务费</p>
+</li>
+<li><p>品牌内部交易平台(BTD - Brand Trading Desk)</p>
+<p>由广告主自己搭建或由技术提供商搭建的仅供广告主内部使用的自有采购交易平台</p>
+</li>
+</ul>
+<h4 id="流量供应方"><a href="#流量供应方" class="headerlink" title="流量供应方"></a>流量供应方</h4><p>媒体网站, APP或广告网盟, 流量的拥有者</p>
+<h4 id="流量方服务-SSP"><a href="#流量方服务-SSP" class="headerlink" title="流量方服务(SSP)"></a>流量方服务(SSP)</h4><p>提供流量方服务的平台有两类，分别是供应方平台（Supply-Side Platform，简称SSP）和广告交易平台（Ad Exchange，简称AdX）。</p>
+<p>DSP通过API接口对接AdX或SSP，实时竞价购买其流量。</p>
+<ul>
+<li><p>第三方开放AdX/SSP</p>
+<p>通过聚合各类大中小媒体的流量进行变现，包括优质流量或者长尾流量资源。</p>
+<p>百度BES、阿里Tanx、腾讯TencentAdX、Google DoubleClick、360 MAX），以及其他交易平台如灵集AdX（原秒针AdX）</p>
+</li>
+<li><p>大型媒体私有AdX/SSP</p>
+<p>大型媒体搭建的私有广告交易平台，拥有自己的媒体流量，包括视频、门户、社交、工具类等。</p>
+<p>优酷AdX、爱奇艺AdX，网易AdX、新浪AdX等。</p>
+</li>
+</ul>
+<h4 id="广告服务与数据管理（Ad-Serving）"><a href="#广告服务与数据管理（Ad-Serving）" class="headerlink" title="广告服务与数据管理（Ad Serving）"></a>广告服务与数据管理（Ad Serving）</h4><p>数据管理则主要是为广告主提供数据收集、清洗及生成标签等服务，提升数据使用效率，并应用于优化投放效果。</p>
+<ul>
+<li><p><strong>程序化创意平台PCP（Programmatic Creative Platform，简称PCP）</strong></p>
+<p>生成创意, 优化创意的平台，是一种智能化内容生产技术</p>
+</li>
+<li><p><strong>广告验证平台AVP（Ad Verification Platform）</strong></p>
+<p>为品牌广告主服务，为其提供广告投放过程中的品牌安全（Brand Safety）、反作弊（Anti-Fraud）、可视度（Viewability）、无效流量验证（Invalid Traffic Verification）等保障，通过分析投放媒体的内容合法性、正面性，为品牌广告的投放提供和谐健康的媒体环境。其代表有Adbug、RTBAsia、Sizmek、IAS等。</p>
+</li>
+<li><p><strong>数据管理平台DMP（Data Management Platform，简称DMP）</strong></p>
+<p>能够为广告投放提供人群标签进行受众精准定向，并通过投放数据建立用户画像，进行人群标签的管理以及再投放。</p>
+</li>
+<li><p><strong>监测分析平台MAP（Measurement &amp; AnalyticsPlatform）</strong></p>
+<p>对广告投放数据进行同步监测，评估广告投放平台数据的真实性，验证投放的数据如展示量、点击量、受众属性等是否与第三方监测报告一致。</p>
+</li>
+<li><p><strong>标签管理系统或标签管理工具TMS (Tag Manager System)</strong></p>
+</li>
+<li><p><strong>客户数据平台CDP（CustomerDataPlatform）</strong></p>
+</li>
+</ul>
+<h2 id="结算方式"><a href="#结算方式" class="headerlink" title="结算方式"></a>结算方式</h2><p><strong>CPT(Cost Per Time)</strong> 按照时长来计算费用, 广告主以固定价格买断某一段时间的某个广告位的展示；</p>
+<p><strong>CPV (Cost Per View)</strong> 每次曝光展示费用;</p>
+<p><strong>CPM(Cost Per Mille/thousand impression)</strong> 每千次曝光展示费用;</p>
+<p><strong>CPC(Cost Per Click)</strong> 每次点击费用, 根据广告被点击次数收费；</p>
+<p><strong>CPA(Cost Per Action)</strong> 按投放实际效果计费的广告——问卷填写、app下载等</p>
+<ul>
+<li>CPI  (Cost Per Installed) 按安装付费</li>
+<li>CPD (Cost Per Download)  按下载付费</li>
+<li>CPL（Cost Per Lead)，每条数据收费, 引导注册,获取潜在客户</li>
+<li>CPR（Cost Per Response），每次回应收费</li>
+</ul>
+<p><strong>CPS(Cost Per Sales)</strong> 按商品实际销售的数量来计算费用——俗称广告返点</p>
+<p><strong>OCPM(Optimized CPM)</strong> 优化千次展示出价. 是在CPM的基础上，以优化为目标，将广告的预点击率和预转化率计入广告的考核目标. 供给方会承担点击率与点击价值预估的任务</p>
+<p><strong>OCPC(Optimized CPC)</strong> 优化点击出价, 是在CPC的基础上，以优化为目标，将广告的预点击率和预转化率计入广告的考核目标. 供给方会承担点击率与点击价值预估的任务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">广告系统实时出价(ECPM) = 设置的转化出价 * pCTR(预估点击率) * pCVR(预估转化比例) * β(调价因子)</span><br></pre></td></tr></table></figure>
+
+<h4 id="结算模式对比"><a href="#结算模式对比" class="headerlink" title="结算模式对比"></a>结算模式对比</h4><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b1a211d2cf7efd418967101eda5ca853-44518c9.png" alt="1667466133066"></p>
+<h2 id="投放转化参数"><a href="#投放转化参数" class="headerlink" title="投放转化参数"></a>投放转化参数</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">广告点击与广告展现的比率称为点击率（Click Through Rate, CTR），随后用户会跳转到广告主的落地页（landing page），落地页打开次数与点击次数的比例称为到达率。用户如果进一步完成下单等操作，则称为转化，转化次数与到达次数的比例称为转化率（Conversion Rate, CVR）。大多数广告产品中，可以通过计算优化的收入部分通常用千次展示期望收入（expected Cost per Mile, eCPM）来量化</span><br></pre></td></tr></table></figure>
+
+<p><strong>CLCKS</strong>：点击数；</p>
+<p><strong>CTR(Click Through Rate)</strong>: 点击通过率, 广告的实际点击次数除以广告的曝光数;</p>
+<p>**CONV(CONVERSION)**：转化成功数据；</p>
+<p><strong>CVR(Conversion Rate) = CR</strong>: 转化率，转化数除以点击数;</p>
+<p><strong>pCTR、pCVR (predict)</strong>: 预估点击率和预估转化率</p>
+<p>**eCPM(Expected/Effective Cost Per Mille)**：每一千次展示的期望广告费用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用于衡量广告变现效果的指标。eCPM是一个竞价值，根据广告主的获客需要调整出价，代表千次广告展示所需要的成本，eCPM越高，排名就越靠前，能获得更多曝光的机会；</span><br></pre></td></tr></table></figure>
+
+<p><strong>ROI(Return On Investment)</strong> : 投资回报率</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">是指企业通过投资某个产品、活动或项目,并在这个投资行为后获得的经济回报。即获得的收益和投入成本的比值。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>REV=REVENUE</strong>：收入（包括成本）</p>
+<p><strong>SPEND=COST</strong>：成本（支出广告费）</p>
+<p><strong>PROFIT</strong>：利润=收入R - 成本S</p>
+<p><strong>PV (Page View)</strong>:  页面访问量/点击量;</p>
+<p><strong>UV (Unique View)</strong>: 独立访客，一台设备24小时内访问多次记为1次;</p>
+<p><strong>ADPV (Advertisement Page View)</strong>: 载有广告的pageview流量</p>
+<p><strong>ADimp (ADimpression)</strong>: 单个广告的展示次数</p>
+<p><strong>RPS (Revenue Per Search)</strong>: 每搜索产生的收入，衡量搜索结果变现能力指标</p>
+<h2 id="广告类型"><a href="#广告类型" class="headerlink" title="广告类型"></a>广告类型</h2><p>开屏广告 - APP启动时展示信息, 支持图片, 视频等动静态内容</p>
+<p>信息流广告 - 资讯流中穿插广告内容, 广告即是内容</p>
+<p>搜索广告 - 搜索结果中展示广告内容, 支持定制和竞价</p>
+<p>首页弹窗广告 - 用户触发动作后, 弹出弹窗, 支持图片、视频等</p>
+<p>视频贴片广告 - 在视频开始, 暂停, 结束位置展示广告, 支持图片、视频等</p>
+<p>激励视频广告 - 用户主动观看的视频广告, 如小游戏道具需要观看广告获得等</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p><strong>GMV(Gross Merchandise Volume)</strong>: 广告主价值, 等于广告主的转化量 * 转化单价. 代表着广告真实转化的效果数据. 电商平台企业通常指代网站成交总金额.</p>
+<p><strong>GSP(Generalized Second Pricing)</strong>: 广义第二高价策略. 竞价时用的是最高的价格，对竞价成功的广告主收费的时候收第二出价人的钱。</p>
+<p><strong>双出价</strong>(深度转化出价): 广告主同时设置目标转化出价和付费用户（深度转化）出价</p>
+<p><strong>DAU（Daily Active User）</strong>: 日活跃用户数量</p>
+<p><strong>Default Ad</strong> : 默认广告/打底广告, 用于确保广告的100%填充率</p>
+<p><strong>Floor Price</strong>: 底价, 竞拍价必须高于底价才能参与竞拍</p>
+<p><strong>IAB(Interactive Advertising Bureau)</strong> : 美国广告互动局, 开发行业标准, 发布报告, 商业组织</p>
+<p><strong>二类电商</strong>: 货到付款型的单品推广形式的电商形式</p>
+<p><strong>跳出率(Bounce Rate)</strong>: 只浏览了落地页入口就离开的访问量占比</p>
+<p><strong>广告可视度(Viewability)</strong>: 广告物料曝光的标准</p>
+<p><strong>频次(Frequency)</strong>: 单个UV广告曝光的频率控制</p>
+<p><strong>TA浓度 (TA  Target Audience)</strong>: 目标受众的占比 </p>
+<p><strong>广告主发布广告逻辑</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b7c4c18b9b019696d7566b5ae44832de-b81ac5b.png" alt="1667469726724"></p>
+<p><strong>用户浏览广告分发逻辑</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/b8abf45c00400c10b71b7f20f66c22e7-81470b0.png" alt="1667469686554"></p>
+<p><strong>OCPM逻辑</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8d39c5bb9240926659274f2980ad5fd2-6754c6b.png" alt="1667458017408"></p>
+<p><strong>RTB流程</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/961be23f675ee902522d1512226033e6-b1c799f.png" alt="img"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- 竞价请求一般会携带的信息：时间、请求识别号、IP地址、网页URL、广告位识别号、广告位频次、广告位宽高、广告位类型、广告位底价、访客来源、媒体分类、UA信息、人群标签ID、操作系统、硬件信息、地区等。</span><br><span class="line">- 广告投放管理平台：广告主在广告投放管理平台设置投放时间、预算、地区定向、用户属性等投放策略。</span><br><span class="line">- 算法引擎：主要的决策部分，主要围绕投放需求、媒体质量、人群属性、创意内容、用户场景、市场环境（竞争激烈程度）细分不同维度，并通过不断升维和降维进行自动调优。</span><br><span class="line">- 竞价过滤：根据广告主设置的投放条件和KPI要求以及流量质量等进行过滤。另外，有反作弊能力的还会对作弊流量进行过滤。</span><br></pre></td></tr></table></figure>
+
+<p><strong>RTA简介</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d3b50682e38d3e2b6aa3d61bc1ccf80c-ca9a3e8.png" alt="1667362622967"></p>
+<p><strong>交易方式</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/dbe58f5be8de8fb2ce4f43bfe2d3f360-5fee456.webp" alt="img"></p>
+<p>参与者</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/f35b82cad24216129ba20432a69c64c7-8f9bd46.png" alt="程序化广告（1）——程序化广告生态圈"></p>
+<p><strong>参与者分工</strong></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/4e18436137ed6c5d5b4bf2ece5032bf5-a5995c4.webp" alt="img"></p>
+<p>公司当前团队业务主要关注PDB,PD,RTB交易业务, 后续资料关注点偏向该领域</p>
+<p>品牌-PD, PDB  效果- RTB,PD</p>
+<h2 id="RTB交易"><a href="#RTB交易" class="headerlink" title="RTB交易"></a>RTB交易</h2><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/d8b49541af2610de845f6e2af7a3f3c4-817ca76.png" alt="1667550550240"></p>
+<h2 id="PDB交易"><a href="#PDB交易" class="headerlink" title="PDB交易"></a>PDB交易</h2><p>非实时竞价模式, 而是买卖双方协商好价格流量, 直接交易</p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/81bf9c859e190dd545845458ab0a3164-afb0f30.png" alt="1667553032362"></p>
+<p>流量分割策略+频次控制+预算控制+创意展示策略</p>
+<ul>
+<li>流量分割策略：PDB可以利用定向条件进行流量分割，针对不同流量制定不同的策略，推出相应的广告活动，设置一定的预算和频次控制，展示不同的创意。</li>
+<li>频次控制：在流量分割基础上建立的多个活动间，通过频次控制来合理调配活动流量。</li>
+<li>预算控制：通过在不同活动、不同创意甚至是不同品牌、同一品牌的不同产品系列间设置相应的预算，实现PDB订单流量的合理分配。</li>
+<li>创意展示策略：不同活动、不同产品系列通常会有不同创意，通过程序化方式，可以灵活控制多个创意间的轮播方式，并通过设置优先级和频次来控制创意展示的先后顺序以及出现次数。</li>
+</ul>
+<p>瀑布流(WaterFall)</p>
+<p>预先竞价(PreBid)</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料:"></a>参考资料:</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/453005998">RTB/RTA/GD/PD/DSP/DMP等——广告中的那些概念</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.dtmao.cc/ios/2891.html">广告计费方式CPC、CPT、CPM</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.opp2.com/206503.html">青瓜传媒百科</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/395018447">程序化广告</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/104228310">OCPM/OCPC核心知识点说明</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzA3OTA5ODIyNw==&mid=2651247739&idx=1&sn=29b057fb88d55f4f19381e8ea0c55408&chksm=844acc67b33d4571a660038c0bdf1dfd2b060933d3808aa7314eea0d7f817545ff1d3f10e370&scene=21#wechat_redirect">程序化广告生态实用手册</a></p>
+<p>巨量引擎 <a target="_blank" rel="noopener" href="https://www.oceanengine.com/">https://www.oceanengine.com/</a></p>
+<p>穿山甲联盟</p>
+<p>广点通, 优亮汇</p>
+<p>百度网盟</p>
+<p>4A公司: 奥美世纪, Accuen , 安吉斯</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2023/01/15/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/%E7%A8%8B%E5%BA%8F%E5%8C%96%E5%B9%BF%E5%91%8A%E7%AE%80%E4%BB%8B/" title="程序化广告简介">https://ni9ne.github.io/2023/01/15/广告营销/程序化广告简介/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/" rel="tag"># 广告营销</a>
+              <a href="/tags/%E4%B8%9A%E5%8A%A1/" rel="tag"># 业务</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/11/22/%E6%A1%86%E6%9E%B6/Laravel/Laravel%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-%E5%85%B6%E4%BB%96/" rel="prev" title="Laravel最佳实践-其他">
+                  <i class="fa fa-chevron-left"></i> Laravel最佳实践-其他
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/02/11/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/SSP%E9%A1%B9%E7%9B%AE%E5%B9%B3%E5%8F%B0%E8%B0%83%E6%9F%A5/" rel="next" title="SSP项目平台调查">
+                  SSP项目平台调查 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

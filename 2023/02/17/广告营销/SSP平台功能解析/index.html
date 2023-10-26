@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ni9ne.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="ssp运行流程12345678910111213141.媒体接入- 确定接入应用及广告位详细信息- 确定媒体接入需求, 如广告过滤条件, 拒绝某类或某些域名广告接入2.运营配置- 上传媒体应用&#x2F;广告位信息到ssp平台- 审核上传数据内容- 第三方(adx&#x2F;dsp)备案媒体广告位信息并同步结果到ssp平台- 绑定上游广告需求到代码位, 分配流量及权重3.程序化逻辑- 媒体用户流量到达, 媒体携带广告">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSP平台功能解析">
+<meta property="og:url" content="https://ni9ne.github.io/2023/02/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/SSP%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="NI9NE&#39;s Zone">
+<meta property="og:description" content="ssp运行流程12345678910111213141.媒体接入- 确定接入应用及广告位详细信息- 确定媒体接入需求, 如广告过滤条件, 拒绝某类或某些域名广告接入2.运营配置- 上传媒体应用&#x2F;广告位信息到ssp平台- 审核上传数据内容- 第三方(adx&#x2F;dsp)备案媒体广告位信息并同步结果到ssp平台- 绑定上游广告需求到代码位, 分配流量及权重3.程序化逻辑- 媒体用户流量到达, 媒体携带广告">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e7309c3e5edca95e6b7f4c7bae419e0a-c419a47.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8eae98467887116dd247a45dd7c07f58-4b42303.png">
+<meta property="og:image" content="https://image.woshipm.com/wp-files/2022/04/csGgoG4ZlmX0ce382wWz.png">
+<meta property="og:image" content="https://image.woshipm.com/wp-files/2022/04/noDdyAyEXTHPekLO2n3z.png">
+<meta property="og:image" content="https://image.woshipm.com/wp-files/2022/04/puZI3YBf2Z2ddB2BFLPx.png">
+<meta property="og:image" content="https://image.woshipm.com/wp-files/2022/04/R6vaKH8T3cIRlxzAqfhz.png">
+<meta property="og:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3b8bf3faa3c3b0a26186cf17bbf62b29-38340ae.png">
+<meta property="article:published_time" content="2023-02-17T02:15:22.000Z">
+<meta property="article:modified_time" content="2023-10-26T04:08:03.945Z">
+<meta property="article:author" content="NI9NE">
+<meta property="article:tag" content="广告营销">
+<meta property="article:tag" content="业务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e7309c3e5edca95e6b7f4c7bae419e0a-c419a47.png">
+
+
+<link rel="canonical" href="https://ni9ne.github.io/2023/02/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/SSP%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ni9ne.github.io/2023/02/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/SSP%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/","path":"2023/02/17/广告营销/SSP平台功能解析/","title":"SSP平台功能解析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SSP平台功能解析 | NI9NE's Zone</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">NI9NE's Zone</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">54</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">7</span></a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">112</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ssp%E8%BF%90%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">ssp运行流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B3%E5%8F%B0%E6%A8%A1%E5%9D%97%E9%A2%84%E6%B5%8B"><span class="nav-number">2.</span> <span class="nav-text">平台模块预测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">流量请求处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.</span> <span class="nav-text">系统模块设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%90%A5-%E5%AA%92%E4%BD%93%E7%AB%AF"><span class="nav-number">4.1.</span> <span class="nav-text">运营&#x2F;媒体端</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AA%92%E4%BD%93%E6%8E%A5%E5%85%A5%E7%9B%B8%E5%85%B3"><span class="nav-number">4.1.1.</span> <span class="nav-text">媒体接入相关:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AA%92%E4%BD%93%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F"><span class="nav-number">4.1.2.</span> <span class="nav-text">媒体管理系统:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8A%E6%B8%B8%E6%8A%A5%E5%A4%87%E7%B3%BB%E7%BB%9F"><span class="nav-number">4.1.3.</span> <span class="nav-text">上游报备系统:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E5%88%86%E9%85%8D%E7%AD%96%E7%95%A5%E5%88%B6%E5%AE%9A"><span class="nav-number">4.1.4.</span> <span class="nav-text">流量分配策略制定:</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E8%84%9A%E6%9C%AC"><span class="nav-number">4.2.</span> <span class="nav-text">同步脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%95%E6%93%8E"><span class="nav-number">4.3.</span> <span class="nav-text">引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E5%88%86%E5%8F%91"><span class="nav-number">4.3.1.</span> <span class="nav-text">流量分发:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%BF%E5%91%8A%E7%89%A9%E6%96%99%E4%B8%8B%E5%8F%91"><span class="nav-number">4.3.2.</span> <span class="nav-text">广告物料下发</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E6%97%A5%E5%BF%97%E8%AE%B0%E5%BD%95%E6%8E%A5%E5%8F%A3"><span class="nav-number">4.3.3.</span> <span class="nav-text">流量日志记录接口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E8%84%9A%E6%9C%AC"><span class="nav-number">4.4.</span> <span class="nav-text">统计脚本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E9%80%BB%E8%BE%91"><span class="nav-number">5.</span> <span class="nav-text">修改逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E6%AC%A1%E4%BF%AE%E6%94%B9%E9%80%BB%E8%BE%91"><span class="nav-number">6.</span> <span class="nav-text">二次修改逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="NI9NE"
+      src="/images/favicon/mstile-150x150.png">
+  <p class="site-author-name" itemprop="name">NI9NE</p>
+  <div class="site-description" itemprop="description">TECH OTAKU SAVE THE WORLD</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">112</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ni9ne" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/ni9ne" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;ni9ne" rel="noopener" target="_blank"><i class="fab fa-git fa-fw"></i>Gitee</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="https://unpkg.com/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://gitee.com/ni9ne" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ni9ne.github.io/2023/02/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/SSP%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/favicon/mstile-150x150.png">
+      <meta itemprop="name" content="NI9NE">
+      <meta itemprop="description" content="TECH OTAKU SAVE THE WORLD">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NI9NE's Zone">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSP平台功能解析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-02-17 10:15:22" itemprop="dateCreated datePublished" datetime="2023-02-17T10:15:22+08:00">2023-02-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%B8%9A%E5%8A%A1%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">业务笔记</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="ssp运行流程"><a href="#ssp运行流程" class="headerlink" title="ssp运行流程"></a>ssp运行流程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1.媒体接入</span><br><span class="line">- 确定接入应用及广告位详细信息</span><br><span class="line">- 确定媒体接入需求, 如广告过滤条件, 拒绝某类或某些域名广告接入</span><br><span class="line">2.运营配置</span><br><span class="line">- 上传媒体应用/广告位信息到ssp平台</span><br><span class="line">- 审核上传数据内容</span><br><span class="line">- 第三方(adx/dsp)备案媒体广告位信息并同步结果到ssp平台</span><br><span class="line">- 绑定上游广告需求到代码位, 分配流量及权重</span><br><span class="line">3.程序化逻辑</span><br><span class="line">- 媒体用户流量到达, 媒体携带广告位标识、当前用户参数及上下文信息请求广告物料</span><br><span class="line">- ssp平台优先检查是否当前曝光广告位是否存在程序化直接购买计划(PDB)</span><br><span class="line">	- 存在, 携带参数请求对应DSP获取广告物料</span><br><span class="line">	- 不存在, 进入交易市场, 携带参数请求ADX发起RTB竞价, 获取竞价胜利平台的广告物料</span><br><span class="line">- 完成广告下发, 并收集记录本次流量处理结果, 供统计报表使用.</span><br></pre></td></tr></table></figure>
+
+<p>补充修改: </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- ssp平台不参与竞价, 仅负责服务于媒体,链接需求方,报备媒体广告位并转发请求下发物料</span><br><span class="line">- 大媒体一般不接ssp平台, 他们有自己的平台和规范, 接也是大媒体引入站外流量(采买我们的流量当上游,而不是出售流量当下游)</span><br><span class="line">- 确定技术参数如广告位标识,当前用户,上下文等, 需要按照技术文档下发媒体</span><br><span class="line">- 广告主通过PDB方式投放广告, 一般不会直接对接媒体(太多).</span><br><span class="line">- 物料审核一般由广告平台去做, 大媒体也会做, 包括素材/资质/行业等, 广告主/代理将广告物料上传平台, 平台通过DSP/ADX/SSP进行审核, 确保媒体/平台的利益不受损伤</span><br></pre></td></tr></table></figure>
+
+<p>下一步应该基于当前了解的业务流程, 基于当前已有后台, 设计其他缺失模块, 完整系统架构. </p>
+<p>(但还不到具体设计表/sql的阶段.)</p>
+<h2 id="平台模块预测"><a href="#平台模块预测" class="headerlink" title="平台模块预测"></a>平台模块预测</h2><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/e7309c3e5edca95e6b7f4c7bae419e0a-c419a47.png" alt="1670581925747"></p>
+<h2 id="流量请求处理"><a href="#流量请求处理" class="headerlink" title="流量请求处理"></a>流量请求处理</h2><p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/8eae98467887116dd247a45dd7c07f58-4b42303.png" alt="1670582200992"></p>
+<h2 id="系统模块设计"><a href="#系统模块设计" class="headerlink" title="系统模块设计"></a>系统模块设计</h2><h3 id="运营-媒体端"><a href="#运营-媒体端" class="headerlink" title="运营/媒体端"></a>运营/媒体端</h3><h4 id="媒体接入相关"><a href="#媒体接入相关" class="headerlink" title="媒体接入相关:"></a><strong>媒体接入相关</strong>:</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">提供平台SDK/API及相关文档, 方便媒体快速接入ssp平台, 包含以下功能:</span><br><span class="line">- 流量上报, 广告获取接口, 提供当前流量所属用户信息/请求广告位ID/上下文信息</span><br><span class="line">- 事件触发, 流量效果(曝光/点击)上报接口</span><br></pre></td></tr></table></figure>
+
+<h4 id="媒体管理系统"><a href="#媒体管理系统" class="headerlink" title="媒体管理系统:"></a>媒体管理系统:</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 数据包: </span></span><br><span class="line">data = [ <span class="string">&quot;媒体&quot;</span> =&gt; [ <span class="string">&quot;应用&quot;</span> =&gt; [ <span class="string">&quot;广告位&quot;</span> =&gt; [] ] ] ]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">主要用于运营人员/媒体方填写媒体基础信息, 如媒体,应用,广告位报备等, 应包含以下功能模块:</span><br><span class="line"></span><br><span class="line">媒体账号创建:</span><br><span class="line"> - 用于运营人员/媒体填写[媒体账号]基础信息,如账号,密码, 审核状态等, 生成媒体ID及媒体标识码, 用于后续创建应用/广告位及请求ssp接口. 数据存入运营/媒体端数据库</span><br><span class="line"> </span><br><span class="line">媒体应用/广告位管理:</span><br><span class="line"> - 基于媒体ID, 生成填写[媒体应用]数据, 用于区分 应用所属行业、操作系统及包名.数据存入运营/媒体端数据库</span><br><span class="line"> - 基于媒体ID和应用ID, 生成填写[媒体广告位]数据,用于区分该广告位的位置,支持广告类型及尺寸, 附带开关功能.数据存入运营/媒体端数据库, 审核通过后通过同步脚本同步至缓存中,等待引擎取用</span><br><span class="line"> </span><br><span class="line">权限系统/登录系统(非必须):</span><br><span class="line"> - 媒体用户登录,可以新增/编辑/删除/开关应用和广告位, 查看本媒体对应报表数据(也可由运营代操作/导出数据)</span><br><span class="line"> </span><br><span class="line">报表查看系统:</span><br><span class="line"> - 主要用于运营/媒体方查看广告分发结果, 应该包含以下功能:</span><br><span class="line"> - 查看各媒体应用下代码位请求/下发/曝光/点击的统计数量, 及各个参数所占比例. 数据从统计脚本导出结果集中获取</span><br></pre></td></tr></table></figure>
+
+<h4 id="上游报备系统"><a href="#上游报备系统" class="headerlink" title="上游报备系统:"></a>上游报备系统:</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">主要用于运营人员将媒体广告位报备至第三方平台,并录入报备信息到本ssp平台, 应包含如下功能模块:</span><br><span class="line"></span><br><span class="line">上游平台管理:</span><br><span class="line"> - 需要报备的平台清单, 用于关联 报备第三方应用/代码位信息. 数据存入运营/媒体端数据库</span><br><span class="line"> </span><br><span class="line">上游平台代码位报备:</span><br><span class="line"> - 基于第三方平台ID, 向上游平台上传报备媒体广告位信息, 获取第三方应用ID/代码位ID并录入报备基础信息</span><br><span class="line"> - 向ADX报备媒体广告位信息, 获取平台代码位ID/应用ID, 并录入/导入ADX报备信息到本ssp平台</span><br><span class="line"> - 以上数据存入运营/媒体端数据库, 录入后通过缓存同步脚本同步至缓存中,等待引擎取用</span><br></pre></td></tr></table></figure>
+
+<h4 id="流量分配策略制定"><a href="#流量分配策略制定" class="headerlink" title="流量分配策略制定:"></a>流量分配策略制定:</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">主要用于运营人员根据 现有媒体下游广告位, 当前流量 及 需求方需求, 绑定上下游, 配置流量分配策略</span><br><span class="line"></span><br><span class="line">广告位上下游绑定:</span><br><span class="line"> - 依据当前需求为广告位绑定上游需求方, 关联媒体广告位与需求方. 数据存入运营/媒体端数据库, 录入后通过缓存同步脚本同步至缓存中,等待引擎在流量分配时取用</span><br><span class="line"> </span><br><span class="line">(绑定逻辑: 存在绑定关系的,当流量进入时, 直接请求获取对应已绑定【第三方代码位】需求方物料. 未绑定的,依据【ADX广告位信息】进行RTB竞价) </span><br></pre></td></tr></table></figure>
+
+<h3 id="同步脚本"><a href="#同步脚本" class="headerlink" title="同步脚本"></a>同步脚本</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">依据引擎需要数据 以及 运营/媒体端的配置数据, 同步基础信息及配置信息到缓存系统中, </span><br><span class="line">方便引擎在分发流量时取用, 以提高引擎运行效率及响应速度</span><br><span class="line">应包含以下同步脚本:</span><br><span class="line"></span><br><span class="line">- 广告位基础信息同步脚本. 用于流量请求时广告位的信息获取及尺寸的确定</span><br><span class="line">- 第三方报备信息同步脚本. 用于采购/竞价时请求第三方接口时携带参数</span><br><span class="line">- 上下游绑定信息同步脚本. 用于引擎流量确定本次流量的分发方案</span><br><span class="line"></span><br><span class="line">方案:</span><br><span class="line"> 独立脚本调度路由, 对外提供API/内部调用队列消费者, 通过请求参数执行对应脚本/ 读取队列数据消费处理. 与运营端共享数据库, 读取配置数据, 链接缓存系统, 将数据存入缓存. </span><br><span class="line"> 触发式脚本还是定时脚本</span><br></pre></td></tr></table></figure>
+
+<h3 id="引擎"><a href="#引擎" class="headerlink" title="引擎"></a>引擎</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">引擎, 不服务于媒体/运营/需求方, 而是做程序化对接, 需要提供足够快的响应速度,且需要支持大流量并发, 所以需要用到的数据最好从缓存系统中获取,</span><br></pre></td></tr></table></figure>
+
+<h4 id="流量分发"><a href="#流量分发" class="headerlink" title="流量分发:"></a>流量分发:</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">依据运营端配置, 将媒体流量按照配置信息进行分发, 进行PDB采购执行/RTB竞价, 获取广告物料. 需要具备以下功能:</span><br><span class="line"></span><br><span class="line">1.媒体流量请求接收接口. 当媒体携带用户参数发起物料请求时,需要:</span><br><span class="line"> - 请求参数校验, 参数格式是否符合接口规定格式, 必填/格式/参数范围 等</span><br><span class="line"> - 查询缓存系统, 依据请求中携带的媒体代码位ID获取该代码位基础信息. 从而判断请求流量是否属于本ssp平台已备案广告位(媒体鉴权/广告位存在鉴定)</span><br><span class="line"> </span><br><span class="line">2.依据携带广告位ID, 查询缓存中的流量分配策略, 当前广告位是否绑定[第三方代码位]</span><br><span class="line"> - 存在绑定上游, 按配置权重转发当前流量到需求方(解析流量参数,转化为需求方参数)</span><br><span class="line"> - 不存在绑定关系, 获取当前广告位在ADX中的备案信息, 转发给ADX参与RTB竞价</span><br><span class="line"> - 转发请求时需要做接口超时控制. </span><br><span class="line"> </span><br><span class="line">3.生成本次请求分发结果,记录日志</span><br><span class="line"> - 日志记录可以通过推送到队列的方式写入数据库</span><br></pre></td></tr></table></figure>
+
+<h4 id="广告物料下发"><a href="#广告物料下发" class="headerlink" title="广告物料下发"></a>广告物料下发</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- 从接口返回获取流量分发结果, 解析内容, 匹配当前广告位配置信息(物料种类/物料尺寸),下发物料到该广告位</span><br><span class="line">- 记录物料下发结果到日志中</span><br></pre></td></tr></table></figure>
+
+<h4 id="流量日志记录接口"><a href="#流量日志记录接口" class="headerlink" title="流量日志记录接口"></a>流量日志记录接口</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">同流量分发系统类似, 该接口虽然不关注响应时间, 但需要考虑大流量并发请求, 不推荐直接链接到mysql中写入数据.</span><br><span class="line"></span><br><span class="line">- 提供给媒体, 由SDK/API发起, 推送广告展现/点击动作记录. 依据流量ID关联到日志中</span><br><span class="line">- 提供给需求方, 需求方回传转化数据, 推送用户落地页操作记录.  依据流量ID关联到日志中 </span><br></pre></td></tr></table></figure>
+
+<h3 id="统计脚本"><a href="#统计脚本" class="headerlink" title="统计脚本"></a>统计脚本</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">引擎日志记录日志(流量请求广告物料及结果)后, 通过统计脚本获取统计结果, 以广告位(媒体端/上游)为颗粒度, 生成记录, 推送到运营/媒体端数据库, 供报表系统使用</span><br><span class="line"></span><br><span class="line">- 统计参数包括请求量, 展现量, 点击量, 下发量及相应比例等数据</span><br><span class="line">- 筛选条件包括媒体, 广告位, 操作系统类型, 地域, 时间等</span><br><span class="line"></span><br><span class="line">- 日志信息存储在文件日志系统中后, 定时脚本按照时间分段获取请求量/展现量/下发数/点击数等数据</span><br><span class="line">- 若存在大量请求, 可以在接收时将日志信息推入队列, 多消费者分时段处理, 提供报表系统需要的基础信息</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改逻辑"><a href="#修改逻辑" class="headerlink" title="修改逻辑"></a>修改逻辑</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- 比起基础的技术实现细节, 应该多关注功能层面的数据流动方向, 及对应的数据逻辑闭环. </span><br><span class="line">- 需要考虑到运营数据与引擎数据不同库, 配置 相关数据同步到缓存 的脚本</span><br><span class="line">- 报表需要支持哪些功能, 数据从哪里获取, 如何存储, 如何展现, 如何统计</span><br></pre></td></tr></table></figure>
+
+<h2 id="二次修改逻辑"><a href="#二次修改逻辑" class="headerlink" title="二次修改逻辑"></a>二次修改逻辑</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">- 系统总架构包括 运营端/引擎/同步脚本/统计脚本(报表/反作弊)</span><br><span class="line">- 一方面需要将整体数据流向画出来, 另一方面要将一次流量处理的逻辑整理清楚</span><br><span class="line">- 讲解ssp平台时, 首先需要介绍整体包含的模块, 模块功能, 在数据处理过程中扮演的角色. 然后再介绍每个模块的具体功能,数据操作流程, 数据获取方式, 数据去向等内容</span><br><span class="line"></span><br><span class="line">- 理清各项功能需要操作哪些数据, 如此操作的原因, 以及操作过程中需要注意的事项,边界. 如性能,效率,限制条件等</span><br><span class="line"></span><br><span class="line">- 理清系统架构逻辑, 可以帮助更好的理解需求, 判断需求, 选择最优实现方式. 以及从性价比方面过滤非必要需求</span><br><span class="line">- 理清系统架构, 可以帮助处理需求时, 知道需要同步变动的功能/代码, 以及改动带来的系统变化影响</span><br><span class="line">- 不能仅关注功能是否完成, 而不考虑可用性和使用性能</span><br><span class="line"></span><br><span class="line">- 后续实际需求关注于后台模块中的数据变动</span><br><span class="line"></span><br><span class="line">示例需求:</span><br><span class="line"> - 统计各广告位一定时段内的UV数据</span><br><span class="line"> 实现过程中若5min统计一次, 合并所有该时段数据, 那么就会存在一个用户多次点击的重复数据出现,不符合要求</span><br><span class="line"> [</span><br><span class="line">   按广告位ID, 每天创建一个hyperloglog, 即 pfadd [ad_index_date] user1</span><br><span class="line">   每次访问均添加到该数据中 pfadd [ad_index_date] userx.</span><br><span class="line">   获取访问UV结果, 可以通过 pfcount [ad_index_date]</span><br><span class="line"> ]</span><br><span class="line"> </span><br><span class="line">- 需求方如何了解广告的 分发次数/展现次数/点击率 数据呢?</span><br><span class="line">直接对接? 需求方不直接和下游媒体对接的</span><br><span class="line">ssp出报表? 需求方表示怀疑ssp报表的真实性</span><br><span class="line">那就是第三方监测机构(adv)/上游自己做监测:</span><br><span class="line"> - 第三方监测机构/上游需求方 针对当前物料生成监测代码(曝光/点击)</span><br><span class="line"> - 需求方下发物料时, 包含上述生成的监测代码, 与物料同时部署在媒体上</span><br><span class="line"> - 监测代码判断触发曝光/点击时, 发送请求推送事件给第三方监测机构/需求方</span><br><span class="line"> - 第三方监测机构定时出具报告/需求方自己生成广告效果及报表数据</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><img src="https://image.woshipm.com/wp-files/2022/04/csGgoG4ZlmX0ce382wWz.png" alt="img2"></p>
+<p><img src="https://image.woshipm.com/wp-files/2022/04/noDdyAyEXTHPekLO2n3z.png" alt="img"></p>
+<p><img src="https://image.woshipm.com/wp-files/2022/04/puZI3YBf2Z2ddB2BFLPx.png" alt="img"></p>
+<p><img src="https://image.woshipm.com/wp-files/2022/04/R6vaKH8T3cIRlxzAqfhz.png" alt="img"></p>
+<p><img src="https://ni9ne.oss-cn-shanghai.aliyuncs.com/mdimg/3b8bf3faa3c3b0a26186cf17bbf62b29-38340ae.png" alt="1670583910979"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">虚假流量越多, 导致实际转化成本越高, 广告结算费用越低, 收益下降, 正常ssp平台失去竞争力, 行业越发混乱, 广告主投放意愿降低. </span><br><span class="line">品牌广告主意愿为加强品牌知名度/凝聚力, 虚假广告影响度延后</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>NI9NE
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://ni9ne.github.io/2023/02/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/SSP%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/" title="SSP平台功能解析">https://ni9ne.github.io/2023/02/17/广告营销/SSP平台功能解析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/" rel="tag"># 广告营销</a>
+              <a href="/tags/%E4%B8%9A%E5%8A%A1/" rel="tag"># 业务</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/02/11/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/SSP%E9%A1%B9%E7%9B%AE%E5%B9%B3%E5%8F%B0%E8%B0%83%E6%9F%A5/" rel="prev" title="SSP项目平台调查">
+                  <i class="fa fa-chevron-left"></i> SSP项目平台调查
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/04/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/ADX%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/" rel="next" title="ADX平台功能解析">
+                  ADX平台功能解析 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NI9NE</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@next-theme/pjax@0.5.0/pjax.min.js" integrity="sha256-3NkoLDrmHLTYj7csHIZSr0MHAFTXth7Ua/DDt4MRUAg=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
