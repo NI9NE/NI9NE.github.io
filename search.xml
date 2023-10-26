@@ -48189,12 +48189,11 @@ https://pan.baidu.com/s/1wUBmiKi5NybkiuHtGwrQRg?pwd=dhje
     <url>/2023/04/17/%E5%B9%BF%E5%91%8A%E8%90%A5%E9%94%80/ADX%E5%B9%B3%E5%8F%B0%E5%8A%9F%E8%83%BD%E8%A7%A3%E6%9E%90/</url>
     <content><![CDATA[
 
-#ADX平台功能解析
+# ADX平台功能解析
 
 ### 新增下游对接
 
 ```
-
 1.下游管理->下游列表 新增该下游媒体		[t_downstream]
 为了录入下游基础信息, 关联上游订单/流量目标, 需要我们为可提供的广告位创建所属目标. 即下游渠道
 	录入信息: 
@@ -49735,6 +49734,177 @@ DSP通过API接口对接AdX或SSP，实时竞价购买其流量。
       <tags>
         <tag>广告营销</tag>
         <tag>业务</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx配置限流</title>
+    <url>/2023/04/21/Nginx/Nginx%E9%85%8D%E7%BD%AE%E9%99%90%E6%B5%81/</url>
+    <content><![CDATA[
+# Nginx配置限流
+
+使用Nginx自有模块, 配置实现限流操作
+
+# limit_req
+
+> 漏桶算法, 先进先出
+
+Nginx模块: **ngx_http_limit_req_module** 
+
+```nginx
+  http {
+    keepalive_timeout 75s;
+    sendfile        on; #当nginx代理的是静态文件服务的时候,打开这个会提升性能
+    tcp_nopush      on; #启用linux上的tcp_cork套接字选项,它只能配合sendfile一起使用
+    # 根据ip限制速率,zone=名称:(桶)大小,放不下会丢弃请求,rate=同IP 5次/s ,平均200ms/次
+    geo $limit {
+      default 1;
+      10.0.0.0/8 0;
+      192.168.0.0/24 0;
+  	}
+
+  	map $limit $limit_key {
+      0 "";
+      1 $binary_remote_addr;
+  	}
+  	# 以remote_addr为限制目标，加上binary是为了压缩内存占用空间
+  	# 分配一个以ratelimit为名的并且大小为30m的内存空间，用来存储访问的频次信息
+  	# 同一个IP每秒只允许15个请求通过。
+    limit_req_zone $binary_remote_addr zone=ratelimit:30m rate=15r/s;
+	server {
+		listen      80; #监听端口
+		server_name  my.domain.cn;  #域名
+		charset utf-8; #设置字符集
+		root   /opt/web/order/dist;  #vue项目路径
+		location / {
+			#burst是突发流量先不拒绝,单ip允许额外5个请求放入队列,nodelay降低突发流量排队,只要队列里有数据,就马上分配worker处理
+      		# 设置一个大小为5的缓冲区，超过频次限制的请求先放入这个缓冲区。
+      		# - delay   前delay个不延迟处理，burst-delay的请求延迟处理，超过burst的503. 
+      		# - nodelay/delay都不填，就按照rate，一个个处理，超过brust直接返回503.
+ 			limit_req zone=ratelimit burst=5 nodelay;
+    		limit_req_log_level error;
+			#当限制时,返回的状态码503 不可访问
+      		limit_req_status 503;
+ 			index  /index.html;
+			try_files $uri $uri/ /index.html;
+	    }
+	}
+  }
+
+```
+
+## 白名单
+
+```nginx
+# geo 指令可以根据 IP 创建变量 $limit。$limit 的默认值是1，如果匹配到了下面的 IP，则返回对应的值（这里返回的是0）。
+geo $limit {
+    default 1;
+    10.0.0.0/8 0;
+    192.168.0.0/24 0;
+}
+
+# map 指令，将 $limit 的值映射为 $limit_key：在白名单内的，$limit_key 为空字符串，不在白名单内的，则为 $binary_remote_addr。
+map $limit $limit_key {
+    0 "";
+    1 $binary_remote_addr;
+}
+
+# 当limit_req_zone指令的第一个参数是一个空字符串，限制不起作用，因此白名单的 IP 地址（在10.0.0.0/8和192.168.0.0/24子网中）没有被限制，其它 IP 地址都被限制为 2r/s。
+limit_req_zone $limit_key zone=mylimit:10m rate=2r/s;
+limit_req_zone $binary_remote_addr zone=myLimit2:10m rate=10r/s;
+server {
+    location ~* \.(html)$ {
+        limit_req zone=mylimit burst=5 nodelay;
+        limit_req zone=myLimit2 burst=5 nodelay;
+    }
+} 
+```
+
+
+
+## 实例
+
+```nginx
+
+limit_req_zone $binary_remote_addr zone=ratelimit:30m rate=5r/s;
+
+server {
+    listen       9728;
+    server_name  192.168.1.251;
+
+    root /home/norman/adx/flow_receive;
+    index index.php;
+
+    try_files $uri $uri/ @rewrite;
+
+    location @rewrite {
+         if ($request_filename ~* "\.(js|ico|gif|jpe?g|bmp|png|css)$") {
+                break;
+         }
+         rewrite ^/(.*)$ /index.php?_url=/$1;
+    }
+
+
+    location ~ \.php$ {
+        limit_req zone=ratelimit burst=5 nodelay;
+        limit_conn_status 503; 
+        root	     /home/norman/adx/flow_receive;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+    
+}
+```
+
+# limit_conn
+
+> 根据特定的key来限制连接的数量，需要注意的是并不是所有的连接都会被算入其中，只有当一个连接的整个请求头被读取并且已经被nginx服务器处理的时候才会算入限制中。
+
+```nginx
+
+
+# $binanry_remote_addr 和$remote_addr 一样 但是 减少空间
+limit_conn_zone $binanry_remote_addr zone=conn_zone:1m
+ 
+server{
+    location / {
+       # 同一时段 只有1个IP能访问
+       limit_conn conn_zone 1;
+    }
+}
+```
+
+
+
+# limit_rate
+
+> 限制用户和服务器之间传输的字节数，最常用的场景可能就是下载/上传限速。
+
+```nginx
+# 语法配置
+# Syntax: limit_rate_after size;
+# Default:    limit_rate_after 0;
+# Context:    http, server, location, if in location
+# This directive appeared in version 0.8.0.
+
+ # 示例
+ location /flv/ {
+     flv;
+     limit_rate_after 500k;
+     limit_rate       50k;
+ }
+# 后面跟随的rate就是具体限速的阈值，限速指令的生效范围是根据每个连接确定的，例如上面限定每个连接的速率为50k，也就是当客户端发起两个连接的时候，速率就可以变为100k
+```
+
+
+
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
       </tags>
   </entry>
 </search>
