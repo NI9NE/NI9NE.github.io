@@ -48193,6 +48193,8 @@ https://pan.baidu.com/s/1wUBmiKi5NybkiuHtGwrQRg?pwd=dhje
 
 ### 新增下游对接
 
+涉及模块
+
 ```
 1.下游管理->下游列表 新增该下游媒体		[t_downstream]
 为了录入下游基础信息, 关联上游订单/流量目标, 需要我们为可提供的广告位创建所属目标. 即下游渠道
@@ -48251,6 +48253,8 @@ https://pan.baidu.com/s/1wUBmiKi5NybkiuHtGwrQRg?pwd=dhje
 ```
 
 ### 新增上游对接
+
+涉及模块
 
 ```
 1. 上游平台管理->基本信息  新增上游信息		[t_dsp_members]
